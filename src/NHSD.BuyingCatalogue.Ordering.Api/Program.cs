@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api
 {
-    public class Program
+    public sealed class Program
     {
         public static void Main(string[] args)
         {

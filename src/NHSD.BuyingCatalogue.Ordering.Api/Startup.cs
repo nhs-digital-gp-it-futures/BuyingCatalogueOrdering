@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api
 {
-    public class Startup
+    public sealed class Startup
     {
         public Startup(IConfiguration configuration)
         {
