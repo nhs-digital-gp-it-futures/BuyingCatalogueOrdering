@@ -2,28 +2,9 @@ version: '3.5'
 
 services:
 
-  nhsd.buyingcatalogue.identity.api:
-    image: ${REGISTRY:-nhsd}/buying-catalogue/identity-isapi:${TAG:-latest}
-    container_name: identity_api
+  nhsd.buyingcatalogue.ordering.api:
+    image: ${REGISTRY:-nhsd}/buying-catalogue/ordering-isapi:${TAG:-latest}
+    container_name: ordering_api
     build: 
       context: .
-      dockerfile: src/NHSD.BuyingCatalogue.Identity.Api/Dockerfile
-
-  nhsd.buyingcatalogue.organisations.api:
-    image: ${REGISTRY:-nhsd}/buying-catalogue/organisations-api:${TAG:-latest}
-    container_name: organisations_api
-    build: 
-        context: .
-        dockerfile: src/NHSD.BuyingCatalogue.Organisations.Api/Dockerfile
-
-  nhsd.buyingcatalogue.identity.api.user.db:
-    image: ${REGISTRY:-nhsd}/buying-catalogue/identity-api-user-db:${TAG:-latest}
-    container_name: identity_api_user_db
-    build: 
-      context: src/NHSD.BuyingCatalogue.Identity.UserDatabase
-
-  nhsd.buyingcatalogue.email:
-    image: ${REGISTRY:-nhsd}/buying-catalogue/smtp-server:${TAG:-latest}
-    container_name: smtp_server
-    build: 
-      context: src/NHSD.BuyingCatalogue.Smtp
+      dockerfile: src/NHSD.BuyingCatalogue.Ordering.Api/Dockerfile
