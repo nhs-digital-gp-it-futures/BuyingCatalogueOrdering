@@ -15,7 +15,7 @@ services:
     networks:
       - nhsd_bcnetwork
     ports:
-      - "8070:80"
+      - "8076:80"
 
 networks: 
   nhsd_bcnetwork:
