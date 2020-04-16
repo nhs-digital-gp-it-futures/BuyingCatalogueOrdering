@@ -1,0 +1,10 @@
+version: '3.5'
+
+services:
+
+  nhsd.buyingcatalogue.ordering.api:
+    image: ${REGISTRY:-nhsd}/buying-catalogue/ordering-api:${TAG:-latest}
+    container_name: ordering_api
+    build: 
+      context: .
+      dockerfile: src/NHSD.BuyingCatalogue.Ordering.Api/Dockerfile
