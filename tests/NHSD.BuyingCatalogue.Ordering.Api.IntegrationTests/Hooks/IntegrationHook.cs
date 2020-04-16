@@ -20,13 +20,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
         }
 
         [BeforeScenario]
-        public async Task BeforeScenarioAsync()
+        public void BeforeScenarioAsync()
         {
             RegisterTestConfiguration();
-
-            RegisterCustomValueRetrievers();
-
-            await Task.CompletedTask;
+            
         }
 
         public void RegisterTestConfiguration()
@@ -37,14 +34,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
                 .Build();
 
             _objectContainer.RegisterInstanceAs<IConfiguration>(configurationBuilder);
-        }
-
-        private static void RegisterCustomValueRetrievers()
-        {
-            var valueRetrievers = Service.Instance.ValueRetrievers;
-
-            //valueRetrievers.Register(new NullStringValueRetriever());
-            //valueRetrievers.Register(new GenerateStringLengthValueRetriever());
         }
     }
 }
