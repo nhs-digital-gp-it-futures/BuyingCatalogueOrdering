@@ -7,6 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHSD.BuyingCatalogue.Orderi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2BC13686-75FE-43D6-A30D-3E39F5D688A9}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{2ADEB1FE-86F6-4F4A-9452-F8C3E82E1400}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose-build.yml = docker-compose-build.yml
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{152C5610-E85A-46DE-876D-3D372B198BE5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NHSD.BuyingCatalogue.Ordering.Api.UnitTests", "tests\NHSD.BuyingCatalogue.Ordering.Api.UnitTests\NHSD.BuyingCatalogue.Ordering.Api.UnitTests.csproj", "{35A62F97-B61C-4135-9A0C-6520C649C2E3}"
