@@ -23,7 +23,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
         public void BeforeScenarioAsync()
         {
             RegisterTestConfiguration();
-            
         }
 
         public void RegisterTestConfiguration()
