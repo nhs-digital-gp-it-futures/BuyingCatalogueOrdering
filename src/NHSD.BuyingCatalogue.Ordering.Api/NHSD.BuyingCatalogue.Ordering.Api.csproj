@@ -3,6 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>c8504945-701b-4e8b-ad21-52964bbcda7f</UserSecretsId>
+    <DockerfileContext>..\..</DockerfileContext>
+    <AssemblyName>NHSD.BuyingCatalogue.Ordering.Api</AssemblyName>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>
@@ -29,6 +31,10 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NHSD.BuyingCatalogue.Ordering.Common\NHSD.BuyingCatalogue.Ordering.Common.csproj" />
   </ItemGroup>
 
 </Project>
