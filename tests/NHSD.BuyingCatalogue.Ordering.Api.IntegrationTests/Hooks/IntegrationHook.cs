@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 using BoDi;
 using Microsoft.Extensions.Configuration;
 using TechTalk.SpecFlow;
-using TechTalk.SpecFlow.Assist;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
 {

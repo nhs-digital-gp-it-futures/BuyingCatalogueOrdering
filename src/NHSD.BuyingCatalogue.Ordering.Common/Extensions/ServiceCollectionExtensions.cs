@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
@@ -23,8 +21,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.Extensions
                     connectionString,
                     "SELECT 1;",
                     "db",
-                    //HealthStatus.Unhealthy,
-                    HealthStatus.Healthy,  // database not available yet hard coding response to healthy until it is implemented
+                    // TODO: database not available yet hard coding response to healthy until it is implemented
+                    HealthStatus.Healthy,  
                     new[] { HealthCheckTags.Ready },
                     TimeSpan.FromSeconds(10));
             return services;
