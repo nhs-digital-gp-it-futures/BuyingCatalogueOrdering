@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Infrastructure
 {
-    public class ObjectExtensions
+    public static  class ObjectExtensions
     {
+        public static T ThrowIfNull<T>(this T item, string name = "arg") where T : class
+            => item ?? throw new ArgumentNullException(name);
+
     }
 }

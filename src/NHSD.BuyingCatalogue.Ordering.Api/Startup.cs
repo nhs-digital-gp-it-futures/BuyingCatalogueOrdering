@@ -6,14 +6,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
+using Serilog;
+using LogHelper = NHSD.BuyingCatalogue.Ordering.Api.Infrastructure.LogHelper;
+
 
 namespace NHSD.BuyingCatalogue.Ordering.Api
 {
     public sealed class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IWebHostEnvironment _environment;
+
+        public Startup(IWebHostEnvironment environment, IConfiguration configuration)
         {
             Configuration = configuration;
+            _environment = environment;
         }
 
         public IConfiguration Configuration { get; }
@@ -26,10 +32,34 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             services.AddControllers();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
+            var pathBase = Configuration.GetValue<string>("pathBase");
+
+            if (string.IsNullOrWhiteSpace(pathBase))
+            {
+                ConfigureApp(app);
+            }
+            else
+            {
+                app.Map($"/{pathBase}", mappedApp =>
+                {
+                    ConfigureApp(mappedApp);
+                });
+            }
+        }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public  void ConfigureApp(IApplicationBuilder app)
+        {
+            app.UseSerilogRequestLogging(opts =>
+            {
+                opts.EnrichDiagnosticContext = LogHelper.EnrichFromRequest;
+                opts.GetLevel = LogHelper.ExcludeHealthChecks;
+            });
+
+
+            if (_environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
