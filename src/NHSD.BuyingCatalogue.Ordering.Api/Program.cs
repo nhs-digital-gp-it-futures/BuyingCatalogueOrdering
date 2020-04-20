@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
-using Serilog.Sinks.SystemConsole.Themes;
+using Serilog.Formatting.Compact;
 
 
 namespace NHSD.BuyingCatalogue.Ordering.Api
@@ -15,16 +15,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-                .MinimumLevel.Override("System", LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-                .MinimumLevel.Override("Microsoft.AspNetCore.Authentication", LogEventLevel.Information)
                 .Enrich.FromLogContext()
 
 #if DEBUG
                 .WriteTo.Debug()
+                .WriteTo.Console(new RenderedCompactJsonFormatter())
+#else
+                .WriteTo.Console(new CompactJsonFormatter())
 #endif
-
-                .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level}] {SourceContext}{NewLine}{Message:lj}{NewLine}{Exception}{NewLine}", theme: AnsiConsoleTheme.Literate)
                 .CreateLogger();
 
             try

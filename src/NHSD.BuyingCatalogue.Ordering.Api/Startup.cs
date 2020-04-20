@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NHSD.BuyingCatalogue.Ordering.Api.Logging;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
 using Serilog;
-using LogHelper = NHSD.BuyingCatalogue.Ordering.Api.Infrastructure.LogHelper;
 
 
 namespace NHSD.BuyingCatalogue.Ordering.Api
@@ -54,8 +54,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
         {
             app.UseSerilogRequestLogging(opts =>
             {
-                opts.EnrichDiagnosticContext = LogHelper.EnrichFromRequest;
-                opts.GetLevel = LogHelper.ExcludeHealthChecks;
+                opts.GetLevel = SerilogRequestLoggingOptions.GetLevel;
             });
 
 
@@ -82,7 +81,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 {
                     Predicate = healthCheckRegistration => healthCheckRegistration.Tags.Contains(HealthCheckTags.Ready)
                 });
-
             });
         }
     }

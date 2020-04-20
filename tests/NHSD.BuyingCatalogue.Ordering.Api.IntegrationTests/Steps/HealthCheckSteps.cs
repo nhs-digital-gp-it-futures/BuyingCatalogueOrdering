@@ -12,9 +12,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     {
         private readonly Response _response;
         private readonly ScenarioContext _context;
-        private readonly Utils.Settings _settings;
+        private readonly Settings _settings;
 
-        public HealthChecksSteps(Response response, ScenarioContext context, Utils.Settings settings)
+        public HealthChecksSteps(Response response, ScenarioContext context, Settings settings)
         {
             _response = response;
             _context = context;
