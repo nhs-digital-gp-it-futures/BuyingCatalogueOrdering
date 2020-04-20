@@ -1,4 +1,5 @@
 using System.Net.Http;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
@@ -31,8 +32,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
 
             services.RegisterHealthChecks(connectionString);
 
-            services.AddAuthentication(BearerToken)
-                .AddJwtBearer(BearerToken, options =>
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
                 {
                     options.Authority = authority;
                     options.RequireHttpsMetadata = requireHttps;
