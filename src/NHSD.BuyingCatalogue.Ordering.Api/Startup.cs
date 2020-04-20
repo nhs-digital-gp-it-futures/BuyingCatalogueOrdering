@@ -13,8 +13,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
 {
     public sealed class Startup
     {
-        private const string BearerToken = "Bearer";
-
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -50,6 +48,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 });
 
             services.AddControllers();
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(PolicyName.CanAccessOrders,
+                    policyBuilder =>
+                    {
+                        policyBuilder.RequireClaim(ApplicationClaimTypes.Ordering);
+                    });
+
+                options.AddPolicy(PolicyName.CanManageOrders,
+                    policyBuilder =>
+                    {
+                        policyBuilder.RequireClaim(ApplicationClaimTypes.Ordering, ApplicationPermissions.Manage);
+                    });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
