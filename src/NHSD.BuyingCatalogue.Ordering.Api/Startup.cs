@@ -1,3 +1,4 @@
+using System.Net.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
@@ -11,6 +12,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
 {
     public sealed class Startup
     {
+        private const string BearerToken = "Bearer";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -22,7 +25,29 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = Configuration.GetConnectionString("OrderingDb");
+            var authority = Configuration.GetValue<string>("authority");
+            var requireHttps = Configuration.GetValue<bool>("RequireHttps");
+            var allowInvalidCertificate = Configuration.GetValue<bool>("AllowInvalidCertificate");
+
             services.RegisterHealthChecks(connectionString);
+
+            services.AddAuthentication(BearerToken)
+                .AddJwtBearer(BearerToken, options =>
+                {
+                    options.Authority = authority;
+                    options.RequireHttpsMetadata = requireHttps;
+                    options.Audience = "Ordering";
+
+                    if (allowInvalidCertificate)
+                    {
+                        options.BackchannelHttpHandler = new HttpClientHandler
+                        {
+                            ServerCertificateCustomValidationCallback =
+                                HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                        };
+                    }
+                });
+
             services.AddControllers();
         }
 
