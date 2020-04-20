@@ -1,3 +1,5 @@
+using System.Net.Http;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
@@ -28,8 +30,45 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = Configuration.GetConnectionString("OrderingDb");
+            var authority = Configuration.GetValue<string>("authority");
+            var requireHttps = Configuration.GetValue<bool>("RequireHttps");
+            var allowInvalidCertificate = Configuration.GetValue<bool>("AllowInvalidCertificate");
+
             services.RegisterHealthChecks(connectionString);
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+                {
+                    options.Authority = authority;
+                    options.RequireHttpsMetadata = requireHttps;
+                    options.Audience = "Ordering";
+
+                    if (allowInvalidCertificate)
+                    {
+                        options.BackchannelHttpHandler = new HttpClientHandler
+                        {
+                            ServerCertificateCustomValidationCallback =
+                                HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                        };
+                    }
+                });
+
             services.AddControllers();
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(PolicyName.CanAccessOrders,
+                    policyBuilder =>
+                    {
+                        policyBuilder.RequireClaim(ApplicationClaimTypes.Ordering);
+                    });
+
+                options.AddPolicy(PolicyName.CanManageOrders,
+                    policyBuilder =>
+                    {
+                        policyBuilder.RequireClaim(ApplicationClaimTypes.Ordering, ApplicationPermissions.Manage);
+                    });
+            });
         }
 
         public void Configure(IApplicationBuilder app)
