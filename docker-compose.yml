@@ -1,5 +1,30 @@
 version: '3.5'
 services:
+  nhsd.buyingcatalogue.ordering.api.ordering.db:
+    image: ${REGISTRY:-nhsd}/buying-catalogue/ordering-api-ordering-db:${TAG:-latest}
+    build: 
+      context: src/NHSD.BuyingCatalogue.Ordering.OrderingDatabase
+    container_name: ordering_api_ordering_db
+    volumes:
+      - nhsd_ordering_db_volume:/var/opt/mssql/
+    networks:
+      - nhsd_bcnetwork
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=MyTestPassword123!
+      - MSSQL_PID=Express
+      - DB_NAME=${NHSD_LOCAL_DB_NAME:-CatalogueOrdering}
+      - NHSD_PASSWORD=DisruptTheMarket1!
+      - INSERT_TEST_DATA=True
+      - CREATE_EA_USER=True
+      - EA_USER_FIRST_NAME=Agency
+      - EA_USER_LAST_NAME=User
+      - EA_USER_EMAIL=user@agency.com
+      - EA_USER_PASSWORD_HASH=AQAAAAEAACcQAAAAEEOFkNNrFpKmDC2TBv2CP/dzxfnjdXk97RoqRlunE/CGs2tmFcewKZj4M/fITiP2tg==
+      - EA_USER_PHONE=01234567890
+    ports:
+      - "${NHSD_LOCAL_DB_PORT:-1533}:1433"
+
   nhsd.buyingcatalogue.ordering.api:
     image: ${REGISTRY:-nhsd}/buying-catalogue/ordering-api:${TAG:-latest}
     container_name: ordering_api
@@ -21,3 +46,8 @@ networks:
   nhsd_bcnetwork:
     name: nhsd_bcnetwork
     driver: bridge
+
+volumes:
+  nhsd_ordering_db_volume:
+    name: nhsd_ordering_db_volume
+
