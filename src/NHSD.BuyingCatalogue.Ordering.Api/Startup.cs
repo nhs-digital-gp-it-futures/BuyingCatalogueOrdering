@@ -71,25 +71,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             });
         }
 
-        public void Configure(IApplicationBuilder app)
-        {
-            var pathBase = Configuration.GetValue<string>("pathBase");
-
-            if (string.IsNullOrWhiteSpace(pathBase))
-            {
-                ConfigureApp(app);
-            }
-            else
-            {
-                app.Map($"/{pathBase}", mappedApp =>
-                {
-                    ConfigureApp(mappedApp);
-                });
-            }
-        }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public  void ConfigureApp(IApplicationBuilder app)
+        public  void Configure(IApplicationBuilder app)
         {
             app.UseSerilogRequestLogging(opts =>
             {
