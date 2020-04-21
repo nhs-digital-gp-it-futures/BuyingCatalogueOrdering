@@ -15,13 +15,6 @@ services:
       - MSSQL_PID=Express
       - DB_NAME=${NHSD_LOCAL_DB_NAME:-CatalogueOrdering}
       - NHSD_PASSWORD=DisruptTheMarket1!
-      - INSERT_TEST_DATA=True
-      - CREATE_EA_USER=True
-      - EA_USER_FIRST_NAME=Agency
-      - EA_USER_LAST_NAME=User
-      - EA_USER_EMAIL=user@agency.com
-      - EA_USER_PASSWORD_HASH=AQAAAAEAACcQAAAAEEOFkNNrFpKmDC2TBv2CP/dzxfnjdXk97RoqRlunE/CGs2tmFcewKZj4M/fITiP2tg==
-      - EA_USER_PHONE=01234567890
     ports:
       - "${NHSD_LOCAL_DB_PORT:-1533}:1433"
 

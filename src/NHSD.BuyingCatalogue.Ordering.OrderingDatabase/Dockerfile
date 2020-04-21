@@ -9,8 +9,7 @@ COPY /Indexes sql/Indexes
 COPY /Tables sql/Tables
 COPY /Security sql/Security
 
-RUN chmod +x /usr/config/entrypoint.sh
-RUN chmod +x /usr/config/configure-db.sh
+RUN chmod +x /usr/config/entrypoint.sh && chmod +x /usr/config/configure-db.sh
 
 ENTRYPOINT ["./entrypoint.sh"]
 
