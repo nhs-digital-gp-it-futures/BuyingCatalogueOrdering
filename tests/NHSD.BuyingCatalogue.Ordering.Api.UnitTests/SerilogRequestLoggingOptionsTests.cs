@@ -50,6 +50,5 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests
             SerilogRequestLoggingOptions.GetLevel(context, 0, null)
                 .Should().Be(expectedLevel);
         }
-
     }
 }

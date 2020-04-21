@@ -11,7 +11,6 @@ using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
 using Serilog;
 
-
 namespace NHSD.BuyingCatalogue.Ordering.Api
 {
     public sealed class Startup
