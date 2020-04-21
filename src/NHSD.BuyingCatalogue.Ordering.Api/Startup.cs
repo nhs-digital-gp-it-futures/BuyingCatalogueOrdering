@@ -6,16 +6,21 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NHSD.BuyingCatalogue.Ordering.Api.Logging;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
+using Serilog;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api
 {
     public sealed class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IWebHostEnvironment _environment;
+
+        public Startup(IWebHostEnvironment environment, IConfiguration configuration)
         {
             Configuration = configuration;
+            _environment = environment;
         }
 
         public IConfiguration Configuration { get; }
@@ -65,10 +70,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             });
         }
 
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public  void Configure(IApplicationBuilder app)
         {
-            if (env.IsDevelopment())
+            app.UseSerilogRequestLogging(opts =>
+            {
+                opts.GetLevel = SerilogRequestLoggingOptions.GetLevel;
+            });
+
+
+            if (_environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
@@ -91,7 +103,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 {
                     Predicate = healthCheckRegistration => healthCheckRegistration.Tags.Contains(HealthCheckTags.Ready)
                 });
-
             });
         }
     }
