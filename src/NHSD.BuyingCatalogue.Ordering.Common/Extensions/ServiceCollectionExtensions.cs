@@ -21,8 +21,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.Extensions
                     connectionString,
                     "SELECT 1;",
                     "db",
-                    // TODO: database not available yet hard coding response to healthy until it is implemented
-                    HealthStatus.Healthy,  
+                    HealthStatus.Unhealthy,  
                     new[] { HealthCheckTags.Ready },
                     TimeSpan.FromSeconds(10));
             return services;
