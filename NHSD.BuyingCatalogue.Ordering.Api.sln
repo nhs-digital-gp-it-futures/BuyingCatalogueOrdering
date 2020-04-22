@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHSD.BuyingCatalogue.Orderi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHSD.BuyingCatalogue.Ordering.Common", "src\NHSD.BuyingCatalogue.Ordering.Common\NHSD.BuyingCatalogue.Ordering.Common.csproj", "{D5697631-9B71-4453-A79E-6E9572E724CC}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "NHSD.BuyingCatalogue.Ordering.OrderingDatabase", "src\NHSD.BuyingCatalogue.Ordering.OrderingDatabase\NHSD.BuyingCatalogue.Ordering.OrderingDatabase.sqlproj", "{A2F7098B-CE37-4744-B92C-255C0365F5B6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,12 @@ Global
 		{D5697631-9B71-4453-A79E-6E9572E724CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5697631-9B71-4453-A79E-6E9572E724CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5697631-9B71-4453-A79E-6E9572E724CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2F7098B-CE37-4744-B92C-255C0365F5B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2F7098B-CE37-4744-B92C-255C0365F5B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2F7098B-CE37-4744-B92C-255C0365F5B6}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{A2F7098B-CE37-4744-B92C-255C0365F5B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2F7098B-CE37-4744-B92C-255C0365F5B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2F7098B-CE37-4744-B92C-255C0365F5B6}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -52,6 +60,7 @@ Global
 		{35A62F97-B61C-4135-9A0C-6520C649C2E3} = {152C5610-E85A-46DE-876D-3D372B198BE5}
 		{B7D6DC1C-174F-477E-BA79-E217AEAAF3E9} = {152C5610-E85A-46DE-876D-3D372B198BE5}
 		{D5697631-9B71-4453-A79E-6E9572E724CC} = {2BC13686-75FE-43D6-A30D-3E39F5D688A9}
+		{A2F7098B-CE37-4744-B92C-255C0365F5B6} = {2BC13686-75FE-43D6-A30D-3E39F5D688A9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B71E924C-436B-42AD-9798-398E75C82AA3}
