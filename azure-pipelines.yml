@@ -4,9 +4,12 @@ variables:
 
 trigger:
 - master
+- development
 
+# PR builds only when against these branches
 pr:
 - master
+- development
 
 pool:
   vmImage: windows-2019
@@ -105,6 +108,7 @@ jobs:
 
   - task: DockerCompose@0
     displayName: 'Build: Test'
+    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
     inputs:
       containerregistrytype: 'Azure Container Registry'
       azureSubscription: 'NHSAPP-BuyingCatalogue (Non-Prod)'
@@ -116,6 +120,7 @@ jobs:
 
   - task: DockerCompose@0
     displayName: 'Push: Test'
+    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
     inputs:
       containerregistrytype: 'Azure Container Registry'
       azureSubscription: 'NHSAPP-BuyingCatalogue (Non-Prod)'
