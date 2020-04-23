@@ -4,11 +4,9 @@ variables:
 
 trigger:
 - master
-- development
 
 pr:
 - master
-- development
 
 pool:
   vmImage: windows-2019
@@ -72,7 +70,7 @@ jobs:
       command: test
       projects: '**/*UnitTests.csproj'
       arguments: '-v n  --collect "Code coverage"'
-    
+
   - task: DotNetCoreCLI@2
     displayName: 'Run Integration tests'
     inputs:
@@ -96,7 +94,6 @@ jobs:
 
   - task: DockerCompose@0
     displayName: 'Push: Dev'
-    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
     inputs:
       containerregistrytype: 'Azure Container Registry'
       azureSubscription: 'NHSAPP-BuyingCatalogue (Non-Prod)'
@@ -108,7 +105,6 @@ jobs:
 
   - task: DockerCompose@0
     displayName: 'Build: Test'
-    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
     inputs:
       containerregistrytype: 'Azure Container Registry'
       azureSubscription: 'NHSAPP-BuyingCatalogue (Non-Prod)'
@@ -120,7 +116,6 @@ jobs:
 
   - task: DockerCompose@0
     displayName: 'Push: Test'
-    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
     inputs:
       containerregistrytype: 'Azure Container Registry'
       azureSubscription: 'NHSAPP-BuyingCatalogue (Non-Prod)'
@@ -156,4 +151,3 @@ jobs:
       additionalImageTags: '$(Build.BuildNumber)'
       includeSourceTags: true
     enabled: false
-    
