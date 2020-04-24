@@ -12,14 +12,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     {
         private readonly Response _response;
         private readonly ScenarioContext _context;
-        private readonly Settings _settings;
 
         public HealthChecksSteps(Response response, ScenarioContext context, Settings settings)
         {
             _response = response;
             _context = context;
-            _settings = settings;
-            _context["orderingBaseUrl"] = _settings.OrderingApiBaseUrl;
+            _context["orderingBaseUrl"] = settings.OrderingApiBaseUrl;
         }
 
         [When(@"the dependency health-check endpoint is hit for API")]
