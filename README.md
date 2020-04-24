@@ -17,12 +17,15 @@ This application uses **.NET core** to provide an ordering API.
 
 ### Project structure
 
-This repository uses **.NET Core**, **Nodejs** and **Docker**.
+This repository uses **.NET Core**,  **Docker**.
 
 It contains the following endpoints:
 
-- ordering/order
-  - Returns a HTML view.
+- health/live
+  - Returns the health status of the service.
+
+- health/ready
+  - Returns the health status of the service dependacies  
 
 The application is broken down into the following project libraries:
 
@@ -49,7 +52,7 @@ When making changes to the database make sure to remove the Docker volume as des
 | outside the docker network | localhost                  | 5104  |  X  |
 
 
-Navigate yourself to [localhost:5104](http://localhost:5104/) to view the Ordering API
+Navigate yourself to [localhost:5104/health/live](http://localhost:5104health/live) to view the health status of the service 
 
 ## Running the Application
 
@@ -59,11 +62,15 @@ To start up the web application, run the following command from the root directo
 docker-compose up -d --build
 ```
 
-This will start the application in a docker container. You can verify that the service has launched correctly by navigating to the following url via any web browser.
+This will start the application in a docker container. You can verify that the service has launched correctly by navigating to the following urls via any web browser.
 
 ```http
-http://localhost:XXX/ordering/Order
+http://localhost:5104//health/live
+http://localhost:5104//health/ready
 ```
+If both URLs return 'Healthy', the environment is configured correctly, and can be accessed via the public endpoints.
+
+If the ready URL returns 'Unhealthy', the associated dependencies of the application may have failed to launch, or cannot be accessed.
 
 ### To stop the application
 
@@ -75,4 +82,4 @@ docker-compose down -v
 
 ### Running the Integration Tests
 
-Start the application as decribed in [running the application](#running-the-application) and run the integration tests using your preferred test runner.
+Start the application as described in [running the application](#running-the-application) and run the integration tests using your preferred test runner.
