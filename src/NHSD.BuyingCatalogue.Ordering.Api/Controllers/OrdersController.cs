@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
@@ -14,14 +15,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [HttpGet]
         public ActionResult GetOrders()
         {
-            var orders = new OrdersModel()
+            var orders = new List<OrdersModel>
             {
-                OrderId = new Guid(),
-                OrderDescription = "Some Order",
-                LastUpdatedBy = "Bob Smith",
-                LastUpdated = DateTime.UtcNow,
-                DateCreated = DateTime.UtcNow,
-                Status = "Unsubmitted"
+                new OrdersModel
+                {
+                    OrderId = Guid.NewGuid(),
+                    OrderDescription = "Some Order",
+                    LastUpdatedBy = "Bob Smith",
+                    LastUpdated = DateTime.UtcNow,
+                    DateCreated = DateTime.UtcNow,
+                    Status = "Unsubmitted"
+                },
+                new OrdersModel
+                {
+                    OrderId = Guid.NewGuid(),
+                    OrderDescription = "Some new order",
+                    LastUpdatedBy = "Alice Smith",
+                    LastUpdated = DateTime.UtcNow,
+                    DateCreated = DateTime.UtcNow,
+                    Status = "Submitted"
+                }
             };
 
             return Ok(orders);
