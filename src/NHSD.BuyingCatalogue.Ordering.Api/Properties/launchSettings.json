@@ -4,7 +4,6 @@
     "NHSD.BuyingCatalogue.Ordering.Api": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "buyingcatalogueordering",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
