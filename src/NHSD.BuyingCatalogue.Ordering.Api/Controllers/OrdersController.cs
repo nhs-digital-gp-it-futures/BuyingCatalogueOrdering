@@ -19,7 +19,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             {
                 new OrdersModel
                 {
-                    OrderId = Guid.NewGuid(),
+                    OrderId = "C0000014-01",
                     OrderDescription = "Some Order",
                     LastUpdatedBy = "Bob Smith",
                     LastUpdated = DateTime.UtcNow,
@@ -28,7 +28,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 },
                 new OrdersModel
                 {
-                    OrderId = Guid.NewGuid(),
+                    OrderId = "C000012-01",
                     OrderDescription = "Some new order",
                     LastUpdatedBy = "Alice Smith",
                     LastUpdated = DateTime.UtcNow,
