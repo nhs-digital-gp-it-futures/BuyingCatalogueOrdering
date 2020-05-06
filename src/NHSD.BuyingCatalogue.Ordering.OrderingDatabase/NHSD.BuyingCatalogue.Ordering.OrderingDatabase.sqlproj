@@ -57,4 +57,25 @@
   <ItemGroup>
     <Folder Include="Properties" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="Tables" />
+    <Folder Include="Indexes" />
+    <Folder Include="Security" />
+    <Folder Include="Deployment" />
+    <Folder Include="Security\Logins" />
+    <Folder Include="Security\Users" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Security\Users\NHSD.sql" />
+    <None Include="Security\Logins\NHSD.sql" />
+    <None Include="Deployment\CreateTables.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Tables\OrderStatus.sql" />
+    <Build Include="Tables\Order.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Deployment\PostDeployment.sql" />
+  </ItemGroup>
 </Project>

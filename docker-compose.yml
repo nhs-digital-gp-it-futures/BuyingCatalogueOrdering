@@ -1,4 +1,5 @@
 version: '3.5'
+
 services:
   nhsd.buyingcatalogue.ordering.api.ordering.db:
     image: ${REGISTRY:-nhsd}/buying-catalogue/ordering-api-ordering-db:${TAG:-latest}
