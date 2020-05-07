@@ -27,4 +27,4 @@ cd sql/Deployment
 for file in ../Indexes/*.sql; do /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $SA_PASSWORD -d $DB_NAME -I -i "$file"; done
 /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $SA_PASSWORD -d $DB_NAME -I -i "PostDeployment.sql"
 
-echo "======= MSSQL CONFIG COMPLETE ======="
+echo "======= MSSQL CONFIG COMPLETE =======" | tee -a /var/opt/mssql/log/config.log

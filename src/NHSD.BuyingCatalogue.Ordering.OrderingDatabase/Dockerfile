@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/mssql/server:2019-latest
 
-WORKDIR ~/config
+WORKDIR /var/opt/mssql/config
 
 COPY /ShellScripts .
 COPY /Deployment sql/Deployment
@@ -12,4 +12,4 @@ ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
 
 CMD ["tail -f /dev/null"]
 
-HEALTHCHECK --interval=15s CMD /opt/mssql-tools/bin/sqlcmd -U sa -P $SA_PASSWORD -Q "select 1"
+HEALTHCHECK --interval=15s CMD /opt/mssql-tools/bin/sqlcmd -U sa -P $SA_PASSWORD -Q "SELECT 1;" && grep -q "MSSQL CONFIG COMPLETE" /var/opt/mssql/log/config.log
