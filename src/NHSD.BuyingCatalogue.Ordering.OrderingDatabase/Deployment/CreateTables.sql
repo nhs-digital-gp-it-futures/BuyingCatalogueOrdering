@@ -1,1 +1,2 @@
-﻿-- Ensure tables are created in the correct order
+﻿:r ../Tables/OrderStatus.sql
+:r ../Tables/Order.sql

@@ -26,6 +26,5 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.Extensions
                     TimeSpan.FromSeconds(10));
             return services;
         }
-
     }
 }
