@@ -5,6 +5,7 @@ export STATUS=1
 i=0
 
 while [[ $STATUS -ne 0 ]] && [[ $i -lt 30 ]]; do
+	sleep 1
 	i=$i+1
 	/opt/mssql-tools/bin/sqlcmd -t 1 -U sa -P $SA_PASSWORD -Q "select 1" >> /dev/null
 	STATUS=$?
