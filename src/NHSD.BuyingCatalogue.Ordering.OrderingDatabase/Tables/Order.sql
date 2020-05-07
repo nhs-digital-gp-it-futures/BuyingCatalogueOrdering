@@ -8,5 +8,5 @@
 	LastUpdated DATETIME2 NOT NULL,
 	LastUpdatedBy UNIQUEIDENTIFIER NOT NULL
 
-	CONSTRAINT FK_Order_StatusId_OrderStatus_OrderStatusId FOREIGN KEY (OrderStatusId) REFERENCES OrderStatus (OrderStatusId)
+	CONSTRAINT FK_Order_OrderStatusId_OrderStatus_OrderStatusId FOREIGN KEY (OrderStatusId) REFERENCES OrderStatus (OrderStatusId)
 )
