@@ -1,6 +1,7 @@
 variables:
   dockerVersion: '19.03.5'
-  dotnetVersion: '3.1.101'
+  dotnetVersion: '3.x'
+  MSBUILDSINGLELOADCONTEXT: '1'
 
 trigger:
 - master
@@ -15,7 +16,7 @@ pool:
 
 jobs:
 - job: build
-  displayName: Build database project
+  displayName: Build database project & publish dacpac
 
   steps:
   - task: VSBuild@1
@@ -85,6 +86,7 @@ jobs:
 
   - task: DockerCompose@0
     displayName: 'Build: Dev'
+    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
     inputs:
       containerregistrytype: 'Azure Container Registry'
       azureSubscription: 'NHSAPP-BuyingCatalogue (Non-Prod)'
