@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.3" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.9.10" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
       <PrivateAssets>all</PrivateAssets>
@@ -30,7 +31,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NHSD.BuyingCatalogue.Ordering.Application\NHSD.BuyingCatalogue.Ordering.Application.csproj" />
     <ProjectReference Include="..\NHSD.BuyingCatalogue.Ordering.Common\NHSD.BuyingCatalogue.Ordering.Common.csproj" />
+    <ProjectReference Include="..\NHSD.BuyingCatalogue.Ordering.Domain\NHSD.BuyingCatalogue.Ordering.Domain.csproj" />
+    <ProjectReference Include="..\NHSD.BuyingCatalogue.Ordering.Persistence\NHSD.BuyingCatalogue.Ordering.Persistence.csproj" />
   </ItemGroup>
 
   <ItemGroup>

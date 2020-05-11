@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\NHSD.BuyingCatalogue.Ordering.Api\NHSD.BuyingCatalogue.Ordering.Api.csproj" />
+    <ProjectReference Include="..\..\src\NHSD.BuyingCatalogue.Ordering.Application\NHSD.BuyingCatalogue.Ordering.Application.csproj" />
   </ItemGroup>
 
 </Project>

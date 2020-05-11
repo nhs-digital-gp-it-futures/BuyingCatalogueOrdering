@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
 using BoDi;
 using Microsoft.Extensions.Configuration;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Assist;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
 {
@@ -16,9 +20,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
         }
 
         [BeforeScenario]
-        public void BeforeScenarioAsync()
+        public async Task BeforeScenarioAsync()
         {
             RegisterTestConfiguration();
+            RegisterCustomValueRetrievers();
+
+            await ResetDatabaseAsync();
         }
 
         public void RegisterTestConfiguration()
@@ -30,5 +37,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
 
             _objectContainer.RegisterInstanceAs<IConfiguration>(configurationBuilder);
         }
+
+        private static void RegisterCustomValueRetrievers()
+        {
+            var valueRetrievers = Service.Instance.ValueRetrievers;
+
+            valueRetrievers.Register(new DateTimeValueRetriever());
+        }
+
+        private async Task ResetDatabaseAsync() =>
+            await IntegrationDatabase.ResetAsync(_objectContainer.Resolve<IConfiguration>());
     }
 }

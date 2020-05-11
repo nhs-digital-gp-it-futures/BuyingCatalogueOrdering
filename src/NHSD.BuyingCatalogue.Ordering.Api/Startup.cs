@@ -1,14 +1,18 @@
-using System.Net.Http;
+﻿using System.Net.Http;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NHSD.BuyingCatalogue.Ordering.Api.Logging;
+using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
+using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
+using NHSD.BuyingCatalogue.Ordering.Persistence.Repositories;
 using Serilog;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api
@@ -33,6 +37,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             var requireHttps = Configuration.GetValue<bool>("RequireHttps");
             var allowInvalidCertificate = Configuration.GetValue<bool>("AllowInvalidCertificate");
 
+
+            services.AddTransient<IOrderRepository, OrderRepository>();
+
             services.RegisterHealthChecks(connectionString);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -53,6 +60,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 });
 
             services.AddControllers();
+
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(connectionString));
 
             services.AddAuthorization(options =>
             {
