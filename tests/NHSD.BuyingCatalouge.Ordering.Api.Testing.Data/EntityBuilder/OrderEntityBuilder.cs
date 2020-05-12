@@ -31,6 +31,12 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             return this;
         }
 
+        public OrderEntityBuilder WithOrganisationId(Guid organisationId)
+        {
+            _orderEntity.OrganisationId = organisationId;
+            return this;
+        }
+
         public OrderEntityBuilder WithDescription(string description)
         {
             _orderEntity.Description = description;

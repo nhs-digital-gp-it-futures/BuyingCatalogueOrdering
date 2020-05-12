@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
@@ -16,9 +18,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Order>> ListOrdersAsync()
+        public async Task<IEnumerable<Order>> ListOrdersByOrganisationIdAsync(Guid organisationId)
         {
-            return await _context.Order.Include(x => x.OrderStatus).ToListAsync();
+            return await _context.Order.Include(x => x.OrderStatus).Where(o => o.OrganisationId == organisationId)
+                .ToListAsync();
         }
     }
 }

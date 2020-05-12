@@ -10,7 +10,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
     {
         public static async Task ResetAsync(IConfiguration config)
         {
-            using IDbConnection databaseConnection = new SqlConnection(config.GetConnectionString("OrderingDbAdmin"));
+            using IDbConnection databaseConnection = new SqlConnection(config.GetConnectionString("OrderingDbAdminConnectionString"));
             await databaseConnection.ExecuteAsync("GRANT CONNECT TO NHSD;");
             await databaseConnection.ExecuteAsync("DELETE FROM [dbo].[Order];");
         }

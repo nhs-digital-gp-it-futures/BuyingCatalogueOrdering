@@ -6,12 +6,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
     {
         public Settings(IConfiguration config)
         {
-            AdminConnectionString = config.GetConnectionString("OrderingDbAdmin");
+            OrderingDbAdminConnectionString = config.GetConnectionString("OrderingDbAdminConnectionString");
             ConnectionString = config.GetConnectionString("OrderingDb");
             OrderingApiBaseUrl = config.GetValue<string>("OrderingApiBaseUrl");
         }
 
-        public string AdminConnectionString { get; }
+        public string OrderingDbAdminConnectionString { get; }
 
         public string ConnectionString { get; }
 

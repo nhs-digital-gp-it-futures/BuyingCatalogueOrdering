@@ -21,23 +21,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
     {
         private readonly IWebHostEnvironment _environment;
 
+        private readonly IConfiguration Configuration;
+
         public Startup(IWebHostEnvironment environment, IConfiguration configuration)
         {
             Configuration = configuration;
             _environment = environment;
         }
 
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = Configuration.GetConnectionString("OrderingDb");
-            var authority = Configuration.GetValue<string>("authority");
+            var authority = Configuration.GetValue<string>("IssuerUrl");
             var requireHttps = Configuration.GetValue<bool>("RequireHttps");
             var allowInvalidCertificate = Configuration.GetValue<bool>("AllowInvalidCertificate");
-
-
+            
             services.AddTransient<IOrderRepository, OrderRepository>();
 
             services.RegisterHealthChecks(connectionString);
@@ -59,7 +57,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                     }
                 });
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
@@ -80,24 +79,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             });
         }
 
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public  void Configure(IApplicationBuilder app)
         {
             app.UseSerilogRequestLogging(opts =>
             {
                 opts.GetLevel = SerilogRequestLoggingOptions.GetLevel;
             });
-
-
+            
             if (_environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
-
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

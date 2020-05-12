@@ -25,10 +25,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             _response = response;
             _request = request;
             _settings = settings;
-            _orderUrl = _settings.OrderingApiBaseUrl + "/api/v1/orders";
+            _orderUrl = _settings.OrderingApiBaseUrl + "/api/v1/organisations";
         }
 
-        [Given(@"Orders Exit")]
+        [Given(@"Orders exist")]
         public async Task GivenOrdersExit(Table table)
         {
             foreach (var ordersTableItem in table.CreateSet<OrdersTable>())
@@ -36,6 +36,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 var order = OrderEntityBuilder
                     .Create()
                     .WithOrderId(ordersTableItem.OrderId)
+                    .WithOrganisationId(ordersTableItem.OrganisationId)
                     .WithDescription(ordersTableItem.Description)
                     .WithOrderStatusId(ordersTableItem.OrderStatusId)
                     .WithDateCreated(ordersTableItem.Created)
@@ -47,10 +48,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             }
         }
 
-        [When(@"a GET request is made for orders")]
-        public async Task WhenAGETRequestIsMadeForOrders()
+        [When(@"a GET request is made for a list of orders with organisationId (.*)")]
+        public async Task WhenAGETRequestIsMadeForOrders(Guid organisationId)
         {
-            await _request.GetAsync(_orderUrl);
+            await _request.GetAsync($"{_orderUrl}/{organisationId}/orders");
         }
 
         [Then(@"the orders list is returned with the following values")]
@@ -60,7 +61,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             var orders = (await _response.ReadBodyAsJsonAsync()).Select(CreateOrders);
 
-            orders.Should().BeEquivalentTo(expectedOrders, a => a.Excluding(u => u.OrderStatusId));
+            orders.Should().BeEquivalentTo(expectedOrders,
+                orderTable => orderTable.Excluding(order => order.OrderStatusId)
+                    .Excluding(order => order.OrganisationId));
+        }
+
+        [Then(@"an empty list is returned")]
+        public async Task AnEmptyListIsReturned()
+        {
+            var orders = (await _response.ReadBodyAsJsonAsync()).Select(CreateOrders);
+            orders.Count().Should().Be(0);
         }
 
         private static object CreateOrders(JToken token)
@@ -68,7 +78,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             return new
             {
                 OrderId = token.SelectToken("orderId").ToString(),
-                Description = token.SelectToken("orderDescription").ToString(),
+                Description = token.SelectToken("description").ToString(),
                 Status = token.SelectToken("status").ToString(),
                 LastUpdated = token.SelectToken("lastUpdated").ToObject<DateTime>(),
                 LastUpdatedBy = token.SelectToken("lastUpdatedBy").ToObject<Guid>(),
@@ -76,9 +86,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             };
         }
 
-        private class OrdersTable
+        private sealed class OrdersTable
         {
             public string OrderId { get; set; }
+
+            public Guid OrganisationId { get; set; }
 
             public string Description { get; set; }
 

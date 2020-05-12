@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
@@ -23,7 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         internal OrdersControllerBuilder WithListOrders(IEnumerable<Order> result)
         {
             var mockOrderRepository = new Mock<IOrderRepository>();
-            mockOrderRepository.Setup(x => x.ListOrdersAsync()).ReturnsAsync(result);
+            mockOrderRepository.Setup(x => x.ListOrdersByOrganisationIdAsync(It.IsAny<Guid>())).ReturnsAsync(result);
 
             _ordersRepository = mockOrderRepository.Object;
             return this;
