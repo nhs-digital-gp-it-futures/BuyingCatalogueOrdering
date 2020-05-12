@@ -17,7 +17,7 @@ services:
       - DB_NAME=${NHSD_LOCAL_DB_NAME:-CatalogueOrdering}
       - NHSD_PASSWORD=DisruptTheMarket1!
     ports:
-      - "${NHSD_LOCAL_DB_PORT:-1533}:1433"
+      - "${NHSD_LOCAL_DB_PORT:-1552}:1433"
 
   nhsd.buyingcatalogue.ordering.api:
     image: ${REGISTRY:-nhsd}/buying-catalogue/ordering-api:${TAG:-latest}
