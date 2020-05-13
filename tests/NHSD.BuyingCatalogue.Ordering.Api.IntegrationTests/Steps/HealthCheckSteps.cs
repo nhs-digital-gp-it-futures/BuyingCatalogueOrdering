@@ -35,5 +35,4 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             healthStatus.Should().Be(status);
         }
     }
-
 }

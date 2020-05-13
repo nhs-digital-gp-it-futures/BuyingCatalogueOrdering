@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
@@ -14,34 +16,33 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [ApiController]
     [Produces("application/json")]
     [AllowAnonymous]
-    public sealed class OrdersController : ControllerBase
+    public sealed class OrdersController : Controller
     {
-        [HttpGet]
-        public ActionResult GetOrders()
-        {
-            var orders = new List<OrdersModel>
-            {
-                new OrdersModel
-                {
-                    OrderId = "C0000014-01",
-                    OrderDescription = "Some Order",
-                    LastUpdatedBy = "Bob Smith",
-                    LastUpdated = DateTime.UtcNow,
-                    DateCreated = DateTime.UtcNow,
-                    Status = "Unsubmitted"
-                },
-                new OrdersModel
-                {
-                    OrderId = "C000012-01",
-                    OrderDescription = "Some new order",
-                    LastUpdatedBy = "Alice Smith",
-                    LastUpdated = DateTime.UtcNow,
-                    DateCreated = DateTime.UtcNow,
-                    Status = "Submitted"
-                }
-            };
+        private readonly IOrderRepository _orderRepository;
 
-            return Ok(orders);
+        public OrdersController(IOrderRepository orderRepository)
+        {
+            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+        }
+
+        [HttpGet]
+        [Route("/api/v1/organisations/{organisationId}/[controller]")]
+        public async Task<ActionResult> GetAllAsync(Guid organisationId)
+        {
+            var orders = await _orderRepository.ListOrdersByOrganisationIdAsync(organisationId);
+
+            var orderModelResult = orders.Select(order => new OrderModel()
+            {
+                OrderId = order.OrderId,
+                Description = order.Description,
+                LastUpdatedBy = order.LastUpdatedBy,
+                LastUpdated = order.LastUpdated,
+                DateCreated = order.Created,
+                Status = order.OrderStatus.Name
+            })
+                .ToList();
+
+            return Ok(orderModelResult);
         }
 
         [HttpGet]
