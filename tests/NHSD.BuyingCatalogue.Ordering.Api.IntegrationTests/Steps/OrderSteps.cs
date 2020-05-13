@@ -18,14 +18,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private readonly Request _request;
         private readonly Settings _settings;
 
-        private readonly string _orderUrl;
+        private readonly string _orderOrganisationsUrl;
 
         public OrderSteps(Response response, Request request, Settings settings)
         {
             _response = response;
             _request = request;
             _settings = settings;
-            _orderUrl = _settings.OrderingApiBaseUrl + "/api/v1/organisations";
+            _orderOrganisationsUrl = _settings.OrderingApiBaseUrl + "/api/v1/organisations/{0}/orders";
         }
 
         [Given(@"Orders exist")]
@@ -51,7 +51,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [When(@"a GET request is made for a list of orders with organisationId (.*)")]
         public async Task WhenAGETRequestIsMadeForOrders(Guid organisationId)
         {
-            await _request.GetAsync($"{_orderUrl}/{organisationId}/orders");
+            await _request.GetAsync(string.Format(_orderOrganisationsUrl, organisationId));
         }
 
         [Then(@"the orders list is returned with the following values")]
@@ -77,12 +77,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             return new
             {
-                OrderId = token.SelectToken("orderId").ToString(),
-                Description = token.SelectToken("description").ToString(),
-                Status = token.SelectToken("status").ToString(),
-                LastUpdated = token.SelectToken("lastUpdated").ToObject<DateTime>(),
+                OrderId = token.Value<string>("orderId"),
+                Description = token.Value<string>("description"),
+                Status = token.Value<string>("status"),
+                LastUpdated = token.Value<DateTime>("lastUpdated"),
                 LastUpdatedBy = token.SelectToken("lastUpdatedBy").ToObject<Guid>(),
-                Created = token.SelectToken("dateCreated").ToObject<DateTime>()
+                Created = token.Value<DateTime>("dateCreated")
             };
         }
 

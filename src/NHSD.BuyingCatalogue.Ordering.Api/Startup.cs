@@ -21,20 +21,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
     {
         private readonly IWebHostEnvironment _environment;
 
-        private readonly IConfiguration Configuration;
+        private readonly IConfiguration _configuration;
 
         public Startup(IWebHostEnvironment environment, IConfiguration configuration)
         {
-            Configuration = configuration;
+            _configuration = configuration;
             _environment = environment;
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var connectionString = Configuration.GetConnectionString("OrderingDb");
-            var authority = Configuration.GetValue<string>("IssuerUrl");
-            var requireHttps = Configuration.GetValue<bool>("RequireHttps");
-            var allowInvalidCertificate = Configuration.GetValue<bool>("AllowInvalidCertificate");
+            var connectionString = _configuration.GetConnectionString("OrderingDb");
+            var authority = _configuration.GetValue<string>("Authority");
+            var requireHttps = _configuration.GetValue<bool>("RequireHttps");
+            var allowInvalidCertificate = _configuration.GetValue<bool>("AllowInvalidCertificate");
             
             services.AddTransient<IOrderRepository, OrderRepository>();
 

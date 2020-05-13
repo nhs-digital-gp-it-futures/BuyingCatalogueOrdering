@@ -8,7 +8,7 @@ using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
-    [Route("api/v1/organisations/{organisationId}/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     [Produces("application/json")]
     [AllowAnonymous]
@@ -22,6 +22,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpGet]
+        [Route("/api/v1/organisations/{organisationId}/[controller]")]
         public async Task<ActionResult> GetAllAsync(Guid organisationId)
         {
             var orders = await _orderRepository.ListOrdersByOrganisationIdAsync(organisationId);

@@ -36,7 +36,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var result = await controller.GetAllAsync(Guid.Empty) as OkObjectResult;
             var orders = result.Value as List<OrderModel>;
-            orders.Count.Should().Be(0);
+            orders.Should().BeEmpty();
         }
 
         [TestCase(null, null)]
@@ -58,7 +58,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var result = await controller.GetAllAsync(organisationId) as OkObjectResult;
             var ordersResult = result.Value as List<OrderModel>;
-            ordersResult.Count.Should().Be(1);
+            ordersResult.Should().ContainSingle();
             ordersResult.Should().BeEquivalentTo(orders.Select(x => x.expected));
         }
 
@@ -86,7 +86,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         private static (Order order, OrderModel expectedOrder) CreateOrderTestData(string orderId, Guid organisationId, string description)
         {
-            var repositoryOrder = OrdersBuilder
+            var repositoryOrder = OrderBuilder
                 .Create()
                 .WithOrderId(orderId)
                 .WithOrganisationId(organisationId)

@@ -3,11 +3,11 @@ using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
-    internal sealed class OrdersBuilder
+    internal sealed class OrderBuilder
     {
         private readonly Order _order;
 
-        private OrdersBuilder()
+        private OrderBuilder()
         {
             _order = new Order()
             {
@@ -21,45 +21,45 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             };
         }
 
-        internal static OrdersBuilder Create() => new OrdersBuilder();
+        internal static OrderBuilder Create() => new OrderBuilder();
 
-        internal OrdersBuilder WithOrderId(string orderId)
+        internal OrderBuilder WithOrderId(string orderId)
         {
             _order.OrderId = orderId;
             return this;
         }
 
-        internal OrdersBuilder WithDescription(string description)
+        internal OrderBuilder WithDescription(string description)
         {
             _order.Description = description;
             return this;
         }
 
-        internal OrdersBuilder WithOrganisationId(Guid organisationId)
+        internal OrderBuilder WithOrganisationId(Guid organisationId)
         {
             _order.OrganisationId = organisationId;
             return this;
         }
 
-        internal OrdersBuilder WithCreated(DateTime created)
+        internal OrderBuilder WithCreated(DateTime created)
         {
             _order.Created = created;
             return this;
         }
 
-        internal OrdersBuilder WithLastUpdated(DateTime lastUpdated)
+        internal OrderBuilder WithLastUpdated(DateTime lastUpdated)
         {
             _order.LastUpdated = lastUpdated;
             return this;
         }
 
-        internal OrdersBuilder WithLastUpdatedBy(Guid lastUpdatedBy)
+        internal OrderBuilder WithLastUpdatedBy(Guid lastUpdatedBy)
         {
             _order.LastUpdatedBy = lastUpdatedBy;
             return this;
         }
 
-        internal OrdersBuilder WithOrderStatus(OrderStatus orderStatus)
+        internal OrderBuilder WithOrderStatus(OrderStatus orderStatus)
         {
             _order.OrderStatus = orderStatus;
             return this;
