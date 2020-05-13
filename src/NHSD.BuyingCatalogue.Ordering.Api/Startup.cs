@@ -35,7 +35,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             var authority = _configuration.GetValue<string>("Authority");
             var requireHttps = _configuration.GetValue<bool>("RequireHttps");
             var allowInvalidCertificate = _configuration.GetValue<bool>("AllowInvalidCertificate");
-            
+
             services.AddTransient<IOrderRepository, OrderRepository>();
 
             services.RegisterHealthChecks(connectionString);
@@ -79,13 +79,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             });
         }
 
-        public  void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseSerilogRequestLogging(opts =>
             {
                 opts.GetLevel = SerilogRequestLoggingOptions.GetLevel;
             });
-            
+
             if (_environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
