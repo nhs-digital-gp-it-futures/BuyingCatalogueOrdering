@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 
@@ -38,6 +41,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             };
 
             return Ok(orders);
+        }
+
+        [HttpPost]
+        public ActionResult<CreateOrderResponseModel> CreateOrderAsync([FromBody][Required] CreateOrderModel order)
+        {
+            if (order is null)
+            {
+                throw new ArgumentNullException(nameof(order));
+            }
+            var createOrderResponse = new CreateOrderResponseModel {OrderId = "C0000014-01" };
+            return Ok(createOrderResponse);
         }
     }
 }
