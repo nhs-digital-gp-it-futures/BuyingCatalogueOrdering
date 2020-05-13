@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -14,12 +14,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [AllowAnonymous]
     public sealed class OrderDescriptionController : Controller
     {
-        [HttpGet]
-        public ActionResult Get([FromRoute][Required] string orderId)
+        private readonly IOrderRepository _orderRepository;
+
+        public OrderDescriptionController(IOrderRepository orderRepository)
         {
+            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+        }
+
+        [HttpGet]
+        public async Task<ActionResult> GetAsync([FromRoute][Required] string orderId)
+        {
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+
+            if (order is null)
+            {
+                return NotFound();
+            }
+
             var descriptionModel = new OrderDescriptionModel()
             {
-                Description = _cannedData.Keys.Contains(orderId) ? _cannedData[orderId] : "This is some description"
+                Description = order.Description
             };
 
             return Ok(descriptionModel);
@@ -28,13 +42,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [HttpPut]
         public ActionResult Update([FromRoute][Required]string orderId, [FromBody][Required] OrderDescriptionModel model)
         {
-            if (model is null)
-                throw new ArgumentNullException(nameof(model));
+            if (orderId is null)
+            {
+                throw new ArgumentNullException(nameof(orderId));
+            }
 
-            _cannedData[orderId] = model.Description;
+            if (model is null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
             return NoContent();
         }
-
-        private static readonly Dictionary<string, string> _cannedData = new Dictionary<string, string>();
     }
 }

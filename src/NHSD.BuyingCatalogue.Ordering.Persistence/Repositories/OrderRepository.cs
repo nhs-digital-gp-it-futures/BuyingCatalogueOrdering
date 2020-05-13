@@ -23,5 +23,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
             return await _context.Order.Include(x => x.OrderStatus).Where(o => o.OrganisationId == organisationId)
                 .ToListAsync();
         }
+
+        public async Task<Order> GetOrderByIdAsync(string orderId)
+        {
+            return await _context.Order.FindAsync(orderId);
+        }
     }
 }
