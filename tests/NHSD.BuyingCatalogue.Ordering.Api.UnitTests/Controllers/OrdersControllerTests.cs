@@ -84,6 +84,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             ordersResult.Should().BeEquivalentTo(orders.Select(x => x.expected));
         }
 
+        [Test]
+        public async Task GetAll_OrdersByOrganisationId_CalledOnce()
+        {
+            var context = OrdersControllerTestContext.Setup();
+
+            using var controller = context.OrdersController;
+
+            await controller.GetAllAsync(Guid.Empty);
+
+            context.OrderRepositoryMock.Verify(x => x.ListOrdersByOrganisationIdAsync(Guid.Empty), Times.Once);
+        }
+
         private static (Order order, OrderModel expectedOrder) CreateOrderTestData(string orderId, Guid organisationId, string description)
         {
             var repositoryOrder = OrderBuilder
@@ -116,9 +128,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     .ReturnsAsync(() => Orders);
 
                 OrdersController = new OrdersController(OrderRepositoryMock.Object);
-
-                OrderRepositoryMock.Setup(x => x.ListOrdersByOrganisationIdAsync(It.IsAny<Guid>()))
-                    .ReturnsAsync(() => Orders);
             }
 
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
