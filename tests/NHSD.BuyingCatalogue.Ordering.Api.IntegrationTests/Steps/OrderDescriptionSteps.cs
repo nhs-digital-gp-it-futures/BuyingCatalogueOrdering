@@ -25,7 +25,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             _orderDescriptionUrl = _settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/description";
         }
 
-        [When(@"a GET request is made for an orders description with orderId (.*)")]
+        [When(@"the user makes a request to retrieve the order description section with the ID (.*)")]
         public async Task WhenAgetRequestIsMadeForAnOrdersDescriptionWithOrderId(string orderId)
         {
             await _request.GetAsync(string.Format(_orderDescriptionUrl, orderId));
@@ -46,7 +46,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected);
         }
 
-        public sealed class OrderDescriptionTable
+        private sealed class OrderDescriptionTable
         {
             public string Description { get; set; }
         }

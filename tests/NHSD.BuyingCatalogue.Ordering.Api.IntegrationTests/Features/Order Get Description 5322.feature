@@ -11,7 +11,7 @@ Background:
 
 @5322
 Scenario: 1. Get an orders description
-	When a GET request is made for an orders description with orderId C000014-01
+	When the user makes a request to retrieve the order description section with the ID C000014-01
 	Then a response with status code 200 is returned
 	And the order description is returned
 		| Description      |
@@ -19,25 +19,25 @@ Scenario: 1. Get an orders description
 
 @5322
 Scenario: 2. A non existent orderId returns not found
-	When a GET request is made for an orders description with orderId INVALID
+	When the user makes a request to retrieve the order description section with the ID INVALID
 	Then a response with status code 404 is returned
 
 @ignore
 @5322
 Scenario: 3. If a user is not authorised then they cannot access the order description
 	#This will not have the logging in
-	When a GET request is made for an orders description with orderId C000014-01
+	When the user makes a request to retrieve the order description section with the ID C000014-01
 	Then a response with status code 401 is returned
 
 @ignore
 @5322
 Scenario: 4. A non authority user cannot access the order description
 	#This will have a non authority user logged in
-	When a GET request is made for an orders description with orderId C000014-01
+	When the user makes a request to retrieve the order description section with the ID C000014-01
 	Then a response with status code 403 is returned
 
 @5322
 Scenario: 5. Service Failure
 	Given the call to the database will fail
-	When a GET request is made for an orders description with orderId C000014-01
+	When the user makes a request to retrieve the order description section with the ID C000014-01
 	Then a response with status code 500 is returned
