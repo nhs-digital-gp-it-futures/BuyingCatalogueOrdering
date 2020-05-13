@@ -52,6 +52,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                     }
                 });
 
+            services.AddControllers()
+                .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);
+
             services.AddControllers();
 
             services.AddAuthorization(options =>
