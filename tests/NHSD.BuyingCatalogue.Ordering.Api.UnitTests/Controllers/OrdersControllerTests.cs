@@ -113,18 +113,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [TestCase("Some Description")]
         public async Task GetOrderSummaryAsync_IsSummaryComplete_ReturnResult(string description)
         {
-            var orderId = "C0000014-01";
+            const string orderId = "C0000014-01";
 
-            var order = CreateOrderSummaryTestData(orderId, description);
+            (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, description);
 
             var context = OrdersControllerTestContext.Setup();
-            context.Order = order.order;
+            context.Order = order;
 
             using var controller = context.OrdersController;
 
             var result = await controller.GetOrderSummaryAsync(orderId) as OkObjectResult;
             var orderSummary = result.Value as OrderSummaryModel;
-            orderSummary.Should().BeEquivalentTo(order.expectedSummary);
+            orderSummary.Should().BeEquivalentTo(expected);
         }
 
         private static (Order order, OrderModel expectedOrder) CreateOrderTestData(string orderId, Guid organisationId, string description)
@@ -162,7 +162,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     OrderId = repositoryOrder.OrderId,
                     OrganisationId = repositoryOrder.OrganisationId,
                     Description = repositoryOrder.Description,
-                    Sections = new List<SectionModel>()
+                    Sections = new List<SectionModel>
                     {
                         new SectionModel
                         {
@@ -208,11 +208,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             {
                 return new OrdersControllerTestContext();
             }
-        }
-
-        private static void AssertSectionComplete(string status, bool shouldBeComplete)
-        {
-            status.Should().Be(shouldBeComplete ? "complete" : "incomplete");
         }
     }
 }

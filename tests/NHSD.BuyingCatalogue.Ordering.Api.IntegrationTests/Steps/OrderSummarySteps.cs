@@ -15,7 +15,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     {
         private readonly Response _response;
         private readonly Request _request;
-        private readonly Settings _settings;
 
         private readonly string _orderSummaryUrl;
 
@@ -23,8 +22,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             _response = response;
             _request = request;
-            _settings = settings;
-            _orderSummaryUrl = _settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/summary";
+            _orderSummaryUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/summary";
         }
 
         [When(@"the user makes a request to retrieve the order summary with the ID (.*)")]
@@ -40,7 +38,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             var response = await _response.ReadBodyAsJsonAsync();
 
-            var actual = new OrderSummaryTable()
+            var actual = new OrderSummaryTable
             {
                 OrderId = response.Value<string>("orderId"),
                 OrganisationId = response.SelectToken("organisationId").ToObject<Guid>(),
@@ -57,7 +55,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             var response = await _response.ReadBodyAsJsonAsync();
 
-            var actual = new SectionsTable()
+            var actual = new SectionsTable
             {
                 Sections = response.SelectToken("sections").ToObject<IEnumerable<SectionTable>>()
             };
