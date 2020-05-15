@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Domain;
@@ -23,7 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var _ = new OrdersController(null);
+                var _ = new OrdersController(null , null);
             });
         }
 
@@ -111,17 +112,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             {
                 OrderRepositoryMock = new Mock<IOrderRepository>();
 
+                CreateOrderServiceMock = new Mock<ICreateOrderService>();
+
                 Orders = new List<Order>();
                 OrderRepositoryMock.Setup(x => x.ListOrdersByOrganisationIdAsync(It.IsAny<Guid>()))
                     .ReturnsAsync(() => Orders);
 
-                OrdersController = new OrdersController(OrderRepositoryMock.Object);
+                OrdersController = new OrdersController(OrderRepositoryMock.Object, CreateOrderServiceMock.Object);
 
                 OrderRepositoryMock.Setup(x => x.ListOrdersByOrganisationIdAsync(It.IsAny<Guid>()))
                     .ReturnsAsync(() => Orders);
             }
 
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
+
+            internal Mock<ICreateOrderService> CreateOrderServiceMock { get; }
 
             internal IEnumerable<Order> Orders { get; set; }
 

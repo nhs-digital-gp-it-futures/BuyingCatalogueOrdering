@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
         {
             return await _context.Order.Include(x => x.OrderStatus).Where(o => o.OrganisationId == organisationId)
                 .ToListAsync();
+        }
+
+        public async Task<string> GetLatestOrderByCreationDate()
+        {
+            var latestOrder = await _context.Order.Include(x => x.OrderStatus).OrderByDescending(o => o.Created).FirstOrDefaultAsync();
+            return latestOrder?.OrderId;
+        }
+
+        public async Task CreateOrderAsync(Order order)
+        {
+            if (order is null)
+            {
+                throw new ArgumentNullException(nameof(order));
+            }
+
+            _context.Order.Add(order);
+            await _context.SaveChangesAsync();
         }
     }
 }

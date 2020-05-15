@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NHSD.BuyingCatalogue.Ordering.Api.Logging;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
@@ -37,6 +38,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             var allowInvalidCertificate = _configuration.GetValue<bool>("AllowInvalidCertificate");
 
             services.AddTransient<IOrderRepository, OrderRepository>();
+            services.AddTransient<ICreateOrderService, CreateOrderService>();
 
             services.RegisterHealthChecks(connectionString);
 
