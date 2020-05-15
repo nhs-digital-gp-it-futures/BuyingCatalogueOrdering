@@ -91,6 +91,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 app.UseDeveloperExceptionPage();
             }
 
+            var pathBase = _configuration.GetValue<string>("PathBase");
+            if (!string.IsNullOrEmpty(pathBase))
+            {
+                Log.Logger.Information($"USING PATH BASE {pathBase}");
+                app.UsePathBase(pathBase);
+            }
+            
             app.UseRouting();
 
             app.UseAuthentication();
