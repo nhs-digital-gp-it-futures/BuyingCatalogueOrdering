@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +25,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             });
         }
 
-        [Test]
+        [TestCase(null)]
         public async Task Get_OrderIdDoesNotExist_ReturnsNotFound()
         {
             var context = OrderDescriptionTestContext.Setup();
@@ -66,8 +67,82 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(string.Empty), Times.Once);
         }
 
+        [TestCase(null)]
+        [TestCase("INVALID")]
+        public async Task UpdateAsync_OrderIdDoesNotExist_ReturnNotFound(string orderId)
+        {
+            var context = OrderDescriptionTestContext.Setup();
+
+            using var controller = context.OrderDescriptionController;
+
+            var response =
+                await controller.UpdateAsync(orderId, new OrderDescriptionModel {Description = "Desc"});
+
+            response.Should().BeEquivalentTo(new NotFoundResult());
+        }
+
+        [Test]
+        public async Task UpdateAsync_ModelIsNull_ReturnNotFound()
+        {
+            const string orderId = "C0000014-01";
+
+            var testData = CreateOrderDescriptionTestData(orderId, "Test Description");
+
+            var context = OrderDescriptionTestContext.Setup();
+            context.Order = testData.order;
+
+            using var controller = context.OrderDescriptionController;
+
+            var response =
+                await controller.UpdateAsync(orderId, null);
+
+            response.Should().BeEquivalentTo(new NotFoundResult());
+        }
+        
+        [Test]
+        public async Task UpdateAsync_UpdatedDescriptionIsValid_ReturnsNoContent()
+        {
+            const string orderId = "C0000014-01";
+
+            var testData = CreateOrderDescriptionTestData(orderId, "Test Description");
+
+            var context = OrderDescriptionTestContext.Setup();
+            context.Order = testData.order;
+
+            using var controller = context.OrderDescriptionController;
+
+            var response =
+                await controller.UpdateAsync(orderId,
+                    new OrderDescriptionModel {Description = "New Description"});
+
+            response.Should().BeOfType<NoContentResult>();
+        }
+
+        [Test]
+        public async Task UpdateAsync_UpdateAndGet_CalledOnce()
+        {
+            const string orderId = "C0000014-01";
+            const string newDescription = "New Description";
+
+            var testData = CreateOrderDescriptionTestData(orderId, "Test Description");
+
+            var context = OrderDescriptionTestContext.Setup();
+            context.Order = testData.order;
+
+            using var controller = context.OrderDescriptionController;
+
+            await controller.UpdateAsync(orderId,
+                    new OrderDescriptionModel { Description = newDescription });
+
+            var updatedOrder = testData.order;
+            updatedOrder.SetDescription(newDescription);
+
+            context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(orderId), Times.Once);
+            context.OrderRepositoryMock.Verify(x => x.UpdateOrderAsync(updatedOrder), Times.Once);
+        }
+
         private static (Order order, OrderDescriptionModel expectedDescription) CreateOrderDescriptionTestData(
-            string orderId, string description)
+            string orderId, OrderDescription description)
         {
             var repositoryOrder = OrderBuilder
                 .Create()

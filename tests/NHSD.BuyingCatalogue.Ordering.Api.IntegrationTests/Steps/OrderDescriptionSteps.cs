@@ -46,6 +46,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected);
         }
 
+        [When(@"the user makes a request to update the description with the ID (.*)")]
+        public async Task WhenTheUserMakesARequestToUpdateTheDescriptionWithOrderId(string orderId, Table table)
+        {
+            var data = table.CreateInstance<OrderDescriptionTable>();
+
+            await _request.PutJsonAsync(string.Format(_orderDescriptionUrl, orderId), data);
+        }
+
+
         private sealed class OrderDescriptionTable
         {
             public string Description { get; set; }

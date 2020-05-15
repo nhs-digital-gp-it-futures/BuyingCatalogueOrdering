@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -33,24 +36,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             var descriptionModel = new OrderDescriptionModel()
             {
-                Description = order.Description
+                Description = order.Description.Value
             };
 
             return Ok(descriptionModel);
         }
 
         [HttpPut]
-        public ActionResult Update([FromRoute][Required]string orderId, [FromBody][Required] OrderDescriptionModel model)
+        public async Task<ActionResult> UpdateAsync([FromRoute][Required]string orderId, [FromBody][Required] OrderDescriptionModel model)
         {
-            if (orderId is null)
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+
+            if (order is null || model is null)
             {
-                throw new ArgumentNullException(nameof(orderId));
+                return NotFound();
             }
 
-            if (model is null)
+            var isValid = OrderDescription.Create(model.Description);
+
+            if (!isValid.IsSuccess)
             {
-                throw new ArgumentNullException(nameof(model));
+                return BadRequest(new ErrorsModel(isValid.Errors.Select(x => new ErrorModel(x.Id, x.Field))));
             }
+
+            order.SetDescription(isValid.Value);
+
+            await _orderRepository.UpdateOrderAsync(order);
 
             return NoContent();
         }
