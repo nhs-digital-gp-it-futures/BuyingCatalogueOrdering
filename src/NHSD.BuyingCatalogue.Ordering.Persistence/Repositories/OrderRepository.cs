@@ -25,6 +25,22 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
                 .ToListAsync();
         }
 
+        public async Task<Order> GetOrderByIdAsync(string orderId)
+        {
+            return await _context.Order.FindAsync(orderId);
+        }
+
+        public async Task UpdateOrderAsync(Order order)
+        {
+            if (order is null)
+            {
+                throw new ArgumentNullException(nameof(order));
+            }
+
+            _context.Order.Update(order);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<string> GetLatestOrderByCreationDate()
         {
             var latestOrder = await _context.Order.Include(x => x.OrderStatus).OrderByDescending(o => o.Created).FirstOrDefaultAsync();

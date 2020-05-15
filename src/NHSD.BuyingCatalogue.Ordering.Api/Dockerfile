@@ -7,6 +7,9 @@ FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
 COPY ["src/NHSD.BuyingCatalogue.Ordering.Api/NHSD.BuyingCatalogue.Ordering.Api.csproj", "src/NHSD.BuyingCatalogue.Ordering.Api/"]
 COPY ["src/NHSD.BuyingCatalogue.Ordering.Common/NHSD.BuyingCatalogue.Ordering.Common.csproj", "src/NHSD.BuyingCatalogue.Ordering.Common/"]
+COPY ["src/NHSD.BuyingCatalogue.Ordering.Application/NHSD.BuyingCatalogue.Ordering.Application.csproj", "src/NHSD.BuyingCatalogue.Ordering.Application/"]
+COPY ["src/NHSD.BuyingCatalogue.Ordering.Domain/NHSD.BuyingCatalogue.Ordering.Domain.csproj", "src/NHSD.BuyingCatalogue.Ordering.Domain/"]
+COPY ["src/NHSD.BuyingCatalogue.Ordering.Persistence/NHSD.BuyingCatalogue.Ordering.Persistence.csproj", "src/NHSD.BuyingCatalogue.Ordering.Persistence/"]
 RUN dotnet restore "src/NHSD.BuyingCatalogue.Ordering.Api/NHSD.BuyingCatalogue.Ordering.Api.csproj"
 COPY . .
 WORKDIR "/src/src/NHSD.BuyingCatalogue.Ordering.Api"

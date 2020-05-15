@@ -11,12 +11,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models.Summary
 
         public string Description { get; set; }
 
-        public string LastUpdatedBy { get; set; }
-
-        public DateTime LastUpdated { get; set; }
-
-        public DateTime DateCreated { get; set; }
-        
         public IEnumerable<SectionModel> Sections { get; set; }
     }
 }

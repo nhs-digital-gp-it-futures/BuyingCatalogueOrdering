@@ -12,6 +12,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
         {
             using IDbConnection databaseConnection = new SqlConnection(config.GetConnectionString("OrderingDbAdminConnectionString"));
             await databaseConnection.ExecuteAsync("GRANT CONNECT TO NHSD;");
+            await databaseConnection.ExecuteAsync("ALTER ROLE db_datareader ADD MEMBER NHSD;");
+            await databaseConnection.ExecuteAsync("ALTER ROLE db_datawriter ADD MEMBER NHSD;");
             await databaseConnection.ExecuteAsync("DELETE FROM [dbo].[Order];");
         }
 

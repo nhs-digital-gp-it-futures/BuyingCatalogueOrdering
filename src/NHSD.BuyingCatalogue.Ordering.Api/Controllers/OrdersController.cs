@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
@@ -38,7 +37,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             var orderModelResult = orders.Select(order => new OrderModel()
             {
                 OrderId = order.OrderId,
-                Description = order.Description,
+                Description = order.Description.Value,
                 LastUpdatedBy = order.LastUpdatedBy,
                 LastUpdated = order.LastUpdated,
                 DateCreated = order.Created,
@@ -51,19 +50,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpGet]
         [Route("{orderId}/summary")]
-        public ActionResult GetOrderSummary(string orderId)
+        public async Task<ActionResult> GetOrderSummaryAsync(string orderId)
         {
-            if (string.IsNullOrWhiteSpace(orderId))
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+
+            if (order is null)
+            {
                 return NotFound();
+            }
 
             return Ok(new OrderSummaryModel
             {
                 OrderId = orderId,
-                OrganisationId = Guid.Parse("B7EE5261-43E7-4589-907B-5EEF5E98C085"),
-                LastUpdatedBy = "Bob Smith",
-                LastUpdated = DateTime.UtcNow,
-                DateCreated = DateTime.UtcNow,
-                Description = "Some description about the order.",
+                OrganisationId = order.OrganisationId,
+                Description = order.Description.Value,
                 Sections = new List<SectionModel>
                 {
                     new SectionModel
@@ -110,7 +110,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     {
                         Id = "funding-source",
                         Status = "incomplete"
-                    },
+                    }
                 }
             });
         }
