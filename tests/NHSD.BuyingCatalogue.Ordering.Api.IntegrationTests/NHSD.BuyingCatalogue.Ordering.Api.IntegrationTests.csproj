@@ -11,6 +11,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="public_privatekey.pfx" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
@@ -19,9 +23,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="public_privatekey.pfx" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.Core" Version="3.3.106.22" />
     <PackageReference Include="Dapper" Version="2.0.35" />
     <PackageReference Include="FluentAssertions" Version="5.10.2" />
     <PackageReference Include="Flurl.Http" Version="2.4.2" />
+    <PackageReference Include="jose-jwt" Version="2.5.0" />
     <PackageReference Include="nunit" Version="3.12.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.15.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
