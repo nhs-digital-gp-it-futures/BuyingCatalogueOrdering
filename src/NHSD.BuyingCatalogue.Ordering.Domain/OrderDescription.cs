@@ -8,8 +8,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
     public sealed class OrderDescription : ValueObject
     {
         public string Value { get; }
+
+        private OrderDescription()
+        {
+
+        }
         
-        private OrderDescription(string value)
+        private OrderDescription(string value) : this()
         {
             Value = value;
         }

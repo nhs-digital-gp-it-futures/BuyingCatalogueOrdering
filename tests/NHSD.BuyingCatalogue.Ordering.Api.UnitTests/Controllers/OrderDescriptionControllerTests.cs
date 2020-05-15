@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             });
         }
 
-        [TestCase(null)]
+        [Test]
         public async Task Get_OrderIdDoesNotExist_ReturnsNotFound()
         {
             var context = OrderDescriptionTestContext.Setup();
@@ -98,7 +97,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             response.Should().BeEquivalentTo(new NotFoundResult());
         }
-        
+
+        [Test]
+        public async Task UpdateAsync_ValidationError_ReturnsBadRequest()
+        {
+            const string orderId = "C0000014-01";
+
+            var testData = CreateOrderDescriptionTestData(orderId, OrderDescription.Create("Test Description").Value);
+
+            var context = OrderDescriptionTestContext.Setup();
+            context.Order = testData.order;
+
+            using var controller = context.OrderDescriptionController;
+
+            var response = await controller.UpdateAsync(orderId, new OrderDescriptionModel() {Description = null});
+
+            response.Should().BeOfType<BadRequestResult>();
+        }
+
         [Test]
         public async Task UpdateAsync_UpdatedDescriptionIsValid_ReturnsNoContent()
         {

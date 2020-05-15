@@ -65,7 +65,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     new SectionModel
                     {
                         Id = "ordering-description",
-                        Status = string.IsNullOrWhiteSpace(order.Description.Value) ? "incomplete" : "complete"
+                        Status = "complete"
                     },
                     new SectionModel
                     {

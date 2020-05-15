@@ -45,9 +45,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [HttpPut]
         public async Task<ActionResult> UpdateAsync([FromRoute][Required]string orderId, [FromBody][Required] OrderDescriptionModel model)
         {
+            if (model is null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
 
-            if (order is null || model is null)
+            if (order is null)
             {
                 return NotFound();
             }
