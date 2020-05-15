@@ -19,19 +19,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             Value = value;
         }
 
-        public static Result<OrderDescription> Create(string desc)
+        public static Result<OrderDescription> Create(string description)
         {
-            if (string.IsNullOrWhiteSpace(desc))
+            if (string.IsNullOrWhiteSpace(description))
             {
                 return Result.Failure<OrderDescription>(OrderErrors.OrderDescriptionRequired());
             }
 
-            if (desc.Length > 100)
+            if (description.Length > 100)
             {
                 return Result.Failure<OrderDescription>(OrderErrors.OrderDescriptionTooLong());
             }
 
-            return Result.Success(new OrderDescription(desc));
+            return Result.Success(new OrderDescription(description));
         }
 
         protected override IEnumerable<object> GetEqualityComponents()

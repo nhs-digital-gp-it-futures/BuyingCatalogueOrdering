@@ -13,7 +13,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     {
         private readonly Response _response;
         private readonly Request _request;
-        private readonly Settings _settings;
 
         private readonly string _orderDescriptionUrl;
 
@@ -21,8 +20,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             _response = response;
             _request = request;
-            _settings = settings;
-            _orderDescriptionUrl = _settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/description";
+            _orderDescriptionUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/description";
         }
 
         [When(@"the user makes a request to retrieve the order description section with the ID (.*)")]
@@ -54,6 +52,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _request.PutJsonAsync(string.Format(_orderDescriptionUrl, orderId), data);
         }
 
+        [When(@"the user makes a request to update the description with the ID (.*) with no model")]
+        public async Task WhenTheUserMakesARequestToUpdateTheDescriptionWithOrderIdWithNoModel(string orderId)
+        {
+            await _request.PutJsonAsync(string.Format(_orderDescriptionUrl, orderId), null);
+        }
 
         private sealed class OrderDescriptionTable
         {
