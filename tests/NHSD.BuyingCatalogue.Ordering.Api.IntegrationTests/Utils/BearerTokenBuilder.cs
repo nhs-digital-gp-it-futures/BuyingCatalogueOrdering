@@ -11,7 +11,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
     public sealed class BearerTokenBuilder
     {
         private X509Certificate2 _signingCertificate;
-        private string _issuer = "http://host.docker.internal:8071/identity";
+        private string _issuer = "www.google.com";
         private string _audience = "Ordering";
         private TimeSpan _life = TimeSpan.FromHours(1);
         private DateTime _notBefore = DateTime.UtcNow;
