@@ -34,7 +34,7 @@ Scenario: 3. If a user is not authorised then they cannot access the orders
 
 @4826
 Scenario: 4. A non buyer user cannot access the orders
-    And the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
+    Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
     When a GET request is made for a list of orders with organisationId 4af62b99-638c-4247-875e-965239cd0c48
     Then a response with status code 403 is returned
 

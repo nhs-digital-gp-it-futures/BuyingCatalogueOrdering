@@ -2,29 +2,28 @@
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
 {
-    public class EmbeddedResourceReader
+    internal sealed class EmbeddedResourceReader
     {
         private const string EmbeddedResourceQualifier = "NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests";
 
         public static X509Certificate2 GetCertificate()
         {
-            var resourceName = $"{EmbeddedResourceQualifier}.public_privatekey.pfx";
-            using (var certificateStream =
-                typeof(EmbeddedResourceReader).Assembly.GetManifestResourceStream(resourceName))
+            var resourceName = $"{EmbeddedResourceQualifier}.IdentitySigningKey.pfx";
+            using var certificateStream =
+                typeof(EmbeddedResourceReader).Assembly.GetManifestResourceStream(resourceName);
+            
+            if (certificateStream == null)
             {
-                if (certificateStream == null)
-                {
-                    return null;
-                }
-
-                var rawBytes = new byte[certificateStream.Length];
-                for (var i = 0; i < certificateStream.Length; i++)
-                {
-                    rawBytes[i] = (byte)certificateStream.ReadByte();
-                }
-
-                return new X509Certificate2(rawBytes, "12345", X509KeyStorageFlags.UserKeySet);
+                return null;
             }
+
+            var rawBytes = new byte[certificateStream.Length];
+            for (var i = 0; i < certificateStream.Length; i++)
+            {
+                rawBytes[i] = (byte)certificateStream.ReadByte();
+            }
+
+            return new X509Certificate2(rawBytes, "12345", X509KeyStorageFlags.UserKeySet);
         }
     }
 }

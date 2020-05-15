@@ -31,7 +31,7 @@ Scenario: 3. If a user is not authorised then they cannot access the order descr
 
 @5322
 Scenario: 4. A non buyer user cannot access the order description
-    And the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
+    Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
     When the user makes a request to retrieve the order description section with the ID C000014-01
     Then a response with status code 403 is returned
 

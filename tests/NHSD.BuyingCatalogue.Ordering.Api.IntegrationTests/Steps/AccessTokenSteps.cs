@@ -9,9 +9,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     internal sealed class AccessTokenSteps
     {
         private readonly ScenarioContext _context;
-        public AccessTokenSteps(ScenarioContext context)
+        private readonly Settings _settings;
+
+        public AccessTokenSteps(ScenarioContext context, Settings settings)
         {
             _context = context;
+            _settings = settings;
         }
 
         [Given(@"no user is logged in")]
@@ -25,6 +28,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var builder = new BearerTokenBuilder()
                 .WithSigningCertificate(EmbeddedResourceReader.GetCertificate())
+                .IssuedBy(_settings.Authority)
                 .ForSubject("7B195137-6A59-4854-B118-62B39A3101EF")
                 .WithClaim("client_id", "PasswordClient")
                 .WithClaim("preferred_username", "BobSmith@email.com")
