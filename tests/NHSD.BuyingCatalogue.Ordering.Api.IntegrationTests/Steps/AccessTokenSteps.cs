@@ -21,7 +21,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Given(@"the user is logged in with the (Buyer|Authority) role for organisation (.*)")]
-        public void GivenTheCallToTheDatabaseWillFail(string role, string organisationId)
+        public void TheUserIsLoggedInWithRoleForOrganisation(string role, string organisationId)
         {
             var builder = new BearerTokenBuilder()
                 .WithSigningCertificate(EmbeddedResourceReader.GetCertificate())
@@ -49,12 +49,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             var token = builder.BuildToken();
             _context[ScenarioContextKeys.AccessToken] = token;
-        }
-
-        private class ClaimsTable
-        {
-            public string Claim { get; set; }
-            public string Value { get; set; }
         }
     }
 }
