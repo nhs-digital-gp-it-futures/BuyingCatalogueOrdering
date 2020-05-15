@@ -42,7 +42,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var orderId = "C0000014-01";
 
-            var testData = CreateOrderDescriptionTestData(orderId, "Test Description");
+            var testData = CreateOrderDescriptionTestData(orderId, OrderDescription.Create("Test Description").Value);
 
             var context = OrderDescriptionTestContext.Setup();
             context.Order = testData.order;
@@ -86,7 +86,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             const string orderId = "C0000014-01";
 
-            var testData = CreateOrderDescriptionTestData(orderId, "Test Description");
+            var testData = CreateOrderDescriptionTestData(orderId, OrderDescription.Create("Test Description").Value);
 
             var context = OrderDescriptionTestContext.Setup();
             context.Order = testData.order;
@@ -104,7 +104,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             const string orderId = "C0000014-01";
 
-            var testData = CreateOrderDescriptionTestData(orderId, "Test Description");
+            var testData = CreateOrderDescriptionTestData(orderId, OrderDescription.Create("Test Description").Value);
 
             var context = OrderDescriptionTestContext.Setup();
             context.Order = testData.order;
@@ -122,9 +122,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task UpdateAsync_UpdateAndGet_CalledOnce()
         {
             const string orderId = "C0000014-01";
-            const string newDescription = "New Description";
+            var newDescription = OrderDescription.Create("New Description").Value;
 
-            var testData = CreateOrderDescriptionTestData(orderId, "Test Description");
+            var testData = CreateOrderDescriptionTestData(orderId, OrderDescription.Create("Test Description").Value);
 
             var context = OrderDescriptionTestContext.Setup();
             context.Order = testData.order;
@@ -132,7 +132,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             using var controller = context.OrderDescriptionController;
 
             await controller.UpdateAsync(orderId,
-                    new OrderDescriptionModel { Description = newDescription });
+                    new OrderDescriptionModel { Description = newDescription.Value });
 
             var updatedOrder = testData.order;
             updatedOrder.SetDescription(newDescription);
@@ -147,11 +147,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var repositoryOrder = OrderBuilder
                 .Create()
                 .WithOrderId(orderId)
-                .WithDescription(description)
+                .WithDescription(description.Value)
                 .Build();
 
             return (order: repositoryOrder,
-                expectedDescription: new OrderDescriptionModel() {Description = repositoryOrder.Description});
+                expectedDescription: new OrderDescriptionModel() {Description = repositoryOrder.Description.Value});
         }
 
         private sealed class OrderDescriptionTestContext

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace NHSD.BuyingCatalogue.Ordering.Domain.Shared
+namespace NHSD.BuyingCatalogue.Ordering.Domain.Common
 {
     public abstract class ValueObject
     {

@@ -33,7 +33,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             var orderModelResult = orders.Select(order => new OrderModel()
             {
                 OrderId = order.OrderId,
-                Description = order.Description,
+                Description = order.Description.Value,
                 LastUpdatedBy = order.LastUpdatedBy,
                 LastUpdated = order.LastUpdated,
                 DateCreated = order.Created,
@@ -59,13 +59,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             {
                 OrderId = orderId,
                 OrganisationId = order.OrganisationId,
-                Description = order.Description,
+                Description = order.Description.Value,
                 Sections = new List<SectionModel>
                 {
                     new SectionModel
                     {
                         Id = "ordering-description",
-                        Status = string.IsNullOrWhiteSpace(order.Description) ? "incomplete" : "complete"
+                        Status = string.IsNullOrWhiteSpace(order.Description.Value) ? "incomplete" : "complete"
                     },
                     new SectionModel
                     {

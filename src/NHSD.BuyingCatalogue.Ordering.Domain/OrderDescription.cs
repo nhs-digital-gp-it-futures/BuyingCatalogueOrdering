@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using NHSD.BuyingCatalogue.Ordering.Domain.Common;
 using NHSD.BuyingCatalogue.Ordering.Domain.Orders;
 using NHSD.BuyingCatalogue.Ordering.Domain.Results;
-using NHSD.BuyingCatalogue.Ordering.Domain.Shared;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain
 {

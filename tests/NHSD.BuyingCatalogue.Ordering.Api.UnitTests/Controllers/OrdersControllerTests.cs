@@ -140,7 +140,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 expectedOrder: new OrderModel
                 {
                     OrderId = repositoryOrder.OrderId,
-                    Description = repositoryOrder.Description,
+                    Description = repositoryOrder.Description.Value,
                     Status = repositoryOrder.OrderStatus.Name,
                     LastUpdated = repositoryOrder.LastUpdated,
                     DateCreated = repositoryOrder.Created,
@@ -161,13 +161,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 {
                     OrderId = repositoryOrder.OrderId,
                     OrganisationId = repositoryOrder.OrganisationId,
-                    Description = repositoryOrder.Description,
+                    Description = repositoryOrder.Description.Value,
                     Sections = new List<SectionModel>
                     {
                         new SectionModel
                         {
                             Id = "ordering-description",
-                            Status = string.IsNullOrWhiteSpace(repositoryOrder.Description) ? "incomplete" : "complete"
+                            Status = string.IsNullOrWhiteSpace(repositoryOrder.Description.Value) ? "incomplete" : "complete"
                         },
                         new SectionModel {Id = "ordering-party", Status = "incomplete"},
                         new SectionModel {Id = "supplier", Status = "incomplete"},

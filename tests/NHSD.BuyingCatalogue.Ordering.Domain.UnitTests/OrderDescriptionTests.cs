@@ -1,5 +1,4 @@
-﻿using System;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 {
