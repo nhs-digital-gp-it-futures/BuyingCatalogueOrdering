@@ -33,7 +33,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
 
             if (_context.ContainsKey(ScenarioContextKeys.AccessToken))
             {
-                accessToken = _context[ScenarioContextKeys.AccessToken] as string;
+                accessToken = _context.Get<string>(ScenarioContextKeys.AccessToken);
             }
 
             return url
