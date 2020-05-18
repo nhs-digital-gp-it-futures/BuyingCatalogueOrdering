@@ -40,9 +40,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             orders.Should().BeEmpty();
         }
 
-        [TestCase(null, null)]
+        [TestCase(null, "Some Description")]
         [TestCase("C0000014-01", "Some Description")]
-        [TestCase("C0000014-02", null)]
         public async Task GetAllAsync_SingleOrderWithOrganisationIdExists_ReturnsTheOrder(string orderId, string orderDescription)
         {
             var organisationId = Guid.NewGuid();
@@ -108,14 +107,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             response.Should().BeEquivalentTo(new NotFoundResult());
         }
 
-        [TestCase("")]
-        [TestCase(" ")]
-        [TestCase("Some Description")]
-        public async Task GetOrderSummaryAsync_IsSummaryComplete_ReturnResult(string description)
+        [Test]
+        public async Task GetOrderSummaryAsync_IsSummaryComplete_ReturnResult()
         {
             const string orderId = "C0000014-01";
 
-            (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, description);
+            (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description");
 
             var context = OrdersControllerTestContext.Setup();
             context.Order = order;
@@ -140,7 +137,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 expectedOrder: new OrderModel
                 {
                     OrderId = repositoryOrder.OrderId,
-                    Description = repositoryOrder.Description,
+                    Description = repositoryOrder.Description.Value,
                     Status = repositoryOrder.OrderStatus.Name,
                     LastUpdated = repositoryOrder.LastUpdated,
                     DateCreated = repositoryOrder.Created,
@@ -161,13 +158,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 {
                     OrderId = repositoryOrder.OrderId,
                     OrganisationId = repositoryOrder.OrganisationId,
-                    Description = repositoryOrder.Description,
+                    Description = repositoryOrder.Description.Value,
                     Sections = new List<SectionModel>
                     {
                         new SectionModel
                         {
                             Id = "ordering-description",
-                            Status = string.IsNullOrWhiteSpace(repositoryOrder.Description) ? "incomplete" : "complete"
+                            Status = string.IsNullOrWhiteSpace(repositoryOrder.Description.Value) ? "incomplete" : "complete"
                         },
                         new SectionModel {Id = "ordering-party", Status = "incomplete"},
                         new SectionModel {Id = "supplier", Status = "incomplete"},

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Logging;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
@@ -35,7 +36,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             var authority = _configuration.GetValue<string>("Authority");
             var requireHttps = _configuration.GetValue<bool>("RequireHttps");
             var allowInvalidCertificate = _configuration.GetValue<bool>("AllowInvalidCertificate");
-
+            var bypassIdentity = _configuration.GetValue<bool>("BypassIdentity");
             services.AddTransient<IOrderRepository, OrderRepository>();
 
             services.RegisterHealthChecks(connectionString);
@@ -46,6 +47,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                     options.Authority = authority;
                     options.RequireHttpsMetadata = requireHttps;
                     options.Audience = "Ordering";
+
+                    if (bypassIdentity)
+                    {
+                        options.BypassIdentity();
+                    }
 
                     if (allowInvalidCertificate)
                     {

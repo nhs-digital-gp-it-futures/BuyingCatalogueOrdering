@@ -12,13 +12,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _order = new Order()
             {
                 OrderId = "C000014-01",
-                Description = "Some Description",
+                
                 OrganisationId = Guid.NewGuid(),
                 Created = DateTime.UtcNow,
                 LastUpdated = DateTime.UtcNow,
                 LastUpdatedBy = Guid.NewGuid(),
                 OrderStatus = new OrderStatus() {OrderStatusId = 1, Name = "Submitted"}
             };
+
+            _order.SetDescription(OrderDescription.Create("Some Description").Value);
         }
 
         internal static OrderBuilder Create() => new OrderBuilder();
@@ -31,7 +33,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 
         internal OrderBuilder WithDescription(string description)
         {
-            _order.Description = description;
+            _order.SetDescription(OrderDescription.Create(description).Value);
             return this;
         }
 

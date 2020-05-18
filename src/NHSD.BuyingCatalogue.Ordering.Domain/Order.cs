@@ -6,7 +6,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
     {
         public string OrderId { get; set; }
          
-        public string Description { get; set; }
+        public OrderDescription Description { get; private set; }
 
         public Guid OrganisationId { get; set; }
 
@@ -17,5 +17,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         public Guid LastUpdatedBy { get; set; }
 
         public OrderStatus OrderStatus { get; set; }
+
+        public void SetDescription(OrderDescription orderDescription)
+        {
+            Description = orderDescription ?? throw new ArgumentNullException(nameof(orderDescription));
+        }
     }
 }
