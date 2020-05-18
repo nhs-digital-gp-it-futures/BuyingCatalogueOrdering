@@ -98,7 +98,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             }
 
             var pathBase = _configuration.GetValue<string>("PathBase");
-            if (!string.IsNullOrEmpty(pathBase))
+            if (!string.IsNullOrWhiteSpace(pathBase))
             {
                 Log.Logger.Information($"USING PATH BASE {pathBase}");
                 app.UsePathBase(pathBase);
