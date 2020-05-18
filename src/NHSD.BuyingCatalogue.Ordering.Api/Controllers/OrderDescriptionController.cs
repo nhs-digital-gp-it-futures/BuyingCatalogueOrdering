@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
+using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
@@ -13,7 +14,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [Route("api/v1/orders/{orderId}/sections/description")]
     [ApiController]
     [Produces("application/json")]
-    [AllowAnonymous]
+    [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class OrderDescriptionController : Controller
     {
         private readonly IOrderRepository _orderRepository;

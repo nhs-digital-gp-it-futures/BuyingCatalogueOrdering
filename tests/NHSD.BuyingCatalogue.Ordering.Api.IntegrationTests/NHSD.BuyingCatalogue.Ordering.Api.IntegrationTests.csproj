@@ -11,11 +11,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="IdentitySigningKey.pfx" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="IdentitySigningKey.pfx" />
   </ItemGroup>
 
   <ItemGroup>

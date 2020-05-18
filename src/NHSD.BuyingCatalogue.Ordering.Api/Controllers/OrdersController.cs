@@ -8,13 +8,14 @@ using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
+using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]
     [Produces("application/json")]
-    [AllowAnonymous]
+    [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class OrdersController : Controller
     {
         private readonly IOrderRepository _orderRepository;
