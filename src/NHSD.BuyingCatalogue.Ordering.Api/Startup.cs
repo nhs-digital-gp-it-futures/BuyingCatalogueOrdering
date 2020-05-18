@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Logging;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
@@ -36,9 +37,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             var authority = _configuration.GetValue<string>("Authority");
             var requireHttps = _configuration.GetValue<bool>("RequireHttps");
             var allowInvalidCertificate = _configuration.GetValue<bool>("AllowInvalidCertificate");
-
+            var bypassIdentity = _configuration.GetValue<bool>("BypassIdentity");
             services.AddTransient<IOrderRepository, OrderRepository>();
             services.AddTransient<ICreateOrderService, CreateOrderService>();
+            
+            services.AddHttpContextAccessor();
 
             services.RegisterHealthChecks(connectionString);
 
@@ -48,6 +51,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                     options.Authority = authority;
                     options.RequireHttpsMetadata = requireHttps;
                     options.Audience = "Ordering";
+
+                    if (bypassIdentity)
+                    {
+                        options.BypassIdentity();
+                    }
 
                     if (allowInvalidCertificate)
                     {
@@ -93,6 +101,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 app.UseDeveloperExceptionPage();
             }
 
+            var pathBase = _configuration.GetValue<string>("PathBase");
+            if (!string.IsNullOrWhiteSpace(pathBase))
+            {
+                Log.Logger.Information($"USING PATH BASE {pathBase}");
+                app.UsePathBase(pathBase);
+            }
+            
             app.UseRouting();
 
             app.UseAuthentication();

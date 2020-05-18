@@ -31,23 +31,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common
 
             var response = await _response.ReadBodyAsJsonAsync();
 
-            var actual = response
-                .SelectToken("errors")
-                .Select(t => new ResponseErrorsTable
-                {
-                    ErrorMessageId = t.Value<string>("id"),
-                    FieldName = t.Value<string>("field")
-                });
+            var actual = response.SelectToken("errors").Select(x => new ResponseErrorsTable()
+            {
+                Id = x.Value<string>("id"),
+                Field = x.Value<string>("field")
+            });
 
             actual.Should().BeEquivalentTo(expected);
         }
 
         private sealed class ResponseErrorsTable
         {
-            public string ErrorMessageId { get; set; }
+            public string Id { get; set; }
 
-            public string FieldName { get; set; }
+            public string Field { get; set; }
         }
-
     }
 }

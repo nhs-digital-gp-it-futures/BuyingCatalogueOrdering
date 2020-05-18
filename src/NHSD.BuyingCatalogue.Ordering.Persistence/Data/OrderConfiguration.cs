@@ -5,7 +5,7 @@ using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 {
-    public class OrderConfiguration : IEntityTypeConfiguration<Order>
+    public sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
     {
         public void Configure(EntityTypeBuilder<Order> builder)
         {

@@ -6,17 +6,21 @@ using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Domain.Results;
-using static System.Int32;
-using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
+
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
 {
     public class CreateOrderService : ICreateOrderService
     {
         private readonly IOrderRepository _orderRepository;
-        public CreateOrderService(IOrderRepository orderRepository)
+        private readonly  IHttpContextAccessor _httpContextAccessor;
+
+        public CreateOrderService(IOrderRepository orderRepository , IHttpContextAccessor httpContextAccessor)
         {
             _orderRepository = orderRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<Result<string>> CreateAsync(CreateOrderRequest createOrderRequest)
@@ -29,8 +33,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
             var order = new Order {
                 OrderStatus = new OrderStatus() { Name = "incomplete" },
                 Created = DateTime.Now,
-                LastUpdated = DateTime.Now                
+                LastUpdated = DateTime.Now,
             };
+
+            var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrEmpty(userId))
+            {
+                order.LastUpdatedBy = Guid.Parse(userId);
+            }
 
             var isDescriptionValid = OrderDescription.Create(createOrderRequest.Description);
             if (isDescriptionValid.IsSuccess)

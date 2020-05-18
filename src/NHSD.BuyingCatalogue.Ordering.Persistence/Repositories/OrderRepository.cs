@@ -60,7 +60,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
                 if (order.OrderId == null)
                 {
                     order.OrderId = await GetIncremenedOrderId();
-                }
+                }                
                 _context.Order.Add(order);
                 await _context.SaveChangesAsync();
                 await dbContextTransaction.CommitAsync();

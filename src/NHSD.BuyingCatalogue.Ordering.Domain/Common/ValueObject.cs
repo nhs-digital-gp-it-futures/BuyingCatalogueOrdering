@@ -3,6 +3,9 @@ using System.Linq;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain.Common
 {
+    /// <summary>
+    ///     Represents a building block of a domain model. It should be a small concept representing the value of an entity.
+    /// </summary>
     public abstract class ValueObject
     {
         /// <summary>
@@ -10,6 +13,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Common
         /// </summary>
         /// <returns>A list of values of this instance to be used for equality.</returns>
         protected abstract IEnumerable<object> GetEqualityComponents();
+
         /// <summary>
         ///     Determines whether the specified object is equal to the current object.
         /// </summary>
@@ -25,8 +29,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Common
             {
                 return false;
             }
+
             return GetEqualityComponents().SequenceEqual(item.GetEqualityComponents());
         }
+
         /// <summary>
         ///     Serves as the default hash function.
         /// </summary>
@@ -42,6 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Common
                     }
                 });
         }
+
         /// <summary>
         ///     Determines whether the specified objects are equal.
         /// </summary>
@@ -58,8 +65,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Common
             {
                 return false;
             }
+
             return a.Equals(b);
         }
+
         /// <summary>
         ///     Determines whether the specified objects are not equal.
         /// </summary>

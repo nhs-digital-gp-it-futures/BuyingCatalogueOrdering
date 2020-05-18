@@ -3,6 +3,8 @@
     I want to create an orders for a given organisation
     So that I can add information to the order
 
+Background:
+    Given  the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 Scenario: 1. A user can create a order and a incremented order id is returned;
 	Given Orders exist
@@ -27,7 +29,6 @@ Scenario: 2. A user creates mutiple orders and order id is incremented multiple 
 	Then a response with status code 201 is returned
 	And a create order response is returned with the OrderId C000016-01
 
-
 Scenario: 3. A user can create a ordrder when no orders exist and a defualt OrderId is returned;
 	When a POST request is made to create a order 
 		| OrganisationId                       | Description                         |
@@ -41,7 +42,7 @@ Scenario: 4. A user create an order without specifing an Organisation Id a Statu
 		| This is an order for organisation 2 |
 	Then a response with status code 400 is returned
      And the response contains the following errors
-		| ErrorMessageId         | FieldName      |
+		| Id                     | Field          |
 		| OrganisationIdRequired | OrganisationId |
 
 Scenario: 5. A user create an order without specifing a description a Status Code of 400 is returned
@@ -50,7 +51,7 @@ Scenario: 5. A user create an order without specifing a description a Status Cod
 		| 4af62b99-638c-4247-875e-965239cd0c48 |
 	Then a response with status code 400 is returned
      And the response contains the following errors
-		| ErrorMessageId           | FieldName   |
+		| Id                       | Field       |
 		| OrderDescriptionRequired | Description |
 
 Scenario: 6. A user attempts to create a order with a description that is too long,  a Status Code of 400 is returned;
@@ -59,7 +60,7 @@ Scenario: 6. A user attempts to create a order with a description that is too lo
 		| 4af62b99-638c-4247-875e-965239cd0c48 | This description is too long 12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901 |
 	Then a response with status code 400 is returned
      And the response contains the following errors
-		| ErrorMessageId          | FieldName   |
+		| Id                      | Field       |
 		| OrderDescriptionTooLong | Description |
 
 Scenario: 7. A user attempts to create a order with multiple errors, all errors are returned;
@@ -68,7 +69,30 @@ Scenario: 7. A user attempts to create a order with multiple errors, all errors 
 		| This description is too long 12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901 |
 	Then a response with status code 400 is returned
      And the response contains the following errors
-		| ErrorMessageId          | FieldName      |
+		| Id                      | Field          |
 		| OrganisationIdRequired  | OrganisationId |
 		| OrderDescriptionTooLong | Description    |
+
+Scenario: 8. If a user is not authorised, then they cannot create the order
+    Given no user is logged in
+	When a POST request is made to create a order 
+		| OrganisationId                       | Description                         |
+		| 4af62b99-638c-4247-875e-965239cd0c48 | This is an order for organisation 2 |
+    Then a response with status code 401 is returned
+
+Scenario: 9. A non buyer user cannot create an order
+    Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
+    When a POST request is made to create a order 
+		| OrganisationId                       | Description                         |
+		| 4af62b99-638c-4247-875e-965239cd0c48 | This is an order for organisation 2 |
+    Then a response with status code 403 is returned
+
+@5322
+Scenario: 10. Service Failure
+    Given the call to the database will fail
+    When a POST request is made to create a order 
+		| OrganisationId                       | Description                         |
+		| 4af62b99-638c-4247-875e-965239cd0c48 | This is an order for organisation 2 |
+    Then a response with status code 500 is returned
+
 

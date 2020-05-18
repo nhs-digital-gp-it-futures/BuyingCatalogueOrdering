@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -62,7 +63,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             using var controller = context.OrderDescriptionController;
 
             await controller.GetAsync(string.Empty);
-            
+
             context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(string.Empty), Times.Once);
         }
 
@@ -75,44 +76,45 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             using var controller = context.OrderDescriptionController;
 
             var response =
-                await controller.UpdateAsync(orderId, new OrderDescriptionModel {Description = "Desc"});
+                await controller.UpdateAsync(orderId, new OrderDescriptionModel { Description = "Desc" });
 
             response.Should().BeEquivalentTo(new NotFoundResult());
         }
 
         [Test]
-        public async Task UpdateAsync_ModelIsNull_ReturnNotFound()
+        public void UpdateAsync_ModelIsNull_ThrowsNullArgumentException()
         {
-            const string orderId = "C0000014-01";
+            static async Task GetOrderDescriptionWithNullModel()
+            {
+                var context = OrderDescriptionTestContext.Setup();
 
-            var testData = CreateOrderDescriptionTestData(orderId, OrderDescription.Create("Test Description").Value);
+                using var controller = context.OrderDescriptionController;
+                await controller.UpdateAsync("OrderId", null);
+            }
 
-            var context = OrderDescriptionTestContext.Setup();
-            context.Order = testData.order;
-
-            using var controller = context.OrderDescriptionController;
-
-            var response =
-                await controller.UpdateAsync(orderId, null);
-
-            response.Should().BeEquivalentTo(new NotFoundResult());
+            Assert.ThrowsAsync<ArgumentNullException>(GetOrderDescriptionWithNullModel);
         }
 
         [Test]
         public async Task UpdateAsync_ValidationError_ReturnsBadRequest()
         {
             const string orderId = "C0000014-01";
+            const string description = null;
 
-            var testData = CreateOrderDescriptionTestData(orderId, OrderDescription.Create("Test Description").Value);
+            (Order order, _) = CreateOrderDescriptionTestData(orderId, OrderDescription.Create("Test Description").Value);
 
             var context = OrderDescriptionTestContext.Setup();
-            context.Order = testData.order;
+            context.Order = order;
 
             using var controller = context.OrderDescriptionController;
 
-            var response = await controller.UpdateAsync(orderId, new OrderDescriptionModel() {Description = null});
+            var response = await controller.UpdateAsync(orderId, new OrderDescriptionModel { Description = description });
 
-            response.Should().BeOfType<BadRequestResult>();
+            var isValid = OrderDescription.Create(description);
+            var expected =
+                new BadRequestObjectResult(new ErrorsModel(isValid.Errors.Select(x => new ErrorModel(x.Id, x.Field))));
+
+            response.Should().BeEquivalentTo(expected);
         }
 
         [Test]
@@ -120,16 +122,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             const string orderId = "C0000014-01";
 
-            var testData = CreateOrderDescriptionTestData(orderId, OrderDescription.Create("Test Description").Value);
+            (Order order, _) = CreateOrderDescriptionTestData(orderId, OrderDescription.Create("Test Description").Value);
 
             var context = OrderDescriptionTestContext.Setup();
-            context.Order = testData.order;
+            context.Order = order;
 
             using var controller = context.OrderDescriptionController;
 
             var response =
                 await controller.UpdateAsync(orderId,
-                    new OrderDescriptionModel {Description = "New Description"});
+                    new OrderDescriptionModel { Description = "New Description" });
 
             response.Should().BeOfType<NoContentResult>();
         }
@@ -140,21 +142,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             const string orderId = "C0000014-01";
             var newDescription = OrderDescription.Create("New Description").Value;
 
-            var testData = CreateOrderDescriptionTestData(orderId, OrderDescription.Create("Test Description").Value);
+            (Order order, _) = CreateOrderDescriptionTestData(orderId, OrderDescription.Create("Test Description").Value);
 
             var context = OrderDescriptionTestContext.Setup();
-            context.Order = testData.order;
+            context.Order = order;
 
             using var controller = context.OrderDescriptionController;
 
             await controller.UpdateAsync(orderId,
                     new OrderDescriptionModel { Description = newDescription.Value });
 
-            var updatedOrder = testData.order;
-            updatedOrder.SetDescription(newDescription);
+            order.SetDescription(newDescription);
 
             context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(orderId), Times.Once);
-            context.OrderRepositoryMock.Verify(x => x.UpdateOrderAsync(updatedOrder), Times.Once);
+            context.OrderRepositoryMock.Verify(x => x.UpdateOrderAsync(order), Times.Once);
         }
 
         private static (Order order, OrderDescriptionModel expectedDescription) CreateOrderDescriptionTestData(
@@ -167,7 +168,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .Build();
 
             return (order: repositoryOrder,
-                expectedDescription: new OrderDescriptionModel() {Description = repositoryOrder.Description.Value});
+                expectedDescription: new OrderDescriptionModel { Description = repositoryOrder.Description.Value });
         }
 
         private sealed class OrderDescriptionTestContext

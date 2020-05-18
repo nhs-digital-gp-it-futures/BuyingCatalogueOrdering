@@ -29,9 +29,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
 
         private IFlurlRequest CreateCommonRequest(string url, params object[] pathSegments)
         {
+            string accessToken = null;
+
+            if (_context.ContainsKey(ScenarioContextKeys.AccessToken))
+            {
+                accessToken = _context.Get<string>(ScenarioContextKeys.AccessToken);
+            }
+
             return url
                 .AppendPathSegments(pathSegments)
-                .WithOAuthBearerToken(_context.Get(ScenarioContextKeys.AccessToken, string.Empty))
+                .WithOAuthBearerToken(accessToken)
                 .AllowAnyHttpStatus();
         }
     }

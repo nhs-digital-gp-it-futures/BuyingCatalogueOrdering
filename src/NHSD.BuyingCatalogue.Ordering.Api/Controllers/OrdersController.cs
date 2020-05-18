@@ -8,15 +8,17 @@ using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
+using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
+using System.Security.Claims;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]
     [Produces("application/json")]
-    [AllowAnonymous]
+    [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class OrdersController : Controller
     {
         private readonly IOrderRepository _orderRepository;
@@ -68,7 +70,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 {
                     new SectionModel
                     {
-                        Id = "ordering-description",
+                        Id = "description",
                         Status = "complete"
                     },
                     new SectionModel
@@ -126,9 +128,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             var result = await _createOrderService.CreateAsync(new CreateOrderRequest
             {
-                Description = order.Description, 
-                OrganisationId = order.OrganisationId
-            });
+                Description = order.Description,
+                OrganisationId = order.OrganisationId,
+            }); 
 
             if (result.IsSuccess)
             {
