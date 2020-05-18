@@ -65,7 +65,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 {
                     new SectionModel
                     {
-                        Id = "ordering-description",
+                        Id = "description",
                         Status = "complete"
                     },
                     new SectionModel
