@@ -163,7 +163,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     {
                         new SectionModel
                         {
-                            Id = "ordering-description",
+                            Id = "description",
                             Status = string.IsNullOrWhiteSpace(repositoryOrder.Description.Value) ? "incomplete" : "complete"
                         },
                         new SectionModel {Id = "ordering-party", Status = "incomplete"},
