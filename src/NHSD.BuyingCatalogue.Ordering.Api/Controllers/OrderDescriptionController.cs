@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
@@ -28,10 +29,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         public async Task<ActionResult> GetAsync([FromRoute][Required] string orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
 
             if (order is null)
             {
                 return NotFound();
+            }
+            if (primaryOrganisationId != order.OrganisationId.ToString())
+            {
+                return Forbid();
             }
 
             var descriptionModel = new OrderDescriptionModel()
@@ -51,10 +57,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
 
             if (order is null)
             {
                 return NotFound();
+            }
+            if (primaryOrganisationId != order.OrganisationId.ToString())
+            {
+                return Forbid();
             }
 
             var isValid = OrderDescription.Create(model.Description);

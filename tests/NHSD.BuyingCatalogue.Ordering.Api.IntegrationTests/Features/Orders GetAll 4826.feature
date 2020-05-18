@@ -22,6 +22,7 @@ Scenario: 1. Get all of the orders from an existing organisationId
 
 @4826
 Scenario: 2. Get all of the orders from an invalid organisationId
+    Given the user is logged in with the Buyer role for organisation 3a72c6ab-0be8-4faa-8cb0-3b2c1f077eeb
     When a GET request is made for a list of orders with organisationId 3a72c6ab-0be8-4faa-8cb0-3b2c1f077eeb
     Then a response with status code 200 is returned
     And an empty list is returned
@@ -39,7 +40,12 @@ Scenario: 4. A non buyer user cannot access the orders
     Then a response with status code 403 is returned
 
 @4826
-Scenario: 5. Service Failure
+Scenario: 5. A buyer user cannot access the orders for an organisation they do not belong to
+    When a GET request is made for a list of orders with organisationId e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
+    Then a response with status code 403 is returned
+
+@4826
+Scenario: 6. Service Failure
     Given the call to the database will fail
     When a GET request is made for a list of orders with organisationId 4af62b99-638c-4247-875e-965239cd0c48
     Then a response with status code 500 is returned

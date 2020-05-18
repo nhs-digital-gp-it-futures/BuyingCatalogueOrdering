@@ -36,7 +36,13 @@ Scenario: 4. A non buyer user cannot access the order description
     Then a response with status code 403 is returned
 
 @5322
-Scenario: 5. Service Failure
+Scenario: 5. A buyer user cannot access the order description for an organisation they don't belong to
+    Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
+    When the user makes a request to retrieve the order description section with the ID C000014-01
+    Then a response with status code 403 is returned
+
+@5322
+Scenario: 6. Service Failure
     Given the call to the database will fail
     When the user makes a request to retrieve the order description section with the ID C000014-01
     Then a response with status code 500 is returned

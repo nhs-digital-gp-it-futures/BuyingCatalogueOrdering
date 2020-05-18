@@ -5,16 +5,16 @@
 
 Background:
     Given Orders exist
-        | OrderId    | Description         | OrderStatusId | Created    | LastUpdated | LastUpdatedBy                        | OrganisationId                       |
-        | C000014-02 | Another Description | 2             | 05/05/2020 | 09/05/2020  | a11a46f9-ce6f-448a-95c2-fde6e61c804a | 4af62b99-638c-4247-875e-965239cd0c48 |
+        | OrderId    | Description   | OrderStatusId | Created    | LastUpdated | LastUpdatedBy                        | OrganisationId                       |
+        | C000014-01 | A Description | 1             | 05/05/2020 | 09/05/2020  | a11a46f9-ce6f-448a-95c2-fde6e61c804a | 4af62b99-638c-4247-875e-965239cd0c48 |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 @5321
 Scenario: 1. Displaying the order summary, where the order sections are complete
-    When the user makes a request to retrieve the order summary with the ID C000014-02
+    When the user makes a request to retrieve the order summary with the ID C000014-01
     Then a response with status code 200 is returned
     And the order summary is returned with the following values
-        | OrderId    | OrganisationId                       | Description         |
-        | C000014-02 | 4af62b99-638c-4247-875e-965239cd0c48 | Another Description |
+        | OrderId    | OrganisationId                       | Description   |
+        | C000014-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
     And the order Summary Sections have the following values
         | Id                   | Status     |
         | ordering-description | complete   |
@@ -45,7 +45,13 @@ Scenario: 4. A non buyer user cannot access the order summary
     Then a response with status code 403 is returned
 
 @5321
-Scenario: 5. Service Failure
+Scenario: 5. A buyer user cannot access the order summary for an organisation they don't belong to
+    Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
+    When the user makes a request to retrieve the order summary with the ID C000014-01
+    Then a response with status code 403 is returned
+
+@5321
+Scenario: 6. Service Failure
     Given the call to the database will fail
     When the user makes a request to retrieve the order summary with the ID C000014-01
     Then a response with status code 500 is returned
