@@ -38,8 +38,8 @@ Scenario: 3. Updating an order, with no description, returns a relevant error me
 @5322
 Scenario: 4. Updating an order, with a description, exceeding it's maximum limit, returns a relevant error message
     When the user makes a request to update the description with the ID C000014-01
-        | Description                     |
-        | A string with the length of 101 |
+        | Description              |
+        | #A string of length 101# |
     Then a response with status code 400 is returned
     And the response contains the following errors
         | Id                      | Field       |
