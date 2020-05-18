@@ -19,8 +19,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
             {
                 throw new ArgumentNullException(nameof(modelBuilder));
             }
-            
+
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.ApplyConfiguration(new OrderConfiguration());
         }
     }
 }

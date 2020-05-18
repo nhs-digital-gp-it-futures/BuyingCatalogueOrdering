@@ -1,7 +1,7 @@
-﻿Feature: Display the Order Description in an Authority Section
-	As an Authority User
-	I want to view an orders description
-	So that I can ensure that the information is correct
+﻿Feature: Display the Order Description in a Buyer Section
+    As a Buyer
+    I want to view an order's description
+    So that I can ensure that the information is correct
 
 Background:
     Given Orders exist

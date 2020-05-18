@@ -43,6 +43,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
             var valueRetrievers = Service.Instance.ValueRetrievers;
 
             valueRetrievers.Register(new DateTimeValueRetriever());
+            valueRetrievers.Register(new GenerateStringLengthValueRetriever());
+            valueRetrievers.Register(new NullStringValueRetriever());
         }
 
         private async Task ResetDatabaseAsync() =>
