@@ -143,7 +143,6 @@ jobs:
       action: 'Build services'
       additionalImageTags: '$(Build.BuildNumber)'
       includeSourceTags: true
-    enabled: false
 
   - task: DockerCompose@0
     displayName: 'Push: Prod'
@@ -156,5 +155,3 @@ jobs:
       action: 'Push services'
       additionalImageTags: '$(Build.BuildNumber)'
       includeSourceTags: true
-    enabled: false
-    
