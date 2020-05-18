@@ -4,9 +4,10 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
-using NHSD.BuyingCatalogue.Ordering.Common.Results;
 using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Domain.Results;
 using static System.Int32;
+using NHSD.BuyingCatalogue.Ordering.Api.Models;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
 {
@@ -25,30 +26,33 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
                 throw new ArgumentNullException(nameof(createOrderRequest));
             }
 
-            
-            //TODO add a create method to Order to fill in defaults 
+            var order = new Order {
+                OrderStatus = new OrderStatus() { Name = "incomplete" },
+                Created = DateTime.Now,
+                LastUpdated = DateTime.Now                
+            };
 
-            var orderId = await GetNewOrderId();
-            var newOrder = new Order {OrderId = orderId, OrganisationId = createOrderRequest.OrganisationId, Description = createOrderRequest.Description , OrderStatus = new OrderStatus() { OrderStatusId = 1, Name = "Submitted" } };
-
-            //TODO validate order 
-
-            await _orderRepository.CreateOrderAsync(newOrder);
-
-            return Result.Success(newOrder.OrderId);
-        }
-
-        private async Task<string> GetNewOrderId()
-        {
-            var resultOrderId = "C0000014-01";
-            var lastOrderId = await _orderRepository.GetLatestOrderByCreationDate();
-            if (!string.IsNullOrEmpty(lastOrderId))
+            var isDescriptionValid = OrderDescription.Create(createOrderRequest.Description);
+            if (isDescriptionValid.IsSuccess)
             {
-                var numberSection = resultOrderId.Substring(1, 7);
-                var orderNumber = Parse(s: numberSection, CultureInfo.InvariantCulture);
-                resultOrderId = $"C{orderNumber+1:D6}-01";
+                order.SetDescription(isDescriptionValid.Value);
             }
-            return resultOrderId;
+                       
+            var isOrganisationValid = OrderOrganisationId.Create(createOrderRequest.OrganisationId);
+            if (isOrganisationValid.IsSuccess)
+            {
+                order.OrganisationId = isOrganisationValid.Value;
+            }
+
+            if (!isDescriptionValid.IsSuccess || !isOrganisationValid.IsSuccess )
+            {
+                var allErrors = isDescriptionValid.Errors.Union(isOrganisationValid.Errors);
+                return  Result.Failure<string>(allErrors);
+            }
+
+            var orderId = await _orderRepository.CreateOrderAsync(order);
+
+            return Result.Success(orderId);
         }
     }
 }

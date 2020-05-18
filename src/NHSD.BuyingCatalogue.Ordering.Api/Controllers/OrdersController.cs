@@ -122,7 +122,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             {
                 throw new ArgumentNullException(nameof(order));
             }
-            var createOrderResponse = new CreateOrderResponseModel {OrderId = "C0000014-01" };
+            var createOrderResponse = new CreateOrderResponseModel();
 
             var result = await _createOrderService.CreateAsync(new CreateOrderRequest
             {
@@ -136,7 +136,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return CreatedAtAction(nameof(CreateOrderAsync).TrimAsync(), null, new { orderId = result.Value }, createOrderResponse);
             }
 
-            createOrderResponse.Errors = result.Errors.Select(x => new ErrorMessageModel(x.Id, x.Field));
+            createOrderResponse.Errors = result.Errors.Select(x => new ErrorModel(x.Id, x.Field));
             return BadRequest(createOrderResponse);
         }
     }

@@ -44,6 +44,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             orderId.Should().Be(responseOrderId);
         }
 
+        [Then(@"a create order response is returned with the Errors")]
+        public async Task ThenTheCreateOrderResponseIsReturnedWithTheFollowingValues()
+        {
+            var errors = await _response.ReadBodyAsJsonAsync();
+            var responseOrderId = errors.Value<string>("orderId");
+        }
+
+
         public sealed class CreateOrderPayload
         {
             public Guid OrganisationId { get; set; }
