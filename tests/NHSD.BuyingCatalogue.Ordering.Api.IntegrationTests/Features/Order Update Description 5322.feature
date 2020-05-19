@@ -16,7 +16,9 @@ Scenario: 1. Updating an orders description
         | Description         |
         | Another Description |
     Then a response with status code 204 is returned
-    And the order description is updated in the database to Another Description with orderId C000014-01
+    And the order description for order with id C000014-01 is set to
+        | Description         |
+        | Another Description |
     And the lastUpdatedName is updated in the database to Bob Smith with orderId C000014-01
 
 @5322
@@ -25,8 +27,10 @@ Scenario: 2. Updating an orders description and with a changed user name
         | Description      |
         | Test Description |
     Then a response with status code 204 is returned
-    And the order description is updated in the database to Test Description with orderId C000014-02
-    And the lastUpdatedName is updated in the database to Bob Smith with orderId C000014-02    
+    And the order description for order with id C000014-02 is set to
+        | Description      |
+        | Test Description |
+    And the lastUpdatedName is updated in the database to Bob Smith with orderId C000014-02
 
 @5322
 Scenario: 3. Updating an order, with a non existent model returns not found
@@ -63,7 +67,7 @@ Scenario: 6. If a user is not authorised, then they cannot update the orders des
 
 @5322
 Scenario: 7. A non buyer user cannot update an orders description
-     Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
+    Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
     When the user makes a request to update the description with the ID C000014-01
         | Description         |
         | Another Description |
@@ -71,7 +75,7 @@ Scenario: 7. A non buyer user cannot update an orders description
 
 @5322
 Scenario: 8. A buyer user cannot update an orders description for an organisation they don't belong to
-     Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
+    Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
     When the user makes a request to update the description with the ID C000014-01
         | Description         |
         | Another Description |
@@ -84,3 +88,13 @@ Scenario: 9. Service Failure
         | Description         |
         | Another Description |
     Then a response with status code 500 is returned
+
+@5322
+Scenario: 10. Update order description to 100 characters should be successful
+    When the user makes a request to update the description with the ID C000014-02
+        | Description              |
+        | #A string of length 100# |
+    Then a response with status code 204 is returned
+    And the order description for order with id C000014-02 is set to
+        | Description              |
+        | #A string of length 100# |

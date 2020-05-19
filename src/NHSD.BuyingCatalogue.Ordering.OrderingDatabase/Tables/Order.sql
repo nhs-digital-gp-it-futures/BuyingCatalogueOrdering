@@ -1,7 +1,7 @@
 ﻿CREATE TABLE dbo.[Order]
 (
     OrderId NVARCHAR(10) NOT NULL PRIMARY KEY,
-    [Description] NVARCHAR(50) NOT NULL,
+    [Description] NVARCHAR(100) NOT NULL,
     OrganisationId UNIQUEIDENTIFIER NOT NULL,
     OrderStatusId INT NOT NULL,
     Created DATETIME2 NOT NULL,
