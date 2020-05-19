@@ -41,6 +41,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithOrderStatusId(ordersTableItem.OrderStatusId)
                     .WithDateCreated(ordersTableItem.Created)
                     .WithLastUpdatedBy(ordersTableItem.LastUpdatedBy)
+                    .WithLastUpdatedName(ordersTableItem.LastUpdatedByName)
                     .WithLastUpdated(ordersTableItem.LastUpdated)
                     .Build();
 
@@ -63,7 +64,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             orders.Should().BeEquivalentTo(expectedOrders,
                 orderTable => orderTable.Excluding(order => order.OrderStatusId)
-                    .Excluding(order => order.OrganisationId));
+                    .Excluding(order => order.OrganisationId)
+                    .Excluding(order => order.LastUpdatedBy));
         }
 
         [Then(@"an empty list is returned")]
@@ -81,7 +83,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 Description = token.Value<string>("description"),
                 Status = token.Value<string>("status"),
                 LastUpdated = token.Value<DateTime>("lastUpdated"),
-                LastUpdatedBy = token.SelectToken("lastUpdatedBy").ToObject<Guid>(),
+                LastUpdatedByName = token.Value<string>("lastUpdatedBy"),
                 Created = token.Value<DateTime>("dateCreated")
             };
         }
@@ -101,6 +103,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public DateTime Created { get; set; }
 
             public Guid LastUpdatedBy { get; set; }
+
+            public string LastUpdatedByName { get; set; }
 
             public DateTime LastUpdated { get; set; }
         }

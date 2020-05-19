@@ -7,11 +7,6 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
     {
         private readonly OrderEntity _orderEntity;
 
-        public static OrderEntityBuilder Create()
-        {
-            return new OrderEntityBuilder();
-        }
-
         private OrderEntityBuilder()
         {
             _orderEntity = new OrderEntity()
@@ -21,8 +16,14 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
                 OrderStatusId = 0,
                 LastUpdated = DateTime.UtcNow,
                 LastUpdatedBy = Guid.NewGuid(),
+                LastUpdatedByName = "Alice Smith",
                 Created = DateTime.UtcNow
             };
+        }
+
+        public static OrderEntityBuilder Create()
+        {
+            return new OrderEntityBuilder();
         }
 
         public OrderEntityBuilder WithOrderId(string orderId)
@@ -58,6 +59,12 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
         public OrderEntityBuilder WithLastUpdatedBy(Guid lastUpdatedBy)
         {
             _orderEntity.LastUpdatedBy = lastUpdatedBy;
+            return this;
+        }
+
+        public OrderEntityBuilder WithLastUpdatedName(string lastUpdatedByName)
+        {
+            _orderEntity.LastUpdatedByName = lastUpdatedByName;
             return this;
         }
 

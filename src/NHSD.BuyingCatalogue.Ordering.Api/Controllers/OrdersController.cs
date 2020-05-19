@@ -31,11 +31,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         {
             var orders = await _orderRepository.ListOrdersByOrganisationIdAsync(organisationId);
 
-            var orderModelResult = orders.Select(order => new OrderModel()
-            {
+            var orderModelResult = orders.Select(order => new OrderModel
+                {
                 OrderId = order.OrderId,
                 Description = order.Description.Value,
-                LastUpdatedBy = order.LastUpdatedBy,
+                LastUpdatedBy = order.LastUpdatedByName,
                 LastUpdated = order.LastUpdated,
                 DateCreated = order.Created,
                 Status = order.OrderStatus.Name
