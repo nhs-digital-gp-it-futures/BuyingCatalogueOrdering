@@ -29,12 +29,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         public async Task<ActionResult> GetAsync([FromRoute][Required] string orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
-            var primaryOrganisationId = User.GetPrimaryOrganisationId();
-
             if (order is null)
             {
                 return NotFound();
             }
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
             if (primaryOrganisationId != order.OrganisationId)
             {
                 return Forbid();
@@ -57,12 +57,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
-            var primaryOrganisationId = User.GetPrimaryOrganisationId();
-
             if (order is null)
             {
                 return NotFound();
             }
+            
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
             if (primaryOrganisationId != order.OrganisationId)
             {
                 return Forbid();

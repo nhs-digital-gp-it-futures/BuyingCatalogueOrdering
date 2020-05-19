@@ -60,6 +60,7 @@ Scenario: 6. A non buyer user cannot update an orders description
     When the user makes a request to update the description with the ID C000014-01
         | Description         |
         | Another Description |
+    Then a response with status code 403 is returned
 
 @5322
 Scenario: 7. A buyer user cannot update an orders description for an organisation they don't belong to
@@ -67,6 +68,7 @@ Scenario: 7. A buyer user cannot update an orders description for an organisatio
     When the user makes a request to update the description with the ID C000014-01
         | Description         |
         | Another Description |
+    Then a response with status code 403 is returned
 
 @5322
 Scenario: 8. Service Failure
