@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Domain.Results;
 using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
 
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
