@@ -23,19 +23,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             static void Test()
             {
                 var context = CreateOrderServiceTestContext.Setup();
-                var sut = new CreateOrderService(null, context.HttpContextAccessorMock.Object);
-            }
-
-            Assert.Throws<ArgumentNullException>(Test);
-        }
-
-        [Test]
-        public void Constructor_NullHttpAccessor_ThrowsException()
-        {
-            static void Test()
-            {
-                var context = CreateOrderServiceTestContext.Setup();
-                var sut = new CreateOrderService(context.OrderRepositoryMock.Object, null);
+                var sut = new CreateOrderService(null);
             }
             Assert.Throws<ArgumentNullException>(Test);
         }
@@ -154,21 +142,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         {
             OrderRepositoryMock = new Mock<IOrderRepository>();
             OrderRepositoryMock.Setup(x => x.CreateOrderAsync(It.IsAny<Order>())).ReturnsAsync("OrderId");
-
-            HttpContextAccessorMock = new Mock<IHttpContextAccessor>();
-            HttpContextAccessorMock.Setup(x => x.HttpContext);
-
-            CreateOrderService = new CreateOrderService(
-                OrderRepositoryMock.Object,
-                HttpContextAccessorMock.Object
-                );
+            CreateOrderService = new CreateOrderService(OrderRepositoryMock.Object);
         }
 
         internal Result OrderValidationResult { get; set; } = Result.Success();
 
         internal Mock<IOrderRepository> OrderRepositoryMock { get; set; }
-
-        internal Mock<IHttpContextAccessor> HttpContextAccessorMock { get; set; }
 
         internal CreateOrderService CreateOrderService { get; }
 

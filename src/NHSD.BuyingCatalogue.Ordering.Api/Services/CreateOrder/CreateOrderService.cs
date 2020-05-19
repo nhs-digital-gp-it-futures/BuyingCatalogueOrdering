@@ -12,12 +12,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
     public class CreateOrderService : ICreateOrderService
     {
         private readonly IOrderRepository _orderRepository;
-        private readonly  IHttpContextAccessor _httpContextAccessor;
 
-        public CreateOrderService(IOrderRepository orderRepository , IHttpContextAccessor httpContextAccessor)
+
+        public CreateOrderService(IOrderRepository orderRepository)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
-            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
         public async Task<Result<string>> CreateAsync(CreateOrderRequest createOrderRequest)
