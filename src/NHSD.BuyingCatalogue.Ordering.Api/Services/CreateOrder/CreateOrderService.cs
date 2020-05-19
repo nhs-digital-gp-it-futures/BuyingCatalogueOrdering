@@ -32,16 +32,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
 
             //TODO Move this to a builder
             var order = new Order {
-                OrderStatus = new OrderStatus() { OrderStatusId=2, Name = "Unsubmitted" },
+                OrderStatus = new OrderStatus() { OrderStatusId = 2, Name = "Unsubmitted" },
+                LastUpdatedByName = createOrderRequest.LastUpdatedByName,
+                LastUpdatedBy = createOrderRequest.LastUpdatedById,
                 Created = DateTime.Now,
                 LastUpdated = DateTime.Now,
             };
-
-            var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!string.IsNullOrEmpty(userId))
-            {
-                order.LastUpdatedBy = Guid.Parse(userId);
-            }
 
             var isDescriptionValid = OrderDescription.Create(createOrderRequest.Description);
             if (isDescriptionValid.IsSuccess)

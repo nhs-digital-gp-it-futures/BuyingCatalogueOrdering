@@ -204,15 +204,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task CreateOrderAsync_CreateOrderFailureResult_ReturnsBadRequest()
         {
-            var errors = new List<ErrorDetails> { new ErrorDetails("TestErrorId", "TestField") };
-
-            var createOrderRequest = new CreateOrderModel { Description = "Test Order 1", OrganisationId = Guid.NewGuid() };
-
             var context = OrdersControllerTestContext.Setup();
-            context.CreateOrderResult = Result.Failure<string>(errors);
-
             using var controller = context.OrdersController;
 
+            var errors = new List<ErrorDetails> { new ErrorDetails("TestErrorId", "TestField") };
+
+            var createOrderRequest = new CreateOrderModel { Description = "Test Order 1", OrganisationId = context.PrimaryOrganisationId };
+                        
+            context.CreateOrderResult = Result.Failure<string>(errors);
+            
             var response = await controller.CreateOrderAsync(createOrderRequest);
 
             response.Should().BeOfType<ActionResult<CreateOrderResponseModel>>();
@@ -298,6 +298,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             private OrdersControllerTestContext()
             {
+                Name = "J.R.Hartley";
+                NameIdentity = Guid.NewGuid();
                 PrimaryOrganisationId = Guid.NewGuid();
                 OrderRepositoryMock = new Mock<IOrderRepository>();
 
@@ -315,10 +317,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]
                 {
                     new Claim("Ordering", "Manage"),
-                    new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString())
-                }, "mock"));
+                    new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
+                    new Claim("name",Name),
+                    new Claim("nameIdentity", NameIdentity.ToString())
+                }, "mock"));              
 
-                OrdersController = new OrdersController(OrderRepositoryMock.Object, CreateOrderServiceMock.Object);
+                OrdersController = new OrdersController(OrderRepositoryMock.Object, CreateOrderServiceMock.Object)
                 {
                     ControllerContext = new ControllerContext
                     {
@@ -326,6 +330,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     }
                 };
             }
+
+            internal string Name { get; }
+
+            internal Guid NameIdentity { get; }
 
             internal Guid PrimaryOrganisationId { get; }
 
