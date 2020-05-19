@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
+using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 
@@ -73,6 +74,27 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var orders = (await _response.ReadBodyAsJsonAsync()).Select(CreateOrders);
             orders.Count().Should().Be(0);
+        }
+
+        [Then(@"the order is created in the database with orderId (.*) and data")]
+        public async Task ThenTheOrderIsCreatedInTheDatabase(string orderId, Table table)
+        {
+            var actual = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
+            table.CompareToInstance<OrderEntity>(actual);
+        }
+
+        [Then(@"the order with orderId (.*) has LastUpdated time present and it is the current time")]
+        public async Task ThenOrderOrderIdHasLastUpdatedAtCurrentTime(string orderId)
+        {
+            var actual = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
+            actual.LastUpdated.Should().BeWithin(TimeSpan.FromSeconds(3));
+        }
+
+        [Then(@"the order with orderId (.*) has Created time present and it is the current time")]
+        public async Task ThenOrderOrderIdHasCreatedAtCurrentTime(string orderId)
+        {
+            var actual = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
+            actual.Created.Should().BeWithin(TimeSpan.FromSeconds(3));
         }
 
         private static object CreateOrders(JToken token)

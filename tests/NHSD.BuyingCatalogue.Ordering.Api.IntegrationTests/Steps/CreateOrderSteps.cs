@@ -29,7 +29,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             _orderingUrl = settings.OrderingApiBaseUrl + "/api/v1/orders";
         }
 
-        [When(@"a POST request is made to create a order")]
+        [When(@"a POST request is made to create an order")]
         public async Task WhenAOrderIsCreated(Table table)
         {
             var data = table.CreateInstance<CreateOrderPayload>();
