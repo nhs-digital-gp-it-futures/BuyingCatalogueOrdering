@@ -107,7 +107,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string LastUpdatedByName { get; set; }
 
             public DateTime LastUpdated { get; set; }
-
         }
     }
 }
