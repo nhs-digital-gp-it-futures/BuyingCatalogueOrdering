@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
@@ -35,7 +37,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             using var controller = context.OrdersController;
 
-            var result = await controller.GetAllAsync(Guid.Empty) as OkObjectResult;
+            var result = await controller.GetAllAsync(context.PrimaryOrganisationId) as OkObjectResult;
             var orders = result.Value as List<OrderModel>;
             orders.Should().BeEmpty();
         }
@@ -44,41 +46,56 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [TestCase("C0000014-01", "Some Description")]
         public async Task GetAllAsync_SingleOrderWithOrganisationIdExists_ReturnsTheOrder(string orderId, string orderDescription)
         {
-            var organisationId = Guid.NewGuid();
-
+            var context = OrdersControllerTestContext.Setup();
             var orders = new List<(Order order, OrderModel expected)>
             {
-                CreateOrderTestData(orderId, organisationId, orderDescription)
+                CreateOrderTestData(orderId, context.PrimaryOrganisationId, orderDescription)
             };
 
-            var context = OrdersControllerTestContext.Setup();
             context.Orders = orders.Select(x => x.order);
 
             using var controller = context.OrdersController;
 
-            var result = await controller.GetAllAsync(organisationId) as OkObjectResult;
+            var result = await controller.GetAllAsync(context.PrimaryOrganisationId) as OkObjectResult;
             var ordersResult = result.Value as List<OrderModel>;
             ordersResult.Should().ContainSingle();
             ordersResult.Should().BeEquivalentTo(orders.Select(x => x.expected));
         }
 
         [Test]
-        public async Task GetAllAsync_MultipleOrdersWithOrganisationIdExist_ReturnsAllOrders()
+        public async Task GetAllAsync_SingleOrderWithOtherOrganisationIdExists_ReturnsForbidden()
         {
-            var organisationId = Guid.NewGuid();
-
+            var otherOrganisationId = Guid.NewGuid();
+            var context = OrdersControllerTestContext.Setup();
             var orders = new List<(Order order, OrderModel expected)>
             {
-                CreateOrderTestData("C0000014-01", organisationId, "Some Description"),
-                CreateOrderTestData("C000012-01", organisationId, "Another Description")
+                CreateOrderTestData("C0000014-01", otherOrganisationId, "A description")
             };
 
-            var context = OrdersControllerTestContext.Setup();
             context.Orders = orders.Select(x => x.order);
 
             using var controller = context.OrdersController;
 
-            var result = await controller.GetAllAsync(organisationId) as OkObjectResult;
+            var result = await controller.GetAllAsync(otherOrganisationId);
+            result.Should().BeOfType<ForbidResult>();
+        }
+
+        [Test]
+        public async Task GetAllAsync_MultipleOrdersWithOrganisationIdExist_ReturnsAllOrders()
+        {
+            var context = OrdersControllerTestContext.Setup();
+
+            var orders = new List<(Order order, OrderModel expected)>
+            {
+                CreateOrderTestData("C0000014-01", context.PrimaryOrganisationId, "Some Description"),
+                CreateOrderTestData("C000012-01", context.PrimaryOrganisationId, "Another Description")
+            };
+
+            context.Orders = orders.Select(x => x.order);
+
+            using var controller = context.OrdersController;
+
+            var result = await controller.GetAllAsync(context.PrimaryOrganisationId) as OkObjectResult;
             var ordersResult = result.Value as List<OrderModel>;
             ordersResult.Count.Should().Be(2);
             ordersResult.Should().BeEquivalentTo(orders.Select(x => x.expected));
@@ -91,9 +108,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             using var controller = context.OrdersController;
 
-            await controller.GetAllAsync(Guid.Empty);
+            await controller.GetAllAsync(context.PrimaryOrganisationId);
 
-            context.OrderRepositoryMock.Verify(x => x.ListOrdersByOrganisationIdAsync(Guid.Empty), Times.Once);
+            context.OrderRepositoryMock.Verify(x => x.ListOrdersByOrganisationIdAsync(context.PrimaryOrganisationId), Times.Once);
         }
 
         [Test]
@@ -111,10 +128,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task GetOrderSummaryAsync_IsSummaryComplete_ReturnResult()
         {
             const string orderId = "C0000014-01";
-
-            (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description");
-
             var context = OrdersControllerTestContext.Setup();
+
+            (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
+
             context.Order = order;
 
             using var controller = context.OrdersController;
@@ -122,6 +139,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var result = await controller.GetOrderSummaryAsync(orderId) as OkObjectResult;
             var orderSummary = result.Value as OrderSummaryModel;
             orderSummary.Should().BeEquivalentTo(expected);
+        }
+
+        [Test]
+        public async Task GetOrderSummaryAsync_OtherOrganisationId_ReturnResult()
+        {
+            var organisationId = Guid.NewGuid();
+            const string orderId = "C0000014-01";
+            var context = OrdersControllerTestContext.Setup();
+
+            (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", organisationId);
+
+            context.Order = order;
+
+            using var controller = context.OrdersController;
+
+            var result = await controller.GetOrderSummaryAsync(orderId);
+            result.Should().BeOfType<ForbidResult>();
         }
 
         private static (Order order, OrderModel expectedOrder) CreateOrderTestData(string orderId, Guid organisationId, string description)
@@ -145,12 +179,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 });
         }
 
-        private static (Order order, OrderSummaryModel expectedSummary) CreateOrderSummaryTestData(string orderId, string description)
+        private static (Order order, OrderSummaryModel expectedSummary) CreateOrderSummaryTestData(string orderId, string description, Guid organisationId)
         {
             var repositoryOrder = OrderBuilder
                 .Create()
                 .WithOrderId(orderId)
                 .WithDescription(description)
+                .WithOrganisationId(organisationId)
                 .Build();
 
             return (order: repositoryOrder,
@@ -182,6 +217,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             private OrdersControllerTestContext()
             {
+                PrimaryOrganisationId = Guid.NewGuid();
                 OrderRepositoryMock = new Mock<IOrderRepository>();
 
                 Orders = new List<Order>();
@@ -190,8 +226,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
                 OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
 
-                OrdersController = new OrdersController(OrderRepositoryMock.Object);
+                ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]
+                {
+                    new Claim("Ordering", "Manage"),
+                    new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString())
+                }, "mock"));
+
+                OrdersController = new OrdersController(OrderRepositoryMock.Object)
+                {
+                    ControllerContext = new ControllerContext
+                    {
+                        HttpContext = new DefaultHttpContext { User = ClaimsPrincipal }
+                    }
+                };
             }
+
+            internal Guid PrimaryOrganisationId { get; }
+
+            internal ClaimsPrincipal ClaimsPrincipal { get; }
 
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
 
