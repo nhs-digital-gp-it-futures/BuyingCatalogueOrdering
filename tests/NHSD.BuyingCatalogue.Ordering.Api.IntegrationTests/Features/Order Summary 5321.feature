@@ -17,7 +17,7 @@ Scenario: 1. Displaying the order summary, where the order sections are complete
         | C000014-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
     And the order Summary Sections have the following values
         | Id                   | Status     |
-        | ordering-description | complete   |
+        | description          | complete   |
         | ordering-party       | incomplete |
         | supplier             | incomplete |
         | commencement-date    | incomplete |
@@ -29,20 +29,20 @@ Scenario: 1. Displaying the order summary, where the order sections are complete
 
 @5321
 Scenario: 2. If the order ID does not exist, return not found
-    When the user makes a request to retrieve the order summary with the ID INVALID
-    Then a response with status code 404 is returned
+	When the user makes a request to retrieve the order summary with the ID INVALID
+	Then a response with status code 404 is returned
 
 @5321
 Scenario: 3. If a user is not authorised then they cannot access the order summary
-    Given no user is logged in
-    When the user makes a request to retrieve the order summary with the ID C000014-01
-    Then a response with status code 401 is returned
+	Given no user is logged in
+	When the user makes a request to retrieve the order summary with the ID C000014-01
+	Then a response with status code 401 is returned
 
 @5321
 Scenario: 4. A non buyer user cannot access the order summary
-    Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
-    When the user makes a request to retrieve the order summary with the ID C000014-01
-    Then a response with status code 403 is returned
+	Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
+	When the user makes a request to retrieve the order summary with the ID C000014-01
+	Then a response with status code 403 is returned
 
 @5321
 Scenario: 5. A buyer user cannot access the order summary for an organisation they don't belong to

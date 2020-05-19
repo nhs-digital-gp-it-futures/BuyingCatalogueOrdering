@@ -17,6 +17,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
                 Created = DateTime.UtcNow,
                 LastUpdated = DateTime.UtcNow,
                 LastUpdatedBy = Guid.NewGuid(),
+                LastUpdatedByName = "Bob Smith",
                 OrderStatus = new OrderStatus() {OrderStatusId = 1, Name = "Submitted"}
             };
 
@@ -58,6 +59,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         internal OrderBuilder WithLastUpdatedBy(Guid lastUpdatedBy)
         {
             _order.LastUpdatedBy = lastUpdatedBy;
+            return this;
+        }
+
+        internal OrderBuilder WithLastUpdatedBy(string lastUpdatedByName)
+        {
+            _order.LastUpdatedByName = lastUpdatedByName;
             return this;
         }
 
