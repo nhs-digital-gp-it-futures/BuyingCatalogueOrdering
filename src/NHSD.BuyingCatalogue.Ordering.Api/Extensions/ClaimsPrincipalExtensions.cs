@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Security.Claims;
 
-
-
 namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 {
     internal static class ClaimsPrincipalExtensions

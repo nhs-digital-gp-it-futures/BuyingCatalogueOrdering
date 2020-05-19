@@ -26,5 +26,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         {
             Description = orderDescription ?? throw new ArgumentNullException(nameof(orderDescription));
         }
+
+        public void SetLastUpdatedByName(string name)
+        {
+            LastUpdatedByName = name;
+        }
     }
 }
