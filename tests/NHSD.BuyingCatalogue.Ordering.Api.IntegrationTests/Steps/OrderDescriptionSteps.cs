@@ -62,11 +62,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _request.PutJsonAsync(string.Format(_orderDescriptionUrl, orderId), null);
         }
 
-        [Then(@"the lastUpdatedName is updated in the database to (.*) with orderId (.*)")]
-        public async Task ThenTheLastUpdatedNameIsUpdatedInTheDatabaseToAliceSmith(string expected, string orderId)
+        [Then(@"the order description is updated in the database to (.*) with orderId (.*)")]
+        public async Task ThenTheOrderDescriptionIsUpdatedInTheDatabase(string expected, string orderId)
         {
-            var actual = await OrderEntity.FetchLastUpdatedByNameByOrderId(_settings.ConnectionString, orderId);
+            var actual = await OrderEntity.FetchOrderDescriptionFromOrderId(_settings.ConnectionString, orderId);
+            actual.Should().BeEquivalentTo(expected);
+        }
 
+        [Then(@"the lastUpdatedName is updated in the database to (.*) with orderId (.*)")]
+        public async Task ThenTheLastUpdatedNameIsUpdatedInTheDatabase(string expected, string orderId)
+        {
+            var actual = await OrderEntity.FetchLastUpdatedByNameFromOrderId(_settings.ConnectionString, orderId);
             actual.Should().BeEquivalentTo(expected);
         }
         

@@ -2,7 +2,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
-using IdentityModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
@@ -76,7 +75,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return BadRequest(new ErrorsModel(isValid.Errors.Select(x => new ErrorModel(x.Id, x.Field))));
             }
 
-            var name = User.FindFirst(x => x.Type == JwtClaimTypes.Name).Value;
+            var name = User.Identity.Name;
 
             order.SetDescription(isValid.Value);
 

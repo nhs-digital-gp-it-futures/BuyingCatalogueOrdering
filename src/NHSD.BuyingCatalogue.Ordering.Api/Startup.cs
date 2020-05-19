@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Logging;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
@@ -47,6 +48,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                     options.Authority = authority;
                     options.RequireHttpsMetadata = requireHttps;
                     options.Audience = "Ordering";
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        NameClaimType = "name"
+                    };
 
                     if (bypassIdentity)
                     {
@@ -103,7 +108,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 Log.Logger.Information($"USING PATH BASE {pathBase}");
                 app.UsePathBase(pathBase);
             }
-            
+
             app.UseRouting();
 
             app.UseAuthentication();

@@ -4,62 +4,54 @@
     So that I can keep an order up to date
 
 Background:
-	Given Orders exist
-		| OrderId    | Description         | OrderStatusId | Created    | LastUpdated | LastUpdatedByName | LastUpdatedBy                        | OrganisationId                       |
-		| C000014-01 | Some Description    | 1             | 11/05/2020 | 11/05/2020  | Bob Smith         | 335392e4-4bb1-413b-9de5-36a85c9c0422 | 4af62b99-638c-4247-875e-965239cd0c48 |
-		| C000014-02 | Another Description | 2             | 05/05/2020 | 09/05/2020  | Alice Smith       | a11a46f9-ce6f-448a-95c2-fde6e61c804a | 4af62b99-638c-4247-875e-965239cd0c48 |
-	And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
+    Given Orders exist
+        | OrderId    | Description         | OrderStatusId | Created    | LastUpdated | LastUpdatedByName | LastUpdatedBy                        | OrganisationId                       |
+        | C000014-01 | Some Description    | 1             | 11/05/2020 | 11/05/2020  | Bob Smith         | 335392e4-4bb1-413b-9de5-36a85c9c0422 | 4af62b99-638c-4247-875e-965239cd0c48 |
+        | C000014-02 | Another Description | 2             | 05/05/2020 | 09/05/2020  | Alice Smith       | a11a46f9-ce6f-448a-95c2-fde6e61c804a | 4af62b99-638c-4247-875e-965239cd0c48 |
+    And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @5322
 Scenario: 1. Updating an orders description
-	When the user makes a request to update the description with the ID C000014-01
-		| Description         |
-		| Another Description |
-	Then a response with status code 204 is returned
-	When the user makes a request to retrieve the order description section with the ID C000014-01
-	Then a response with status code 200 is returned
-	And the order description is returned
-		| Description         |
-		| Another Description |
-	And the lastUpdatedName is updated in the database to Bob Smith with orderId C000014-01
+    When the user makes a request to update the description with the ID C000014-01
+        | Description         |
+        | Another Description |
+    Then a response with status code 204 is returned
+    And the order description is updated in the database to Another Description with orderId C000014-01
+    And the lastUpdatedName is updated in the database to Bob Smith with orderId C000014-01
 
 @5322
 Scenario: 2. Updating an orders description and with a changed user name
-	When the user makes a request to update the description with the ID C000014-02
-		| Description      |
-		| Test Description |
-	Then a response with status code 204 is returned
-	When the user makes a request to retrieve the order description section with the ID C000014-02
-	Then a response with status code 200 is returned
-	And the order description is returned
-		| Description      |
-		| Test Description |    
-	And the lastUpdatedName is updated in the database to Bob Smith with orderId C000014-02    
+    When the user makes a request to update the description with the ID C000014-02
+        | Description      |
+        | Test Description |
+    Then a response with status code 204 is returned
+    And the order description is updated in the database to Test Description with orderId C000014-02
+    And the lastUpdatedName is updated in the database to Bob Smith with orderId C000014-02    
 
 @5322
 Scenario: 3. Updating an order, with a non existent model returns not found
-	When the user makes a request to update the description with the ID C000014-01 with no model
-	Then a response with status code 400 is returned
+    When the user makes a request to update the description with the ID C000014-01 with no model
+    Then a response with status code 400 is returned
 
 @5322
 Scenario: 4. Updating an order, with no description, returns a relevant error message
-	When the user makes a request to update the description with the ID C000014-01
-		| Description |
-		| NULL        |
-	Then a response with status code 400 is returned
-	And the response contains the following errors
-		| Id                       | Field       |
-		| OrderDescriptionRequired | Description |
+    When the user makes a request to update the description with the ID C000014-01
+        | Description |
+        | NULL        |
+    Then a response with status code 400 is returned
+    And the response contains the following errors
+        | Id                       | Field       |
+        | OrderDescriptionRequired | Description |
 
 @5322
 Scenario: 5. Updating an order, with a description, exceeding it's maximum limit, returns a relevant error message
-	When the user makes a request to update the description with the ID C000014-01
-		| Description              |
-		| #A string of length 101# |
-	Then a response with status code 400 is returned
-	And the response contains the following errors
-		| Id                      | Field       |
-		| OrderDescriptionTooLong | Description |
+    When the user makes a request to update the description with the ID C000014-01
+        | Description              |
+        | #A string of length 101# |
+    Then a response with status code 400 is returned
+    And the response contains the following errors
+        | Id                      | Field       |
+        | OrderDescriptionTooLong | Description |
 
 @5322
 Scenario: 6. If a user is not authorised, then they cannot update the orders description
