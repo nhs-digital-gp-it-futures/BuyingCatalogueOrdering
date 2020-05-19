@@ -243,7 +243,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]
                 {
                     new Claim("Ordering", "Manage"),
-                    new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString())
+                    new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
+                    new Claim("name", "Test User")
                 }, "mock"));
 
                 OrderDescriptionController = new OrderDescriptionController(OrderRepositoryMock.Object)
@@ -253,7 +254,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         HttpContext = new DefaultHttpContext {User = ClaimsPrincipal}
                     }
                 };
-
             }
 
             internal Guid PrimaryOrganisationId { get; }
