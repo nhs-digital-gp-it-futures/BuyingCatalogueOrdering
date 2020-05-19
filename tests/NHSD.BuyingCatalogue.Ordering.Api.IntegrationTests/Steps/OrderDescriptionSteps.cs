@@ -62,9 +62,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _request.PutJsonAsync(string.Format(_orderDescriptionUrl, orderId), null);
         }
 
-        [Then(@"the order description is updated in the database to (.*) with orderId (.*)")]
-        public async Task ThenTheOrderDescriptionIsUpdatedInTheDatabase(string expected, string orderId)
+
+        [Then(@"the order description for order with id (.*) is set to")]
+        public async Task ThenTheOrderDescriptionForOrderWithIdIsSetTo(string orderId, Table table)
         {
+            var expected = table.CreateInstance<OrderDescriptionTable>().Description;
+
             var actual = await OrderEntity.FetchOrderDescriptionFromOrderId(_settings.ConnectionString, orderId);
             actual.Should().BeEquivalentTo(expected);
         }
@@ -75,7 +78,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var actual = await OrderEntity.FetchLastUpdatedByNameFromOrderId(_settings.ConnectionString, orderId);
             actual.Should().BeEquivalentTo(expected);
         }
-        
+
         private sealed class OrderDescriptionTable
         {
             public string Description { get; set; }
