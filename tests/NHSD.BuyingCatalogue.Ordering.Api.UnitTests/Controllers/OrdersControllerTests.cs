@@ -11,7 +11,9 @@ using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
+using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Domain.Results;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
@@ -125,6 +127,84 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             orderSummary.Should().BeEquivalentTo(expected);
         }
 
+        [Test]
+        public async Task CreateOrderAsync_CreateOrderSuccessfullResult_ReturnsOrderId()
+        {
+            const string newOrderId = "New Test Order Id";
+            
+            var createOrderRequest = new CreateOrderModel { Description = "Test Order 1", OrganisationId=Guid.NewGuid() };
+
+            var context = OrdersControllerTestContext.Setup();
+            context.CreateOrderResult = Result.Success(newOrderId);
+
+            using var controller = context.OrdersController;
+
+            var response = await controller.CreateOrderAsync(createOrderRequest);
+
+            var actual = response.Result;
+
+            var expectation = new CreatedAtActionResult(nameof(controller.CreateOrderAsync).TrimAsync(),null, new { orderId = newOrderId }, new CreateOrderResponseModel { OrderId= newOrderId});
+
+            actual.Should().BeEquivalentTo(expectation);
+        }
+
+        [Test]
+        public async Task CreateOrderAsync_CreateOrderService_CreateAsync_CalledOnce()
+        {
+            var context = OrdersControllerTestContext.Setup();
+
+            using var controller = context.OrdersController;
+
+            var createOrderModel = new CreateOrderModel
+            {
+                Description = "Description1",
+                OrganisationId = new Guid()
+            };
+
+            var response = await controller.CreateOrderAsync(createOrderModel);
+
+            context.CreateOrderServiceMock.Verify(x => x.CreateAsync(It.IsAny<CreateOrderRequest>()), Times.Once);
+        }
+
+
+        [Test]
+        public async Task CreateOrderAsync_CreateOrderFailureResult_ReturnsBadRequest()
+        {
+            var errors = new List<ErrorDetails> { new ErrorDetails("TestErrorId", "TestField") };
+
+            var createOrderRequest = new CreateOrderModel { Description = "Test Order 1", OrganisationId = Guid.NewGuid() };
+
+            var context = OrdersControllerTestContext.Setup();
+            context.CreateOrderResult = Result.Failure<string>(errors);
+
+            using var controller = context.OrdersController;
+
+            var response = await controller.CreateOrderAsync(createOrderRequest);
+
+            response.Should().BeOfType<ActionResult<CreateOrderResponseModel>>();
+            var actual = response.Result;
+
+            var expectedErrors =
+                new List<ErrorModel> { new ErrorModel("TestErrorId", "TestField") };
+            var expected = new BadRequestObjectResult(new CreateOrderResponseModel { Errors = expectedErrors });
+            actual.Should().BeEquivalentTo(expected);
+        }
+
+        [Test]
+        public void CreateOrderAsync_NullApplicationUser_ThrowsException()
+        {
+            var context = OrdersControllerTestContext.Setup();
+
+            async Task<ActionResult<CreateOrderResponseModel>> CreateOrder()
+            {
+                using var controller = context.OrdersController;
+                return await controller.CreateOrderAsync(null);
+            }
+
+            Assert.ThrowsAsync<ArgumentNullException>(CreateOrder);
+        }
+
+
         private static (Order order, OrderModel expectedOrder) CreateOrderTestData(string orderId, Guid organisationId, string description)
         {
             var repositoryOrder = OrderBuilder
@@ -179,13 +259,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 });
         }
 
-        private sealed class OrdersControllerTestContext
+        internal sealed class OrdersControllerTestContext
         {
             private OrdersControllerTestContext()
             {
                 OrderRepositoryMock = new Mock<IOrderRepository>();
 
                 CreateOrderServiceMock = new Mock<ICreateOrderService>();
+                CreateOrderServiceMock.Setup(x => x.CreateAsync(It.IsAny<CreateOrderRequest>()))
+                    .ReturnsAsync(() => CreateOrderResult);
+
 
                 Orders = new List<Order>();
                 OrderRepositoryMock.Setup(x => x.ListOrdersByOrganisationIdAsync(It.IsAny<Guid>()))
@@ -199,6 +282,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
 
             internal Mock<ICreateOrderService> CreateOrderServiceMock { get; }
+
+            internal Result<string> CreateOrderResult { get; set; } = Result.Success("NewOrderId");
 
             internal IEnumerable<Order> Orders { get; set; }
 

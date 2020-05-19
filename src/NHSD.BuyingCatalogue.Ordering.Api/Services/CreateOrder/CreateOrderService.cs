@@ -19,8 +19,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
 
         public CreateOrderService(IOrderRepository orderRepository , IHttpContextAccessor httpContextAccessor)
         {
-            _orderRepository = orderRepository;
-            _httpContextAccessor = httpContextAccessor;
+            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
         public async Task<Result<string>> CreateAsync(CreateOrderRequest createOrderRequest)
@@ -30,13 +30,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
                 throw new ArgumentNullException(nameof(createOrderRequest));
             }
 
+            //TODO Move this to a builder
             var order = new Order {
-                OrderStatus = new OrderStatus() { Name = "incomplete" },
+                OrderStatus = new OrderStatus() { OrderStatusId=2, Name = "Unsubmitted" },
                 Created = DateTime.Now,
                 LastUpdated = DateTime.Now,
             };
 
-            var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!string.IsNullOrEmpty(userId))
             {
                 order.LastUpdatedBy = Guid.Parse(userId);
