@@ -13,6 +13,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
 {
     public sealed class OrderRepository : IOrderRepository
     {
+        public const string DefaultOrderId = "C000000-01";
         private readonly ApplicationDbContext _context;
 
         public OrderRepository(ApplicationDbContext context)
@@ -74,7 +75,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
 
         private async Task<string> GetIncremenedOrderId()
         {
-            var resultOrderId = "C000000-01";
+            var resultOrderId = DefaultOrderId;
             var latestOrderId = await GetLatestOrderIdByCreationDate();
             if (!string.IsNullOrEmpty(latestOrderId))
             {
