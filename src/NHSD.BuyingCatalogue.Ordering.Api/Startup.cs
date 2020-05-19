@@ -38,6 +38,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             var requireHttps = _configuration.GetValue<bool>("RequireHttps");
             var allowInvalidCertificate = _configuration.GetValue<bool>("AllowInvalidCertificate");
             var bypassIdentity = _configuration.GetValue<bool>("BypassIdentity");
+
+            Log.Logger.Information("Authority on ORDAPI is: {@authority}", authority);
+            Log.Logger.Information("ORDAPI Require Https: {@requiredHttps}", requireHttps);
+            Log.Logger.Information($"ORDAPI Allow Invalid Certificates: {@allowInvalidCertificate}", allowInvalidCertificate);
+            Log.Logger.Information("ORDAPI BypassIdentity: {@bypassIdentity}", bypassIdentity);
+
             services.AddTransient<IOrderRepository, OrderRepository>();
 
             services.RegisterHealthChecks(connectionString);
