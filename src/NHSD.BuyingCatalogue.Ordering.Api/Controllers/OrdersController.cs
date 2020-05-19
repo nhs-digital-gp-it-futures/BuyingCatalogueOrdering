@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
@@ -34,13 +35,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [Route("/api/v1/organisations/{organisationId}/[controller]")]
         public async Task<ActionResult> GetAllAsync(Guid organisationId)
         {
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+
+            if (primaryOrganisationId != organisationId)
+            {
+                return Forbid();
+            }
+
             var orders = await _orderRepository.ListOrdersByOrganisationIdAsync(organisationId);
 
-            var orderModelResult = orders.Select(order => new OrderModel()
-            {
+            var orderModelResult = orders.Select(order => new OrderModel
+                {
                 OrderId = order.OrderId,
                 Description = order.Description.Value,
-                LastUpdatedBy = order.LastUpdatedBy,
+                LastUpdatedBy = order.LastUpdatedByName,
                 LastUpdated = order.LastUpdated,
                 DateCreated = order.Created,
                 Status = order.OrderStatus.Name
@@ -59,6 +67,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (order is null)
             {
                 return NotFound();
+            }
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
             }
 
             return Ok(new OrderSummaryModel
@@ -124,6 +138,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             {
                 throw new ArgumentNullException(nameof(order));
             }
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
             var createOrderResponse = new CreateOrderResponseModel();
 
             var result = await _createOrderService.CreateAsync(new CreateOrderRequest

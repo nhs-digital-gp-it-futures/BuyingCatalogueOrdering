@@ -18,23 +18,30 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public Guid LastUpdatedBy { get; set; }
 
+        public string LastUpdatedByName { get; set; }
+
         protected override string InsertSql => $@"
-                                INSERT INTO [dbo].[Order]
-                                (OrderId,
-                                 Description,
-                                 OrganisationId,
-                                 OrderStatusId,
-                                 Created,
-                                 LastUpdated,
-                                 LastUpdatedBy
-                                 )
-                                VALUES
-                                (@OrderId,
-                                 @Description,
-                                 @OrganisationId,
-                                 @OrderStatusId,
-                                 @Created,
-                                 @LastUpdated,
-                                 @LastUpdatedBy)";
+            INSERT INTO [dbo].[Order]
+            (
+                OrderId,
+                Description,
+                OrganisationId,
+                OrderStatusId,
+                Created,
+                LastUpdated,
+                LastUpdatedBy,
+                LastUpdatedByName
+            )
+            VALUES
+            (
+                @OrderId,
+                @Description,
+                @OrganisationId,
+                @OrderStatusId,
+                @Created,
+                @LastUpdated,
+                @LastUpdatedBy,
+                @LastUpdatedByName
+            )";
     }
 }

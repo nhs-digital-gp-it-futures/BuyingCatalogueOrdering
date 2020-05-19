@@ -13,6 +13,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 
         public DateTime LastUpdated { get; set; }
 
-        public Guid LastUpdatedBy { get; set; }
+        public string LastUpdatedBy { get; set; }
     }
 }

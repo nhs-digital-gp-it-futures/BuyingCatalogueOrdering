@@ -18,6 +18,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         public Guid LastUpdatedBy { get; set; }
                 
 
+        public string LastUpdatedByName { get; set; }
+
         public OrderStatus OrderStatus { get; set; }
 
         public void SetDescription(OrderDescription orderDescription)
