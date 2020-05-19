@@ -35,7 +35,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             {
                 return NotFound();
             }
-            if (primaryOrganisationId != order.OrganisationId.ToString())
+            if (primaryOrganisationId != order.OrganisationId)
             {
                 return Forbid();
             }
@@ -63,7 +63,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             {
                 return NotFound();
             }
-            if (primaryOrganisationId != order.OrganisationId.ToString())
+            if (primaryOrganisationId != order.OrganisationId)
             {
                 return Forbid();
             }

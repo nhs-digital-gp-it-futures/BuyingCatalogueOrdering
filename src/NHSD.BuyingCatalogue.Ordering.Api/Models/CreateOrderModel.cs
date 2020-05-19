@@ -9,6 +9,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
     {
         public string Description { get; set; }
 
-        public string OrganisationId { get; set; }
+        public Guid OrganisationId { get; set; }
     }
 }

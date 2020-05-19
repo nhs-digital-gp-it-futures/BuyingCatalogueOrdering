@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System;
+using System.Security.Claims;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 {
@@ -6,9 +7,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
     {
         private const string PrimaryOrganisationIdType = "primaryOrganisationId";
 
-        public static string GetPrimaryOrganisationId(this ClaimsPrincipal user)
+        public static Guid GetPrimaryOrganisationId(this ClaimsPrincipal user)
         {
-            return user.FindFirst(PrimaryOrganisationIdType).Value;
+            return new Guid(user.FindFirst(PrimaryOrganisationIdType).Value);
         }
     }
 }

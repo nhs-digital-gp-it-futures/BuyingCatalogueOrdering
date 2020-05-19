@@ -32,7 +32,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         {
             var primaryOrganisationId = User.GetPrimaryOrganisationId();
 
-            if (primaryOrganisationId != organisationId.ToString())
+            if (primaryOrganisationId != organisationId)
             {
                 return Forbid();
             }
@@ -65,7 +65,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             var primaryOrganisationId = User.GetPrimaryOrganisationId();
-            if (primaryOrganisationId != order.OrganisationId.ToString())
+            if (primaryOrganisationId != order.OrganisationId)
             {
                 return Forbid();
             }
