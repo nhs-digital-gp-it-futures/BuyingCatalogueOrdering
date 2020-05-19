@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 {
@@ -43,5 +44,13 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 @LastUpdatedBy,
                 @LastUpdatedByName
             )";
+
+        public static async Task<string> FetchLastUpdatedByNameByOrderId(string connectionString, string orderId)
+        {
+            return (await SqlRunner.QueryFirstAsync<string>(connectionString, $@"SELECT
+                         [LastUpdatedByName]
+                         FROM [Order]
+                         WHERE [OrderId] = @orderId", new { orderId }));
+        }
     }
 }

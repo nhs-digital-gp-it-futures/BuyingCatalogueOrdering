@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
+using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 
@@ -13,6 +14,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     {
         private readonly Response _response;
         private readonly Request _request;
+        private readonly Settings _settings;
 
         private readonly string _orderDescriptionUrl;
 
@@ -20,6 +22,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             _response = response;
             _request = request;
+            _settings = settings;
+
             _orderDescriptionUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/description";
         }
 
@@ -58,6 +62,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _request.PutJsonAsync(string.Format(_orderDescriptionUrl, orderId), null);
         }
 
+        [Then(@"the lastUpdatedName is updated in the database to (.*) with orderId (.*)")]
+        public async Task ThenTheLastUpdatedNameIsUpdatedInTheDatabaseToAliceSmith(string expected, string orderId)
+        {
+            var actual = await OrderEntity.FetchLastUpdatedByNameByOrderId(_settings.ConnectionString, orderId);
+
+            actual.Should().BeEquivalentTo(expected);
+        }
+        
         private sealed class OrderDescriptionTable
         {
             public string Description { get; set; }

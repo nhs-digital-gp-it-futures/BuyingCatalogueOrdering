@@ -20,10 +20,10 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data
             await databaseConnection.ExecuteAsync(sql, items);
         }
 
-        internal static async Task<IEnumerable<dynamic>> QueryAsync(string connectionString, string sql)
+        internal static async Task<T> QueryFirstAsync<T>(string connectionString, string sql, object parameters = null)
         {
             await using var databaseConnection = new SqlConnection(connectionString);
-            return await databaseConnection.QueryAsync(sql);
+            return await databaseConnection.QueryFirstAsync<T>(sql, parameters);
         }
     }
 }
