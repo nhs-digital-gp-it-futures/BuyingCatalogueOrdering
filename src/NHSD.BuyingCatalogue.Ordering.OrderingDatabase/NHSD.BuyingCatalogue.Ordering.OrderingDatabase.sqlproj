@@ -72,6 +72,7 @@
   <ItemGroup>
     <Build Include="Tables\OrderStatus.sql" />
     <Build Include="Tables\Order.sql" />
+    <Build Include="Tables\SupplierContact.sql" />
     <Build Include="Tables\Address.sql" />
   </ItemGroup>
   <ItemGroup>
