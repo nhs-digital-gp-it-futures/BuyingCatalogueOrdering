@@ -9,6 +9,7 @@ using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
+using System.Threading;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 {
@@ -87,14 +88,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public async Task ThenOrderOrderIdHasLastUpdatedAtCurrentTime(string orderId)
         {
             var actual = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
-            actual.LastUpdated.Should().BeWithin(TimeSpan.FromSeconds(3));
+            actual.LastUpdated.Should().BeWithin(TimeSpan.FromSeconds(3)).Before(DateTime.UtcNow);
         }
 
         [Then(@"the order with orderId (.*) has Created time present and it is the current time")]
         public async Task ThenOrderOrderIdHasCreatedAtCurrentTime(string orderId)
         {
             var actual = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
-            actual.Created.Should().BeWithin(TimeSpan.FromSeconds(3));
+            actual.Created.Should().BeWithin(TimeSpan.FromSeconds(3)).Before(DateTime.UtcNow);
         }
 
         private static object CreateOrders(JToken token)

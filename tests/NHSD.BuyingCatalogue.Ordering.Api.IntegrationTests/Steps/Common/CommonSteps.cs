@@ -4,7 +4,6 @@ using FluentAssertions;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 
-
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common
 {
     [Binding]

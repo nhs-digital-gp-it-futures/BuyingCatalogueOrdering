@@ -9,10 +9,9 @@ using Microsoft.AspNetCore.Http;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
 {
-    public class CreateOrderService : ICreateOrderService
+    sealed public class CreateOrderService : ICreateOrderService
     {
         private readonly IOrderRepository _orderRepository;
-
 
         public CreateOrderService(IOrderRepository orderRepository)
         {
@@ -26,35 +25,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
                 throw new ArgumentNullException(nameof(createOrderRequest));
             }
 
-            //TODO Move this to a builder
-            var order = new Order {
-                OrderStatus = new OrderStatus() { OrderStatusId = 2, Name = "Unsubmitted" },
-                LastUpdatedByName = createOrderRequest.LastUpdatedByName,
-                LastUpdatedBy = createOrderRequest.LastUpdatedById,
-                Created = DateTime.Now,
-                LastUpdated = DateTime.Now,
-            };
-
             var isDescriptionValid = OrderDescription.Create(createOrderRequest.Description);
-            if (isDescriptionValid.IsSuccess)
-            {
-                order.SetDescription(isDescriptionValid.Value);
-            }
-                       
             var isOrganisationValid = OrderOrganisationId.Create(createOrderRequest.OrganisationId);
-            if (isOrganisationValid.IsSuccess)
-            {
-                order.OrganisationId = isOrganisationValid.Value;
-            }
 
-            if (!isDescriptionValid.IsSuccess || !isOrganisationValid.IsSuccess )
+            if (!isDescriptionValid.IsSuccess || !isOrganisationValid.IsSuccess)
             {
                 var allErrors = isDescriptionValid.Errors.Union(isOrganisationValid.Errors);
-                return  Result.Failure<string>(allErrors);
+                return Result.Failure<string>(allErrors);
             }
 
-            var orderId = await _orderRepository.CreateOrderAsync(order);
+            var order = new Order {
+                OrderStatus = new OrderStatus() { OrderStatusId = 2, Name = "Unsubmitted" },
+                OrganisationId = isOrganisationValid.Value,
+                LastUpdatedByName = createOrderRequest.LastUpdatedByName,
+                LastUpdatedBy = createOrderRequest.LastUpdatedById,
+                Created = DateTime.UtcNow,
+                LastUpdated = DateTime.UtcNow
+            };
+            order.SetDescription(isDescriptionValid.Value);
 
+            var orderId = await _orderRepository.CreateOrderAsync(order);
             return Result.Success(orderId);
         }
     }

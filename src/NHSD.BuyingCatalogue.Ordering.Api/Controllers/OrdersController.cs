@@ -13,8 +13,6 @@ using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
 
-
-
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
     [Route("api/v1/[controller]")]
@@ -145,9 +143,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             {
                 return Forbid();
             }
-            
-            var createOrderResponse = new CreateOrderResponseModel();
-
 
             var result = await _createOrderService.CreateAsync(new CreateOrderRequest
             {
@@ -155,7 +150,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 LastUpdatedById = User.GetUserId(),
                 Description = order.Description,
                 OrganisationId = order.OrganisationId,
-            }); 
+            });
+
+            var createOrderResponse = new CreateOrderResponseModel();
 
             if (result.IsSuccess)
             {

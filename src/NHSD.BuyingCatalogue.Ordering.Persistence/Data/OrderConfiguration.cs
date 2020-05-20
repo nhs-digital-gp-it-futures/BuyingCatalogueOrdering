@@ -14,7 +14,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 
             builder.Property(x => x.Description).HasConversion<string>(description => description.Value,
                 data => OrderDescription.Create(data).Value);
-
         }
     }
 }

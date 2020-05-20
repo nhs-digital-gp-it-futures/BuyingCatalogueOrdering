@@ -9,7 +9,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Application.Persistence
     {
         Task<IEnumerable<Order>> ListOrdersByOrganisationIdAsync(Guid organisationId);
         Task<Order> GetOrderByIdAsync(string orderId);
-        Task<string> GetLatestOrderIdByCreationDate();
         Task UpdateOrderAsync(Order order);
         Task<string> CreateOrderAsync(Order order);
     }

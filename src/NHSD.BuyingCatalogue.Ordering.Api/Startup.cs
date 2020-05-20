@@ -47,9 +47,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
 
             services.AddTransient<IOrderRepository, OrderRepository>();
             services.AddTransient<ICreateOrderService, CreateOrderService>();
-            
-            services.AddHttpContextAccessor();
-
             services.RegisterHealthChecks(connectionString);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

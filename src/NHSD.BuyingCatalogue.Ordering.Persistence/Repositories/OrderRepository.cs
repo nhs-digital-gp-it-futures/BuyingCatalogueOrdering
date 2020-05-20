@@ -45,7 +45,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
 
         public async Task<string> GetLatestOrderIdByCreationDate()
         {
-            var latestOrder = await _context.Order.Include(x => x.OrderStatus).OrderByDescending(o => o.Created).FirstOrDefaultAsync();
+            var latestOrder = await _context.Order.OrderByDescending(o => o.Created).FirstOrDefaultAsync();
             return latestOrder?.OrderId;
         }
 
@@ -63,7 +63,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
                     order.OrderId = await GetIncremenedOrderId();
                 }
 
-                order.OrderStatus =  _context.OrderStatus.Find(order.OrderStatus.OrderStatusId) ?? order.OrderStatus;
+                order.OrderStatus = await  _context.OrderStatus.FindAsync(order.OrderStatus.OrderStatusId) ?? order.OrderStatus;
 
                 _context.Order.Add(order);
                 await _context.SaveChangesAsync();

@@ -32,7 +32,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
-
         internal CreateOrderRequest Build() => _createOrderRequest;
 
     }
