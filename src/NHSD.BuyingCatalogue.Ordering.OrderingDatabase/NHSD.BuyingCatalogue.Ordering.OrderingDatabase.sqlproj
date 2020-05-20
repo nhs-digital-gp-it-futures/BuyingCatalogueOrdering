@@ -78,5 +78,4 @@
   <ItemGroup>
     <PostDeploy Include="Deployment\PostDeployment.sql" />
   </ItemGroup>
-  </ItemGroup>
 </Project>
