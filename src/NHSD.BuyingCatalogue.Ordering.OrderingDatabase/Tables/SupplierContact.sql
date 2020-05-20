@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[Contact]
+﻿CREATE TABLE [dbo].[SupplierContact.sql]
 (
 	[ContactId] INT NOT NULL PRIMARY KEY, 
     [Name] VARCHAR(100) NULL, 
