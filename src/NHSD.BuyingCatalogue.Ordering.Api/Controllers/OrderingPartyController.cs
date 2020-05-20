@@ -4,7 +4,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Models;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
-    [Route("api/v1/orders/{orderId}/ordering-party")]
+    [Route("api/v1/orders/{orderId}/sections/ordering-party")]
     [ApiController]
     [Produces("application/json")]
     public sealed class OrderingPartyController : Controller
