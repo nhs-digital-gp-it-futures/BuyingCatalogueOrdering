@@ -1,6 +1,6 @@
 ﻿namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
-    internal sealed class AddressModel
+    public sealed class AddressModel
     {
         public string Line1 { get; set; }
         public string Line2 { get; set; }

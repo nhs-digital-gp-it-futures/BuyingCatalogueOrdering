@@ -1,6 +1,6 @@
 ﻿namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
-    internal sealed class PrimaryContactModel
+    public sealed class PrimaryContactModel
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
