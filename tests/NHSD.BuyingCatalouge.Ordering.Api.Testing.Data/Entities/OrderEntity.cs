@@ -60,5 +60,20 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                          FROM [Order]
                          WHERE [OrderId] = @orderId", new { orderId }));
         }
+
+        public static async Task<OrderEntity> FetchOrderByOrderId(string connectionString, string orderId)
+        {
+            return (await SqlRunner.QueryFirstAsync<OrderEntity>(connectionString, $@"SELECT
+                          [OrderId],
+                          [Description],
+                          [OrganisationId],
+                          [OrderStatusId],
+                          [Created],
+                          [LastUpdated],
+                          [LastUpdatedBy],
+                          [LastUpdatedByName]
+                         FROM [Order]
+                         WHERE [OrderId] = @orderId", new { orderId }));
+        }
     }
 }

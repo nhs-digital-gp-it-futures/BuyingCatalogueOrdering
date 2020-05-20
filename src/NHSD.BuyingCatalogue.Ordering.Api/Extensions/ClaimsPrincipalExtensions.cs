@@ -11,5 +11,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
         {
             return new Guid(user.FindFirst(PrimaryOrganisationIdType).Value);
         }
+
+        public static Guid GetUserId(this ClaimsPrincipal user)
+        {
+            return new Guid(user.FindFirstValue(ClaimTypes.NameIdentifier));
+        }
+
+        public static string GetUserName(this ClaimsPrincipal user)
+        {
+            return user.Identity.Name;
+        }
     }
 }
