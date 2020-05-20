@@ -1,0 +1,103 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.181
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHSD.BuyingCatalogue.Ordering.Api", "src\NHSD.BuyingCatalogue.Ordering.Api\NHSD.BuyingCatalogue.Ordering.Api.csproj", "{B4DBCB83-BDBA-4C65-9F0B-C6FCB06A846B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2BC13686-75FE-43D6-A30D-3E39F5D688A9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{2ADEB1FE-86F6-4F4A-9452-F8C3E82E1400}"
+	ProjectSection(SolutionItems) = preProject
+		docker-compose-build.yml = docker-compose-build.yml
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{152C5610-E85A-46DE-876D-3D372B198BE5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHSD.BuyingCatalogue.Ordering.Api.UnitTests", "tests\NHSD.BuyingCatalogue.Ordering.Api.UnitTests\NHSD.BuyingCatalogue.Ordering.Api.UnitTests.csproj", "{35A62F97-B61C-4135-9A0C-6520C649C2E3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests", "tests\NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests\NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.csproj", "{B7D6DC1C-174F-477E-BA79-E217AEAAF3E9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHSD.BuyingCatalogue.Ordering.Common", "src\NHSD.BuyingCatalogue.Ordering.Common\NHSD.BuyingCatalogue.Ordering.Common.csproj", "{D5697631-9B71-4453-A79E-6E9572E724CC}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "NHSD.BuyingCatalogue.Ordering.OrderingDatabase", "src\NHSD.BuyingCatalogue.Ordering.OrderingDatabase\NHSD.BuyingCatalogue.Ordering.OrderingDatabase.sqlproj", "{A2F7098B-CE37-4744-B92C-255C0365F5B6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHSD.BuyingCatalogue.Ordering.Persistence", "src\NHSD.BuyingCatalogue.Ordering.Persistence\NHSD.BuyingCatalogue.Ordering.Persistence.csproj", "{048CB224-ACFA-4BA8-A54C-AC1B3911E7F9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHSD.BuyingCatalogue.Ordering.Domain", "src\NHSD.BuyingCatalogue.Ordering.Domain\NHSD.BuyingCatalogue.Ordering.Domain.csproj", "{F07D23DA-704D-4873-AF32-D935DC649784}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHSD.BuyingCatalogue.Ordering.Application", "src\NHSD.BuyingCatalogue.Ordering.Application\NHSD.BuyingCatalogue.Ordering.Application.csproj", "{5EAE2A8E-A151-48B1-BC0C-B7A3D7FA699E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHSD.BuyingCatalouge.Ordering.Api.Testing.Data", "tests\NHSD.BuyingCatalouge.Ordering.Api.Testing.Data\NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.csproj", "{CABE776C-2670-4941-8421-C36F0DFBE90B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHSD.BuyingCatalogue.Ordering.Domain.UnitTests", "tests\NHSD.BuyingCatalogue.Ordering.Domain.UnitTests\NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.csproj", "{B0EA4A17-4EE3-4557-842D-BDFA0136F5D3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B4DBCB83-BDBA-4C65-9F0B-C6FCB06A846B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4DBCB83-BDBA-4C65-9F0B-C6FCB06A846B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4DBCB83-BDBA-4C65-9F0B-C6FCB06A846B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4DBCB83-BDBA-4C65-9F0B-C6FCB06A846B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35A62F97-B61C-4135-9A0C-6520C649C2E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35A62F97-B61C-4135-9A0C-6520C649C2E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35A62F97-B61C-4135-9A0C-6520C649C2E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35A62F97-B61C-4135-9A0C-6520C649C2E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B7D6DC1C-174F-477E-BA79-E217AEAAF3E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B7D6DC1C-174F-477E-BA79-E217AEAAF3E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B7D6DC1C-174F-477E-BA79-E217AEAAF3E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B7D6DC1C-174F-477E-BA79-E217AEAAF3E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5697631-9B71-4453-A79E-6E9572E724CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5697631-9B71-4453-A79E-6E9572E724CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5697631-9B71-4453-A79E-6E9572E724CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5697631-9B71-4453-A79E-6E9572E724CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2F7098B-CE37-4744-B92C-255C0365F5B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2F7098B-CE37-4744-B92C-255C0365F5B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2F7098B-CE37-4744-B92C-255C0365F5B6}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{A2F7098B-CE37-4744-B92C-255C0365F5B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2F7098B-CE37-4744-B92C-255C0365F5B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2F7098B-CE37-4744-B92C-255C0365F5B6}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{048CB224-ACFA-4BA8-A54C-AC1B3911E7F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{048CB224-ACFA-4BA8-A54C-AC1B3911E7F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{048CB224-ACFA-4BA8-A54C-AC1B3911E7F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{048CB224-ACFA-4BA8-A54C-AC1B3911E7F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F07D23DA-704D-4873-AF32-D935DC649784}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F07D23DA-704D-4873-AF32-D935DC649784}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F07D23DA-704D-4873-AF32-D935DC649784}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F07D23DA-704D-4873-AF32-D935DC649784}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EAE2A8E-A151-48B1-BC0C-B7A3D7FA699E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EAE2A8E-A151-48B1-BC0C-B7A3D7FA699E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EAE2A8E-A151-48B1-BC0C-B7A3D7FA699E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EAE2A8E-A151-48B1-BC0C-B7A3D7FA699E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CABE776C-2670-4941-8421-C36F0DFBE90B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CABE776C-2670-4941-8421-C36F0DFBE90B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CABE776C-2670-4941-8421-C36F0DFBE90B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CABE776C-2670-4941-8421-C36F0DFBE90B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0EA4A17-4EE3-4557-842D-BDFA0136F5D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0EA4A17-4EE3-4557-842D-BDFA0136F5D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0EA4A17-4EE3-4557-842D-BDFA0136F5D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0EA4A17-4EE3-4557-842D-BDFA0136F5D3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B4DBCB83-BDBA-4C65-9F0B-C6FCB06A846B} = {2BC13686-75FE-43D6-A30D-3E39F5D688A9}
+		{35A62F97-B61C-4135-9A0C-6520C649C2E3} = {152C5610-E85A-46DE-876D-3D372B198BE5}
+		{B7D6DC1C-174F-477E-BA79-E217AEAAF3E9} = {152C5610-E85A-46DE-876D-3D372B198BE5}
+		{D5697631-9B71-4453-A79E-6E9572E724CC} = {2BC13686-75FE-43D6-A30D-3E39F5D688A9}
+		{A2F7098B-CE37-4744-B92C-255C0365F5B6} = {2BC13686-75FE-43D6-A30D-3E39F5D688A9}
+		{048CB224-ACFA-4BA8-A54C-AC1B3911E7F9} = {2BC13686-75FE-43D6-A30D-3E39F5D688A9}
+		{F07D23DA-704D-4873-AF32-D935DC649784} = {2BC13686-75FE-43D6-A30D-3E39F5D688A9}
+		{5EAE2A8E-A151-48B1-BC0C-B7A3D7FA699E} = {2BC13686-75FE-43D6-A30D-3E39F5D688A9}
+		{CABE776C-2670-4941-8421-C36F0DFBE90B} = {152C5610-E85A-46DE-876D-3D372B198BE5}
+		{B0EA4A17-4EE3-4557-842D-BDFA0136F5D3} = {152C5610-E85A-46DE-876D-3D372B198BE5}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B71E924C-436B-42AD-9798-398E75C82AA3}
+	EndGlobalSection
+EndGlobal
