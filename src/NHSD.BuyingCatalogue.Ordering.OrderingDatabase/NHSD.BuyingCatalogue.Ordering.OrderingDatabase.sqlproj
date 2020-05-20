@@ -73,11 +73,10 @@
     <Build Include="Tables\OrderStatus.sql" />
     <Build Include="Tables\Order.sql" />
     <Build Include="Tables\SupplierContact.sql" />
+    <Build Include="Tables\Address.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Deployment\PostDeployment.sql" />
   </ItemGroup>
-  <ItemGroup>
-    <RefactorLog Include="NHSD.BuyingCatalogue.Ordering.OrderingDatabase.refactorlog" />
   </ItemGroup>
 </Project>
