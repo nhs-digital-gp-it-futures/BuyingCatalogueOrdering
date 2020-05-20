@@ -19,8 +19,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpPut]
-        public ActionResult Update([FromRoute] [Required] string orderId,
-            [FromBody] [Required] CommencementDateModel model)
+        public ActionResult Update(string orderId, CommencementDateModel model)
         {
             if (orderId is null)
             {
