@@ -2,7 +2,7 @@
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
 {
-    sealed public class CreateOrderRequest
+    public sealed class CreateOrderRequest
     {
         public Guid LastUpdatedById { get; set; }
 

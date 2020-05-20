@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
 {
-    sealed public class CreateOrderService : ICreateOrderService
+    public sealed class CreateOrderService : ICreateOrderService
     {
         private readonly IOrderRepository _orderRepository;
 
