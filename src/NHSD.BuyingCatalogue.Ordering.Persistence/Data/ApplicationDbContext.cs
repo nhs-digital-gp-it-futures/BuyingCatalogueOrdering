@@ -8,6 +8,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
     {
         public DbSet<Order> Order { get; set; }
 
+        public DbSet<OrderStatus> OrderStatus { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) 
             : base(options)
         {
