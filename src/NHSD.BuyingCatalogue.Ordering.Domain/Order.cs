@@ -1,6 +1,5 @@
 ﻿using System;
 
-
 namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class Order
@@ -16,7 +15,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         public DateTime LastUpdated { get; set; }
         
         public Guid LastUpdatedBy { get; set; }
-                
 
         public string LastUpdatedByName { get; set; }
 
