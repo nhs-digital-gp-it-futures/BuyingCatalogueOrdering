@@ -4,5 +4,5 @@
     [Name] VARCHAR(100) NULL, 
     [Email] VARCHAR(100) NULL, 
     [Phone] VARCHAR(35) NULL,
-    CONSTRAINT PK_SupplierContactId PRIMARY KEY (SupplierContactId)
+    CONSTRAINT PK_SupplierContact PRIMARY KEY (SupplierContactId)
 );
