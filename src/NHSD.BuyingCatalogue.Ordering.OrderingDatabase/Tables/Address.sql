@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[Address]
+﻿CREATE TABLE dbo.[Address]
 (
     AddressId INT IDENTITY(1,1) NOT NULL PRIMARY KEY, 
     Line1 NVARCHAR(256) NULL, 
