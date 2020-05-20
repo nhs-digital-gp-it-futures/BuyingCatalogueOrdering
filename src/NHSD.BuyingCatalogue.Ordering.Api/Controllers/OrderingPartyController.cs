@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 
@@ -45,7 +44,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpPut]
-        public ActionResult Update([FromRoute][Required]string orderId, [FromBody][Required] OrderingPartyModel model)
+        public ActionResult Update(string orderId, OrderingPartyModel model)
         {
             if (orderId is null)
             {
