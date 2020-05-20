@@ -1,8 +1,8 @@
 ﻿namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
-    internal sealed class OrderingPartyModel
+    public sealed class OrderingPartyModel
     {
-        internal OrganisationModel Organisation { get; set; }
-        internal PrimaryContactModel PrimaryContact { get; set; }
+        public OrganisationModel Organisation { get; set; }
+        public PrimaryContactModel PrimaryContact { get; set; }
     }
 }
