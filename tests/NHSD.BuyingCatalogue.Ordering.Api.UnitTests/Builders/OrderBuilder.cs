@@ -12,7 +12,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _order = new Order()
             {
                 OrderId = "C000014-01",
-                
                 OrganisationId = Guid.NewGuid(),
                 Created = DateTime.UtcNow,
                 LastUpdated = DateTime.UtcNow,
@@ -20,7 +19,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
                 LastUpdatedByName = "Bob Smith",
                 OrderStatus = new OrderStatus() {OrderStatusId = 1, Name = "Submitted"}
             };
-
             _order.SetDescription(OrderDescription.Create("Some Description").Value);
         }
 

@@ -10,6 +10,8 @@ using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
+using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -20,10 +22,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     public sealed class OrdersController : Controller
     {
         private readonly IOrderRepository _orderRepository;
+        private readonly ICreateOrderService _createOrderService;
 
-        public OrdersController(IOrderRepository orderRepository)
+        public OrdersController(IOrderRepository orderRepository , ICreateOrderService createOrderService)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            _createOrderService = createOrderService ?? throw new ArgumentNullException(nameof(createOrderService));
         }
 
         [HttpGet]
@@ -36,7 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             {
                 return Forbid();
             }
-
+            
             var orders = await _orderRepository.ListOrdersByOrganisationIdAsync(organisationId);
 
             var orderModelResult = orders.Select(order => new OrderModel
@@ -127,7 +131,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpPost]
-        public ActionResult<CreateOrderResponseModel> CreateOrderAsync([FromBody][Required] CreateOrderModel order)
+        public async Task<ActionResult<CreateOrderResponseModel>> CreateOrderAsync([FromBody][Required] CreateOrderModel order)
         {
             if (order is null)
             {
@@ -140,8 +144,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            var createOrderResponse = new CreateOrderResponseModel {OrderId = "C0000014-01" };
-            return Ok(createOrderResponse);
+            var result = await _createOrderService.CreateAsync(new CreateOrderRequest
+            {
+                LastUpdatedByName = User.GetUserName(),
+                LastUpdatedById = User.GetUserId(),
+                Description = order.Description,
+                OrganisationId = order.OrganisationId,
+            });
+
+            var createOrderResponse = new CreateOrderResponseModel();
+
+            if (result.IsSuccess)
+            {
+                createOrderResponse.OrderId = result.Value;
+                return CreatedAtAction(nameof(CreateOrderAsync).TrimAsync(), null, new { orderId = result.Value }, createOrderResponse);
+            }
+
+            createOrderResponse.Errors = result.Errors.Select(x => new ErrorModel(x.Id, x.Field));
+            return BadRequest(createOrderResponse);
         }
     }
 }

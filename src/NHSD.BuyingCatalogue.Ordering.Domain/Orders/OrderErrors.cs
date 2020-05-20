@@ -11,5 +11,10 @@
         {
             return new ErrorDetails("OrderDescriptionTooLong", nameof(Order.Description));
         }
+
+        public static ErrorDetails OrderOrganisationIdRequired()
+        {
+            return new ErrorDetails("OrganisationIdRequired", nameof(Order.OrganisationId));
+        }
     }
 }

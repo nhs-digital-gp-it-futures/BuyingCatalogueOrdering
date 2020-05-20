@@ -1,6 +1,6 @@
 ﻿namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
-    public sealed class OrganisationModel
+    internal sealed class OrganisationModel
     {
         public string Name { get; set; }
         public string OdsCode { get; set; }
