@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Logging;
@@ -43,6 +44,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             Log.Logger.Information("ORDAPI Require Https: {@requiredHttps}", requireHttps);
             Log.Logger.Information($"ORDAPI Allow Invalid Certificates: {@allowInvalidCertificate}", allowInvalidCertificate);
             Log.Logger.Information("ORDAPI BypassIdentity: {@bypassIdentity}", bypassIdentity);
+            
+            IdentityModelEventSource.ShowPII = _environment.IsDevelopment();
 
             services.AddTransient<IOrderRepository, OrderRepository>();
 
