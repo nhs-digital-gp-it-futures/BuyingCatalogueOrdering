@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
@@ -37,6 +39,22 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             };
 
             return Ok(result);
+        }
+
+        [HttpPut]
+        public ActionResult Update([FromRoute] [Required] string orderId, [FromBody] [Required] SupplierModel model)
+        {
+            if (orderId is null)
+            {
+                return NotFound();
+            }
+
+            if (model is null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            return NoContent();
         }
     }
 }
