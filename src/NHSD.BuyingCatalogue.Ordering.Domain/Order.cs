@@ -5,15 +5,25 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
     public sealed class Order
     {
         public string OrderId { get; set; }
-         
+
         public OrderDescription Description { get; private set; }
 
         public Guid OrganisationId { get; set; }
 
+        public string OrganisationName { get; set; }
+
+        public string OrganisationOdsCode { get; set; }
+
+        public Address OrganisationAddress { get; set; }
+
+        public Address OrganisationBillingAddress { get; set; }
+
+        public Contact OrganisationContact { get; set; }
+
         public DateTime Created { get; set; }
-         
+
         public DateTime LastUpdated { get; set; }
-        
+
         public Guid LastUpdatedBy { get; set; }
 
         public string LastUpdatedByName { get; set; }
