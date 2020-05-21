@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
@@ -19,6 +20,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         public string LastUpdatedByName { get; set; }
 
         public OrderStatus OrderStatus { get; set; }
+
+        public int? SupplierId { get; set; } 
+
+        public string SupplierName { get; set; }
+
+        [ForeignKey("SupplierAddressId")]
+        public Address SupplierAddress { get; set; }
+
+        [ForeignKey("SupplierContactId")]
+        public Contact SupplierContact { get; set; }
 
         public void SetDescription(OrderDescription orderDescription)
         {
