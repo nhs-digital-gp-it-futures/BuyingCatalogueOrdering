@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using static System.Int32;
 using System.Linq;
 using System.Threading.Tasks;
@@ -55,14 +56,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
                 throw new ArgumentNullException(nameof(order));
             }
 
-            using ( var dbContextTransaction = _context.Database.BeginTransaction())
+            using (var dbContextTransaction = _context.Database.BeginTransaction())
             {
                 if (order.OrderId == null)
                 {
                     order.OrderId = await GetIncremenedOrderId();
                 }
 
-                order.OrderStatus = await  _context.OrderStatus.FindAsync(order.OrderStatus.OrderStatusId) ?? order.OrderStatus;
+                order.OrderStatus = await _context.OrderStatus.FindAsync(order.OrderStatus.OrderStatusId) ?? order.OrderStatus;
 
                 _context.Order.Add(order);
                 await _context.SaveChangesAsync();
