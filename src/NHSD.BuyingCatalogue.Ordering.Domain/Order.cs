@@ -31,6 +31,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public OrderStatus OrderStatus { get; set; }
 
+        public int? SupplierId { get; set; } 
+
+        public string SupplierName { get; set; }
+
+        [ForeignKey("SupplierAddressId")]
+        public Address SupplierAddress { get; set; }
+
+        [ForeignKey("SupplierContactId")]
+        public Contact SupplierContact { get; set; }
+
         public void SetDescription(OrderDescription orderDescription)
         {
             Description = orderDescription ?? throw new ArgumentNullException(nameof(orderDescription));
