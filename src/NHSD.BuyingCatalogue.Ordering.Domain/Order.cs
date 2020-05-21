@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
@@ -9,6 +10,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         public OrderDescription Description { get; private set; }
 
         public Guid OrganisationId { get; set; }
+
+        public string OrganisationName { get; set; }
+
+        public string OrganisationOdsCode { get; set; }
+
+        [ForeignKey("OrganisationAddressId")]
+        public Address OrganisationAddress { get; set; }
+
+        [ForeignKey("OrganisationContactId")]
+        public Contact OrganisationContact { get; set; }
 
         public DateTime Created { get; set; }
 
