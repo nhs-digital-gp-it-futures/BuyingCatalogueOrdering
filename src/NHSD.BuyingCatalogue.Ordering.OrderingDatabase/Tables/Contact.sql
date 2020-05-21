@@ -1,9 +1,9 @@
 ﻿CREATE TABLE dbo.Contact
 (
-    [ContactId] INT IDENTITY(1, 1) NOT NULL,
-    FirstName VARCHAR(100) NULL, 
+    ContactId INT IDENTITY(1, 1) NOT NULL,
+    FirstName NVARCHAR(100) NULL, 
     LastName NVARCHAR(100) NULL,
-    Email VARCHAR(100) NULL, 
-    Phone VARCHAR(35) NULL,
+    Email NVARCHAR(100) NULL, 
+    Phone NVARCHAR(35) NULL,
     CONSTRAINT PK_Contact PRIMARY KEY (ContactId)
 );
