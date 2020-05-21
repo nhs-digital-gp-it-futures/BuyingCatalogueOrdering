@@ -6,7 +6,7 @@
     OrganisationName NVARCHAR(256) NULL, 
     OrganisationOdsCode NVARCHAR(8) NULL, 
     OrganisationAddressId INT NULL,
-    OrganisationBilingAddressId INT NULL,    
+    OrganisationBillingAddressId INT NULL,    
     OrganisationContactId INT NULL,
     OrderStatusId INT NOT NULL,    
     Created DATETIME2 NOT NULL,
