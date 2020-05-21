@@ -55,7 +55,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
                 throw new ArgumentNullException(nameof(order));
             }
 
-            using (var dbContextTransaction = _context.Database.BeginTransactionAsync())
+            using (var dbContextTransaction = await _context.Database.BeginTransactionAsync())
             {
                 if (order.OrderId == null)
                 {
@@ -66,7 +66,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
 
                 _context.Order.Add(order);
                 await _context.SaveChangesAsync();
-                await (await dbContextTransaction).CommitAsync();
+                await dbContextTransaction.CommitAsync();
             }
 
             return order.OrderId;
