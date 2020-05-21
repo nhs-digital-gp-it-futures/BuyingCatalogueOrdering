@@ -1,6 +1,6 @@
 ﻿CREATE TABLE dbo.Contact
 (
-    [ContactId] INT IDENTITY(1, 1) NOT NULL,
+    ContactId INT IDENTITY(1, 1) NOT NULL,
     FirstName NVARCHAR(100) NULL, 
     LastName NVARCHAR(100) NULL,
     Email NVARCHAR(100) NULL, 
