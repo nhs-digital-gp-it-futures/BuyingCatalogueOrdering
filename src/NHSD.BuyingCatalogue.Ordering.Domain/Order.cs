@@ -11,6 +11,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public Guid OrganisationId { get; set; }
 
+        public string OrganisationName { get; set; }
+
+        public string OrganisationOdsCode { get; set; }
+
+        [ForeignKey("OrganisationAddressId")]
+        public Address OrganisationAddress { get; set; }
+
+        [ForeignKey("OrganisationContactId")]
+        public Contact OrganisationContact { get; set; }
+
         public DateTime Created { get; set; }
 
         public DateTime LastUpdated { get; set; }
