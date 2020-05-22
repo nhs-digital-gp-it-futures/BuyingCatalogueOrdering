@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -9,6 +14,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [Produces("application/json")]
     public sealed class OrderingPartyController : Controller
     {
+        private readonly IOrderRepository _orderRepository;
+
+        public OrderingPartyController(IOrderRepository orderRepository)
+        {
+            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+
+        }
+
         [HttpGet]
         public ActionResult Get(string orderId)
         {
@@ -44,17 +57,42 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpPut]
-        public ActionResult Update(string orderId, OrderingPartyModel model)
+        public async Task<ActionResult> Update(string orderId, OrderingPartyModel model)
         {
-            if (orderId is null)
-            {
-                return NotFound();
-            }
-
             if (model is null)
             {
                 throw new ArgumentNullException(nameof(model));
             }
+
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            if (order is null)
+            {
+                return NotFound();
+            }
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
+            var contact = model.PrimaryContact;
+
+
+            var isContactValid = OrderPartyContact.Create(contact.FirstName, contact.LastName, contact.EmailAddress, contact.TelephoneNumber);
+
+            if (!isContactValid.IsSuccess)
+            {
+                return BadRequest(new ErrorsModel(isContactValid.Errors.Select(x => new ErrorModel(x.Id, x.Field))));
+            }
+
+            order.OrganisationContact = isContactValid.Value.GetContact();
+
+            var name = User.Identity.Name;
+
+            order.SetLastUpdatedByName(name);
+
+            await _orderRepository.UpdateOrderAsync(order);
 
             return NoContent();
         }
