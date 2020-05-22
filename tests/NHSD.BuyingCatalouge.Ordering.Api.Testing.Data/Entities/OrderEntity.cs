@@ -11,6 +11,16 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public Guid OrganisationId { get; set; }
 
+        public string OrganisationName { get; set; }
+
+        public string OrganisationOdsCode { get; set; }
+
+        public int? OrganisationAddressId { get; set; }
+
+        public int? OrganisationBillingAddressId { get; set; }
+
+        public int? OrganisationContactId { get; set; }
+
         public int OrderStatusId { get; set; }
 
         public DateTime Created { get; set; }
@@ -27,6 +37,11 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 OrderId,
                 Description,
                 OrganisationId,
+                OrganisationName,
+                OrganisationOdsCode,
+                OrganisationAddressId,
+                OrganisationBillingAddressId,
+                OrganisationContactId,
                 OrderStatusId,
                 Created,
                 LastUpdated,
@@ -38,6 +53,11 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 @OrderId,
                 @Description,
                 @OrganisationId,
+                @OrganisationName,
+                @OrganisationOdsCode,
+                @OrganisationAddressId,
+                @OrganisationBillingAddressId,
+                @OrganisationContactId,
                 @OrderStatusId,
                 @Created,
                 @LastUpdated,
