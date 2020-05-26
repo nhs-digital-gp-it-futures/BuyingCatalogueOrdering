@@ -11,6 +11,16 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public Guid OrganisationId { get; set; }
 
+        public string OrganisationName { get; set; }
+
+        public string OrganisationOdsCode { get; set; }
+
+        public int? OrganisationAddressId { get; set; }
+
+        public int? OrganisationBillingAddressId { get; set; }
+
+        public int? OrganisationContactId { get; set; }
+
         public int OrderStatusId { get; set; }
 
         public DateTime Created { get; set; }
@@ -27,6 +37,11 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 OrderId,
                 Description,
                 OrganisationId,
+                OrganisationName,
+                OrganisationOdsCode,
+                OrganisationAddressId,
+                OrganisationBillingAddressId,
+                OrganisationContactId,
                 OrderStatusId,
                 Created,
                 LastUpdated,
@@ -38,6 +53,11 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 @OrderId,
                 @Description,
                 @OrganisationId,
+                @OrganisationName,
+                @OrganisationOdsCode,
+                @OrganisationAddressId,
+                @OrganisationBillingAddressId,
+                @OrganisationContactId,
                 @OrderStatusId,
                 @Created,
                 @LastUpdated,
@@ -67,6 +87,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                           [OrderId],
                           [Description],
                           [OrganisationId],
+                          [OrganisationName],
+                          [OrganisationOdsCode],
                           [OrderStatusId],
                           [Created],
                           [LastUpdated],
@@ -74,6 +96,35 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                           [LastUpdatedByName]
                          FROM [Order]
                          WHERE [OrderId] = @orderId", new { orderId }));
+        }
+
+        public static async Task<ContactEntity> FetchPrimaryContactByOrderId(string connectionString, string orderId)
+        {
+            return (await SqlRunner.QueryFirstAsync<ContactEntity>(connectionString, $@"SELECT
+                        [ContactId],
+                        [FirstName],
+                        [LastName],
+                        [Email],
+                        [Phone] 
+                        FROM [CatalogueOrdering].[dbo].[Order] od join [CatalogueOrdering].[dbo].[Contact] ct on od.organisationContactId = ct.ContactId
+                        WHERE [OrderId] = @orderId", new { orderId }));
+        }
+
+        public static async Task<AddressEntity> FetchOrganisationAddressByOrderId(string connectionString, string orderId)
+        {
+            return (await SqlRunner.QueryFirstAsync<AddressEntity>(connectionString, $@"SELECT  
+                        [AddressId],
+                        [Line1],
+                        [Line2],
+                        [Line3],
+                        [Line4],
+                        [Line5],
+                        [Town],
+                        [County],
+                        [Postcode], 
+                        [Country]
+                        FROM [CatalogueOrdering].[dbo].[Order] od join [CatalogueOrdering].[dbo].[Address] ad on od.organisationAddressId = ad.AddressId
+                        WHERE [OrderId] = @orderId", new { orderId }));
         }
     }
 }
