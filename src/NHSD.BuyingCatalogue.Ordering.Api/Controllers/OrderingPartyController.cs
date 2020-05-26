@@ -77,8 +77,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             var contact = model.PrimaryContact;
-
-
             var isContactValid = OrderPartyContact.Create(contact.FirstName, contact.LastName, contact.EmailAddress, contact.TelephoneNumber);
 
             if (!isContactValid.IsSuccess)
@@ -88,9 +86,36 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             order.OrganisationContact = isContactValid.Value.GetContact();
 
+            var organisation = model.Organisation;
+            var addressModel = organisation.Address;
+            var address = new Address
+            {
+                Line1 = addressModel.Line1,
+                Line2 = addressModel.Line2,
+                Line3 = addressModel.Line3,
+                Line4 = addressModel.Line4,
+                Line5 = addressModel.Line5,
+                County = addressModel.County,
+                Country = addressModel.Country
+            };
+            var isOrganisationValid = OrderPartyOrganisation.Create(organisation.Name, organisation.OdsCode, address);
+
+            if (!isOrganisationValid.IsSuccess)
+            {
+                return BadRequest(new ErrorsModel(isContactValid.Errors.Select(x => new ErrorModel(x.Id, x.Field))));
+            }
+
+            var updateOrganisation = isOrganisationValid.Value.GetOrganisation();
+
+            order.OrganisationName = updateOrganisation.Name;
+            order.OrganisationOdsCode = updateOrganisation.OdsCode;
+            order.OrganisationAddress = updateOrganisation.Adress;
+
             var name = User.Identity.Name;
 
             order.SetLastUpdatedByName(name);
+            order.LastUpdatedBy = User.GetUserId();
+            order.LastUpdated = DateTime.UtcNow;
 
             await _orderRepository.UpdateOrderAsync(order);
 
