@@ -9,7 +9,6 @@ using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
-using System.Threading;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 {
