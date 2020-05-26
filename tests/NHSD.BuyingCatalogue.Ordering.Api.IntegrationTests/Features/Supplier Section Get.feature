@@ -17,3 +17,14 @@ Scenario: 1. Get the order supplier section details
     And the response contains the following supplier details
         | SupplierId | SupplierName       |
         | 123        | Some supplier name |
+
+@4621
+Scenario: 2. A non existent orderId returns not found
+    When the user makes a request to retrieve the order supplier section with the ID C000016-01
+    Then a response with status code 404 is returned
+
+@4621
+Scenario: 3. If a user is not authorised then they cannot access the order supplier section
+    Given no user is logged in
+    When the user makes a request to retrieve the order supplier section with the ID C000014-01
+    Then a response with status code 401 is returned

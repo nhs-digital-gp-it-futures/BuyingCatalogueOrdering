@@ -1,16 +1,19 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
+using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
     [Route("api/v1/orders/{orderId}/sections/supplier")]
     [ApiController]
     [Produces("application/json")]
+    [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class SupplierSectionController : Controller
     {
         private readonly IOrderRepository _orderRepository;
@@ -21,7 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetAsync(string orderId)
+        public async Task<ActionResult<SupplierModel>> GetAsync(string orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)

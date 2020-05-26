@@ -65,7 +65,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                           [LastUpdatedBy],
                           [LastUpdatedByName],
                           [SupplierId],
-                          [SupplierName],
+                          [SupplierName]
                          FROM [Order]
                          WHERE [OrderId] = @orderId", new { orderId }));
         }

@@ -30,7 +30,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [When(@"the user makes a request to retrieve the order supplier section with the ID (.*)")]
-        public async Task WhenAgetRequestIsMadeForAnOrdersSupplierWithOrderId(string orderId)
+        public async Task WhenTheUserMakesARequestToRetrieveTheOrderSupplierSectionWithId(string orderId)
         {
             await _request.GetAsync(string.Format(_orderSupplierSectionUrl, orderId));
         }

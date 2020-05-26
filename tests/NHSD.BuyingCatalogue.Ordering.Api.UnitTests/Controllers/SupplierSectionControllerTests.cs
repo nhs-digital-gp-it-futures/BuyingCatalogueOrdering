@@ -40,7 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             using var controller = context.SupplierSectionController;
             var response = await controller.GetAsync(orderId);
             
-            response.Should().BeEquivalentTo(new NotFoundResult());
+            response.Should().BeEquivalentTo(new ActionResult<SupplierModel>(new NotFoundResult()));
         }
 
         [Test]
@@ -70,12 +70,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .Build();
 
             using var controller = context.SupplierSectionController;
-            var response = await controller.GetAsync(orderId) as OkObjectResult;
+            var response = await controller.GetAsync(orderId);
             
-            Assert.IsNotNull(response);
-
-            var supplierModel = response.Value as SupplierModel;
-
             var expected = new SupplierModel
             {
                 SupplierId = supplierId,
@@ -84,7 +80,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 PrimaryContact = supplierContact.ToModel()
             };
 
-            supplierModel.Should().BeEquivalentTo(expected);
+            response.Should().BeEquivalentTo(new ActionResult<SupplierModel>(new OkObjectResult(expected)));
         }
 
         [Test]
@@ -100,9 +96,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .Build();
 
             using var controller = context.SupplierSectionController;
+            var actual = await controller.GetAsync(orderId);
 
-            var result = await controller.GetAsync(orderId);
-            result.Should().BeOfType<ForbidResult>();
+            var expected = new ActionResult<SupplierModel>(new ForbidResult());
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Test]

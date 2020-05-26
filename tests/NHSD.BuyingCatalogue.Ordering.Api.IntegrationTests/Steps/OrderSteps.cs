@@ -30,7 +30,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Given(@"Orders exist")]
-        public async Task GivenOrdersExit(Table table)
+        public async Task GivenOrdersExist(Table table)
         {
             foreach (var ordersTableItem in table.CreateSet<OrdersTable>())
             {
@@ -61,14 +61,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Then(@"the orders list is returned with the following values")]
         public async Task ThenTheOrdersListIsReturnedWithTheFollowingValues(Table table)
         {
-            var expectedOrders = table.CreateSet<OrdersTable>();
+            var expectedOrders = table.CreateSet<GetOrdersResultsTable>();
 
             var orders = (await _response.ReadBodyAsJsonAsync()).Select(CreateOrders);
 
-            orders.Should().BeEquivalentTo(expectedOrders,
-                orderTable => orderTable.Excluding(order => order.OrderStatusId)
-                    .Excluding(order => order.OrganisationId)
-                    .Excluding(order => order.LastUpdatedBy));
+            orders.Should().BeEquivalentTo(expectedOrders);
         }
 
         [Then(@"an empty list is returned")]
@@ -122,8 +119,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             public int OrderStatusId { get; set; } = 1;
 
-            public string Status { get; set; }
-
             public DateTime Created { get; set; }
 
             public Guid LastUpdatedBy { get; set; }
@@ -135,6 +130,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string SupplierId { get; set; }
 
             public string SupplierName { get; set; }
+        }
+
+        private sealed class GetOrdersResultsTable
+        {
+            public string OrderId { get; set; }
+
+            public string Description { get; set; }
+
+            public string Status { get; set; }
+
+            public DateTime Created { get; set; }
+
+            public string LastUpdatedByName { get; set; }
+
+            public DateTime LastUpdated { get; set; }
         }
     }
 }
