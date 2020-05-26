@@ -21,6 +21,10 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public string LastUpdatedByName { get; set; }
 
+        public string SupplierId { get; set; }
+
+        public string SupplierName { get; set; }
+
         protected override string InsertSql => $@"
             INSERT INTO [dbo].[Order]
             (
@@ -31,7 +35,9 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 Created,
                 LastUpdated,
                 LastUpdatedBy,
-                LastUpdatedByName
+                LastUpdatedByName,
+                SupplierId,
+                SupplierName
             )
             VALUES
             (
@@ -42,24 +48,10 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 @Created,
                 @LastUpdated,
                 @LastUpdatedBy,
-                @LastUpdatedByName
+                @LastUpdatedByName,
+                @SupplierId,
+                @SupplierName
             )";
-
-        public static async Task<string> FetchOrderDescriptionFromOrderId(string connectionString, string orderId)
-        {
-            return (await SqlRunner.QueryFirstAsync<string>(connectionString, $@"SELECT
-                         [Description]
-                         FROM [Order]
-                         WHERE [OrderId] = @orderId", new { orderId }));
-        }
-
-        public static async Task<string> FetchLastUpdatedByNameFromOrderId(string connectionString, string orderId)
-        {
-            return (await SqlRunner.QueryFirstAsync<string>(connectionString, $@"SELECT
-                         [LastUpdatedByName]
-                         FROM [Order]
-                         WHERE [OrderId] = @orderId", new { orderId }));
-        }
 
         public static async Task<OrderEntity> FetchOrderByOrderId(string connectionString, string orderId)
         {
@@ -71,7 +63,9 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                           [Created],
                           [LastUpdated],
                           [LastUpdatedBy],
-                          [LastUpdatedByName]
+                          [LastUpdatedByName],
+                          [SupplierId],
+                          [SupplierName],
                          FROM [Order]
                          WHERE [OrderId] = @orderId", new { orderId }));
         }

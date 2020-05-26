@@ -28,6 +28,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
 
         public async Task<Order> GetOrderByIdAsync(string orderId)
         {
+            if (string.IsNullOrWhiteSpace(orderId))
+                return null;
+
             return await _context.Order.FindAsync(orderId);
         }
 

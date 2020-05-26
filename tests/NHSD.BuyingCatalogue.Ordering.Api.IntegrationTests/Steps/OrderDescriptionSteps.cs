@@ -68,14 +68,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var expected = table.CreateInstance<OrderDescriptionTable>().Description;
 
-            var actual = await OrderEntity.FetchOrderDescriptionFromOrderId(_settings.ConnectionString, orderId);
+            var actual = (await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId)).Description;
             actual.Should().BeEquivalentTo(expected);
         }
 
         [Then(@"the lastUpdatedName is updated in the database to (.*) with orderId (.*)")]
         public async Task ThenTheLastUpdatedNameIsUpdatedInTheDatabase(string expected, string orderId)
         {
-            var actual = await OrderEntity.FetchLastUpdatedByNameFromOrderId(_settings.ConnectionString, orderId);
+            var actual = (await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId)).LastUpdatedByName;
             actual.Should().BeEquivalentTo(expected);
         }
 
