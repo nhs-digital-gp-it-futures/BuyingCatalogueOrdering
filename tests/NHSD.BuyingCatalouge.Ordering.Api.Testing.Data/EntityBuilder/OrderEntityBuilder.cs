@@ -17,7 +17,9 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
                 LastUpdated = DateTime.UtcNow,
                 LastUpdatedBy = Guid.NewGuid(),
                 LastUpdatedByName = "Alice Smith",
-                Created = DateTime.UtcNow
+                Created = DateTime.UtcNow,
+                SupplierId = null,
+                SupplierName = null
             };
         }
 
@@ -71,6 +73,18 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
         public OrderEntityBuilder WithDateCreated(DateTime dateCreated)
         {
             _orderEntity.Created = dateCreated;
+            return this;
+        }
+
+        public OrderEntityBuilder WithSupplierId(string supplierId)
+        {
+            _orderEntity.SupplierId = supplierId;
+            return this;
+        }
+
+        public OrderEntityBuilder WithSupplierName(string supplierName)
+        {
+            _orderEntity.SupplierName = supplierName;
             return this;
         }
 

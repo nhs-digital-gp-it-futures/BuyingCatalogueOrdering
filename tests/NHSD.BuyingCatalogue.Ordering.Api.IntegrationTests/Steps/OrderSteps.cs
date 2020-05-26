@@ -40,10 +40,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithOrganisationId(ordersTableItem.OrganisationId)
                     .WithDescription(ordersTableItem.Description)
                     .WithOrderStatusId(ordersTableItem.OrderStatusId)
-                    .WithDateCreated(ordersTableItem.Created)
+                    .WithDateCreated(ordersTableItem.Created != DateTime.MinValue ? ordersTableItem.Created : DateTime.UtcNow)
                     .WithLastUpdatedBy(ordersTableItem.LastUpdatedBy)
                     .WithLastUpdatedName(ordersTableItem.LastUpdatedByName)
-                    .WithLastUpdated(ordersTableItem.LastUpdated)
+                    .WithLastUpdated(ordersTableItem.LastUpdated != DateTime.MinValue ? ordersTableItem.LastUpdated : DateTime.UtcNow)
+                    .WithSupplierId(ordersTableItem.SupplierId)
+                    .WithSupplierName(ordersTableItem.SupplierName)
                     .Build();
 
                 await order.InsertAsync(_settings.ConnectionString);
@@ -118,7 +120,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             public string Description { get; set; }
 
-            public int OrderStatusId { get; set; }
+            public int OrderStatusId { get; set; } = 1;
 
             public string Status { get; set; }
 
@@ -129,6 +131,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string LastUpdatedByName { get; set; }
 
             public DateTime LastUpdated { get; set; }
+
+            public string SupplierId { get; set; }
+
+            public string SupplierName { get; set; }
         }
     }
 }
