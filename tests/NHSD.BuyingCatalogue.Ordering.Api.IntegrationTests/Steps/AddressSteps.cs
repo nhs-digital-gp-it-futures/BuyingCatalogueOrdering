@@ -53,7 +53,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Then(@"the Address section (.*) is returned")]
-        public async Task ThenTheAddressSectionOrganiationIsReturned(string section, Table table)
+        public async Task ThenTheAddressSectionIsReturned(string section, Table table)
         {
             var expected = table.CreateSet<AddressTable>().FirstOrDefault();
             var response = (await _response.ReadBodyAsJsonAsync()).SelectToken(section).SelectToken("address");

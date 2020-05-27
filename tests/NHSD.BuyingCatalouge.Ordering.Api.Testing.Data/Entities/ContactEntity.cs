@@ -7,8 +7,8 @@
         public string Email { get; set; }
         public string Phone { get; set; }
 
-        protected override string InsertSql => $@"
-            INSERT INTO [dbo].[Contact]
+        protected override string InsertSql => @"
+            INSERT INTO dbo.Contact
             (
                 FirstName,
                 LastName,
@@ -21,7 +21,7 @@
                 @LastName,
                 @Email,
                 @Phone
-            )
-            SELECT SCOPE_IDENTITY()";
+            );
+            SELECT SCOPE_IDENTITY();";
     }
 }

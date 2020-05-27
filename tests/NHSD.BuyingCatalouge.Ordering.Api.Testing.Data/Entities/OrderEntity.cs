@@ -31,8 +31,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public string LastUpdatedByName { get; set; }
 
-        protected override string InsertSql => $@"
-            INSERT INTO [dbo].[Order]
+        protected override string InsertSql => @"
+            INSERT INTO dbo.[Order]
             (
                 OrderId,
                 Description,
@@ -63,7 +63,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 @LastUpdated,
                 @LastUpdatedBy,
                 @LastUpdatedByName
-            )";
+            );";
 
         public static async Task<string> FetchOrderDescriptionFromOrderId(string connectionString, string orderId)
         {

@@ -31,10 +31,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = OrderingPartyTestContext.Setup();
 
-            using var controller = context.OrderingPartyController;
+            var controller = context.OrderingPartyController;
 
             var response = await controller.GetAsync("INVALID");
-            response.Should().BeEquivalentTo(new NotFoundResult());
+            response.Should().BeEquivalentTo(new ActionResult<OrderingPartyModel>(new NotFoundResult()));
         }
 
         [Test]
@@ -42,33 +42,33 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = OrderingPartyTestContext.Setup();
 
-            var orderId = "C0000014-01";
-            var testData = CreateOrderingPartyTestData(orderId, Guid.NewGuid());
+            const string orderId = "C0000014-01";
+            (Order order, _) = CreateOrderingPartyTestData(orderId, Guid.NewGuid());
 
-            context.Order = testData.order;
+            context.Order = order;
 
-            using var controller = context.OrderingPartyController;
+            var controller = context.OrderingPartyController;
 
             var result = await controller.GetAsync(orderId);
-            result.Should().BeOfType<ForbidResult>();
+            result.Should().BeEquivalentTo(new ActionResult<OrderingPartyModel>(new ForbidResult()));
         }
 
         [Test]
         public async Task GetAsync_OrderIdExists_ReturnsTheOrderingParty()
         {
-            var orderId = "C0000014-01";
+            const string orderId = "C0000014-01";
             var context = OrderingPartyTestContext.Setup();
 
-            var testData = CreateOrderingPartyTestData(orderId, context.PrimaryOrganisationId);
+            (Order order, OrderingPartyModel expectedOrderingParty) = CreateOrderingPartyTestData(orderId, context.PrimaryOrganisationId);
 
-            context.Order = testData.order;
+            context.Order = order;
 
-            using var controller = context.OrderingPartyController;
+            var controller = context.OrderingPartyController;
 
-            var result = await controller.GetAsync(orderId) as OkObjectResult;
+            var result = await controller.GetAsync(orderId);
 
-            var orderingParty = result.Value as OrderingPartyModel;
-            orderingParty.Should().BeEquivalentTo(testData.expectedOrderingParty);
+            result.Should()
+                .BeEquivalentTo(new ActionResult<OrderingPartyModel>(new OkObjectResult(expectedOrderingParty)));
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = OrderingPartyTestContext.Setup();
 
-            using var controller = context.OrderingPartyController;
+            var controller = context.OrderingPartyController;
 
             await controller.GetAsync(string.Empty);
 
@@ -147,7 +147,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             internal Guid PrimaryOrganisationId { get; }
 
-            internal ClaimsPrincipal ClaimsPrincipal { get; }
+            private ClaimsPrincipal ClaimsPrincipal { get; }
 
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
 
