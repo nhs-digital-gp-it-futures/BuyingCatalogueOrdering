@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Mime;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -13,9 +14,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
     [Route("api/v1/orders/{orderId}/sections/ordering-party")]
     [ApiController]
-    [Produces("application/json")]
+    [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
-    public sealed class OrderingPartyController : Controller
+    public sealed class OrderingPartyController : ControllerBase
     {
         private readonly IOrderRepository _orderRepository;
 
@@ -25,7 +26,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetAsync(string orderId)
+        public async Task<ActionResult<OrderingPartyModel>> GetAsync(string orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
 

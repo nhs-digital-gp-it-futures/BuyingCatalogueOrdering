@@ -31,8 +31,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public string LastUpdatedByName { get; set; }
 
-        protected override string InsertSql => $@"
-            INSERT INTO [dbo].[Order]
+        protected override string InsertSql => @"
+            INSERT INTO dbo.[Order]
             (
                 OrderId,
                 Description,
@@ -63,37 +63,37 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 @LastUpdated,
                 @LastUpdatedBy,
                 @LastUpdatedByName
-            )";
+            );";
 
         public static async Task<string> FetchOrderDescriptionFromOrderId(string connectionString, string orderId)
         {
-            return (await SqlRunner.QueryFirstAsync<string>(connectionString, $@"SELECT
+            return (await SqlRunner.QueryFirstAsync<string>(connectionString, @"SELECT
                          [Description]
-                         FROM [Order]
-                         WHERE [OrderId] = @orderId", new { orderId }));
+                         FROM dbo.[Order]
+                         WHERE OrderId = @orderId;", new { orderId }));
         }
 
         public static async Task<string> FetchLastUpdatedByNameFromOrderId(string connectionString, string orderId)
         {
-            return (await SqlRunner.QueryFirstAsync<string>(connectionString, $@"SELECT
-                         [LastUpdatedByName]
-                         FROM [Order]
-                         WHERE [OrderId] = @orderId", new { orderId }));
+            return (await SqlRunner.QueryFirstAsync<string>(connectionString, @"SELECT
+                         LastUpdatedByName
+                         FROM dbo.[Order]
+                         WHERE OrderId = @orderId;", new { orderId }));
         }
 
         public static async Task<OrderEntity> FetchOrderByOrderId(string connectionString, string orderId)
         {
-            return (await SqlRunner.QueryFirstAsync<OrderEntity>(connectionString, $@"SELECT
-                          [OrderId],
+            return (await SqlRunner.QueryFirstAsync<OrderEntity>(connectionString, @"SELECT
+                          OrderId,
                           [Description],
-                          [OrganisationId],
-                          [OrganisationName],
-                          [OrganisationOdsCode],
-                          [OrderStatusId],
-                          [Created],
-                          [LastUpdated],
-                          [LastUpdatedBy],
-                          [LastUpdatedByName]
+                          OrganisationId,
+                          OrganisationName,
+                          OrganisationOdsCode,
+                          OrderStatusId,
+                          Created,
+                          LastUpdated,
+                          LastUpdatedBy,
+                          LastUpdatedByName
                          FROM [Order]
                          WHERE [OrderId] = @orderId", new { orderId }));
         }

@@ -9,7 +9,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
 
         private OrderEntityBuilder()
         {
-            _orderEntity = new OrderEntity()
+            _orderEntity = new OrderEntity
             {
                 Description = "Some Description",
                 OrganisationId = Guid.NewGuid(),

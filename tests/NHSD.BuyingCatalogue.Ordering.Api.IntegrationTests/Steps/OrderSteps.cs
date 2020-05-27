@@ -99,7 +99,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public async Task ThenTheOrderIsCreatedInTheDatabase(string orderId, Table table)
         {
             var actual = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
-            table.CompareToInstance<OrderEntity>(actual);
+            table.CompareToInstance(actual);
         }
 
         [Then(@"the order with orderId (.*) is updated and has a primary contact with data")]

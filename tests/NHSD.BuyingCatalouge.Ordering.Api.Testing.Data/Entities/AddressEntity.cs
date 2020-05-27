@@ -12,8 +12,8 @@
         public string Postcode { get; set; }
         public string Country { get; set; }
 
-        protected override string InsertSql => $@"
-            INSERT INTO [dbo].[Address]
+        protected override string InsertSql => @"
+            INSERT INTO dbo.[Address]
             (
                 Line1,
                 Line2,
@@ -36,7 +36,7 @@
                 @County,
                 @Postcode,
                 @Country
-            )
-            SELECT SCOPE_IDENTITY()";
+            );
+            SELECT SCOPE_IDENTITY();";
     }
 }
