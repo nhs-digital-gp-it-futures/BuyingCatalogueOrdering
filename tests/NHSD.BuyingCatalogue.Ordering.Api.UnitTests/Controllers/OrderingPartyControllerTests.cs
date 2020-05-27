@@ -147,13 +147,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             internal Guid PrimaryOrganisationId { get; }
 
-            private ClaimsPrincipal ClaimsPrincipal { get; }
-
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
 
             internal Order Order { get; set; }
 
             internal OrderingPartyController OrderingPartyController { get; }
+
+            private ClaimsPrincipal ClaimsPrincipal { get; }
 
             internal static OrderingPartyTestContext Setup()
             {

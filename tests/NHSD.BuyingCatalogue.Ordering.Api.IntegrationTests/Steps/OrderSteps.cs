@@ -98,7 +98,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public async Task ThenTheOrderIsCreatedInTheDatabase(string orderId, Table table)
         {
             var actual = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
-            table.CompareToInstance<OrderEntity>(actual);
+            table.CompareToInstance(actual);
         }
 
         [Then(@"the order with orderId (.*) has LastUpdated time present and it is the current time")]
