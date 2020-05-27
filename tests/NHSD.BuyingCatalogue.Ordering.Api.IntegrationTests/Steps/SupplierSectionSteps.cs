@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
+using NUnit.Framework;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 
@@ -46,7 +47,27 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 SupplierName = response.Value<string>("name")
             };
 
-            var expected = table.CreateSet<SupplierSectionTable>().FirstOrDefault();
+            var expected = table.CreateInstance<SupplierSectionTable>();
+            actual.Should().BeEquivalentTo(expected);
+        }
+
+        [Then(@"the response contains the following primary supplier contact details")]
+        public async Task ThenTheResponseContainsTheFollowingSupplierContactDetails(Table table)
+        {
+            var response = await _response.ReadBodyAsJsonAsync();
+
+            var primaryContactResponse = response.SelectToken("primaryContact");
+            Assert.IsNotNull(primaryContactResponse);
+
+            var actual = new SupplierContactTable
+            {
+                FirstName = primaryContactResponse.Value<string>("firstName"),
+                LastName = primaryContactResponse.Value<string>("lastName"),
+                Email = primaryContactResponse.Value<string>("emailAddress"),
+                PhoneNumber = primaryContactResponse.Value<string>("telephoneNumber")
+            };
+
+            var expected = table.CreateInstance<SupplierContactTable>();
             actual.Should().BeEquivalentTo(expected);
         }
 
@@ -55,6 +76,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string SupplierId { get; set; }
 
             public string SupplierName { get; set; }
+        }
+
+        private sealed class SupplierContactTable
+        {
+            public string FirstName { get; set; }
+
+            public string LastName { get; set; }
+
+            public string Email { get; set; }
+
+            public string PhoneNumber { get; set; }
         }
     }
 }
