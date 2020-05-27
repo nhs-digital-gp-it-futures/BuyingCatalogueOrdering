@@ -106,7 +106,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .Create()
                 .WithOrderId(orderId)
                 .WithOrganisationId(organisationId)
-                .HasOrganisationContact(hasOrganisationContact)
+                .WithOrganisationContact(hasOrganisationContact ? new Contact { ContactId = 1, FirstName = "Fred", LastName = "Robinson", Email = "f@emai.com", Phone = "12345678912" } : null)
                 .Build();
 
             return (order: repositoryOrder,

@@ -76,19 +76,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
-        internal OrderBuilder HasOrganisationContact(bool hasOrganisationContact)
+        internal OrderBuilder WithOrganisationContact(Contact organisationContact)
         {
-            _order.OrganisationContact = hasOrganisationContact
-                ? new Contact
-                {
-                    ContactId = 1,
-                    FirstName = "Fred",
-                    LastName = "Robinson",
-                    Email = "f@emai.com",
-                    Phone = "12345678912"
-                }
-                : null;
-
+            _order.OrganisationContact = organisationContact;
             return this;
         }
 
