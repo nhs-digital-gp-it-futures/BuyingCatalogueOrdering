@@ -17,19 +17,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     [Binding]
     internal sealed class OrderSteps
     {
-        private readonly Response _response;
-        private readonly Request _request;
-        private readonly Settings _settings;
         private readonly ScenarioContext _context;
+        private readonly Request _request;
+        private readonly Response _response;
+        private readonly Settings _settings;
 
         private readonly string _orderOrganisationsUrl;
 
-        public OrderSteps(Response response, Request request, Settings settings, ScenarioContext context)
+        public OrderSteps(
+            ScenarioContext context,
+            Request request, 
+            Response response, 
+            Settings settings)
         {
-            _response = response;
-            _request = request;
-            _settings = settings;
             _context = context;
+            _request = request;
+            _response = response;
+            _settings = settings;
+
             _orderOrganisationsUrl = _settings.OrderingApiBaseUrl + "/api/v1/organisations/{0}/orders";
         }
 
@@ -74,7 +79,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [When(@"a GET request is made for a list of orders with organisationId (.*)")]
-        public async Task WhenAGETRequestIsMadeForOrders(Guid organisationId)
+        public async Task WhenAGetRequestIsMadeForOrders(Guid organisationId)
         {
             await _request.GetAsync(string.Format(_orderOrganisationsUrl, organisationId));
         }
@@ -100,7 +105,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public async Task ThenTheOrderIsCreatedInTheDatabase(string orderId, Table table)
         {
             var actual = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
-            table.CompareToInstance<OrderEntity>(actual);
+            table.CompareToInstance(actual);
         }
 
         [Then(@"the order with orderId (.*) has LastUpdated time present and it is the current time")]
@@ -175,8 +180,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             public int OrderStatusId { get; set; } = 1;
 
-            public string Status { get; set; }
-
             public DateTime Created { get; set; }
 
             public Guid LastUpdatedBy { get; set; }
@@ -184,6 +187,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string LastUpdatedByName { get; set; }
 
             public DateTime LastUpdated { get; set; }
+
+            public string SupplierId { get; set; }
+
+            public string SupplierName { get; set; }
         }
     }
 }
