@@ -69,31 +69,31 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
         {
             return (await SqlRunner.QueryFirstAsync<string>(connectionString, @"SELECT
                          [Description]
-                         FROM [Order]
-                         WHERE [OrderId] = @orderId", new { orderId }));
+                         FROM dbo.[Order]
+                         WHERE OrderId = @orderId", new { orderId }));
         }
 
         public static async Task<string> FetchLastUpdatedByNameFromOrderId(string connectionString, string orderId)
         {
             return (await SqlRunner.QueryFirstAsync<string>(connectionString, @"SELECT
-                         [LastUpdatedByName]
-                         FROM [Order]
-                         WHERE [OrderId] = @orderId", new { orderId }));
+                         LastUpdatedByName
+                         FROM dbo.[Order]
+                         WHERE OrderId = @orderId", new { orderId }));
         }
 
         public static async Task<OrderEntity> FetchOrderByOrderId(string connectionString, string orderId)
         {
             return (await SqlRunner.QueryFirstAsync<OrderEntity>(connectionString, @"SELECT
-                          [OrderId],
+                          OrderId,
                           [Description],
-                          [OrganisationId],
-                          [OrderStatusId],
-                          [Created],
-                          [LastUpdated],
-                          [LastUpdatedBy],
-                          [LastUpdatedByName]
-                         FROM [Order]
-                         WHERE [OrderId] = @orderId", new { orderId }));
+                          OrganisationId,
+                          OrderStatusId,
+                          Created,
+                          LastUpdated,
+                          LastUpdatedBy,
+                          LastUpdatedByName
+                         FROM dbo.[Order]
+                         WHERE OrderId = @orderId", new { orderId }));
         }
     }
 }
