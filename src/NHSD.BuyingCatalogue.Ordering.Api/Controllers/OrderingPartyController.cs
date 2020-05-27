@@ -42,9 +42,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             var organisationAddress = order.OrganisationAddress;
             var primaryContact = order.OrganisationContact;
 
-            var result = new OrderingPartyModel
+            var result = new OrderingPartyModel 
             {
-                Organisation = new OrganisationModel
+                Organisation = primaryContact is null ? null : new OrganisationModel 
                 {
                     Name = order.OrganisationName,
                     OdsCode = order.OrganisationOdsCode,
