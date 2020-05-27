@@ -63,6 +63,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         public async Task<ActionResult> GetOrderSummaryAsync(string orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            
 
             if (order is null)
             {

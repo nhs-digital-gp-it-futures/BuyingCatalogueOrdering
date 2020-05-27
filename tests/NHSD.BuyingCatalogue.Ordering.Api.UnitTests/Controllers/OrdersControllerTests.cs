@@ -145,6 +145,242 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
+        public async Task GetOrderSummaryAsync_OrderPartyOrganisationNameMissing_ReturnsOrderPartyIncomplete()
+        {
+            const string orderId = "C0000014-01";
+            var context = OrdersControllerTestContext.Setup();
+
+            (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
+
+            order.OrganisationName = null;
+            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = "incomplete";
+
+            context.Order = order;
+
+            using var controller = context.OrdersController;
+
+            var result = await controller.GetOrderSummaryAsync(orderId) as OkObjectResult;
+            var orderSummary = result.Value as OrderSummaryModel;
+            orderSummary.Should().BeEquivalentTo(expected);
+        }
+
+        [Test]
+        public async Task GetOrderSummaryAsync_OrderPartyOrganisationOdsMissing_ReturnsOrderPartyIncomplete()
+        {
+            const string orderId = "C0000014-01";
+            var context = OrdersControllerTestContext.Setup();
+
+            (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
+
+            order.OrganisationOdsCode = null;
+            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = "incomplete";
+
+            context.Order = order;
+
+            using var controller = context.OrdersController;
+
+            var result = await controller.GetOrderSummaryAsync(orderId) as OkObjectResult;
+            var orderSummary = result.Value as OrderSummaryModel;
+            orderSummary.Should().BeEquivalentTo(expected);
+        }
+
+        [Test]
+        public async Task GetOrderSummaryAsync_OrderPartyOrganisationAddressMissing_ReturnsOrderPartyIncomplete()
+        {
+            const string orderId = "C0000014-01";
+            var context = OrdersControllerTestContext.Setup();
+
+            (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
+
+            order.OrganisationAddress =null;
+            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = "incomplete";
+
+            context.Order = order;
+
+            using var controller = context.OrdersController;
+
+            var result = await controller.GetOrderSummaryAsync(orderId) as OkObjectResult;
+            var orderSummary = result.Value as OrderSummaryModel;
+            orderSummary.Should().BeEquivalentTo(expected);
+        }
+
+
+        [Test]
+        public async Task GetOrderSummaryAsync_OrderPartyOrganisationContactMissing_ReturnsOrderPartyIncomplete()
+        {
+            const string orderId = "C0000014-01";
+            var context = OrdersControllerTestContext.Setup();
+
+            (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
+
+            order.OrganisationContact = null;
+            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = "incomplete";
+
+            context.Order = order;
+
+            using var controller = context.OrdersController;
+
+            var result = await controller.GetOrderSummaryAsync(orderId) as OkObjectResult;
+            var orderSummary = result.Value as OrderSummaryModel;
+            orderSummary.Should().BeEquivalentTo(expected);
+        }
+
+        [TestCase(null, "incomplete")]
+        [TestCase("", "incomplete")]
+        [TestCase("777 Street Lain", "complete")]
+        public async Task GetOrderSummaryAsync_OrderPartyOrganisationAddressline1Missing_ReturnsOrderPartyIncomplete(string line1Value,string expectedStatus)
+        {
+            const string orderId = "C0000014-01";
+            var context = OrdersControllerTestContext.Setup();
+
+            (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
+
+            order.OrganisationAddress.Line1 = line1Value;
+            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = expectedStatus;
+
+            context.Order = order;
+
+            using var controller = context.OrdersController;
+
+            var result = await controller.GetOrderSummaryAsync(orderId) as OkObjectResult;
+            var orderSummary = result.Value as OrderSummaryModel;
+            orderSummary.Should().BeEquivalentTo(expected);
+        }
+
+        [TestCase(null, "incomplete")]
+        [TestCase("", "incomplete")]
+        [TestCase("LS7 1NS", "complete")]
+        public async Task GetOrderSummaryAsync_OrderPartyOrganisationAddressPostCodeMissing_ReturnsOrderPartyIncomplete(string postcodeValue,string expectedStatus)
+        {
+            const string orderId = "C0000014-01";
+            var context = OrdersControllerTestContext.Setup();
+
+            (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
+
+            order.OrganisationAddress.Postcode = postcodeValue;
+            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = expectedStatus;
+
+            context.Order = order;
+
+            using var controller = context.OrdersController;
+
+            var result = await controller.GetOrderSummaryAsync(orderId) as OkObjectResult;
+            var orderSummary = result.Value as OrderSummaryModel;
+            orderSummary.Should().BeEquivalentTo(expected);
+        }
+
+        [TestCase(null, "incomplete")]
+        [TestCase("", "incomplete")]
+        [TestCase("Leeds", "complete")]
+        public async Task GetOrderSummaryAsync_OrderPartyOrganisationAddressTownMissing_ReturnsOrderPartyIncomplete(string townValue,string expectedStatus)
+        {
+            const string orderId = "C0000014-01";
+            var context = OrdersControllerTestContext.Setup();
+
+            (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
+
+            order.OrganisationAddress.Town = townValue;
+            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = expectedStatus;
+
+            context.Order = order;
+
+            using var controller = context.OrdersController;
+
+            var result = await controller.GetOrderSummaryAsync(orderId) as OkObjectResult;
+            var orderSummary = result.Value as OrderSummaryModel;
+            orderSummary.Should().BeEquivalentTo(expected);
+        }
+
+        [TestCase(null, "incomplete")]
+        [TestCase("", "incomplete")]
+        [TestCase("Rupert", "complete")]
+        public async Task GetOrderSummaryAsync_OrderPartyOrganisationContactFirstNameMissing_ReturnsOrderPartyIncomplete(string firstNameValue, string expectedStatus)
+        {
+            const string orderId = "C0000014-01";
+            var context = OrdersControllerTestContext.Setup();
+
+            (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
+
+            order.OrganisationContact.FirstName = firstNameValue;
+            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = expectedStatus;
+
+            context.Order = order;
+
+            using var controller = context.OrdersController;
+
+            var result = await controller.GetOrderSummaryAsync(orderId) as OkObjectResult;
+            var orderSummary = result.Value as OrderSummaryModel;
+            orderSummary.Should().BeEquivalentTo(expected);
+        }
+
+        [TestCase(null, "incomplete")]
+        [TestCase("", "incomplete")]
+        [TestCase("Fortesque", "complete")]
+        public async Task GetOrderSummaryAsync_OrderPartyOrganisationContactLastNameMissing_ReturnsOrderPartyIncomplete(string  lastNameValue, string expectedStatus)
+        {
+            const string orderId = "C0000014-01";
+            var context = OrdersControllerTestContext.Setup();
+
+            (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
+
+            order.OrganisationContact.LastName = lastNameValue;
+            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = expectedStatus;
+
+            context.Order = order;
+
+            using var controller = context.OrdersController;
+
+            var result = await controller.GetOrderSummaryAsync(orderId) as OkObjectResult;
+            var orderSummary = result.Value as OrderSummaryModel;
+            orderSummary.Should().BeEquivalentTo(expected);
+        }
+
+        [TestCase(null, "incomplete")]
+        [TestCase("", "incomplete")]
+        [TestCase("Fortesque", "complete")]
+        public async Task GetOrderSummaryAsync_OrderPartyOrganisationContactEmailMissing_ReturnsOrderPartyIncomplete(string emailValue, string expectedStatus)
+        {
+            const string orderId = "C0000014-01";
+            var context = OrdersControllerTestContext.Setup();
+
+            (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
+
+            order.OrganisationContact.Email = emailValue;
+            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = expectedStatus;
+
+            context.Order = order;
+
+            using var controller = context.OrdersController;
+
+            var result = await controller.GetOrderSummaryAsync(orderId) as OkObjectResult;
+            var orderSummary = result.Value as OrderSummaryModel;
+            orderSummary.Should().BeEquivalentTo(expected);
+        }
+
+        [TestCase(null, "incomplete")]
+        [TestCase("", "incomplete")]
+        [TestCase("123456789", "complete")]
+        public async Task GetOrderSummaryAsync_OrderPartyOrganisationContactPhoneMissing_ReturnsOrderPartyIncomplete(string phoneValue, string expectedStatus)
+        {
+            const string orderId = "C0000014-01";
+            var context = OrdersControllerTestContext.Setup();
+
+            (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
+
+            order.OrganisationContact.Phone = phoneValue;
+            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = expectedStatus;
+
+            context.Order = order;
+
+            using var controller = context.OrdersController;
+
+            var result = await controller.GetOrderSummaryAsync(orderId) as OkObjectResult;
+            var orderSummary = result.Value as OrderSummaryModel;
+            orderSummary.Should().BeEquivalentTo(expected);
+        }
+
+
+        [Test]
         public async Task GetOrderSummaryAsync_OtherOrganisationId_ReturnResult()
         {
             var organisationId = Guid.NewGuid();
@@ -200,7 +436,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             context.CreateOrderServiceMock.Verify(x => x.CreateAsync(It.IsAny<CreateOrderRequest>()), Times.Once);
         }
 
-
         [Test]
         public async Task CreateOrderAsync_CreateOrderFailureResult_ReturnsBadRequest()
         {
@@ -237,7 +472,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             Assert.ThrowsAsync<ArgumentNullException>(CreateOrder);
         }
-
 
         private static (Order order, OrderModel expectedOrder) CreateOrderTestData(string orderId, Guid organisationId, string description)
         {
@@ -282,7 +516,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                             Id = "description",
                             Status = string.IsNullOrWhiteSpace(repositoryOrder.Description.Value) ? "incomplete" : "complete"
                         },
-                        new SectionModel {Id = "ordering-party", Status = "incomplete"},
+                        new SectionModel {Id = "ordering-party",Status = "complete"},
                         new SectionModel {Id = "supplier", Status = "incomplete"},
                         new SectionModel {Id = "commencement-date", Status = "incomplete"},
                         new SectionModel {Id = "associated-services", Status = "incomplete"},
