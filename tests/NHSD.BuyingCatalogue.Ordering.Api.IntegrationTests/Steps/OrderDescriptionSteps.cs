@@ -28,7 +28,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [When(@"the user makes a request to retrieve the order description section with the ID (.*)")]
-        public async Task WhenAgetRequestIsMadeForAnOrdersDescriptionWithOrderId(string orderId)
+        public async Task WhenAGetRequestIsMadeForAnOrdersDescriptionWithOrderId(string orderId)
         {
             await _request.GetAsync(string.Format(_orderDescriptionUrl, orderId));
         }
@@ -40,9 +40,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             var response = await _response.ReadBodyAsJsonAsync();
 
-            var actual = new OrderDescriptionTable()
+            var actual = new OrderDescriptionTable
             {
-                Description = response.SelectToken("description").ToString()
+                Description = response.Value<string>("description")
             };
 
             actual.Should().BeEquivalentTo(expected);
@@ -61,7 +61,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             await _request.PutJsonAsync(string.Format(_orderDescriptionUrl, orderId), null);
         }
-
 
         [Then(@"the order description for order with id (.*) is set to")]
         public async Task ThenTheOrderDescriptionForOrderWithIdIsSetTo(string orderId, Table table)
