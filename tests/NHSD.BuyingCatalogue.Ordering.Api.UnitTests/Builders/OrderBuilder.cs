@@ -9,10 +9,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 
         private OrderBuilder()
         {
-            _order = new Order()
+            _order = new Order
             {
                 OrderId = "C000014-01",
                 OrganisationId = Guid.NewGuid(),
+                OrganisationName = "Organisation Name",
+                OrganisationOdsCode = "Ods Code",
+                OrganisationAddress = new Address { AddressId = 1, Line1 = "Line1", Line2 = "Line2", Line3 = "Line3", Town = "Leeds",County = "W Yorks", Postcode = "LS1 123", Country = "W YORKS"},
+                OrganisationContact = new Contact { ContactId = 1, FirstName = "Fred", LastName = "Robinson", Email = "f@emai.com", Phone = "12345678912"},
                 Created = DateTime.UtcNow,
                 LastUpdated = DateTime.UtcNow,
                 LastUpdatedBy = Guid.NewGuid(),

@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
@@ -18,14 +20,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private readonly Response _response;
         private readonly Request _request;
         private readonly Settings _settings;
+        private readonly ScenarioContext _context;
 
         private readonly string _orderOrganisationsUrl;
 
-        public OrderSteps(Response response, Request request, Settings settings)
+        public OrderSteps(Response response, Request request, Settings settings, ScenarioContext context)
         {
             _response = response;
             _request = request;
             _settings = settings;
+            _context = context;
             _orderOrganisationsUrl = _settings.OrderingApiBaseUrl + "/api/v1/organisations/{0}/orders";
         }
 
@@ -34,11 +38,28 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             foreach (var ordersTableItem in table.CreateSet<OrdersTable>())
             {
+                if (ordersTableItem.OrganisationAddressPostcode != null)
+                {
+                    ordersTableItem.OrganisationAddressId = GetIdFromContext(ScenarioContextKeys.AddressMapDictionary,
+                        ordersTableItem.OrganisationAddressPostcode);
+                }
+
+                if (ordersTableItem.OrganisationContactEmail != null)
+                {
+                    ordersTableItem.OrganisationContactId = GetIdFromContext(ScenarioContextKeys.ContactMapDictionary,
+                        ordersTableItem.OrganisationContactEmail);
+                }
+
                 var order = OrderEntityBuilder
                     .Create()
                     .WithOrderId(ordersTableItem.OrderId)
-                    .WithOrganisationId(ordersTableItem.OrganisationId)
                     .WithDescription(ordersTableItem.Description)
+                    .WithOrganisationId(ordersTableItem.OrganisationId)
+                    .WithOrganisationName(ordersTableItem.OrganisationName)
+                    .WithOrganisationOdsCode(ordersTableItem.OrganisationOdsCode)
+                    .WithOrganisationAddressId(ordersTableItem.OrganisationAddressId)
+                    .WithOrganisationBillingAddressId(ordersTableItem.OrganisationBillingAddressId)
+                    .WithOrganisationContactId(ordersTableItem.OrganisationContactId)
                     .WithOrderStatusId(ordersTableItem.OrderStatusId)
                     .WithDateCreated(ordersTableItem.Created != DateTime.MinValue ? ordersTableItem.Created : DateTime.UtcNow)
                     .WithLastUpdatedBy(ordersTableItem.LastUpdatedBy)
@@ -61,7 +82,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Then(@"the orders list is returned with the following values")]
         public async Task ThenTheOrdersListIsReturnedWithTheFollowingValues(Table table)
         {
-            var expectedOrders = table.CreateSet<GetOrdersResultsTable>();
+            var expectedOrders = table.CreateSet<GetOrdersTable>();
 
             var orders = (await _response.ReadBodyAsJsonAsync()).Select(CreateOrders);
 
@@ -109,30 +130,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             };
         }
 
-        private sealed class OrdersTable
+        private int GetIdFromContext(string context, string value)
         {
-            public string OrderId { get; set; }
-
-            public Guid OrganisationId { get; set; }
-
-            public string Description { get; set; }
-
-            public int OrderStatusId { get; set; } = 1;
-
-            public DateTime Created { get; set; }
-
-            public Guid LastUpdatedBy { get; set; }
-
-            public string LastUpdatedByName { get; set; }
-
-            public DateTime LastUpdated { get; set; }
-
-            public string SupplierId { get; set; }
-
-            public string SupplierName { get; set; }
+            var results = _context.Get<IDictionary<string, int>>(context);
+            return results.TryGetValue(value, out int valueId) ? valueId : -1;
         }
 
-        private sealed class GetOrdersResultsTable
+        private sealed class GetOrdersTable
         {
             public string OrderId { get; set; }
 
@@ -141,6 +145,41 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string Status { get; set; }
 
             public DateTime Created { get; set; }
+
+            public DateTime LastUpdated { get; set; }
+
+            public string LastUpdatedByName { get; set; }
+        }
+
+        private sealed class OrdersTable
+        {
+            public string OrderId { get; set; }
+
+            public string Description { get; set; }
+
+            public Guid OrganisationId { get; set; }
+
+            public string OrganisationName { get; set; }
+
+            public string OrganisationOdsCode { get; set; }
+
+            public int? OrganisationAddressId { get; set; }
+
+            public string OrganisationAddressPostcode { get; set; }
+
+            public string OrganisationContactEmail { get; set; }
+
+            public int? OrganisationBillingAddressId { get; set; }
+
+            public int? OrganisationContactId { get; set; }
+
+            public int OrderStatusId { get; set; } = 1;
+
+            public string Status { get; set; }
+
+            public DateTime Created { get; set; }
+
+            public Guid LastUpdatedBy { get; set; }
 
             public string LastUpdatedByName { get; set; }
 

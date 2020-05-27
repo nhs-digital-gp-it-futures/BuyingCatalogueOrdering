@@ -22,16 +22,29 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
 
         public async Task<IEnumerable<Order>> ListOrdersByOrganisationIdAsync(Guid organisationId)
         {
-            return await _context.Order.Include(x => x.OrderStatus).Where(o => o.OrganisationId == organisationId)
+            return await _context.Order
+                .Include(x => x.OrderStatus)
+                .Include(x => x.OrganisationAddress)
+                .Include(x => x.OrganisationContact)
+                .Where(o => o.OrganisationId == organisationId)
                 .ToListAsync();
         }
 
         public async Task<Order> GetOrderByIdAsync(string orderId)
         {
-            if (string.IsNullOrWhiteSpace(orderId))
-                return null;
+        	if (string.IsNullOrWhiteSpace(orderId))
+            	return null;
+        	
+            var order = await _context.Order.FindAsync(orderId);
 
-            return await _context.Order.FindAsync(orderId);
+            if (order != null)
+            {
+                await _context.Entry(order).Reference(x => x.OrderStatus).LoadAsync();
+                await _context.Entry(order).Reference(x => x.OrganisationAddress).LoadAsync();
+                await _context.Entry(order).Reference(x => x.OrganisationContact).LoadAsync();
+            }
+
+            return order;
         }
 
         public async Task UpdateOrderAsync(Order order)
