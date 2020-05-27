@@ -9,7 +9,7 @@
     OrganisationBillingAddressId INT NULL,
     OrganisationContactId INT NULL,
     OrderStatusId INT NOT NULL,
-    SupplierId INT NULL,
+    SupplierId NVARCHAR(6) NULL,
     SupplierName NVARCHAR(255) NULL,
     SupplierAddressId INT NULL,
     SupplierContactId INT NULL,
