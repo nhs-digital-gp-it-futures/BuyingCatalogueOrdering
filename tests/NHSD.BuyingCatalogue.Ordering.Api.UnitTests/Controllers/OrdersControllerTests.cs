@@ -153,7 +153,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
 
             order.OrganisationName = null;
-            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = "incomplete";
+            expected.Sections.Single(s => s.Id == "ordering-party").Status = "incomplete";
 
             context.Order = order;
 
@@ -173,7 +173,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
 
             order.OrganisationOdsCode = null;
-            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = "incomplete";
+            expected.Sections.Single(s => s.Id == "ordering-party").Status = "incomplete";
 
             context.Order = order;
 
@@ -193,7 +193,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
 
             order.OrganisationAddress =null;
-            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = "incomplete";
+            expected.Sections.Single(s => s.Id == "ordering-party").Status = "incomplete";
 
             context.Order = order;
 
@@ -214,7 +214,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
 
             order.OrganisationContact = null;
-            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = "incomplete";
+            expected.Sections.Single(s => s.Id == "ordering-party").Status = "incomplete";
 
             context.Order = order;
 
@@ -236,7 +236,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
 
             order.OrganisationAddress.Line1 = line1Value;
-            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = expectedStatus;
+            expected.Sections.Single(s => s.Id == "ordering-party").Status = expectedStatus;
 
             context.Order = order;
 
@@ -258,7 +258,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
 
             order.OrganisationAddress.Postcode = postcodeValue;
-            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = expectedStatus;
+            expected.Sections.Single(s => s.Id == "ordering-party").Status = expectedStatus;
 
             context.Order = order;
 
@@ -280,7 +280,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
 
             order.OrganisationAddress.Town = townValue;
-            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = expectedStatus;
+            expected.Sections.Single(s => s.Id == "ordering-party").Status = expectedStatus;
 
             context.Order = order;
 
@@ -302,7 +302,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
 
             order.OrganisationContact.FirstName = firstNameValue;
-            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = expectedStatus;
+            expected.Sections.Single(s => s.Id == "ordering-party").Status = expectedStatus;
 
             context.Order = order;
 
@@ -324,7 +324,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
 
             order.OrganisationContact.LastName = lastNameValue;
-            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = expectedStatus;
+            expected.Sections.Single(s => s.Id == "ordering-party").Status = expectedStatus;
 
             context.Order = order;
 
@@ -346,7 +346,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
 
             order.OrganisationContact.Email = emailValue;
-            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = expectedStatus;
+            expected.Sections.Single(s => s.Id == "ordering-party").Status = expectedStatus;
 
             context.Order = order;
 
@@ -368,7 +368,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
 
             order.OrganisationContact.Phone = phoneValue;
-            expected.Sections.Where(s => s.Id == "ordering-party").Single().Status = expectedStatus;
+            expected.Sections.Single(s => s.Id == "ordering-party").Status = expectedStatus;
 
             context.Order = order;
 
