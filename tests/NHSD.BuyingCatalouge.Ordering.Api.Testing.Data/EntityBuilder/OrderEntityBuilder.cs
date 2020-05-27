@@ -9,10 +9,13 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
 
         private OrderEntityBuilder()
         {
-            _orderEntity = new OrderEntity()
+            _orderEntity = new OrderEntity
             {
                 Description = "Some Description",
                 OrganisationId = Guid.NewGuid(),
+                OrganisationAddressId = null,
+                OrganisationBillingAddressId = null,
+                OrganisationContactId = null,
                 OrderStatusId = 0,
                 LastUpdated = DateTime.UtcNow,
                 LastUpdatedBy = Guid.NewGuid(),
@@ -31,6 +34,11 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             _orderEntity.OrderId = orderId;
             return this;
         }
+        public OrderEntityBuilder WithDescription(string description)
+        {
+            _orderEntity.Description = description;
+            return this;
+        }
 
         public OrderEntityBuilder WithOrganisationId(Guid organisationId)
         {
@@ -38,9 +46,33 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             return this;
         }
 
-        public OrderEntityBuilder WithDescription(string description)
+        public OrderEntityBuilder WithOrganisationName(string organisationName)
         {
-            _orderEntity.Description = description;
+            _orderEntity.OrganisationName = organisationName;
+            return this;
+        }
+
+        public OrderEntityBuilder WithOrganisationOdsCode(string odsCode)
+        {
+            _orderEntity.OrganisationOdsCode = odsCode;
+            return this;
+        }
+
+        public OrderEntityBuilder WithOrganisationAddressId(int? addressId)
+        {
+            _orderEntity.OrganisationAddressId = addressId;
+            return this;
+        }
+
+        public OrderEntityBuilder WithOrganisationBillingAddressId(int? billingAddressId)
+        {
+            _orderEntity.OrganisationBillingAddressId = billingAddressId;
+            return this;
+        }
+
+        public OrderEntityBuilder WithOrganisationContactId(int? organisationContactId)
+        {
+            _orderEntity.OrganisationContactId = organisationContactId;
             return this;
         }
 
