@@ -30,7 +30,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
         public Guid LastUpdatedBy { get; set; }
 
         public string LastUpdatedByName { get; set; }
-        
+
         public string SupplierId { get; set; }
 
         public string SupplierName { get; set; }
@@ -83,19 +83,19 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public static async Task<OrderEntity> FetchOrderByOrderId(string connectionString, string orderId)
         {
-            return (await SqlRunner.QueryFirstAsync<OrderEntity>(connectionString, $@"SELECT
-                          [OrderId],
+            return (await SqlRunner.QueryFirstAsync<OrderEntity>(connectionString, @"SELECT
+                          OrderId,
                           [Description],
-                          [OrganisationId],
-                          [OrderStatusId],
-                          [Created],
-                          [LastUpdated],
-                          [LastUpdatedBy],
-                          [LastUpdatedByName],
-                          [SupplierId],
-                          [SupplierName]
-                         FROM [Order]
-                         WHERE [OrderId] = @orderId", new { orderId }));
+                          OrganisationId,
+                          OrderStatusId,
+                          Created,
+                          LastUpdated,
+                          LastUpdatedBy,
+                          LastUpdatedByName,
+                          SupplierId,
+                          SupplierName
+                         FROM dbo.[Order]
+                         WHERE OrderId = @orderId;", new { orderId }));
         }
     }
 }
