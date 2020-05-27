@@ -78,6 +78,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                         };
                     }
                 });
+
             services.AddControllers(options => options.Filters.Add<InputValidationActionFilter>())
                 .ConfigureApiBehaviorOptions(options => options.SuppressModelStateInvalidFilter = true)
                 .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);

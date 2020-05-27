@@ -7,7 +7,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Models;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.ActionFilters
 {
-    public class InputValidationActionFilter : IActionFilter
+    internal sealed class InputValidationActionFilter : IActionFilter
     {
         public void OnActionExecuting(ActionExecutingContext context)
         {
@@ -36,6 +36,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.ActionFilters
         }
 
         public void OnActionExecuted(ActionExecutedContext context)
-        { }
+        {
+
+        }
     }
 }
