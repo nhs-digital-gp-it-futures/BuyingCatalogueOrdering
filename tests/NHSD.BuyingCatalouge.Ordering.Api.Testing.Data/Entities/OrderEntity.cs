@@ -34,6 +34,10 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
         public string SupplierId { get; set; }
 
         public string SupplierName { get; set; }
+        
+        public int? SupplierAddressId { get; set; }
+
+        public int? SupplierContactId { get; set; }
 
         protected override string InsertSql => @"
             INSERT INTO dbo.[Order]
@@ -52,7 +56,9 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 LastUpdatedBy,
                 LastUpdatedByName,
                 SupplierId,
-                SupplierName
+                SupplierName,
+                SupplierAddressId,
+                SupplierContactId
             )
             VALUES
             (
@@ -70,7 +76,9 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 @LastUpdatedBy,
                 @LastUpdatedByName,
                 @SupplierId,
-                @SupplierName
+                @SupplierName,
+                @SupplierAddressId,
+                @SupplierContactId
             );";
 
         public static async Task<OrderEntity> FetchOrderByOrderId(string connectionString, string orderId)

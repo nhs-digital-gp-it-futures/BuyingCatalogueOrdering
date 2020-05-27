@@ -43,17 +43,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             foreach (var ordersTableItem in table.CreateSet<OrdersTable>())
             {
-                if (ordersTableItem.OrganisationAddressPostcode != null)
-                {
-                    ordersTableItem.OrganisationAddressId = GetIdFromContext(ScenarioContextKeys.AddressMapDictionary,
-                        ordersTableItem.OrganisationAddressPostcode);
-                }
+                int? organisationAddressId = _context.GetAddressIdByPostcode(ordersTableItem.OrganisationAddressPostcode);
+                int? organisationContactId = _context.GetContactIdByEmail(ordersTableItem.OrganisationContactEmail);
 
-                if (ordersTableItem.OrganisationContactEmail != null)
-                {
-                    ordersTableItem.OrganisationContactId = GetIdFromContext(ScenarioContextKeys.ContactMapDictionary,
-                        ordersTableItem.OrganisationContactEmail);
-                }
+                int? supplierAddressId = _context.GetAddressIdByPostcode(ordersTableItem.SupplierAddressPostcode);
+                int? supplierContactId = _context.GetContactIdByEmail(ordersTableItem.SupplierContactEmail);
 
                 var order = OrderEntityBuilder
                     .Create()
@@ -62,9 +56,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithOrganisationId(ordersTableItem.OrganisationId)
                     .WithOrganisationName(ordersTableItem.OrganisationName)
                     .WithOrganisationOdsCode(ordersTableItem.OrganisationOdsCode)
-                    .WithOrganisationAddressId(ordersTableItem.OrganisationAddressId)
+                    .WithOrganisationAddressId(organisationAddressId)
                     .WithOrganisationBillingAddressId(ordersTableItem.OrganisationBillingAddressId)
-                    .WithOrganisationContactId(ordersTableItem.OrganisationContactId)
+                    .WithOrganisationContactId(organisationContactId)
                     .WithOrderStatusId(ordersTableItem.OrderStatusId)
                     .WithDateCreated(ordersTableItem.Created != DateTime.MinValue ? ordersTableItem.Created : DateTime.UtcNow)
                     .WithLastUpdatedBy(ordersTableItem.LastUpdatedBy)
@@ -72,6 +66,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithLastUpdated(ordersTableItem.LastUpdated != DateTime.MinValue ? ordersTableItem.LastUpdated : DateTime.UtcNow)
                     .WithSupplierId(ordersTableItem.SupplierId)
                     .WithSupplierName(ordersTableItem.SupplierName)
+                    .WithSupplierAddressId(supplierAddressId)
+                    .WithSupplierContactId(supplierContactId)
                     .Build();
 
                 await order.InsertAsync(_settings.ConnectionString);
@@ -135,12 +131,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             };
         }
 
-        private int GetIdFromContext(string context, string value)
-        {
-            var results = _context.Get<IDictionary<string, int>>(context);
-            return results.TryGetValue(value, out int valueId) ? valueId : -1;
-        }
-
         private sealed class GetOrdersTable
         {
             public string OrderId { get; set; }
@@ -168,15 +158,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             public string OrganisationOdsCode { get; set; }
 
-            public int? OrganisationAddressId { get; set; }
-
             public string OrganisationAddressPostcode { get; set; }
 
             public string OrganisationContactEmail { get; set; }
 
             public int? OrganisationBillingAddressId { get; set; }
-
-            public int? OrganisationContactId { get; set; }
 
             public int OrderStatusId { get; set; } = 1;
 
@@ -191,6 +177,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string SupplierId { get; set; }
 
             public string SupplierName { get; set; }
+
+            public string SupplierAddressPostcode { get; set; }
+
+            public string SupplierContactEmail { get; set; }
+
         }
     }
 }

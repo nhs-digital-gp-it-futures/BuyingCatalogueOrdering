@@ -120,6 +120,18 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             return this;
         }
 
+        public OrderEntityBuilder WithSupplierAddressId(int? supplierAddressId)
+        {
+            _orderEntity.SupplierAddressId = supplierAddressId;
+            return this;
+        }
+
+        public OrderEntityBuilder WithSupplierContactId(int? supplierContactId)
+        {
+            _orderEntity.SupplierContactId = supplierContactId;
+            return this;
+        }
+
         public OrderEntity Build()
         {
             return _orderEntity;

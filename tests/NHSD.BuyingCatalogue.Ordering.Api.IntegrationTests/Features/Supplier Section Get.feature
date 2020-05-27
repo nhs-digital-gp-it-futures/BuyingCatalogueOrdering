@@ -4,10 +4,15 @@
 	So that I can ensure that the information is correct
 
 Background:
-    Given Orders exist
-        | OrderId    | Description         | OrganisationId                       | SupplierId | SupplierName       |
-        | C000014-01 | Some Description    | 4af62b99-638c-4247-875e-965239cd0c48 | 123        | Some supplier name |
-        | C000015-01 | Another Description | 4af62b99-638c-4247-875e-965239cd0c48 |            |                    |
+    Given Contacts exist
+        | FirstName | LastName | EmailAddress            | TelephoneNumber |
+        | Fred      | Robinson | Fred.robinson@email.com | 12312543212     |
+    Given Addresses exist
+        | Line1 | Line2      | Line3      | Line4          | Line5          | Town      | County  | Postcode | Country        |
+        | 4     | Upper Flat | Rocks Lane | Little Village | Bigger Village | Some Town | W Yorks | LS15 3AP | United Kingdom |
+    And Orders exist
+        | OrderId    | Description      | OrganisationId                       | SupplierId | SupplierName       | SupplierContactEmail    | SupplierAddressPostcode |
+        | C000014-01 | Some Description | 4af62b99-638c-4247-875e-965239cd0c48 | 123        | Some supplier name | Fred.robinson@email.com | LS15 3AP                |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @4621
@@ -18,8 +23,11 @@ Scenario: 1. Get the order supplier section details
         | SupplierId | SupplierName       |
         | 123        | Some supplier name |
     And the response contains the following primary supplier contact details
-        | FirstName | LastName | EmailAddress       | PhoneNumber |
-        | Tom       | Smith    | tomsmith@email.com | 0123456789  |
+        | FirstName | LastName | EmailAddress            | PhoneNumber |
+        | Fred      | Robinson | Fred.robinson@email.com | 12312543212 |
+    And the response contains the following supplier address
+        | Line1 | Line2      | Line3      | Line4          | Line5          | Town      | County  | Postcode | Country        |
+        | 4     | Upper Flat | Rocks Lane | Little Village | Bigger Village | Some Town | W Yorks | LS15 3AP | United Kingdom |
 
 @4621
 Scenario: 2. A non existent orderId returns not found

@@ -63,13 +63,39 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             {
                 FirstName = primaryContactResponse.Value<string>("firstName"),
                 LastName = primaryContactResponse.Value<string>("lastName"),
-                Email = primaryContactResponse.Value<string>("emailAddress"),
+                EmailAddress = primaryContactResponse.Value<string>("emailAddress"),
                 PhoneNumber = primaryContactResponse.Value<string>("telephoneNumber")
             };
 
             var expected = table.CreateInstance<SupplierContactTable>();
             actual.Should().BeEquivalentTo(expected);
         }
+
+        [Then(@"the response contains the following supplier address")]
+        public async Task ThenTheResponseContainsTheFollowingSupplierAddress(Table table)
+        {
+            var response = await _response.ReadBodyAsJsonAsync();
+
+            var address = response.SelectToken("address");
+            Assert.IsNotNull(address);
+
+            var actual = new SupplierAddressTable
+            {
+                Line1 = address.Value<string>("line1"),
+                Line2 = address.Value<string>("line2"),
+                Line3 = address.Value<string>("line3"),
+                Line4 = address.Value<string>("line4"),
+                Line5 = address.Value<string>("line5"),
+                Town =  address.Value<string>("town"),
+                County =  address.Value<string>("county"),
+                Postcode =  address.Value<string>("postcode"),
+                Country =  address.Value<string>("country")
+            };
+
+            var expected = table.CreateInstance<SupplierAddressTable>();
+            actual.Should().BeEquivalentTo(expected);
+        }
+
 
         private sealed class SupplierSectionTable
         {
@@ -84,9 +110,22 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             public string LastName { get; set; }
 
-            public string Email { get; set; }
+            public string EmailAddress { get; set; }
 
             public string PhoneNumber { get; set; }
+        }
+
+        private sealed class SupplierAddressTable
+        {
+            public string Line1 { get; set; }
+            public string Line2 { get; set; }
+            public string Line3 { get; set; }
+            public string Line4 { get; set; }
+            public string Line5 { get; set; }
+            public string Town { get; set; }
+            public string County { get; set; }
+            public string Postcode { get; set; }
+            public string Country { get; set; }
         }
     }
 }
