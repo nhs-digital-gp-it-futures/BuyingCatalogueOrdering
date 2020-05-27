@@ -91,7 +91,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     new SectionModel
                     {
                         Id = "ordering-party",
-                        Status = order.IsOrderPartyCompete() ? "complete" : "incomplete"
+                        Status = order.IsOrderPartyComplete() ? "complete" : "incomplete"
                     },
                     new SectionModel
                     {

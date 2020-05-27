@@ -34,7 +34,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             }
         }
 
-        public static bool IsOrderPartyCompete(this Order order)
+        public static bool IsOrderPartyComplete(this Order order)
         {
             if (order == null)
             {
