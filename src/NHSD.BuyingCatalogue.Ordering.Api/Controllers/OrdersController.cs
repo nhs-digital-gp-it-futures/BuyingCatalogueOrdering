@@ -12,6 +12,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -89,7 +90,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     new SectionModel
                     {
                         Id = "ordering-party",
-                        Status = "incomplete"
+                        Status = order.IsOrderPartyCompete() ? "complete" : "incomplete"
                     },
                     new SectionModel
                     {
