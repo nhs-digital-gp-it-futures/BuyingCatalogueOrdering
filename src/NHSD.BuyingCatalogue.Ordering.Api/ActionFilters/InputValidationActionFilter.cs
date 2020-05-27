@@ -37,7 +37,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.ActionFilters
 
         public void OnActionExecuted(ActionExecutedContext context)
         {
-
         }
     }
 }
