@@ -67,7 +67,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public static async Task<string> FetchOrderDescriptionFromOrderId(string connectionString, string orderId)
         {
-            return (await SqlRunner.QueryFirstAsync<string>(connectionString, $@"SELECT
+            return (await SqlRunner.QueryFirstAsync<string>(connectionString, @"SELECT
                          [Description]
                          FROM [Order]
                          WHERE [OrderId] = @orderId", new { orderId }));
@@ -75,7 +75,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public static async Task<string> FetchLastUpdatedByNameFromOrderId(string connectionString, string orderId)
         {
-            return (await SqlRunner.QueryFirstAsync<string>(connectionString, $@"SELECT
+            return (await SqlRunner.QueryFirstAsync<string>(connectionString, @"SELECT
                          [LastUpdatedByName]
                          FROM [Order]
                          WHERE [OrderId] = @orderId", new { orderId }));
@@ -83,7 +83,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public static async Task<OrderEntity> FetchOrderByOrderId(string connectionString, string orderId)
         {
-            return (await SqlRunner.QueryFirstAsync<OrderEntity>(connectionString, $@"SELECT
+            return (await SqlRunner.QueryFirstAsync<OrderEntity>(connectionString, @"SELECT
                           [OrderId],
                           [Description],
                           [OrganisationId],
