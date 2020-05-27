@@ -70,7 +70,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
             return (await SqlRunner.QueryFirstAsync<string>(connectionString, @"SELECT
                          [Description]
                          FROM dbo.[Order]
-                         WHERE OrderId = @orderId", new { orderId }));
+                         WHERE OrderId = @orderId;", new { orderId }));
         }
 
         public static async Task<string> FetchLastUpdatedByNameFromOrderId(string connectionString, string orderId)
@@ -78,7 +78,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
             return (await SqlRunner.QueryFirstAsync<string>(connectionString, @"SELECT
                          LastUpdatedByName
                          FROM dbo.[Order]
-                         WHERE OrderId = @orderId", new { orderId }));
+                         WHERE OrderId = @orderId;", new { orderId }));
         }
 
         public static async Task<OrderEntity> FetchOrderByOrderId(string connectionString, string orderId)
@@ -93,7 +93,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                           LastUpdatedBy,
                           LastUpdatedByName
                          FROM dbo.[Order]
-                         WHERE OrderId = @orderId", new { orderId }));
+                         WHERE OrderId = @orderId;", new { orderId }));
         }
     }
 }
