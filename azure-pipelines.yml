@@ -140,6 +140,7 @@ jobs:
       done;
     failOnStderr: true
     displayName: 'Helm package'
+    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
   - bash: |
       cd charts  
       for chartPackage in *.tgz; do
@@ -152,6 +153,8 @@ jobs:
     failOnStderr: true
     name: helmPush
     displayName: 'Push helm to az acr'
+    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
+
 
   - task: DockerCompose@0
     displayName: 'Build: Test'
