@@ -1,4 +1,4 @@
-﻿Feature: Update an Supplier in a Buyer Section
+﻿Feature: Update an Supplier Section
     As a Buyer
     I want to update an supplier
     So that I can ensure that it is kept up to date
@@ -16,7 +16,7 @@ Background:
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @4621
-Scenario: 1. Update a supplier
+Scenario: 1. Update a supplier section
     Given the user wants to update the SupplierAddress section for the address
         | Line1     | Line2      | Line3       | Line4          | Line5          | Town         | County  | Postcode | Country        |
         | New Line1 | Lower Flat | Rocks Close | Larger Village | Masive Village | Another Town | N Yorks | YO11 1AP | United Kingdom |
@@ -39,7 +39,7 @@ Scenario: 1. Update a supplier
         | Sup3       | Updated Supplier |
 
 @4621
-Scenario: 2. Updating a supplier, with a non existent model returns not found
+Scenario: 2. Updating a supplier section, with a non existent model returns not found
     When the user makes a request to update the supplier with order ID C000014-01 with no model
     Then a response with status code 400 is returned
 
@@ -58,7 +58,7 @@ Scenario: 3. If a user is not authorised, then they cannot update the supplier
     Then a response with status code 401 is returned
 
 @4621
-Scenario: 4. A non buyer user cannot update an orders description
+Scenario: 4. A non buyer user cannot update the supplier section
     Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
     Given the user wants to update the SupplierAddress section for the address
         | Line1     | Line2      | Line3       | Line4          | Line5          | Town         | County  | Postcode | Country        |
@@ -72,7 +72,7 @@ Scenario: 4. A non buyer user cannot update an orders description
     Then a response with status code 403 is returned
 
 @4621
-Scenario: 5. A buyer user cannot update an orders description for an organisation they don't belong to
+Scenario: 5. A buyer user cannot update a supplier section for an organisation they don't belong to
     Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
     Given the user wants to update the SupplierAddress section for the address
         | Line1     | Line2      | Line3       | Line4          | Line5          | Town         | County  | Postcode | Country        |

@@ -109,7 +109,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             var data = new
             {
-                SupplierId = supplierTable.SupplierId,
+                supplierTable.SupplierId,
                 Name = supplierTable.SupplierName,
                 Address = addressTable,
                 PrimaryContact = contactTable

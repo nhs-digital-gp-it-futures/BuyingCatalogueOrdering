@@ -50,7 +50,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             return Ok(supplierModel);
         }
 
-       [HttpPut]
+        [HttpPut]
         public async Task<ActionResult> UpdateAsync(string orderId, SupplierModel model)
         {
             if (model is null)
@@ -76,7 +76,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             var address = model.Address;
 
-            if(order.SupplierAddress is null)
+            if (order.SupplierAddress is null)
                 order.SupplierAddress = new Address();
 
             order.SupplierAddress.Line1 = address.Line1;
@@ -89,7 +89,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             order.SupplierAddress.Postcode = address.Postcode;
             order.SupplierAddress.Country = address.Country;
 
-            if(order.SupplierContact is null)
+            if (order.SupplierContact is null)
                 order.SupplierContact = new Contact();
 
             var contact = model.PrimaryContact;
