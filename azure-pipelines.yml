@@ -15,12 +15,11 @@ pr:
 - master
 - development
 
-pool:
-  vmImage: windows-2019
-
 jobs:
 - job: version
   displayName: Work out Version
+  pool:
+    vmImage: 'ubuntu-latest'
   steps:
   - task: UseGitVersion@5
     displayName: gitversion
@@ -33,6 +32,8 @@ jobs:
 
 - job: build
   displayName: Build database project & publish dacpac
+  pool:
+    vmImage: windows-2019
   steps:
   - task: VSBuild@1
     displayName: 'Build database solution'
