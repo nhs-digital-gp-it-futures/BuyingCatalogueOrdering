@@ -66,7 +66,6 @@ jobs:
   displayName: Run Unit & Integration tests and build & push docker containers to the acr
   variables:
     semVer: $[ dependencies.version.outputs['setVersionStep.semVer'] ]
-  condition: and(succeeded(), not(eq(variables['build.reason'], 'PullRequest')))
   dependsOn: version
   pool:
     vmImage: 'ubuntu-latest'
