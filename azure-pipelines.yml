@@ -24,7 +24,7 @@ jobs:
   - task: UseGitVersion@5
     displayName: gitversion
     inputs:
-      versionSpec: '5.x'
+      versionSpec: '5.0.1'
   - script: echo "##vso[task.setvariable variable=semVer;isOutput=true]$(GitVersion.SemVer)"
     name: setVersionStep
   - script: echo semVer $(setVersionStep.semVer)
