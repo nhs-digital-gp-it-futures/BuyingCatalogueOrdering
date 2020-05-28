@@ -89,12 +89,35 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                           OrganisationId,
                           OrderStatusId,
                           Created,
+                          SupplierId,
+                          SupplierName,
+                          SupplierAddressId,
+                          SupplierContactId,
                           LastUpdated,
                           LastUpdatedBy,
                           LastUpdatedByName,
                           SupplierId,
                           SupplierName
                          FROM dbo.[Order]
+                         WHERE OrderId = @orderId;", new {orderId}));
+        }
+
+        public static async Task<OrderEntity> FetchOrderBySupplierAddressId(string connectionString, string orderId)
+        {
+            return (await SqlRunner.QueryFirstAsync<OrderEntity>(connectionString, @"SELECT
+                          SupplierAddressId,
+                          Line1,
+                          Line2,
+                          Line3,
+                          Line4,
+                          Line5,
+                          Town,
+                          County,
+                          Postcode,
+                          Country
+                         FROM dbo.[Order]
+                         INNER JOIN dbo.[Address]
+                         ON [Order].SupplierAddressId = [Address].AddressId
                          WHERE OrderId = @orderId;", new { orderId }));
         }
     }

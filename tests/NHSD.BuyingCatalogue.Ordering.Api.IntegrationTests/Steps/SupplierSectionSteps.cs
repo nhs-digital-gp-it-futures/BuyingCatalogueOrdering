@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
+using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
@@ -12,6 +13,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     [Binding]
     internal sealed class SupplierSectionSteps
     {
+        private readonly ScenarioContext _context;
         private readonly Request _request;
         private readonly Response _response;
         private readonly Settings _settings;
@@ -19,10 +21,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private readonly string _orderSupplierSectionUrl;
 
         public SupplierSectionSteps(
+            ScenarioContext context,
             Request request, 
             Response response, 
             Settings settings)
         {
+            _context = context;
             _request = request;
             _response = response;
             _settings = settings;
@@ -96,6 +100,61 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected);
         }
 
+        [When(@"the user makes a request to update the supplier with order ID (.*)")]
+        public async Task WhenTheUserMakesARequestToUpdateTheSupplierWithOrderId(string orderId, Table table)
+        {
+            var supplierTable = table.CreateInstance<SupplierSectionTable>();
+            var addressTable = _context["SupplierAddress"];
+            var contactTable = _context["SupplierContact"];
+
+            var data = new
+            {
+                SupplierId = supplierTable.SupplierId,
+                Name = supplierTable.SupplierName,
+                Address = addressTable,
+                PrimaryContact = contactTable
+            };
+
+            await _request.PutJsonAsync(string.Format(_orderSupplierSectionUrl, orderId), data);
+        }
+
+
+        [Then(@"the supplier address for order (.*) is")]
+        public async Task ThenTheSupplierAddressForOrderIs(string orderId, Table table)
+        {
+            var address = table.CreateInstance<SupplierAddressTable>();
+
+            var addressId = (int)(await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId))
+                .SupplierAddressId;
+
+            var actual = await AddressEntity.FetchAddressById(_settings.ConnectionString, addressId);
+
+            actual.Should().BeEquivalentTo(address);
+        }
+
+        [Then(@"the supplier contact for order (.*) is")]
+        public async Task ThenTheSupplierContactIdContactForOrderCIs(string orderId, Table table)
+        {
+            var contact = table.CreateInstance<SupplierContactTable>();
+
+            var contactId = (int)(await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId))
+                .SupplierContactId;
+
+            var actual = await ContactEntity.FetchContactById(_settings.ConnectionString, contactId);
+            contact.Should().BeEquivalentTo(actual);
+        }
+
+        [Then(@"the supplier for order (.*) is updated")]
+        public async Task ThenTheSupplierForOrderCIsUpdated(string orderId, Table table)
+        {
+            var supplier = table.CreateInstance<SupplierSectionTable>();
+
+            var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
+
+            var actual = new { SupplierId = order.SupplierContactId, SupplierName = order.SupplierName };
+
+            supplier.Should().BeEquivalentTo(actual);
+        }
 
         private sealed class SupplierSectionTable
         {

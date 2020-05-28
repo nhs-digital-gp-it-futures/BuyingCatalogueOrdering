@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using TechTalk.SpecFlow;
@@ -39,7 +40,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 .WithClaim("email", "BobSmith@email.com")
                 .WithClaim("email_verified", "true")
                 .WithClaim("primaryOrganisationId", organisationId)
-                .WithClaim("organisationFunction", role);
+                .WithClaim("organisationFunction", role)
+                .WithClaim(ClaimTypes.Name, "Test User")
+                .WithClaim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString());
 
             if (role.Equals("Buyer", StringComparison.InvariantCultureIgnoreCase))
             {
