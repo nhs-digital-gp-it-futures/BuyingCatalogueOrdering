@@ -10,7 +10,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    public class ContactExtensionsTests
+    public sealed class ContactExtensionsTests
     {
         [Test]
         public void ToModel_NullContact_ReturnsNull()
