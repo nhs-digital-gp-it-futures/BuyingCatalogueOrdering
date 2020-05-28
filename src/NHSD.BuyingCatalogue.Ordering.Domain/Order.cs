@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
@@ -50,5 +51,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         {
             LastUpdatedByName = name;
         }
+        
     }
 }

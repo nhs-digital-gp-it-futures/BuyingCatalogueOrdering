@@ -1,4 +1,6 @@
-﻿namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
+﻿using System.Threading.Tasks;
+
+namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 {
     public sealed class ContactEntity : EntityBase
     {
@@ -23,5 +25,17 @@
                 @Phone
             );
             SELECT SCOPE_IDENTITY();";
+
+        public static async Task<ContactEntity> FetchContactByContactId(string connectionString, int? contactId)
+        {
+            return (await SqlRunner.QueryFirstAsync<ContactEntity>(connectionString, @"SELECT
+                        ContactId,
+                        FirstName,
+                        LastName,
+                        Email,
+                        Phone 
+                        FROM dbo.[Contact]
+                        WHERE ContactId = @ContactId;", new { contactId }));
+        }
     }
 }

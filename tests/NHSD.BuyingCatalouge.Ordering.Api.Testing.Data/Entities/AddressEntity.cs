@@ -1,4 +1,6 @@
-﻿namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
+﻿using System.Threading.Tasks;
+
+namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 {
     public sealed class AddressEntity : EntityBase
     {
@@ -38,5 +40,22 @@
                 @Country
             );
             SELECT SCOPE_IDENTITY();";
+
+        public static async Task<AddressEntity> FetchAddressByAddressId(string connectionString, int? addressId)
+        {
+            return (await SqlRunner.QueryFirstAsync<AddressEntity>(connectionString, @"SELECT  
+                        AddressId,
+                        Line1,
+                        Line2,
+                        Line3,
+                        Line4,
+                        Line5,
+                        Town,
+                        County,
+                        Postcode, 
+                        Country
+                        FROM dbo.[Address]
+                        WHERE AddressId = @addressId;", new { addressId }));
+        }
     }
 }

@@ -13,7 +13,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     {
         private readonly Response _response;
         private readonly Request _request;
-
         private readonly string _orderingPartyUrl;
 
         public OrderingPartySteps(Response response, Request request, Settings settings)
@@ -35,7 +34,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [When(@"the user makes a request to update the order party on the order with the ID (.*)")]
         public async Task WhenTheUserMakesARequestToUpdateTheOrderPartyWithOrderId(string orderId, Table table)
         {
-            var requestData = new OrgansationPartyPayload();
+            var requestData = new OrganisationPartyPayload();
             var organisationData = table.CreateInstance<OrganisationPayload>();
             var organisationAddressData = table.CreateInstance<AddressPayload>();
             var contactData = table.CreateInstance<ContactPayload>();
@@ -67,7 +66,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string OdsCode { get; set; }
         }
 
-        private sealed class OrgansationPartyPayload
+        private sealed class OrganisationPartyPayload
         {
             public OrganisationPayload Organisation { get; set; }
             public ContactPayload PrimaryContact { get; set; }

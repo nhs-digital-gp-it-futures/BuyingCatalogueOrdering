@@ -95,6 +95,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Then(@"the order with orderId (.*) is updated in the database with data")]
+        public async Task ThenTheOrderIsUpdatedInTheDatabase(string orderId, Table table)
+        {
+            var actual = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
+            table.CompareToInstance(actual);
+        }
+
         [Then(@"the order is created in the database with orderId (.*) and data")]
         public async Task ThenTheOrderIsCreatedInTheDatabase(string orderId, Table table)
         {
@@ -105,14 +111,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Then(@"the order with orderId (.*) is updated and has a primary contact with data")]
         public async Task ThenTheOrderWithOrderIdHasContactData(string orderId, Table table)
         {
-            var actual = await OrderEntity.FetchPrimaryContactByOrderId(_settings.ConnectionString, orderId);
+            var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
+            var actual = await ContactEntity.FetchContactByContactId(_settings.ConnectionString, order.OrganisationContactId);
             table.CompareToInstance<ContactEntity>(actual);
         }
 
         [Then(@"the order with orderId (.*) is updated and has a Organisation Address with data")]
         public async Task ThenTheOrderWithOrderIdHasOrganisationAddresData(string orderId, Table table)
         {
-            var actual = await OrderEntity.FetchOrganisationAddressByOrderId(_settings.ConnectionString, orderId);
+            var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
+
+            var actual = await AddressEntity.FetchAddressByAddressId(_settings.ConnectionString, order.OrganisationAddressId);
             table.CompareToInstance<AddressEntity>(actual);
         }
 
