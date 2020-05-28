@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace NHSD.BuyingCatalogue.Ordering.Domain
+﻿namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class Contact
     {
