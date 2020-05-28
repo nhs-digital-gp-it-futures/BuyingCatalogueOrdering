@@ -31,6 +31,14 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public string LastUpdatedByName { get; set; }
 
+        public string SupplierId { get; set; }
+
+        public string SupplierName { get; set; }
+        
+        public int? SupplierAddressId { get; set; }
+
+        public int? SupplierContactId { get; set; }
+
         protected override string InsertSql => @"
             INSERT INTO dbo.[Order]
             (
@@ -46,7 +54,11 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 Created,
                 LastUpdated,
                 LastUpdatedBy,
-                LastUpdatedByName
+                LastUpdatedByName,
+                SupplierId,
+                SupplierName,
+                SupplierAddressId,
+                SupplierContactId
             )
             VALUES
             (
@@ -62,24 +74,12 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 @Created,
                 @LastUpdated,
                 @LastUpdatedBy,
-                @LastUpdatedByName
+                @LastUpdatedByName,
+                @SupplierId,
+                @SupplierName,
+                @SupplierAddressId,
+                @SupplierContactId
             );";
-
-        public static async Task<string> FetchOrderDescriptionFromOrderId(string connectionString, string orderId)
-        {
-            return (await SqlRunner.QueryFirstAsync<string>(connectionString, @"SELECT
-                         [Description]
-                         FROM dbo.[Order]
-                         WHERE OrderId = @orderId;", new { orderId }));
-        }
-
-        public static async Task<string> FetchLastUpdatedByNameFromOrderId(string connectionString, string orderId)
-        {
-            return (await SqlRunner.QueryFirstAsync<string>(connectionString, @"SELECT
-                         LastUpdatedByName
-                         FROM dbo.[Order]
-                         WHERE OrderId = @orderId;", new { orderId }));
-        }
 
         public static async Task<OrderEntity> FetchOrderByOrderId(string connectionString, string orderId)
         {
@@ -91,7 +91,9 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                           Created,
                           LastUpdated,
                           LastUpdatedBy,
-                          LastUpdatedByName
+                          LastUpdatedByName,
+                          SupplierId,
+                          SupplierName
                          FROM dbo.[Order]
                          WHERE OrderId = @orderId;", new { orderId }));
         }

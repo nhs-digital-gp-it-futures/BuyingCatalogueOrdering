@@ -17,38 +17,37 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     [Binding]
     internal sealed class OrderSteps
     {
-        private readonly Response _response;
-        private readonly Request _request;
-        private readonly Settings _settings;
         private readonly ScenarioContext _context;
+        private readonly Request _request;
+        private readonly Response _response;
+        private readonly Settings _settings;
 
         private readonly string _orderOrganisationsUrl;
 
-        public OrderSteps(Response response, Request request, Settings settings, ScenarioContext context)
+        public OrderSteps(
+            ScenarioContext context,
+            Request request, 
+            Response response, 
+            Settings settings)
         {
-            _response = response;
-            _request = request;
-            _settings = settings;
             _context = context;
+            _request = request;
+            _response = response;
+            _settings = settings;
+
             _orderOrganisationsUrl = _settings.OrderingApiBaseUrl + "/api/v1/organisations/{0}/orders";
         }
 
         [Given(@"Orders exist")]
-        public async Task GivenOrdersExit(Table table)
+        public async Task GivenOrdersExist(Table table)
         {
             foreach (var ordersTableItem in table.CreateSet<OrdersTable>())
             {
-                if (ordersTableItem.OrganisationAddressPostcode != null)
-                {
-                    ordersTableItem.OrganisationAddressId = GetIdFromContext(ScenarioContextKeys.AddressMapDictionary,
-                        ordersTableItem.OrganisationAddressPostcode);
-                }
+                int? organisationAddressId = _context.GetAddressIdByPostcode(ordersTableItem.OrganisationAddressPostcode);
+                int? organisationContactId = _context.GetContactIdByEmail(ordersTableItem.OrganisationContactEmail);
 
-                if (ordersTableItem.OrganisationContactEmail != null)
-                {
-                    ordersTableItem.OrganisationContactId = GetIdFromContext(ScenarioContextKeys.ContactMapDictionary,
-                        ordersTableItem.OrganisationContactEmail);
-                }
+                int? supplierAddressId = _context.GetAddressIdByPostcode(ordersTableItem.SupplierAddressPostcode);
+                int? supplierContactId = _context.GetContactIdByEmail(ordersTableItem.SupplierContactEmail);
 
                 var order = OrderEntityBuilder
                     .Create()
@@ -57,14 +56,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithOrganisationId(ordersTableItem.OrganisationId)
                     .WithOrganisationName(ordersTableItem.OrganisationName)
                     .WithOrganisationOdsCode(ordersTableItem.OrganisationOdsCode)
-                    .WithOrganisationAddressId(ordersTableItem.OrganisationAddressId)
+                    .WithOrganisationAddressId(organisationAddressId)
                     .WithOrganisationBillingAddressId(ordersTableItem.OrganisationBillingAddressId)
-                    .WithOrganisationContactId(ordersTableItem.OrganisationContactId)
+                    .WithOrganisationContactId(organisationContactId)
                     .WithOrderStatusId(ordersTableItem.OrderStatusId)
-                    .WithDateCreated(ordersTableItem.Created)
+                    .WithDateCreated(ordersTableItem.Created != DateTime.MinValue ? ordersTableItem.Created : DateTime.UtcNow)
                     .WithLastUpdatedBy(ordersTableItem.LastUpdatedBy)
                     .WithLastUpdatedName(ordersTableItem.LastUpdatedByName)
-                    .WithLastUpdated(ordersTableItem.LastUpdated)
+                    .WithLastUpdated(ordersTableItem.LastUpdated != DateTime.MinValue ? ordersTableItem.LastUpdated : DateTime.UtcNow)
+                    .WithSupplierId(ordersTableItem.SupplierId)
+                    .WithSupplierName(ordersTableItem.SupplierName)
+                    .WithSupplierAddressId(supplierAddressId)
+                    .WithSupplierContactId(supplierContactId)
                     .Build();
 
                 await order.InsertAsync(_settings.ConnectionString);
@@ -72,7 +75,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [When(@"a GET request is made for a list of orders with organisationId (.*)")]
-        public async Task WhenAGETRequestIsMadeForOrders(Guid organisationId)
+        public async Task WhenAGetRequestIsMadeForOrders(Guid organisationId)
         {
             await _request.GetAsync(string.Format(_orderOrganisationsUrl, organisationId));
         }
@@ -128,12 +131,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             };
         }
 
-        private int GetIdFromContext(string context, string value)
-        {
-            var results = _context.Get<IDictionary<string, int>>(context);
-            return results.TryGetValue(value, out int valueId) ? valueId : -1;
-        }
-
         private sealed class GetOrdersTable
         {
             public string OrderId { get; set; }
@@ -161,19 +158,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             public string OrganisationOdsCode { get; set; }
 
-            public int? OrganisationAddressId { get; set; }
-
             public string OrganisationAddressPostcode { get; set; }
 
             public string OrganisationContactEmail { get; set; }
 
             public int? OrganisationBillingAddressId { get; set; }
 
-            public int? OrganisationContactId { get; set; }
-
-            public int OrderStatusId { get; set; }
-
-            public string Status { get; set; }
+            public int OrderStatusId { get; set; } = 1;
 
             public DateTime Created { get; set; }
 
@@ -182,6 +173,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string LastUpdatedByName { get; set; }
 
             public DateTime LastUpdated { get; set; }
+
+            public string SupplierId { get; set; }
+
+            public string SupplierName { get; set; }
+
+            public string SupplierAddressPostcode { get; set; }
+
+            public string SupplierContactEmail { get; set; }
+
         }
     }
 }

@@ -24,7 +24,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             _orderingPartyUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/ordering-party";
         }
 
-
         [When(@"the user makes a request to retrieve the ordering-party section with the ID (.*)")]
         public async Task GivenTheUserMakesARequestToRetrieveTheOrdering_PartySectionWithTheID(string orderId)
         {
