@@ -15,13 +15,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
                 OrganisationId = Guid.NewGuid(),
                 OrganisationName = "Organisation Name",
                 OrganisationOdsCode = "Ods Code",
-                OrganisationAddress = new Address { AddressId = 1, Line1 = "Line1", Line2 = "Line2", Line3 = "Line3", Town = "Leeds",County = "W Yorks", Postcode = "LS1 123", Country = "W YORKS"},
-                OrganisationContact = new Contact { ContactId = 1, FirstName = "Fred", LastName = "Robinson", Email = "f@emai.com", Phone = "12345678912"},
+                OrganisationAddress = new Address { AddressId = 1, Line1 = "Line1", Line2 = "Line2", Line3 = "Line3", Town = "Leeds", County = "W Yorks", Postcode = "LS1 123", Country = "W YORKS" },
+                OrganisationContact = new Contact { ContactId = 1, FirstName = "Fred", LastName = "Robinson", Email = "f@emai.com", Phone = "12345678912" },
                 Created = DateTime.UtcNow,
                 LastUpdated = DateTime.UtcNow,
                 LastUpdatedBy = Guid.NewGuid(),
                 LastUpdatedByName = "Bob Smith",
-                OrderStatus = new OrderStatus {OrderStatusId = 1, Name = "Submitted"}
+                OrderStatus = new OrderStatus { OrderStatusId = 1, Name = "Submitted" }
             };
             _order.SetDescription(OrderDescription.Create("Some Description").Value);
         }
@@ -73,6 +73,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         internal OrderBuilder WithOrderStatus(OrderStatus orderStatus)
         {
             _order.OrderStatus = orderStatus;
+            return this;
+        }
+
+        internal OrderBuilder WithOrganisationContact(Contact organisationContact)
+        {
+            _order.OrganisationContact = organisationContact;
             return this;
         }
 
