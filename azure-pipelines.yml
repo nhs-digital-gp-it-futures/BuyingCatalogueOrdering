@@ -127,6 +127,7 @@ jobs:
 
   - task: HelmInstaller@1
     displayName: 'Install helm'
+    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
     inputs:
       helmVersionToInstall: 'latest'
   - bash: |
