@@ -22,11 +22,5 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
         {
             return user.Identity.Name;
         }
-        public static void SetLastUpdated(this Order order, ClaimsPrincipal user)
-        {
-            order.SetLastUpdatedByName(user.GetUserName());
-            order.LastUpdatedBy = user.GetUserId();
-            order.LastUpdated = DateTime.UtcNow;
-        }
     }
 }

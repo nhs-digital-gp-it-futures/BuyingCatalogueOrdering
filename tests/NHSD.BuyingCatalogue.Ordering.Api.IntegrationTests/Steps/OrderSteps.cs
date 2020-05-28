@@ -123,7 +123,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public async Task ThenTheOrderWithOrderIdHasOrganisationAddresData(string orderId, Table table)
         {
             var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
-
             var actual = await AddressEntity.FetchAddressByAddressId(_settings.ConnectionString, order.OrganisationAddressId);
             table.CompareToInstance<AddressEntity>(actual);
         }

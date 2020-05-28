@@ -79,7 +79,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             order.SetDescription(isValid.Value);
 
-            order.SetLastUpdatedByName(name);
+            order.SetLastUpdatedBy(User.GetUserId(), name);
 
             await _orderRepository.UpdateOrderAsync(order);
 

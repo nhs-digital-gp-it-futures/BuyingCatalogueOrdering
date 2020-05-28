@@ -28,6 +28,11 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public static async Task<ContactEntity> FetchContactByContactId(string connectionString, int? contactId)
         {
+            if (contactId == null)
+            {
+                return null;
+            }
+
             return (await SqlRunner.QueryFirstAsync<ContactEntity>(connectionString, @"SELECT
                         ContactId,
                         FirstName,

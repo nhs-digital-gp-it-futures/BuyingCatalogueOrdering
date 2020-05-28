@@ -125,7 +125,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             order.OrganisationName = organisationModel.Name;
             order.OrganisationOdsCode = organisationModel.OdsCode;
             order.OrganisationAddress = address;
-            order.SetLastUpdated(User);
+
+            var name = User.Identity.Name;
+            order.SetLastUpdatedBy(User.GetUserId(), name);
 
             await _orderRepository.UpdateOrderAsync(order);
 

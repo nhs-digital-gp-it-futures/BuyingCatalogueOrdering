@@ -43,6 +43,11 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public static async Task<AddressEntity> FetchAddressByAddressId(string connectionString, int? addressId)
         {
+            if (addressId == null)
+            {
+                return null;
+            }
+
             return (await SqlRunner.QueryFirstAsync<AddressEntity>(connectionString, @"SELECT  
                         AddressId,
                         Line1,
