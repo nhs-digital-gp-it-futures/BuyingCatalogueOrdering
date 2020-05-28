@@ -29,7 +29,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var _ = new OrdersController(null , null);
+                var _ = new OrdersController(null, null);
             });
         }
 
@@ -124,7 +124,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             using var controller = context.OrdersController;
 
             var response = await controller.GetOrderSummaryAsync("INVALID");
-            response.Should().BeEquivalentTo(new NotFoundResult());
+            response.Should().BeEquivalentTo(new ActionResult<OrderSummaryModel>(new NotFoundResult()));
         }
 
         [Test]
@@ -139,9 +139,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             using var controller = context.OrdersController;
 
-            var result = await controller.GetOrderSummaryAsync(orderId) as OkObjectResult;
-            var orderSummary = result.Value as OrderSummaryModel;
-            orderSummary.Should().BeEquivalentTo(expected);
+            var response = await controller.GetOrderSummaryAsync(orderId);
+            response.Should().BeEquivalentTo(new ActionResult<OrderSummaryModel>(new OkObjectResult(expected)));
         }
 
         [Test]
@@ -151,25 +150,40 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             const string orderId = "C0000014-01";
             var context = OrdersControllerTestContext.Setup();
 
-            (Order order, OrderSummaryModel expected) = CreateOrderSummaryTestData(orderId, "Some Description", organisationId);
+            (Order order, _) = CreateOrderSummaryTestData(orderId, "Some Description", organisationId);
 
             context.Order = order;
 
             using var controller = context.OrdersController;
 
-            var result = await controller.GetOrderSummaryAsync(orderId);
-            result.Should().BeOfType<ForbidResult>();
+            var response = await controller.GetOrderSummaryAsync(orderId);
+            response.Should().BeEquivalentTo(new ActionResult<OrderSummaryModel>(new ForbidResult()));
+        }
+
+        [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.SectionStatusCases))]
+        public async Task GetOrderSummaryAsync_HasPrimarySupplierContact_ReturnsComplete(Order order, OrderSummaryModel expected)
+        {
+            var context = OrdersControllerTestContext.Setup(order.OrganisationId);
+            context.Order = order;
+
+            using var controller = context.OrdersController;
+
+            var response = (await controller.GetOrderSummaryAsync(context.Order.OrderId)).Result as OkObjectResult;
+            Assert.IsNotNull(response);
+
+            var actual = response.Value.As<OrderSummaryModel>();
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Test]
-        public async Task CreateOrderAsync_CreateOrderSuccessfullResult_ReturnsOrderId()
+        public async Task CreateOrderAsync_CreateOrderSuccessfulResult_ReturnsOrderId()
         {
             const string newOrderId = "New Test Order Id";
 
             var context = OrdersControllerTestContext.Setup();
             context.CreateOrderResult = Result.Success(newOrderId);
 
-            var createOrderRequest = new CreateOrderModel { Description = "Test Order 1", OrganisationId= context.PrimaryOrganisationId };
+            var createOrderRequest = new CreateOrderModel { Description = "Test Order 1", OrganisationId = context.PrimaryOrganisationId };
 
             using var controller = context.OrdersController;
 
@@ -177,7 +191,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var actual = response.Result;
 
-            var expectation = new CreatedAtActionResult(nameof(controller.CreateOrderAsync).TrimAsync(),null, new { orderId = newOrderId }, new CreateOrderResponseModel { OrderId= newOrderId});
+            var expectation = new CreatedAtActionResult(nameof(controller.CreateOrderAsync).TrimAsync(), null, new { orderId = newOrderId }, new CreateOrderResponseModel { OrderId = newOrderId });
 
             actual.Should().BeEquivalentTo(expectation);
         }
@@ -200,7 +214,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             context.CreateOrderServiceMock.Verify(x => x.CreateAsync(It.IsAny<CreateOrderRequest>()), Times.Once);
         }
 
-
         [Test]
         public async Task CreateOrderAsync_CreateOrderFailureResult_ReturnsBadRequest()
         {
@@ -210,9 +223,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var errors = new List<ErrorDetails> { new ErrorDetails("TestErrorId", "TestField") };
 
             var createOrderRequest = new CreateOrderModel { Description = "Test Order 1", OrganisationId = context.PrimaryOrganisationId };
-                        
+
             context.CreateOrderResult = Result.Failure<string>(errors);
-            
+
             var response = await controller.CreateOrderAsync(createOrderRequest);
 
             response.Should().BeOfType<ActionResult<CreateOrderResponseModel>>();
@@ -237,7 +250,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             Assert.ThrowsAsync<ArgumentNullException>(CreateOrder);
         }
-
 
         private static (Order order, OrderModel expectedOrder) CreateOrderTestData(string orderId, Guid organisationId, string description)
         {
@@ -277,36 +289,31 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     Description = repositoryOrder.Description.Value,
                     Sections = new List<SectionModel>
                     {
-                        new SectionModel
-                        {
-                            Id = "description",
-                            Status = string.IsNullOrWhiteSpace(repositoryOrder.Description.Value) ? "incomplete" : "complete"
-                        },
-                        new SectionModel {Id = "ordering-party", Status = "incomplete"},
-                        new SectionModel {Id = "supplier", Status = "incomplete"},
-                        new SectionModel {Id = "commencement-date", Status = "incomplete"},
-                        new SectionModel {Id = "associated-services", Status = "incomplete"},
-                        new SectionModel {Id = "service-recipients", Status = "incomplete"},
-                        new SectionModel {Id = "catalogue-solutions", Status = "incomplete"},
-                        new SectionModel {Id = "additional-services", Status = "incomplete"},
-                        new SectionModel {Id = "funding-source", Status = "incomplete"}
+                        SectionModel.Description.WithStatus(string.IsNullOrWhiteSpace(repositoryOrder.Description.Value) ? "incomplete" : "complete"),
+                        SectionModel.OrderingParty,
+                        SectionModel.Supplier,
+                        SectionModel.CatalogueSolutions,
+                        SectionModel.AssociatedServices,
+                        SectionModel.ServiceRecipients,
+                        SectionModel.CatalogueSolutions,
+                        SectionModel.AdditionalServices,
+                        SectionModel.FundingSource
                     }
                 });
         }
 
         internal sealed class OrdersControllerTestContext
         {
-            private OrdersControllerTestContext()
+            private OrdersControllerTestContext(Guid primaryOrganisationId)
             {
                 Name = "Test User";
                 NameIdentity = Guid.NewGuid();
-                PrimaryOrganisationId = Guid.NewGuid();
+                PrimaryOrganisationId = primaryOrganisationId;
                 OrderRepositoryMock = new Mock<IOrderRepository>();
 
                 CreateOrderServiceMock = new Mock<ICreateOrderService>();
                 CreateOrderServiceMock.Setup(x => x.CreateAsync(It.IsAny<CreateOrderRequest>()))
                     .ReturnsAsync(() => CreateOrderResult);
-
 
                 Orders = new List<Order>();
                 OrderRepositoryMock.Setup(x => x.ListOrdersByOrganisationIdAsync(It.IsAny<Guid>()))
@@ -320,7 +327,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
                     new Claim(ClaimTypes.Name,Name),
                     new Claim(ClaimTypes.NameIdentifier,NameIdentity.ToString())
-                }, "mock")) ;              
+                }, "mock"));
 
                 OrdersController = new OrdersController(OrderRepositoryMock.Object, CreateOrderServiceMock.Object)
                 {
@@ -353,7 +360,37 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             internal static OrdersControllerTestContext Setup()
             {
-                return new OrdersControllerTestContext();
+                return new OrdersControllerTestContext(Guid.NewGuid());
+            }
+
+            internal static OrdersControllerTestContext Setup(Guid primaryOrganisationId)
+            {
+                return new OrdersControllerTestContext(primaryOrganisationId);
+            }
+        }
+
+        private class SummaryModelSectionTestCaseData
+        {
+            internal static IEnumerable<TestCaseData> SectionStatusCases
+            {
+                get
+                {
+                    var organisationId = Guid.NewGuid();
+
+                    yield return new TestCaseData(OrderBuilder.Create().WithOrganisationId(organisationId).Build(), 
+                        OrderSummaryModelBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithSections(SectionModelListBuilder.Create().WithSupplier(SectionModel.Supplier.WithStatus("complete")).Build())
+                            .Build());
+
+                    yield return new TestCaseData(OrderBuilder.Create().WithOrganisationId(organisationId).WithSupplierContact(null).Build(),
+                        OrderSummaryModelBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithSections(SectionModelListBuilder.Create().Build())
+                            .Build());
+                }
             }
         }
     }
