@@ -22,8 +22,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
         public SupplierSectionSteps(
             ScenarioContext context,
-            Request request, 
-            Response response, 
+            Request request,
+            Response response,
             Settings settings)
         {
             _context = context;
@@ -67,8 +67,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             {
                 FirstName = primaryContactResponse.Value<string>("firstName"),
                 LastName = primaryContactResponse.Value<string>("lastName"),
-                EmailAddress = primaryContactResponse.Value<string>("emailAddress"),
-                PhoneNumber = primaryContactResponse.Value<string>("telephoneNumber")
+                Email = primaryContactResponse.Value<string>("emailAddress"),
+                Phone = primaryContactResponse.Value<string>("telephoneNumber")
             };
 
             var expected = table.CreateInstance<SupplierContactTable>();
@@ -90,10 +90,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 Line3 = address.Value<string>("line3"),
                 Line4 = address.Value<string>("line4"),
                 Line5 = address.Value<string>("line5"),
-                Town =  address.Value<string>("town"),
-                County =  address.Value<string>("county"),
-                Postcode =  address.Value<string>("postcode"),
-                Country =  address.Value<string>("country")
+                Town = address.Value<string>("town"),
+                County = address.Value<string>("county"),
+                Postcode = address.Value<string>("postcode"),
+                Country = address.Value<string>("country")
             };
 
             var expected = table.CreateInstance<SupplierAddressTable>();
@@ -118,6 +118,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _request.PutJsonAsync(string.Format(_orderSupplierSectionUrl, orderId), data);
         }
 
+        [When(@"the user makes a request to update the supplier with order ID (.*) with no model")]
+        public async Task WhenTheUserMakesARequestToUpdateTheSupplierWithOrderIdWithNoModel(string orderId)
+        {
+            await _request.PutJsonAsync(string.Format(_orderSupplierSectionUrl, orderId), null);
+        }
 
         [Then(@"the supplier address for order (.*) is")]
         public async Task ThenTheSupplierAddressForOrderIs(string orderId, Table table)
@@ -141,7 +146,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 .SupplierContactId;
 
             var actual = await ContactEntity.FetchContactById(_settings.ConnectionString, contactId);
-            contact.Should().BeEquivalentTo(actual);
+            actual.Should().BeEquivalentTo(contact);
         }
 
         [Then(@"the supplier for order (.*) is updated")]
@@ -151,9 +156,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
 
-            var actual = new { SupplierId = order.SupplierContactId, SupplierName = order.SupplierName };
-
-            supplier.Should().BeEquivalentTo(actual);
+            var actual = new { order.SupplierId, order.SupplierName };
+            actual.Should().BeEquivalentTo(supplier);
         }
 
         private sealed class SupplierSectionTable
@@ -169,9 +173,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             public string LastName { get; set; }
 
-            public string EmailAddress { get; set; }
+            public string Email { get; set; }
 
-            public string PhoneNumber { get; set; }
+            public string Phone { get; set; }
         }
 
         private sealed class SupplierAddressTable

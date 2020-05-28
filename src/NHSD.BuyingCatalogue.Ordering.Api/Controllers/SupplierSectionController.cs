@@ -65,33 +65,39 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return NotFound();
             }
 
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
             order.SupplierId = model.SupplierId;
             order.SupplierName = model.Name;
 
             var address = model.Address;
-            order.SupplierAddress = new Address
-            {
-                AddressId = order.SupplierAddress.AddressId,
-                Line1 = address.Line1,
-                Line2 = address.Line2,
-                Line3 = address.Line3,
-                Line4 = address.Line4,
-                Line5 = address.Line5,
-                Town = address.Town,
-                County = address.County,
-                Postcode = address.Postcode,
-                Country = address.Country
-            };
+
+            if(order.SupplierAddress is null)
+                order.SupplierAddress = new Address();
+
+            order.SupplierAddress.Line1 = address.Line1;
+            order.SupplierAddress.Line2 = address.Line2;
+            order.SupplierAddress.Line3 = address.Line3;
+            order.SupplierAddress.Line4 = address.Line4;
+            order.SupplierAddress.Line5 = address.Line5;
+            order.SupplierAddress.Town = address.Town;
+            order.SupplierAddress.County = address.County;
+            order.SupplierAddress.Postcode = address.Postcode;
+            order.SupplierAddress.Country = address.Country;
+
+            if(order.SupplierContact is null)
+                order.SupplierContact = new Contact();
 
             var contact = model.PrimaryContact;
-            order.SupplierContact = new Contact
-            {
-                ContactId = order.SupplierContact.ContactId,
-                FirstName = contact.FirstName,
-                LastName = contact.LastName,
-                Email = contact.EmailAddress,
-                Phone = contact.TelephoneNumber
-            };
+
+            order.SupplierContact.FirstName = contact.FirstName;
+            order.SupplierContact.LastName = contact.LastName;
+            order.SupplierContact.Email = contact.EmailAddress;
+            order.SupplierContact.Phone = contact.TelephoneNumber;
 
             var name = User.Identity.Name;
             order.SetLastUpdatedBy(User.GetUserId(), name);

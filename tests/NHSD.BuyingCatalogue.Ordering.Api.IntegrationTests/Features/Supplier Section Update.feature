@@ -32,8 +32,8 @@ Scenario: 1. Update a supplier
         | Line1     | Line2      | Line3       | Line4          | Line5          | Town         | County  | Postcode | Country        |
         | New Line1 | Lower Flat | Rocks Close | Larger Village | Masive Village | Another Town | N Yorks | YO11 1AP | United Kingdom |
     And the supplier contact for order C000014-01 is
-        | FirstName | LastName | EmailAddress         | TelephoneNumber |
-        | Greg      | Smith    | Greg.smith@email.com | 23456234521     |
+        | FirstName | LastName | Email                | Phone       |
+        | Greg      | Smith    | Greg.smith@email.com | 23456234521 |
     And the supplier for order C000014-01 is updated
         | SupplierId | SupplierName     |
         | Sup3       | Updated Supplier |
