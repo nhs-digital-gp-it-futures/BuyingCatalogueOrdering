@@ -44,7 +44,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             var result = new OrderingPartyModel
             {
-                Organisation = primaryContact is null ? null : new OrganisationModel
+                Organisation = !order.IsOrderingPartySectionComplete() ? null : new OrganisationModel
                 {
                     Name = order.OrganisationName,
                     OdsCode = order.OrganisationOdsCode,
