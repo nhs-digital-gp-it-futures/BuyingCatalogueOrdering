@@ -76,7 +76,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult> Update(string orderId, OrderingPartyModel model)
+        public async Task<ActionResult> UpdateAsync(string orderId, OrderingPartyModel model)
         {
             if (model is null)
             {
