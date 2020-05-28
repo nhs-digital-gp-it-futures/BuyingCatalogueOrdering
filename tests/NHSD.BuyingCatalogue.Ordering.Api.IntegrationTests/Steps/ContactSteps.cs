@@ -25,7 +25,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             _settings = settings;
         }
 
-
         [Given(@"Contacts exist")]
         public async Task GivenContactsExist(Table table)
         {
@@ -55,7 +54,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             var response = (await _response.ReadBodyAsJsonAsync()).SelectToken(section);
 
-            var actual = new 
+            var actual = new
             {
                 FirstName = response.Value<string>("firstName"),
                 LastName = response.Value<string>("lastName"),
@@ -65,7 +64,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             actual.Should().BeEquivalentTo(expected);
         }
-
 
         private sealed class ContactTable
         {

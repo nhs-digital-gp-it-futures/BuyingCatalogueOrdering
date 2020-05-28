@@ -54,6 +54,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
+        public async Task GetAsync_EmptyOrderingParty_ReturnsEmptyResult()
+        {
+            const string orderId = "C0000014-01";
+            var context = OrderingPartyTestContext.Setup();
+
+            (Order order, OrderingPartyModel expectedOrderingParty) = CreateOrderingPartyTestData(orderId, context.PrimaryOrganisationId, false);
+
+            context.Order = order;
+
+            var controller = context.OrderingPartyController;
+
+            var result = await controller.GetAsync(orderId);
+            result.Should()
+                .BeEquivalentTo(new ActionResult<OrderingPartyModel>(new OkObjectResult(expectedOrderingParty)));
+        }
+
+        [Test]
         public async Task GetAsync_OrderIdExists_ReturnsTheOrderingParty()
         {
             const string orderId = "C0000014-01";
@@ -83,18 +100,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(string.Empty), Times.Once);
         }
 
-        private static (Order order, OrderingPartyModel expectedOrderingParty) CreateOrderingPartyTestData(string orderId, Guid organisationId)
+        private static (Order order, OrderingPartyModel expectedOrderingParty) CreateOrderingPartyTestData(string orderId, Guid organisationId, bool hasOrganisationContact = true)
         {
             var repositoryOrder = OrderBuilder
                 .Create()
                 .WithOrderId(orderId)
                 .WithOrganisationId(organisationId)
+                .WithOrganisationContact(hasOrganisationContact ? new Contact { ContactId = 1, FirstName = "Fred", LastName = "Robinson", Email = "f@emai.com", Phone = "12345678912" } : null)
                 .Build();
 
             return (order: repositoryOrder,
                 expectedOrderingParty: new OrderingPartyModel
                 {
-                    Organisation = new OrganisationModel
+                    Organisation = repositoryOrder.OrganisationContact is null ? null : new OrganisationModel
                     {
                         Name = repositoryOrder.OrganisationName,
                         OdsCode = repositoryOrder.OrganisationOdsCode,
@@ -111,7 +129,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                             Country = repositoryOrder.OrganisationAddress.Country
                         }
                     },
-                    PrimaryContact = new PrimaryContactModel
+                    PrimaryContact = repositoryOrder.OrganisationContact is null ? null : new PrimaryContactModel
                     {
                         FirstName = repositoryOrder.OrganisationContact.FirstName,
                         LastName = repositoryOrder.OrganisationContact.LastName,
