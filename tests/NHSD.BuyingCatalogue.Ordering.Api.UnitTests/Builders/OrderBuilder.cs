@@ -89,7 +89,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _order.OrderStatus = orderStatus;
             return this;
         }
-
+        
+        internal OrderBuilder WithOrganisationContact(Contact organisationContact)
+        {
+            _order.OrganisationContact = organisationContact;
+            return this;
+        }
+        
         internal OrderBuilder WithSupplierId(string supplierId)
         {
             _order.SupplierId = supplierId;
