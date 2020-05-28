@@ -5,15 +5,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
     internal sealed class AddressBuilder
     {
         private readonly int _addressId;
-        private readonly string _line1;
-        private readonly string _line2;
-        private readonly string _line3;
-        private readonly string _line4;
-        private readonly string _line5;
-        private readonly string _town;
-        private readonly string _county;
-        private readonly string _postcode;
-        private readonly string _country;
+        private string _line1;
+        private string _line2;
+        private string _line3;
+        private string _line4;
+        private string _line5;
+        private string _town;
+        private string _county;
+        private string _postcode;
+        private string _country;
 
         private AddressBuilder()
         {
@@ -32,6 +32,60 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         internal static AddressBuilder Create()
         {
             return new AddressBuilder();
+        }
+
+        internal AddressBuilder WithLine1(string line1)
+        {
+            _line1 = line1;
+            return this;
+        }
+
+        internal AddressBuilder WithLine2(string line2)
+        {
+            _line2 = line2;
+            return this;
+        }
+
+        internal AddressBuilder WithLine3(string line3)
+        {
+            _line3 = line3;
+            return this;
+        }
+
+        internal AddressBuilder WithLine4(string line4)
+        {
+            _line4 = line4;
+            return this;
+        }
+
+        internal AddressBuilder WithLine5(string line5)
+        {
+            _line5 = line5;
+            return this;
+        }
+
+        internal AddressBuilder WithTown(string town)
+        {
+            _town = town;
+            return this;
+        }
+
+        internal AddressBuilder WithCounty(string county)
+        {
+            _county = county;
+            return this;
+        }
+
+        internal AddressBuilder WithPostcode(string postcode)
+        {
+            _postcode = postcode;
+            return this;
+        }
+
+        internal AddressBuilder WithCountry(string country)
+        {
+            _country = country;
+            return this;
         }
 
         internal Address Build()
