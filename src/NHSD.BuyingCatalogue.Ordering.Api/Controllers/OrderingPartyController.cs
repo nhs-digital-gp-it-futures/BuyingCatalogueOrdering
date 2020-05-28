@@ -95,18 +95,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            var contact = model.PrimaryContact;
-            var isContactValid = OrderPartyContact.Create(contact.FirstName, contact.LastName, contact.EmailAddress, contact.TelephoneNumber);
+            var primaryContact = model.PrimaryContact;
 
-            if (!isContactValid.IsSuccess)
+            var contact = new Contact
             {
-                return BadRequest(new ErrorsModel(isContactValid.Errors.Select(x => new ErrorModel(x.Id, x.Field))));
-            }
+                FirstName = primaryContact.FirstName,
+                LastName = primaryContact.LastName,
+                Email = primaryContact.EmailAddress,
+                Phone = primaryContact.TelephoneNumber
+            };
 
-            order.OrganisationContact = isContactValid.Value.GetContact();
+            order.OrganisationContact = contact;
 
-            var organisation = model.Organisation;
-            var addressModel = organisation.Address;
+            var organisationModel = model.Organisation;
+            var addressModel = organisationModel.Address;
             var address = new Address
             {
                 Line1 = addressModel.Line1,
@@ -119,18 +121,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 Postcode = addressModel.Postcode,
                 Country = addressModel.Country
             };
-            var isOrganisationValid = OrderPartyOrganisation.Create(organisation.Name, organisation.OdsCode, address);
 
-            if (!isOrganisationValid.IsSuccess)
-            {
-                return BadRequest(new ErrorsModel(isContactValid.Errors.Select(x => new ErrorModel(x.Id, x.Field))));
-            }
-
-            var updateOrganisation = isOrganisationValid.Value.GetOrganisation();
-
-            order.OrganisationName = updateOrganisation.Name;
-            order.OrganisationOdsCode = updateOrganisation.OdsCode;
-            order.OrganisationAddress = updateOrganisation.Adress;
+            order.OrganisationName = organisationModel.Name;
+            order.OrganisationOdsCode = organisationModel.OdsCode;
+            order.OrganisationAddress = address;
 
             var name = User.Identity.Name;
 
