@@ -39,10 +39,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common
             actual.Should().BeEquivalentTo(expected);
         }
 
-        [Then(@"an empty object is returned")]
+        [Then(@"the response contains no data")]
         public async Task ThenAnEmptyObjectIsReturned()
         {
-            var response = (await _response.ReadBodyAsJsonAsync());
+            var response = await _response.ReadBodyAsJsonAsync();
             response.Should().BeEmpty();
         }
 

@@ -34,7 +34,7 @@ Scenario: 1. Get an ordering party
 Scenario: 2. Get an empty ordering party
     When the user makes a request to retrieve the ordering-party section with the ID C000014-02
     Then a response with status code 200 is returned
-    And an empty object is returned
+    And the response contains no data
 
 @4616
 Scenario: 3. A non existent orderId returns not found
