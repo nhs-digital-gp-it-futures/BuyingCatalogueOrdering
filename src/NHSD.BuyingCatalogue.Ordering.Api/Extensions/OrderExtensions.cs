@@ -8,5 +8,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
         {
             return order?.OrganisationContact != null;
         }
+
+        public static bool IsSupplierSectionComplete(this Order order)
+        {
+            return order?.SupplierContact != null;
+        }
     }
 }
