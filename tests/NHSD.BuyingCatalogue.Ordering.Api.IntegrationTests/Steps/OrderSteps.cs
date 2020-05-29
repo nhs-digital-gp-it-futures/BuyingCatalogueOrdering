@@ -118,7 +118,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             order.OrganisationContactId.Should().BeNull();
         }
 
-
         [Then(@"the order is created in the database with orderId (.*) and data")]
         public async Task ThenTheOrderIsCreatedInTheDatabase(string orderId, Table table)
         {
