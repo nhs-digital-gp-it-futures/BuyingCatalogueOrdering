@@ -104,6 +104,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             table.CompareToInstance(actual);
         }
 
+        [Then(@"the order with orderId (.*) has a primary contact")]
+        public async Task ThenTheOrderHasAPrimaryContact(string orderId)
+        {
+            var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
+            order.OrganisationContactId.Should().NotBeNull();
+        }
+
+        [Then(@"the order with orderId (.*) does not have a primary contact")]
+        public async Task ThenTheOrderDoesNotHaveAPrimaryContact(string orderId)
+        {
+            var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
+            order.OrganisationContactId.Should().BeNull();
+        }
+
+
         [Then(@"the order is created in the database with orderId (.*) and data")]
         public async Task ThenTheOrderIsCreatedInTheDatabase(string orderId, Table table)
         {
