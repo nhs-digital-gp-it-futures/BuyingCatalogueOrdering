@@ -29,6 +29,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public Guid LastUpdatedBy { get; set; }
 
+        public DateTime? CommencementDate { get; set; }
+
         public string LastUpdatedByName { get; set; }
 
         public string SupplierId { get; set; }
@@ -99,6 +101,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                           SupplierContactId,
                           LastUpdated,
                           LastUpdatedBy,
+                          CommencementDate,
                           LastUpdatedByName,
                           SupplierId,
                           SupplierName

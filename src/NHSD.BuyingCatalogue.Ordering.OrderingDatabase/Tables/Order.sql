@@ -13,6 +13,7 @@
     SupplierName NVARCHAR(255) NULL,
     SupplierAddressId INT NULL,
     SupplierContactId INT NULL,
+    CommencementDate DATETIME2 NULL,
     Created DATETIME2 NOT NULL,
     LastUpdated DATETIME2 NOT NULL,
     LastUpdatedBy UNIQUEIDENTIFIER NOT NULL,
