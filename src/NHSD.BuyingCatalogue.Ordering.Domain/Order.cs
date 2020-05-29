@@ -41,6 +41,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         [ForeignKey("SupplierContactId")]
         public Contact SupplierContact { get; set; }
 
+        public DateTime? CommencementDate { get; set; }
+
         public void SetDescription(OrderDescription orderDescription)
         {
             Description = orderDescription ?? throw new ArgumentNullException(nameof(orderDescription));
