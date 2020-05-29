@@ -52,5 +52,39 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
 
             actual.Should().BeEquivalentTo(expected);
         }
+
+        [Test]
+        public void FromModel_AddressModel_UpdatesAddress()
+        {
+            Address address = AddressBuilder
+                .Create()
+                .WithLine1(Guid.NewGuid().ToString())
+                .WithLine2(Guid.NewGuid().ToString())
+                .WithLine3(Guid.NewGuid().ToString())
+                .WithLine4(Guid.NewGuid().ToString())
+                .WithLine5(Guid.NewGuid().ToString())
+                .WithTown(Guid.NewGuid().ToString())
+                .WithCounty(Guid.NewGuid().ToString())
+                .WithPostcode(Guid.NewGuid().ToString())
+                .WithCountry(Guid.NewGuid().ToString())
+                .Build();
+
+            AddressModel expected = new AddressModel
+            {
+                Line1 = Guid.NewGuid().ToString(),
+                Line2 = Guid.NewGuid().ToString(),
+                Line3 = Guid.NewGuid().ToString(),
+                Line4 = Guid.NewGuid().ToString(),
+                Line5 = Guid.NewGuid().ToString(),
+                Town = Guid.NewGuid().ToString(),
+                County = Guid.NewGuid().ToString(),
+                Postcode = Guid.NewGuid().ToString(),
+                Country = Guid.NewGuid().ToString()
+            };
+
+            address.FromModel(expected);
+
+            address.Should().BeEquivalentTo(expected);
+        }
     }
 }

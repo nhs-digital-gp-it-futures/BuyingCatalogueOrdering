@@ -18,5 +18,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
                 TelephoneNumber = contact.Phone
             };
         }
+
+        internal static void FromModel(this Contact contact, PrimaryContactModel model)
+        {
+            if (contact is null)
+                contact = new Contact();
+
+            contact.FirstName = model.FirstName;
+            contact.LastName = model.LastName;
+            contact.Email = model.EmailAddress;
+            contact.Phone = model.TelephoneNumber;
+        }
     }
 }

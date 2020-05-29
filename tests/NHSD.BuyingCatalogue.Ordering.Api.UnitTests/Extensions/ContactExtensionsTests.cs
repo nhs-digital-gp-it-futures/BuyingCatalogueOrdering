@@ -42,5 +42,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
 
             actual.Should().BeEquivalentTo(expected);
         }
+
+        [Test]
+        public void FromModel_PrimaryContactModel_UpdatesContact()
+        {
+            Contact contact = ContactBuilder
+                .Create()
+                .WithFirstName(Guid.NewGuid().ToString())
+                .WithLastName(Guid.NewGuid().ToString())
+                .WithEmail(Guid.NewGuid().ToString())
+                .WithPhone(Guid.NewGuid().ToString())
+                .Build();
+
+            PrimaryContactModel updatedModel = new PrimaryContactModel
+            {
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                EmailAddress = Guid.NewGuid().ToString(),
+                TelephoneNumber = Guid.NewGuid().ToString()
+            };
+
+            contact.FromModel(updatedModel);
+
+            contact.FirstName.Should().BeEquivalentTo(updatedModel.FirstName);
+            contact.LastName.Should().BeEquivalentTo(updatedModel.LastName);
+            contact.Email.Should().BeEquivalentTo(updatedModel.EmailAddress);
+            contact.Phone.Should().BeEquivalentTo(updatedModel.TelephoneNumber);
+        }
     }
 }
