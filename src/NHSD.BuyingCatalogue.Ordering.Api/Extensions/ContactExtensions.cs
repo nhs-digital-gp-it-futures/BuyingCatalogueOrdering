@@ -1,4 +1,5 @@
-﻿using NHSD.BuyingCatalogue.Ordering.Api.Models;
+﻿using System;
+using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
@@ -23,6 +24,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
         {
             if (contact is null)
                 contact = new Contact();
+
+            if (model is null)
+                throw new ArgumentNullException(nameof(model));
 
             contact.FirstName = model.FirstName;
             contact.LastName = model.LastName;

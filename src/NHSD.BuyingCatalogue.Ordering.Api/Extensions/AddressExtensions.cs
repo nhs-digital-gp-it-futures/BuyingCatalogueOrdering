@@ -1,4 +1,5 @@
-﻿using NHSD.BuyingCatalogue.Ordering.Api.Models;
+﻿using System;
+using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
@@ -28,6 +29,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
         {
             if(address is null)
                 address = new Address();
+
+            if(model is null)
+                throw new ArgumentNullException(nameof(model));
 
             address.Line1 = model.Line1;
             address.Line2 = model.Line2;
