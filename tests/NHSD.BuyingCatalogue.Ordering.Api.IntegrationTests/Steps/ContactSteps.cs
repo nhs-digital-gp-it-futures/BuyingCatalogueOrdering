@@ -66,7 +66,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Given(@"the user wants to update the (.*) section for the contact")]
-        public void WhenTheUserWantsToUpdateTheSupplierContactSectionForTheContact(string section, Table table)
+        public void WhenTheUserWantsToUpdateTheSectionForTheContact(string section, Table table)
         {
             var contact = table.CreateSet<ContactTable>().FirstOrDefault();
             _context[section] = contact;

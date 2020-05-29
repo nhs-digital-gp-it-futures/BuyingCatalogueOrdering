@@ -138,7 +138,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Then(@"the supplier contact for order (.*) is")]
-        public async Task ThenTheSupplierContactIdContactForOrderCIs(string orderId, Table table)
+        public async Task ThenTheSupplierContactIdContactForOrderIs(string orderId, Table table)
         {
             var contact = table.CreateInstance<SupplierContactTable>();
 
@@ -150,7 +150,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Then(@"the supplier for order (.*) is updated")]
-        public async Task ThenTheSupplierForOrderCIsUpdated(string orderId, Table table)
+        public async Task ThenTheSupplierForOrderIsUpdated(string orderId, Table table)
         {
             var supplier = table.CreateInstance<SupplierSectionTable>();
 

@@ -74,30 +74,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             order.SupplierId = model.SupplierId;
             order.SupplierName = model.Name;
 
-            var address = model.Address;
-
-            if (order.SupplierAddress is null)
-                order.SupplierAddress = new Address();
-
-            order.SupplierAddress.Line1 = address.Line1;
-            order.SupplierAddress.Line2 = address.Line2;
-            order.SupplierAddress.Line3 = address.Line3;
-            order.SupplierAddress.Line4 = address.Line4;
-            order.SupplierAddress.Line5 = address.Line5;
-            order.SupplierAddress.Town = address.Town;
-            order.SupplierAddress.County = address.County;
-            order.SupplierAddress.Postcode = address.Postcode;
-            order.SupplierAddress.Country = address.Country;
-
-            if (order.SupplierContact is null)
-                order.SupplierContact = new Contact();
-
-            var contact = model.PrimaryContact;
-
-            order.SupplierContact.FirstName = contact.FirstName;
-            order.SupplierContact.LastName = contact.LastName;
-            order.SupplierContact.Email = contact.EmailAddress;
-            order.SupplierContact.Phone = contact.TelephoneNumber;
+            order.SupplierAddress = model.Address.ToObject();
+            order.SupplierContact = model.PrimaryContact.ToObject();
 
             var name = User.Identity.Name;
             order.SetLastUpdatedBy(User.GetUserId(), name);
