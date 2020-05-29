@@ -9,5 +9,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common
         public HttpResponseMessage Result { get; set; }
 
         public async Task<JToken> ReadBodyAsJsonAsync() => JToken.Parse(await Result.Content.ReadAsStringAsync());
+
+        public async Task<string> ReadStringAsAsync() => await Result.Content.ReadAsStringAsync();
     }
 }

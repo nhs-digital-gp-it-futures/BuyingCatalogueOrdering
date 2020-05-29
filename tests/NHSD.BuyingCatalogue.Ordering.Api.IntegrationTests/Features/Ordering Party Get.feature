@@ -20,10 +20,10 @@ Background:
 Scenario: 1. Get an ordering party
     When the user makes a request to retrieve the ordering-party section with the ID C000014-01
     Then a response with status code 200 is returned
-    And the ordering-party Organisation is returned
+    And the ordering-party is returned
         | Name         | OdsCode |
         | Hampshire CC | 432432  |
-    And the Address section organisation is returned
+    And the Address section is returned
         | Line1 | Line2      | Line3      | Line4          | Line5          | Town      | County  | Postcode | Country        |
         | 4     | Upper Flat | Rocks Lane | Little Village | Bigger Village | Some Town | W Yorks | LS 1 3AP | United Kingdom |
     And the Contact section primaryContact is returned
