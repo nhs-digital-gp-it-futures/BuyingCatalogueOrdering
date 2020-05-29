@@ -59,8 +59,8 @@ Scenario: 3. Updating a supplier section, and not providing a correct email addr
         | Line1     | Line2      | Line3       | Line4          | Line5           | Town         | County  | Postcode | Country        |
         | New Line1 | Lower Flat | Rocks Close | Larger Village | Massive Village | Another Town | N Yorks | YO11 1AP | United Kingdom |
     And the user wants to update the SupplierContact section for the contact
-        | FirstName | LastName | EmailAddress | TelephoneNumber |
-        | Greg      | Smith    | INVALID      | 23456234521     |
+        | FirstName | LastName | EmailAddress   | TelephoneNumber |
+        | Greg      | Smith    | <EmailAddress> | 23456234521     |
     When the user makes a request to update the supplier with order ID C000014-01
         | SupplierId | SupplierName     |
         | Sup3       | Updated Supplier |
@@ -68,3 +68,12 @@ Scenario: 3. Updating a supplier section, and not providing a correct email addr
     And the response contains the following errors
         | id                        | field        |
         | EmailAddressInvalidFormat | EmailAddress |
+
+    Examples:
+        | EmailAddress        |
+        | INVALID             |
+        | @Bobsmith.email.com |
+        | Bobsmith.email.com@ |
+        | Bobsmith.email.com  |
+        | @                   |
+        | Bob@smith@email.com |
