@@ -76,14 +76,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Given(@"the update request for order ID (.*) has a contact")]
-        public void GivenTheUpdateRequestForOrderIdcHasAContact(string orderId, Table table)
+        public void GivenTheUpdateRequestForOrderIdHasAContact(string orderId, Table table)
         {
             var payload = GetOrganisationPartyPayloadByOrderId(_context, orderId);
             payload.PrimaryContact = table.CreateInstance<ContactPayload>();
         }
 
         [Given(@"the order party update request for order ID (.*) has a address")]
-        public void GivenTheOrderPartyUpdateRequestForOrderIdcHasAAddress(string orderId, Table table)
+        public void GivenTheOrderPartyUpdateRequestForOrderIdHasAAddress(string orderId, Table table)
         {
             var payload = GetOrganisationPartyPayloadByOrderId(_context,orderId);
 
@@ -91,7 +91,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Given(@"the order party update request for order ID (.*) has a Name of (.*)")]
-        public void GivenTheOrderPartyUpdateRequestForOrderIdcHasANameOfTestCareCenter(string orderId, string name)
+        public void GivenTheOrderPartyUpdateRequestForOrderIdHasANameOfTestCareCenter(string orderId, string name)
         {
             var payload = GetOrganisationPartyPayloadByOrderId(_context, orderId);
 
@@ -100,7 +100,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Given(@"the order party update request for order ID (.*) has a OdsCode of (.*)")]
-        public void GivenTheOrderPartyUpdateRequestForOrderIdcHasAOrganisationOdsCodeOfTestCareOds(string orderId, string odsCode)
+        public void GivenTheOrderPartyUpdateRequestForOrderIdHasAOrganisationOdsCodeOfTestCareOds(string orderId, string odsCode)
         {
             var payload = GetOrganisationPartyPayloadByOrderId(_context, orderId);
 

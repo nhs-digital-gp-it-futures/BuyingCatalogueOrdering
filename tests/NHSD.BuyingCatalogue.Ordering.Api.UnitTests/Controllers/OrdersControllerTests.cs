@@ -381,10 +381,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         OrderSummaryModelBuilder
                             .Create()
                             .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create().WithSupplier(SectionModel.Supplier.WithStatus("complete")).Build())
+                            .WithSections(SectionModelListBuilder.Create()
+                                .WithSupplier(SectionModel.Supplier.WithStatus("complete"))
+                                .WithOrderingParty(SectionModel.OrderingParty.WithStatus("complete"))
+                                .Build())
                             .Build());
 
-                    yield return new TestCaseData(OrderBuilder.Create().WithOrganisationId(organisationId).WithSupplierContact(null).Build(),
+                    yield return new TestCaseData(OrderBuilder.Create().WithOrganisationId(organisationId).WithOrganisationContact(null).WithSupplierContact(null).Build(),
                         OrderSummaryModelBuilder
                             .Create()
                             .WithOrganisationId(organisationId)

@@ -12,6 +12,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -62,6 +63,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         public async Task<ActionResult<OrderSummaryModel>> GetOrderSummaryAsync(string orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            
 
             if (order is null)
             {
@@ -82,7 +84,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 Sections = new List<SectionModel>
                 {
                     SectionModel.Description,
-                    SectionModel.OrderingParty,
+                    SectionModel.OrderingParty.WithStatus(order.IsOrderingPartySectionComplete() ? "complete" : "incomplete"),
                     SectionModel.Supplier.WithStatus(order.IsSupplierSectionComplete() ? "complete" : "incomplete"),
                     SectionModel.CommencementDate,
                     SectionModel.AssociatedServices,

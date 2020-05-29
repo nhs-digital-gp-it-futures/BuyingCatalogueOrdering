@@ -52,7 +52,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             _context[ScenarioContextKeys.AddressMapDictionary] = addressDictionary;
         }
 
-        [Then(@"the Address section is returned")]
+        [Then(@"the Address is returned")]
         public async Task ThenTheAddressSectionIsReturned(Table table)
         {
             var expected = table.CreateSet<AddressTable>().FirstOrDefault();
