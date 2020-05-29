@@ -57,6 +57,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             order.CommencementDate = model.CommencementDate.Value;
+
+            var name = User.Identity.Name;
+            order.SetLastUpdatedBy(User.GetUserId(), name);
+
             await _orderRepository.UpdateOrderAsync(order);
 
             return NoContent();
