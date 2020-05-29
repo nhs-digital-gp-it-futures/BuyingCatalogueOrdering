@@ -100,6 +100,86 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(string.Empty), Times.Once);
         }
 
+        [TestCase(null)]
+        [TestCase("INVALID")]
+        public async Task UpdateAsync_OrderIdDoesNotExist_ReturnNotFound(string orderId)
+        {
+            var context = OrderingPartyTestContext.Setup();
+
+            var controller = context.OrderingPartyController;
+
+            var response =
+                await controller.UpdateAsync(orderId, new OrderingPartyModel { PrimaryContact = new PrimaryContactModel() });
+
+            response.Should().BeEquivalentTo(new NotFoundResult());
+        }
+
+        [Test]
+        public void UpdateAsync_ModelIsNull_ThrowsNullArgumentException()
+        {
+            static async Task GetOrderingPartyWithModelModel()
+            {
+                var context = OrderingPartyTestContext.Setup();
+
+                var controller = context.OrderingPartyController;
+                await controller.UpdateAsync("OrderId", null);
+            }
+
+            Assert.ThrowsAsync<ArgumentNullException>(GetOrderingPartyWithModelModel);
+        }
+
+        [TestCase(false, true)]
+        [TestCase(true, false)]
+        [TestCase(false, false)]
+        public void UpdateAsync_NullAddressOrContact_ThrowsNullArgumentException(bool hasPrimaryContact, bool hasAddress)
+        {
+            const string orderId = "C0000014-01";
+            var context = OrderingPartyTestContext.Setup();
+
+            (Order order, OrderingPartyModel _) = CreateOrderingPartyTestData(orderId, context.PrimaryOrganisationId);
+
+            context.Order = order;
+
+            var controller = context.OrderingPartyController;
+
+            Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            {
+                var _ = await controller.UpdateAsync(orderId,
+                    new OrderingPartyModel
+                    {
+                        Name = "New Description",
+                        OdsCode = "NewODS",
+                        PrimaryContact = hasPrimaryContact ? new PrimaryContactModel() : null,
+                        Address = hasAddress ? new AddressModel() : null
+                    });
+            });
+        }
+
+        [Test]
+        public async Task UpdateAsync_UpdateIsValid_ReturnsNoContent()
+        {
+            const string orderId = "C0000014-01";
+            var context = OrderingPartyTestContext.Setup();
+
+            (Order order, OrderingPartyModel _) = CreateOrderingPartyTestData(orderId, context.PrimaryOrganisationId);
+
+            context.Order = order;
+
+            var controller = context.OrderingPartyController;
+
+            var response =
+                await controller.UpdateAsync(orderId,
+                    new OrderingPartyModel
+                    {
+                        Name = "New Description",
+                        OdsCode = "New",
+                        PrimaryContact = new PrimaryContactModel(),
+                        Address = new AddressModel()
+                    });
+
+            response.Should().BeOfType<NoContentResult>();
+        }
+
         private static (Order order, OrderingPartyModel expectedOrderingParty) CreateOrderingPartyTestData(string orderId, Guid organisationId, bool hasOrganisationContact = true)
         {
             var repositoryOrder = OrderBuilder
@@ -112,22 +192,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             return (order: repositoryOrder,
                 expectedOrderingParty: new OrderingPartyModel
                 {
-                    Organisation = repositoryOrder.OrganisationContact is null ? null : new OrganisationModel
+                    Name = repositoryOrder.OrganisationName,
+                    OdsCode = repositoryOrder.OrganisationOdsCode,
+                    Address = new AddressModel
                     {
-                        Name = repositoryOrder.OrganisationName,
-                        OdsCode = repositoryOrder.OrganisationOdsCode,
-                        Address = new AddressModel
-                        {
-                            Line1 = repositoryOrder.OrganisationAddress.Line1,
-                            Line2 = repositoryOrder.OrganisationAddress.Line2,
-                            Line3 = repositoryOrder.OrganisationAddress.Line3,
-                            Line4 = repositoryOrder.OrganisationAddress.Line4,
-                            Line5 = repositoryOrder.OrganisationAddress.Line5,
-                            Town = repositoryOrder.OrganisationAddress.Town,
-                            County = repositoryOrder.OrganisationAddress.County,
-                            Postcode = repositoryOrder.OrganisationAddress.Postcode,
-                            Country = repositoryOrder.OrganisationAddress.Country
-                        }
+                        Line1 = repositoryOrder.OrganisationAddress.Line1,
+                        Line2 = repositoryOrder.OrganisationAddress.Line2,
+                        Line3 = repositoryOrder.OrganisationAddress.Line3,
+                        Line4 = repositoryOrder.OrganisationAddress.Line4,
+                        Line5 = repositoryOrder.OrganisationAddress.Line5,
+                        Town = repositoryOrder.OrganisationAddress.Town,
+                        County = repositoryOrder.OrganisationAddress.County,
+                        Postcode = repositoryOrder.OrganisationAddress.Postcode,
+                        Country = repositoryOrder.OrganisationAddress.Country
                     },
                     PrimaryContact = repositoryOrder.OrganisationContact is null ? null : new PrimaryContactModel
                     {

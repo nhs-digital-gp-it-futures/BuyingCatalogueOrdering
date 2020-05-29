@@ -27,7 +27,6 @@ Scenario: 1. Update a supplier section
         | SupplierId | SupplierName     |
         | Sup3       | Updated Supplier |
     Then a response with status code 204 is returned
-    And the lastUpdatedName is updated in the database to Bob Smith with orderId C000014-01
     And the supplier address for order C000014-01 is
         | Line1     | Line2      | Line3       | Line4          | Line5           | Town         | County  | Postcode | Country        |
         | New Line1 | Lower Flat | Rocks Close | Larger Village | Massive Village | Another Town | N Yorks | YO11 1AP | United Kingdom |
@@ -37,14 +36,45 @@ Scenario: 1. Update a supplier section
     And the supplier for order C000014-01 is updated
         | SupplierId | SupplierName     |
         | Sup3       | Updated Supplier |
+    And the order with orderId C000014-01 is updated in the database with data
+        | LastUpdatedBy                        | LastUpdatedByName |
+        | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
+    And the order with orderId C000014-01 has LastUpdated time present and it is the current time
 
 @4621
-Scenario: 2. Updating a supplier section, with a non existent model returns not found
+Scenario: 2. Updating a supplier section with boundary values
+    Given the user wants to update the SupplierAddress section for the address
+        | Line1     | Line2      | Line3       | Line4          | Line5           | Town         | County  | Postcode | Country        |
+        | New Line1 | Lower Flat | Rocks Close | Larger Village | Massive Village | Another Town | N Yorks | YO11 1AP | United Kingdom |
+    And the user wants to update the SupplierContact section for the contact
+        | FirstName                | LastName                 | EmailAddress                  | TelephoneNumber         |
+        | #A string of length 100# | #A string of length 100# | #A string of length 251#@.com | #A string of length 35# |
+    When the user makes a request to update the supplier with order ID C000014-01
+        | SupplierId | SupplierName     |
+        | Sup3       | Updated Supplier |
+    Then a response with status code 204 is returned
+    And the lastUpdatedName is updated in the database to Bob Smith with orderId C000014-01
+    And the supplier address for order C000014-01 is
+        | Line1     | Line2      | Line3       | Line4          | Line5           | Town         | County  | Postcode | Country        |
+        | New Line1 | Lower Flat | Rocks Close | Larger Village | Massive Village | Another Town | N Yorks | YO11 1AP | United Kingdom |
+    And the supplier contact for order C000014-01 is
+        | FirstName                | LastName                 | Email                         | Phone                   |
+        | #A string of length 100# | #A string of length 100# | #A string of length 251#@.com | #A string of length 35# |
+    And the supplier for order C000014-01 is updated
+        | SupplierId | SupplierName     |
+        | Sup3       | Updated Supplier |
+    And the order with orderId C000014-01 is updated in the database with data
+        | LastUpdatedBy                        | LastUpdatedByName |
+        | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
+    And the order with orderId C000014-01 has LastUpdated time present and it is the current time
+
+@4621
+Scenario: 3. Updating a supplier section, with a non existent model returns not found
     When the user makes a request to update the supplier with order ID C000014-01 with no model
     Then a response with status code 400 is returned
 
 @4621
-Scenario: 3. If a user is not authorised, then they cannot update the supplier
+Scenario: 4. If a user is not authorised, then they cannot update the supplier
     Given no user is logged in
     Given the user wants to update the SupplierAddress section for the address
         | Line1     | Line2      | Line3       | Line4          | Line5           | Town         | County  | Postcode | Country        |
@@ -58,7 +88,7 @@ Scenario: 3. If a user is not authorised, then they cannot update the supplier
     Then a response with status code 401 is returned
 
 @4621
-Scenario: 4. A non buyer user cannot update the supplier section
+Scenario: 5. A non buyer user cannot update the supplier section
     Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
     Given the user wants to update the SupplierAddress section for the address
         | Line1     | Line2      | Line3       | Line4          | Line5           | Town         | County  | Postcode | Country        |
@@ -72,7 +102,7 @@ Scenario: 4. A non buyer user cannot update the supplier section
     Then a response with status code 403 is returned
 
 @4621
-Scenario: 5. A buyer user cannot update a supplier section for an organisation they don't belong to
+Scenario: 6. A buyer user cannot update a supplier section for an organisation they don't belong to
     Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
     Given the user wants to update the SupplierAddress section for the address
         | Line1     | Line2      | Line3       | Line4          | Line5           | Town         | County  | Postcode | Country        |
@@ -86,7 +116,7 @@ Scenario: 5. A buyer user cannot update a supplier section for an organisation t
     Then a response with status code 403 is returned
 
 @4621
-Scenario: 6. Service Failure
+Scenario: 7. Service Failure
     Given the call to the database will fail
     Given the user wants to update the SupplierAddress section for the address
         | Line1     | Line2      | Line3       | Line4          | Line5           | Town         | County  | Postcode | Country        |

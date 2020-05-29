@@ -52,11 +52,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             _context[ScenarioContextKeys.AddressMapDictionary] = addressDictionary;
         }
 
-        [Then(@"the Address section (.*) is returned")]
-        public async Task ThenTheAddressSectionIsReturned(string section, Table table)
+        [Then(@"the Address is returned")]
+        public async Task ThenTheAddressSectionIsReturned(Table table)
         {
             var expected = table.CreateSet<AddressTable>().FirstOrDefault();
-            var response = (await _response.ReadBodyAsJsonAsync()).SelectToken(section).SelectToken("address");
+            var response = (await _response.ReadBodyAsJsonAsync()).SelectToken("address");
 
             var actual = new AddressTable
             {
