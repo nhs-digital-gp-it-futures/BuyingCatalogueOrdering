@@ -46,9 +46,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             Description = orderDescription ?? throw new ArgumentNullException(nameof(orderDescription));
         }
 
-        public void SetLastUpdatedByName(string name)
+        public void SetLastUpdatedBy(Guid userId, string name)
         {
-            LastUpdatedByName = name;
+            LastUpdatedBy = userId;
+            LastUpdatedByName = name ?? throw new ArgumentNullException(nameof(name));
+            LastUpdated = DateTime.UtcNow;
         }
     }
 }

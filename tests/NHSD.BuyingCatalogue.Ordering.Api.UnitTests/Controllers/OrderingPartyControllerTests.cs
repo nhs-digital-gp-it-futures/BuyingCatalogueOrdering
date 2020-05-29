@@ -151,7 +151,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 {
                     new Claim("Ordering", "Manage"),
                     new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
-                    new Claim("name", "Test User")
+                    new Claim(ClaimTypes.Name, "Test User")
                 }, "mock"));
 
                 OrderingPartyController = new OrderingPartyController(OrderRepositoryMock.Object)
