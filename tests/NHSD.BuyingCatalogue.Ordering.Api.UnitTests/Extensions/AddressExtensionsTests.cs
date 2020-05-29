@@ -34,7 +34,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
                 .WithPostcode(Guid.NewGuid().ToString())
                 .WithCountry(Guid.NewGuid().ToString())
                 .Build();
-            
+
             var actual = address.ToModel();
 
             AddressModel expected = new AddressModel
@@ -51,6 +51,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
             };
 
             actual.Should().BeEquivalentTo(expected);
+        }
+
+        [Test]
+        public void FromModel_NullAddressModel_ThrowsException()
+        {
+            Address address = AddressBuilder
+                .Create()
+                .Build();
+
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                address.FromModel(null);
+            });
         }
 
         [Test]
