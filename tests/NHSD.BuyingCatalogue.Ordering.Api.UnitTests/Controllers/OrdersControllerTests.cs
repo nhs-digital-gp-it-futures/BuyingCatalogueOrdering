@@ -161,7 +161,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.SectionStatusCases))]
-        public async Task GetOrderSummaryAsync_HasPrimarySupplierContact_ReturnsComplete(Order order, OrderSummaryModel expected)
+        public async Task GetOrderSummaryAsync_ChangeOrderData_ReturnsExpectedSummary(Order order, OrderSummaryModel expected)
         {
             var context = OrdersControllerTestContext.Setup(order.OrganisationId);
             context.Order = order;
