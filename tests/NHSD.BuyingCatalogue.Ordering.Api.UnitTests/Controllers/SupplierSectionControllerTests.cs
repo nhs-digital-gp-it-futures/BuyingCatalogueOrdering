@@ -144,6 +144,49 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             Assert.ThrowsAsync<ArgumentNullException>(GetSupplierSectionWithNullModel);
         }
 
+        [TestCase(false, true)]
+        [TestCase(true, false)]
+        [TestCase(false, false)]
+        public void UpdateAsync_NullAddressOrContact_ThrowsNullArgumentException(bool hasPrimaryContact, bool hasAddress)
+        {
+            const string orderId = "C0000014-01";
+            const string supplierId = "1234";
+            const string supplierName = "NHS Supplier";
+
+            var supplierAddress = AddressBuilder
+                .Create()
+                .Build();
+
+            var supplierContact = ContactBuilder
+                .Create()
+                .Build();
+            var context = SupplierSectionControllerTestContext.Setup();
+
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrderId(orderId)
+                .WithOrganisationId(context.PrimaryOrganisationId)
+                .WithSupplierId(supplierId)
+                .WithSupplierName(supplierName)
+                .WithSupplierAddress(supplierAddress)
+                .WithSupplierContact(supplierContact)
+                .Build(); ;
+
+            var controller = context.SupplierSectionController;
+
+            Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            {
+                var _ = await controller.UpdateAsync(orderId,
+                    new SupplierModel()
+                    {
+                        Name = "New Description",
+                        SupplierId = "New",
+                        PrimaryContact = hasPrimaryContact ? new PrimaryContactModel() : null,
+                        Address = hasAddress ? new AddressModel() : null
+                    });
+            });
+        }
+
         [Test]
         public async Task UpdateAsync_UpdateIsValid_ReturnsNoContent()
         {

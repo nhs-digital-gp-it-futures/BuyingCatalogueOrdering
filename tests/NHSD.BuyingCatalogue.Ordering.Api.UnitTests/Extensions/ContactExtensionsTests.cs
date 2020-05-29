@@ -29,7 +29,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
                 .WithEmail(Guid.NewGuid().ToString())
                 .WithPhone(Guid.NewGuid().ToString())
                 .Build();
-            
+
             var actual = contact.ToModel();
 
             PrimaryContactModel expected = new PrimaryContactModel
@@ -41,6 +41,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
             };
 
             actual.Should().BeEquivalentTo(expected);
+        }
+
+        [Test]
+        public void FromModel_NullPrimaryContactModelModel_ThrowsException()
+        {
+            Contact contact = ContactBuilder
+                .Create()
+                .Build();
+
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                contact.FromModel(null);
+            });
         }
 
         [Test]

@@ -75,46 +75,36 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             SetOrganisationPartyPayloadByOrderId(_context, orderId, new OrganisationPartyPayload());
         }
 
-        [Given(@"the update request for order ID (.*) has a organisation contact")]
-        public void GivenTheUpdateRequestForOrderIdcHasAOrganisationContact(string orderId, Table table)
+        [Given(@"the update request for order ID (.*) has a contact")]
+        public void GivenTheUpdateRequestForOrderIdHasAContact(string orderId, Table table)
         {
             var payload = GetOrganisationPartyPayloadByOrderId(_context, orderId);
             payload.PrimaryContact = table.CreateInstance<ContactPayload>();
         }
 
-        [Given(@"the order party update request for order ID (.*) has a organisation address")]
-        public void GivenTheOrderPartyUpdateRequestForOrderIdcHasAOrganisationAddress(string orderId, Table table)
+        [Given(@"the order party update request for order ID (.*) has a address")]
+        public void GivenTheOrderPartyUpdateRequestForOrderIdHasAAddress(string orderId, Table table)
         {
             var payload = GetOrganisationPartyPayloadByOrderId(_context,orderId);
-            if (payload.Organisation == null)
-            {
-                payload.Organisation = new OrganisationPayload();
-            }
-            payload.Organisation.address = table.CreateInstance<AddressPayload>();
+
+            payload.Address = table.CreateInstance<AddressPayload>();
         }
 
-        [Given(@"the order party update request for order ID (.*) has a organisation Name of (.*)")]
-        public void GivenTheOrderPartyUpdateRequestForOrderIdcHasAOrganisationNameOfTestCareCenter(string orderId, string name)
+        [Given(@"the order party update request for order ID (.*) has a Name of (.*)")]
+        public void GivenTheOrderPartyUpdateRequestForOrderIdHasANameOfTestCareCenter(string orderId, string name)
         {
             var payload = GetOrganisationPartyPayloadByOrderId(_context, orderId);
-            if (payload.Organisation == null)
-            {
-                payload.Organisation = new OrganisationPayload();
-            }
 
-            payload.Organisation.Name = name;
+           
+            payload.Name = name;
         }
 
-        [Given(@"the order party update request for order ID (.*) has a organisation OdsCode of (.*)")]
-        public void GivenTheOrderPartyUpdateRequestForOrderIdcHasAOrganisationOdsCodeOfTestCareOds(string orderId, string odsCode)
+        [Given(@"the order party update request for order ID (.*) has a OdsCode of (.*)")]
+        public void GivenTheOrderPartyUpdateRequestForOrderIdHasAOrganisationOdsCodeOfTestCareOds(string orderId, string odsCode)
         {
             var payload = GetOrganisationPartyPayloadByOrderId(_context, orderId);
-            if (payload.Organisation == null)
-            {
-                payload.Organisation = new OrganisationPayload();
-            }
 
-            payload.Organisation.OdsCode = odsCode;
+            payload.OdsCode = odsCode;
         }
 
         [When(@"the user makes a request to retrieve the ordering-party section with the ID (.*)")]
@@ -130,12 +120,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _request.PutJsonAsync(string.Format(_orderingPartyUrl, orderId), payload);
         }
 
-        [Then(@"the ordering-party Organisation is returned")]
+        [Then(@"the ordering-party is returned")]
         public async Task ThenTheOrdering_PartyOrganisationIsReturned(Table table)
         {
             var expected = table.CreateSet<OrganisationTable>().FirstOrDefault();
 
-            var response = (await _response.ReadBodyAsJsonAsync()).SelectToken("organisation");
+            var response = (await _response.ReadBodyAsJsonAsync());
 
             var actual = new OrganisationTable
             {
@@ -154,15 +144,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
         private sealed class OrganisationPartyPayload
         {
-            public OrganisationPayload Organisation { get; set; }
-            public ContactPayload PrimaryContact { get; set; }
-        }
-
-        private sealed class OrganisationPayload
-        {
             public string Name { get; set; }
             public string OdsCode { get; set; }
-            public AddressPayload address { get; set; }
+            public AddressPayload Address { get; set; }
+            public ContactPayload PrimaryContact { get; set; }
         }
 
         private sealed class AddressPayload
