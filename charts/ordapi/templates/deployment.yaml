@@ -1,0 +1,98 @@
+{{- $name := include "ordapi.fullname" . -}}
+{{- $cfgname := printf "%s-%s" "cfg" $name -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ordapi.fullname" . }}
+  labels:
+    {{- include "ordapi.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy: {{ toYaml .Values.updateStrategy | nindent 4 }}  
+  selector:
+    matchLabels:
+      {{- include "ordapi.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "ordapi.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "ordapi.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      hostAliases:
+        {{- toYaml .Values.hostAliases | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- include "ordapi.image.properties" . | nindent 10 }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Development
+            - name: CONNECTIONSTRINGS__ORDERINGDB
+              valueFrom:
+                secretKeyRef:            
+                  name: {{ .Values.connectionStringSecret.name }}
+                  key: {{ .Values.connectionStringSecret.key }}
+            - name: AUTHORITY
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.serviceDependencies.oidc.baseUriConfig.name | quote }}
+                  key: {{ .Values.serviceDependencies.oidc.baseUriConfig.key | quote }}
+            - name: ALLOWINVALIDCERTIFICATE
+              value: {{ .Values.allowInvalidCertificate | quote }}
+            {{- if .Values.env.values -}}
+            {{- range .Values.env.values }}
+              - name: {{ .name }}
+                value: {{ .value | quote }}
+            {{- end -}}
+            {{- end -}}
+            {{- if .Values.env.configmap -}}
+            {{- range .Values.env.configmap }}
+              - name: {{ .name }}
+                valueFrom:
+                  configMapKeyRef:
+                    name: {{ $cfgname }}
+                    key: {{ .key }}
+            {{- end -}}
+            {{- end }}
+            {{- if .Values.env.secrets -}}
+            {{- range .Values.env.secrets }}
+              - name: {{ .name }}
+                valueFrom:
+                  secretKeyRef:            
+                    name: {{ .valueFrom.secretKeyRef.name }}
+                    key: {{ .valueFrom.secretKeyRef.key }}            
+            {{- end -}}
+            {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

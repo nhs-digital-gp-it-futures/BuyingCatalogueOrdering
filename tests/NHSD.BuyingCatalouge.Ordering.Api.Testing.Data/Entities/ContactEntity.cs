@@ -26,7 +26,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
             );
             SELECT SCOPE_IDENTITY();";
 
-        public static async Task<ContactEntity> FetchContactByContactId(string connectionString, int? contactId)
+        public static async Task<ContactEntity> FetchContactById(string connectionString, int? contactId)
         {
             if (contactId == null)
             {
@@ -34,13 +34,12 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
             }
 
             return (await SqlRunner.QueryFirstAsync<ContactEntity>(connectionString, @"SELECT
-                        ContactId,
-                        FirstName,
-                        LastName,
-                        Email,
-                        Phone 
-                        FROM dbo.[Contact]
-                        WHERE ContactId = @ContactId;", new { contactId }));
+                          FirstName,
+                          LastName,
+                          Email,
+                          Phone
+                         FROM dbo.Contact
+                         WHERE ContactId = @contactId;", new { contactId }));
         }
     }
 }

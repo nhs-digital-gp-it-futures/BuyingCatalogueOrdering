@@ -75,10 +75,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return BadRequest(new ErrorsModel(isValid.Errors.Select(x => new ErrorModel(x.Id, x.Field))));
             }
 
-            var name = User.Identity.Name;
-
             order.SetDescription(isValid.Value);
-
+            
+            var name = User.Identity.Name;
             order.SetLastUpdatedBy(User.GetUserId(), name);
 
             await _orderRepository.UpdateOrderAsync(order);

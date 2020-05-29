@@ -23,7 +23,7 @@ Scenario: 1. Get the order supplier section details
         | SupplierId | SupplierName       |
         | 123        | Some supplier name |
     And the response contains the following primary supplier contact details
-        | FirstName | LastName | EmailAddress            | PhoneNumber |
+        | FirstName | LastName | Email                   | Phone       |
         | Fred      | Robinson | Fred.robinson@email.com | 12312543212 |
     And the response contains the following supplier address
         | Line1 | Line2      | Line3      | Line4          | Line5          | Town      | County  | Postcode | Country        |

@@ -16,8 +16,9 @@ using NUnit.Framework;
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
+
     [Parallelizable(ParallelScope.All)]
-    public sealed class SupplierSectionControllerTests
+    internal sealed class SupplierSectionControllerTests
     {
         [Test]
         public void Constructor_NullRepository_Throws()
@@ -37,9 +38,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var context = SupplierSectionControllerTestContext.Setup();
 
-            using var controller = context.SupplierSectionController;
+            var controller = context.SupplierSectionController;
             var response = await controller.GetAsync(orderId);
-            
+
             response.Should().BeEquivalentTo(new ActionResult<SupplierModel>(new NotFoundResult()));
         }
 
@@ -69,9 +70,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithSupplierContact(supplierContact)
                 .Build();
 
-            using var controller = context.SupplierSectionController;
+            var controller = context.SupplierSectionController;
             var response = await controller.GetAsync(orderId);
-            
+
             var expected = new SupplierModel
             {
                 SupplierId = supplierId,
@@ -95,7 +96,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithOrganisationId(Guid.NewGuid())
                 .Build();
 
-            using var controller = context.SupplierSectionController;
+            var controller = context.SupplierSectionController;
             var actual = await controller.GetAsync(orderId);
 
             var expected = new ActionResult<SupplierModel>(new ForbidResult());
@@ -107,12 +108,75 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = SupplierSectionControllerTestContext.Setup();
 
-            using var controller = context.SupplierSectionController;
+            var controller = context.SupplierSectionController;
 
             const string orderId = "C123";
             await controller.GetAsync(orderId);
 
             context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(orderId), Times.Once);
+        }
+
+        [TestCase(null)]
+        [TestCase("INVALID")]
+        public async Task UpdateAsync_OrderIdDoesNotExist_ReturnNotFound(string orderId)
+        {
+            var context = SupplierSectionControllerTestContext.Setup();
+
+            var controller = context.SupplierSectionController;
+
+            var response =
+                await controller.UpdateAsync(orderId, new SupplierModel { PrimaryContact = new PrimaryContactModel() });
+
+            response.Should().BeEquivalentTo(new NotFoundResult());
+        }
+
+        [Test]
+        public void UpdateAsync_ModelIsNull_ThrowsNullArgumentException()
+        {
+            static async Task GetSupplierSectionWithNullModel()
+            {
+                var context = SupplierSectionControllerTestContext.Setup();
+
+                var controller = context.SupplierSectionController;
+                await controller.UpdateAsync("OrderId", null);
+            }
+
+            Assert.ThrowsAsync<ArgumentNullException>(GetSupplierSectionWithNullModel);
+        }
+
+        [Test]
+        public async Task UpdateAsync_UpdateIsValid_ReturnsNoContent()
+        {
+            const string orderId = "C0000014-01";
+            const string supplierId = "1234";
+            const string supplierName = "NHS Supplier";
+
+            var supplierAddress = AddressBuilder
+                .Create()
+                .Build();
+
+            var supplierContact = ContactBuilder
+                .Create()
+                .Build();
+            var context = SupplierSectionControllerTestContext.Setup();
+
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrderId(orderId)
+                .WithOrganisationId(context.PrimaryOrganisationId)
+                .WithSupplierId(supplierId)
+                .WithSupplierName(supplierName)
+                .WithSupplierAddress(supplierAddress)
+                .WithSupplierContact(supplierContact)
+                .Build(); ;
+
+            var controller = context.SupplierSectionController;
+
+            var response =
+                await controller.UpdateAsync(orderId,
+                    new SupplierModel() { Name = "New Description",SupplierId = "New", PrimaryContact = new PrimaryContactModel(), Address = new AddressModel()});
+
+            response.Should().BeOfType<NoContentResult>();
         }
 
         private sealed class SupplierSectionControllerTestContext
@@ -127,7 +191,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]
                 {
-                    new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString())
+                    new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
+                    new Claim(ClaimTypes.Name, "Test User"),
+                    new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
                 }, "mock"));
 
                 SupplierSectionController = new SupplierSectionController(OrderRepositoryMock.Object)

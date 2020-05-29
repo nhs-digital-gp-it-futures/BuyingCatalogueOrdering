@@ -34,7 +34,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
         public string SupplierId { get; set; }
 
         public string SupplierName { get; set; }
-        
+
         public int? SupplierAddressId { get; set; }
 
         public int? SupplierContactId { get; set; }
@@ -93,6 +93,10 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                           OrganisationContactId,
                           OrderStatusId,
                           Created,
+                          SupplierId,
+                          SupplierName,
+                          SupplierAddressId,
+                          SupplierContactId,
                           LastUpdated,
                           LastUpdatedBy,
                           LastUpdatedByName,

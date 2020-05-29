@@ -41,26 +41,25 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
             );
             SELECT SCOPE_IDENTITY();";
 
-        public static async Task<AddressEntity> FetchAddressByAddressId(string connectionString, int? addressId)
+        public static async Task<AddressEntity> FetchAddressById(string connectionString, int? addressId)
         {
             if (addressId == null)
             {
                 return null;
             }
 
-            return (await SqlRunner.QueryFirstAsync<AddressEntity>(connectionString, @"SELECT  
-                        AddressId,
-                        Line1,
-                        Line2,
-                        Line3,
-                        Line4,
-                        Line5,
-                        Town,
-                        County,
-                        Postcode, 
-                        Country
-                        FROM dbo.[Address]
-                        WHERE AddressId = @addressId;", new { addressId }));
+            return (await SqlRunner.QueryFirstAsync<AddressEntity>(connectionString, @"SELECT
+                          Line1,
+                          Line2,
+                          Line3,
+                          Line4,
+                          Line5,
+                          Town,
+                          County,
+                          Postcode,
+                          Country
+                         FROM dbo.[Address]
+                         WHERE AddressId = @addressId;", new { addressId }));
         }
     }
 }
