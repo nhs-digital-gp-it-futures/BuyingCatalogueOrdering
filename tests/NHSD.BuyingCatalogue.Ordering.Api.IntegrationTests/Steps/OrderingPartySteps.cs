@@ -39,7 +39,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 return null;
 
             var payloadDictionary =
-                context.Get<IDictionary<string, OrganisationPartyPayload>>(ScenarioContextKeys.PayloadDictionary, new Dictionary<string, OrganisationPartyPayload>());
+                context.Get<IDictionary<string, OrganisationPartyPayload>>(ScenarioContextKeys.OrganisationPayloadDictionary, new Dictionary<string, OrganisationPartyPayload>());
 
             if (payloadDictionary.TryGetValue(orderId, out var payload))
                 return payload;
@@ -58,13 +58,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 return ;
 
             var payloadDictionary =
-                context.Get<IDictionary<string, OrganisationPartyPayload>>(ScenarioContextKeys.PayloadDictionary, new Dictionary<string, OrganisationPartyPayload>());
+                context.Get<IDictionary<string, OrganisationPartyPayload>>(ScenarioContextKeys.OrganisationPayloadDictionary, new Dictionary<string, OrganisationPartyPayload>());
 
             payloadDictionary[orderId] = payload;
 
-            if (!context.ContainsKey(ScenarioContextKeys.PayloadDictionary))
+            if (!context.ContainsKey(ScenarioContextKeys.OrganisationPayloadDictionary))
             {
-                context.Add(ScenarioContextKeys.PayloadDictionary, payloadDictionary);
+                context.Add(ScenarioContextKeys.OrganisationPayloadDictionary, payloadDictionary);
             }
         }
 
@@ -85,7 +85,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Given(@"the order party update request for order ID (.*) has a organisation address")]
         public void GivenTheOrderPartyUpdateRequestForOrderIdcHasAOrganisationAddress(string orderId, Table table)
         {
-            
             var payload = GetOrganisationPartyPayloadByOrderId(_context,orderId);
             if (payload.Organisation == null)
             {
@@ -117,8 +116,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             payload.Organisation.OdsCode = odsCode;
         }
-
-
 
         [When(@"the user makes a request to retrieve the ordering-party section with the ID (.*)")]
         public async Task GivenTheUserMakesARequestToRetrieveTheOrdering_PartySectionWithTheID(string orderId)
