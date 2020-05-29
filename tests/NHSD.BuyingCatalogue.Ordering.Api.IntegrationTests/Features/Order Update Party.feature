@@ -18,14 +18,14 @@ Background:
 @4616
 Scenario: 1. Update an ordering party results in persisted data
     Given an order party update request exist for order ID C000014-01
-    And the update request for order ID C000014-01 has a organisation contact
+    And the update request for order ID C000014-01 has a contact
         | FirstName     | LastName     | EmailAddress        | TelephoneNumber |
         | TestFirstName | TestLastName | TestEmail@email.com | TestNumber      |
-    And the order party update request for order ID C000014-01 has a organisation address
+    And the order party update request for order ID C000014-01 has a address
         | Line1 | Line2    | Line3     | Line4        | Line5           | Town         | County        | Postcode | Country        |
         | 4     | TestRoad | Test Lane | Test Village | Testing Village | Testing Town | TestingCounty | TE 1 ST  | United Kingdom |
-    And the order party update request for order ID C000014-01 has a organisation Name of TestCare Center
-    And the order party update request for order ID C000014-01 has a organisation OdsCode of ODS1
+    And the order party update request for order ID C000014-01 has a Name of TestCare Center
+    And the order party update request for order ID C000014-01 has a OdsCode of ODS1
     When the user makes a request to update the order party on the order with the ID C000014-01
     Then a response with status code 204 is returned
     And the order with orderId C000014-01 is updated and has a primary contact with data

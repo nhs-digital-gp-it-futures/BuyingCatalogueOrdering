@@ -112,22 +112,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             return (order: repositoryOrder,
                 expectedOrderingParty: new OrderingPartyModel
                 {
-                    Organisation = repositoryOrder.OrganisationContact is null ? null : new OrganisationModel
+                    Name = repositoryOrder.OrganisationName,
+                    OdsCode = repositoryOrder.OrganisationOdsCode,
+                    Address = new AddressModel
                     {
-                        Name = repositoryOrder.OrganisationName,
-                        OdsCode = repositoryOrder.OrganisationOdsCode,
-                        Address = new AddressModel
-                        {
-                            Line1 = repositoryOrder.OrganisationAddress.Line1,
-                            Line2 = repositoryOrder.OrganisationAddress.Line2,
-                            Line3 = repositoryOrder.OrganisationAddress.Line3,
-                            Line4 = repositoryOrder.OrganisationAddress.Line4,
-                            Line5 = repositoryOrder.OrganisationAddress.Line5,
-                            Town = repositoryOrder.OrganisationAddress.Town,
-                            County = repositoryOrder.OrganisationAddress.County,
-                            Postcode = repositoryOrder.OrganisationAddress.Postcode,
-                            Country = repositoryOrder.OrganisationAddress.Country
-                        }
+                        Line1 = repositoryOrder.OrganisationAddress.Line1,
+                        Line2 = repositoryOrder.OrganisationAddress.Line2,
+                        Line3 = repositoryOrder.OrganisationAddress.Line3,
+                        Line4 = repositoryOrder.OrganisationAddress.Line4,
+                        Line5 = repositoryOrder.OrganisationAddress.Line5,
+                        Town = repositoryOrder.OrganisationAddress.Town,
+                        County = repositoryOrder.OrganisationAddress.County,
+                        Postcode = repositoryOrder.OrganisationAddress.Postcode,
+                        Country = repositoryOrder.OrganisationAddress.Country
                     },
                     PrimaryContact = repositoryOrder.OrganisationContact is null ? null : new PrimaryContactModel
                     {

@@ -42,7 +42,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common
         [Then(@"the response contains no data")]
         public async Task TheResponseContainsNoData()
         {
-            var response = await _response.ReadBodyAsJsonAsync();
+            var response = await _response.ReadBodyAsStringAsync();
             response.Should().BeEmpty();
         }
 
