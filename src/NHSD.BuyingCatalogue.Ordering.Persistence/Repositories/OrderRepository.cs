@@ -26,19 +26,25 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
                 .Include(x => x.OrderStatus)
                 .Include(x => x.OrganisationAddress)
                 .Include(x => x.OrganisationContact)
+                .Include(x => x.SupplierAddress)
+                .Include(x => x.SupplierContact)
                 .Where(o => o.OrganisationId == organisationId)
                 .ToListAsync();
         }
 
         public async Task<Order> GetOrderByIdAsync(string orderId)
         {
+        	if (string.IsNullOrWhiteSpace(orderId))
+            	return null;
+        	
             var order = await _context.Order.FindAsync(orderId);
-
             if (order != null)
             {
                 await _context.Entry(order).Reference(x => x.OrderStatus).LoadAsync();
                 await _context.Entry(order).Reference(x => x.OrganisationAddress).LoadAsync();
                 await _context.Entry(order).Reference(x => x.OrganisationContact).LoadAsync();
+                await _context.Entry(order).Reference(x => x.SupplierAddress).LoadAsync();
+                await _context.Entry(order).Reference(x => x.SupplierContact).LoadAsync();
             }
 
             return order;

@@ -39,6 +39,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common
             actual.Should().BeEquivalentTo(expected);
         }
 
+        [Then(@"the response contains no data")]
+        public async Task ThenAnEmptyObjectIsReturned()
+        {
+            var response = await _response.ReadBodyAsJsonAsync();
+            response.Should().BeEmpty();
+        }
+
         private sealed class ResponseErrorsTable
         {
             public string Id { get; set; }

@@ -11,12 +11,12 @@
     },
     "NHSD.BuyingCatalogue.Ordering.Api Docker": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "ConnectionStrings__OrderingDb": "Data Source=localhost,1552;Initial Catalog=CatalogueOrdering;MultipleActiveResultSets=true;User ID=NHSD;Password=DisruptTheMarket1!"
       },
-      "applicationUrl": "http://localhost:5104"
+      "applicationUrl": "http://localhost:8076"
     }
   }
 }
