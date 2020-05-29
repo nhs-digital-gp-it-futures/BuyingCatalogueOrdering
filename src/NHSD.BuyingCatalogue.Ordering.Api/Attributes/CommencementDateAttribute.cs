@@ -6,8 +6,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Attributes
 
     public class CommencementDateAttribute : ValidationAttribute
     {
-        private int _days;
-        public CommencementDateAttribute(int days = 60)
+        private readonly int _days;
+        public CommencementDateAttribute(int days = -60)
         {
             _days = days;
         }
@@ -27,7 +27,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Attributes
 
             var commencementDate = (DateTime)value;
 
-            if (commencementDate.ToUniversalTime() <= DateTime.UtcNow.AddDays(-60))
+            if (commencementDate.ToUniversalTime() <= DateTime.UtcNow.AddDays(_days))
             {
                 return new ValidationResult(ErrorMessage);
             }
