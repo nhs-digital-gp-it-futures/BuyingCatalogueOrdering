@@ -85,8 +85,12 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
         {
             return (await SqlRunner.QueryFirstAsync<OrderEntity>(connectionString, @"SELECT
                           OrderId,
-                          [Description],
+                          Description,
                           OrganisationId,
+                          OrganisationName,
+                          OrganisationOdsCode,
+                          OrganisationAddressId,
+                          OrganisationContactId,
                           OrderStatusId,
                           Created,
                           SupplierId,

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Security.Claims;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 {

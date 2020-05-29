@@ -26,8 +26,13 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
             );
             SELECT SCOPE_IDENTITY();";
 
-        public static async Task<ContactEntity> FetchContactById(string connectionString, int contactId)
+        public static async Task<ContactEntity> FetchContactById(string connectionString, int? contactId)
         {
+            if (contactId == null)
+            {
+                return null;
+            }
+
             return (await SqlRunner.QueryFirstAsync<ContactEntity>(connectionString, @"SELECT
                           FirstName,
                           LastName,

@@ -41,8 +41,13 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
             );
             SELECT SCOPE_IDENTITY();";
 
-        public static async Task<AddressEntity> FetchAddressById(string connectionString, int addressId)
+        public static async Task<AddressEntity> FetchAddressById(string connectionString, int? addressId)
         {
+            if (addressId == null)
+            {
+                return null;
+            }
+
             return (await SqlRunner.QueryFirstAsync<AddressEntity>(connectionString, @"SELECT
                           Line1,
                           Line2,
