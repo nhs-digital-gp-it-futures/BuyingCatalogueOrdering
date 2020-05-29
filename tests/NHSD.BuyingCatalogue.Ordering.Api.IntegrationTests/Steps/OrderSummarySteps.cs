@@ -62,7 +62,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             actual.Sections.Should().BeEquivalentTo(expected);
         }
-        
+
+        [Then(@"the order Summary Section (.*) has status (.*)")]
+        public async Task ThenTheOrderSummarySectionsHaveTheFollowingValues(string sectionId,string status)
+        {
+            var response = await _response.ReadBodyAsJsonAsync();
+
+            var actual = new SectionsTable
+            {
+                Sections = response.SelectToken("sections").ToObject<IEnumerable<SectionTable>>()
+            };
+
+            actual.Sections.Should().ContainSingle(s => s.Id == sectionId && s.Status == status);
+        }
+
         private sealed class OrderSummaryTable
         {
             public string OrderId { get; set; }

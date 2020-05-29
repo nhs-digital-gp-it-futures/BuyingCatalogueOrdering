@@ -13,9 +13,8 @@ Background:
         | C000014-02 | A Description | 1             | 05/05/2020 | Fred.robinson@email.com  | 09/05/2020  | 7b195137-6a59-4854-b118-62b39a3101e | 4af62b99-638c-4247-875e-965239cd0c48 |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
-
 @5321
-Scenario: 1. Displaying the order summary, where the order descript section is complete
+Scenario: 1. Displaying the order summary, where the order description section is complete
     When the user makes a request to retrieve the order summary with the ID C000014-01
     Then a response with status code 200 is returned
     And the order summary is returned with the following values
@@ -33,45 +32,25 @@ Scenario: 1. Displaying the order summary, where the order descript section is c
         | additional-services  | incomplete |
         | funding-source       | incomplete |
 
-@7221
+@4621
 Scenario: 2. Displaying the order summary, where the ordering party section is complete
+    Given the order with orderId C000014-02 has a primary contact
     When the user makes a request to retrieve the order summary with the ID C000014-02
     Then a response with status code 200 is returned
     And the order summary is returned with the following values
         | OrderId    | OrganisationId                       | Description   |
         | C000014-02 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
-    And the order Summary Sections have the following values
-        | Id                  | Status     |
-        | description         | complete   |
-        | ordering-party      | complete   |
-        | supplier            | incomplete |
-        | commencement-date   | incomplete |
-        | associated-services | incomplete |
-        | service-recipients  | incomplete |
-        | catalogue-solutions | incomplete |
-        | additional-services | incomplete |
-        | funding-source      | incomplete |
-    And the order with orderId C000014-02 has a primary contact
+    And the order Summary Section ordering-party has status complete
 
-@7221
+@4621
 Scenario: 3. Displaying the order summary, where the ordering party section is incomplete
+    Given the order with orderId C000014-01 does not have a primary contact
     When the user makes a request to retrieve the order summary with the ID C000014-01
     Then a response with status code 200 is returned
     And the order summary is returned with the following values
-        | OrderId    | OrganisationId                       | Description   | 
-        | C000014-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description | 
-    And the order Summary Sections have the following values
-        | Id                  | Status     |
-        | description         | complete   |
-        | ordering-party      | incomplete |
-        | supplier            | incomplete |
-        | commencement-date   | incomplete |
-        | associated-services | incomplete |
-        | service-recipients  | incomplete |
-        | catalogue-solutions | incomplete |
-        | additional-services | incomplete |
-        | funding-source      | incomplete |
-    And the order with orderId C000014-01 does not have a primary contact
+        | OrderId    | OrganisationId                       | Description   |
+        | C000014-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
+    And the order Summary Section ordering-party has status incomplete
 
 @5321
 Scenario: 3. If the order ID does not exist, return not found
