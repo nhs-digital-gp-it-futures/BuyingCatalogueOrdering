@@ -95,36 +95,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            var primaryContact = model.PrimaryContact;
-
-            var contact = new Contact
-            {
-                FirstName = primaryContact.FirstName,
-                LastName = primaryContact.LastName,
-                Email = primaryContact.EmailAddress,
-                Phone = primaryContact.TelephoneNumber
-            };
-
-            order.OrganisationContact = contact;
-
-            var organisationModel = model.Organisation;
-            var addressModel = organisationModel.Address;
-            var address = new Address
-            {
-                Line1 = addressModel.Line1,
-                Line2 = addressModel.Line2,
-                Line3 = addressModel.Line3,
-                Line4 = addressModel.Line4,
-                Line5 = addressModel.Line5,
-                Town = addressModel.Town,
-                County = addressModel.County,
-                Postcode = addressModel.Postcode,
-                Country = addressModel.Country
-            };
-
-            order.OrganisationName = organisationModel.Name;
-            order.OrganisationOdsCode = organisationModel.OdsCode;
-            order.OrganisationAddress = address;
+            order.OrganisationName = model.Organisation.Name;
+            order.OrganisationOdsCode = model.Organisation.OdsCode;
+            order.OrganisationContact.FromModel(model.PrimaryContact); 
+            order.OrganisationAddress.FromModel(model.Organisation.Address);
 
             var name = User.Identity.Name;
             order.SetLastUpdatedBy(User.GetUserId(), name);

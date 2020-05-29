@@ -115,7 +115,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public async Task ThenTheOrderWithOrderIdHasContactData(string orderId, Table table)
         {
             var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
-            var actual = await ContactEntity.FetchContactByContactId(_settings.ConnectionString, order.OrganisationContactId);
+            var actual = await ContactEntity.FetchContactById(_settings.ConnectionString, order.OrganisationContactId);
             table.CompareToInstance<ContactEntity>(actual);
         }
 
@@ -123,7 +123,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public async Task ThenTheOrderWithOrderIdHasOrganisationAddresData(string orderId, Table table)
         {
             var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
-            var actual = await AddressEntity.FetchAddressByAddressId(_settings.ConnectionString, order.OrganisationAddressId);
+            var actual = await AddressEntity.FetchAddressById(_settings.ConnectionString, order.OrganisationAddressId);
             table.CompareToInstance<AddressEntity>(actual);
         }
 
