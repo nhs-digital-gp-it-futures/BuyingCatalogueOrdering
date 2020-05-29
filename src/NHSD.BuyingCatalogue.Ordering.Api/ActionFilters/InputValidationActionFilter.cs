@@ -26,7 +26,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.ActionFilters
             {
                 errors.AddRange(
                     propertyState.Value.Errors.Select(
-                        error => new ErrorModel(propertyState.Key.Split(".").Last(), error.ErrorMessage)));
+                        error => new ErrorModel(error.ErrorMessage, propertyState.Key.Split(".").Last())));
             }
 
             context.Result = new JsonResult(new {errors})
