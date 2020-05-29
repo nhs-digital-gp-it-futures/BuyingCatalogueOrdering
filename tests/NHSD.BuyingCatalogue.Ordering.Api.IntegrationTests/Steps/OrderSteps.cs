@@ -114,9 +114,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Then(@"the order with orderId (.*) is updated and has a primary contact with data")]
         public async Task ThenTheOrderWithOrderIdHasContactData(string orderId, Table table)
         {
+            var expected = table.CreateInstance<ContactEntity>();
+
             var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
             var actual = await ContactEntity.FetchContactById(_settings.ConnectionString, order.OrganisationContactId);
-            table.CompareToInstance<ContactEntity>(actual);
+
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Then(@"the order with orderId (.*) is updated and has a Organisation Address with data")]
