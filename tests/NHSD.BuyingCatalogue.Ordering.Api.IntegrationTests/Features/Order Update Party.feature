@@ -40,6 +40,10 @@ Scenario: 1. Update an ordering party results in persisted data
     And the order with orderId C000014-01 is updated in the database with data
         | OrganisationOdsCode |
         | ODS1                |
+    And the order with orderId C000014-01 is updated in the database with data
+        | LastUpdatedBy                        | LastUpdatedByName |
+        | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
+    And the order with orderId C000014-01 has LastUpdated time present and it is the current time
 
 @4616
 Scenario: 2. A non existent orderId returns not found
