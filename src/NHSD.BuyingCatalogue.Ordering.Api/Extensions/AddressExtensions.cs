@@ -23,5 +23,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
                 Country = address.Country
             };
         }
+
+        internal static void FromModel(this Address address, AddressModel model)
+        {
+            if(address is null)
+                address = new Address();
+
+            address.Line1 = model.Line1;
+            address.Line2 = model.Line2;
+            address.Line3 = model.Line3;
+            address.Line4 = model.Line4;
+            address.Line5 = model.Line5;
+            address.Town = model.Town;
+            address.County = model.County;
+            address.Postcode = model.Postcode;
+            address.Country = model.Country;
+        }
     }
 }

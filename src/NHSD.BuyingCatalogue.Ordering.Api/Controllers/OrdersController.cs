@@ -60,7 +60,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpGet]
         [Route("{orderId}/summary")]
-        public async Task<ActionResult> GetOrderSummaryAsync(string orderId)
+        public async Task<ActionResult<OrderSummaryModel>> GetOrderSummaryAsync(string orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
             
@@ -83,51 +83,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 Description = order.Description.Value,
                 Sections = new List<SectionModel>
                 {
-                    new SectionModel
-                    {
-                        Id = "description",
-                        Status = "complete"
-                    },
-                    new SectionModel
-                    {
-                        Id = "ordering-party",
-                        Status = order.IsOrderPartyComplete() ? "complete" : "incomplete"
-                    },
-                    new SectionModel
-                    {
-                        Id = "supplier",
-                        Status = "incomplete"
-                    },
-                    new SectionModel
-                    {
-                        Id = "commencement-date",
-                        Status = "incomplete"
-                    },
-                    new SectionModel
-                    {
-                        Id = "associated-services",
-                        Status = "incomplete"
-                    },
-                    new SectionModel
-                    {
-                        Id = "service-recipients",
-                        Status = "incomplete"
-                    },
-                    new SectionModel
-                    {
-                        Id = "catalogue-solutions",
-                        Status = "incomplete"
-                    },
-                    new SectionModel
-                    {
-                        Id = "additional-services",
-                        Status = "incomplete"
-                    },
-                    new SectionModel
-                    {
-                        Id = "funding-source",
-                        Status = "incomplete"
-                    }
+                    SectionModel.Description,
+                    SectionModel.OrderingParty.WithStatus(order.IsOrderingPartySectionComplete() ? "complete" : "incomplete"),
+                    SectionModel.Supplier.WithStatus(order.IsSupplierSectionComplete() ? "complete" : "incomplete"),
+                    SectionModel.CommencementDate,
+                    SectionModel.AssociatedServices,
+                    SectionModel.ServiceRecipients,
+                    SectionModel.CatalogueSolutions,
+                    SectionModel.AdditionalServices,
+                    SectionModel.FundingSource
                 }
             });
         }
