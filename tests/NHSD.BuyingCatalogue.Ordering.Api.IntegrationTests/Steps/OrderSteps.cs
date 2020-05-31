@@ -49,6 +49,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 int? supplierAddressId = _context.GetAddressIdByPostcode(ordersTableItem.SupplierAddressPostcode);
                 int? supplierContactId = _context.GetContactIdByEmail(ordersTableItem.SupplierContactEmail);
 
+                DateTime? commencementDate = null;
+                if (ordersTableItem.CommencementDate != DateTime.MinValue)
+                {
+                    commencementDate = ordersTableItem.CommencementDate;
+                }
+
                 var order = OrderEntityBuilder
                     .Create()
                     .WithOrderId(ordersTableItem.OrderId)
@@ -68,6 +74,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithSupplierName(ordersTableItem.SupplierName)
                     .WithSupplierAddressId(supplierAddressId)
                     .WithSupplierContactId(supplierContactId)
+                    .WithCommencementDate(commencementDate)
                     .Build();
 
                 await order.InsertAsync(_settings.ConnectionString);
@@ -208,6 +215,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             public string SupplierContactEmail { get; set; }
 
+            public DateTime CommencementDate { get; set; }
         }
     }
 }
