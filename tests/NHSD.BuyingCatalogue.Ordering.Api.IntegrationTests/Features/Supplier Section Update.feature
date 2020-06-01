@@ -17,10 +17,10 @@ Background:
 
 @4621
 Scenario: 1. Update a supplier section
-    Given the user wants to update the SupplierAddress section for the address
+    Given the user wants to update the supplier address section
         | Line1     | Line2      | Line3       | Line4          | Line5           | Town         | County  | Postcode | Country        |
         | New Line1 | Lower Flat | Rocks Close | Larger Village | Massive Village | Another Town | N Yorks | YO11 1AP | United Kingdom |
-    And the user wants to update the SupplierContact section for the contact
+    And the user wants to update the supplier contact section
         | FirstName | LastName | EmailAddress         | TelephoneNumber |
         | Greg      | Smith    | Greg.smith@email.com | 23456234521     |
     When the user makes a request to update the supplier with order ID C000014-01
@@ -43,10 +43,10 @@ Scenario: 1. Update a supplier section
 
 @4621
 Scenario: 2. Updating a supplier section with boundary values
-    Given the user wants to update the SupplierAddress section for the address
+    Given the user wants to update the supplier address section
         | Line1     | Line2      | Line3       | Line4          | Line5           | Town         | County  | Postcode | Country        |
         | New Line1 | Lower Flat | Rocks Close | Larger Village | Massive Village | Another Town | N Yorks | YO11 1AP | United Kingdom |
-    And the user wants to update the SupplierContact section for the contact
+    And the user wants to update the supplier contact section
         | FirstName                | LastName                 | EmailAddress                  | TelephoneNumber         |
         | #A string of length 100# | #A string of length 100# | #A string of length 251#@.com | #A string of length 35# |
     When the user makes a request to update the supplier with order ID C000014-01

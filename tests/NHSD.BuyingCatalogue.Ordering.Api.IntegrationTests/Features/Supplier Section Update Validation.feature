@@ -17,10 +17,10 @@ Background:
 
 @4621
 Scenario: 1. Updating a supplier section with not filling in required fields produces the relavent error message
-    Given the user wants to update the SupplierAddress section for the address
+    Given the user wants to update the supplier address section
         | Line1     | Line2      | Line3       | Line4          | Line5           | Town         | County  | Postcode | Country        |
         | New Line1 | Lower Flat | Rocks Close | Larger Village | Massive Village | Another Town | N Yorks | YO11 1AP | United Kingdom |
-    And the user wants to update the SupplierContact section for the contact
+    And the user wants to update the supplier contact section
         | FirstName | LastName | EmailAddress | TelephoneNumber |
         | NULL      | NULL     | NULL         | NULL            |
     When the user makes a request to update the supplier with order ID C000014-01
@@ -36,10 +36,10 @@ Scenario: 1. Updating a supplier section with not filling in required fields pro
 
 @4621
 Scenario: 2. Updating a supplier section, and exceeding the maxLength fields, produces the relavent error message
-    Given the user wants to update the SupplierAddress section for the address
+    Given the user wants to update the supplier address section
         | Line1     | Line2      | Line3       | Line4          | Line5           | Town         | County  | Postcode | Country        |
         | New Line1 | Lower Flat | Rocks Close | Larger Village | Massive Village | Another Town | N Yorks | YO11 1AP | United Kingdom |
-    And the user wants to update the SupplierContact section for the contact
+    And the user wants to update the supplier contact section
         | FirstName                | LastName                 | EmailAddress                  | TelephoneNumber         |
         | #A string of length 101# | #A string of length 101# | #A string of length 252#@.com | #A string of length 36# |
     When the user makes a request to update the supplier with order ID C000014-01
@@ -55,10 +55,10 @@ Scenario: 2. Updating a supplier section, and exceeding the maxLength fields, pr
 
 @4621
 Scenario: 3. Updating a supplier section, and not providing a correct email address format, produces the relavent error message
-    Given the user wants to update the SupplierAddress section for the address
+    Given the user wants to update the supplier address section
         | Line1     | Line2      | Line3       | Line4          | Line5           | Town         | County  | Postcode | Country        |
         | New Line1 | Lower Flat | Rocks Close | Larger Village | Massive Village | Another Town | N Yorks | YO11 1AP | United Kingdom |
-    And the user wants to update the SupplierContact section for the contact
+    And the user wants to update the supplier contact section
         | FirstName | LastName | EmailAddress   | TelephoneNumber |
         | Greg      | Smith    | <EmailAddress> | 23456234521     |
     When the user makes a request to update the supplier with order ID C000014-01

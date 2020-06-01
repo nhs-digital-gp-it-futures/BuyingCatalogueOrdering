@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
@@ -161,6 +162,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(supplier);
         }
 
+        [Given(@"the user wants to update the supplier address section")]
+        public void WhenTheUserWantsToUpdateTheSupplierAddressSection(Table table)
+        {
+            var address = table.CreateSet<SupplierAddressTable>().FirstOrDefault();
+            _context[ScenarioContextKeys.SupplierAddress] = address;
+        }
+        
+        [Given(@"the user wants to update the supplier contact section")]
+        public void WhenTheUserWantsToUpdateTheSectionForTheContact(Table table)
+        {
+            var contact = table.CreateSet<ContactTable>().FirstOrDefault();
+            _context[ScenarioContextKeys.SupplierContact] = contact;
+        }
+
         private sealed class SupplierSectionTable
         {
             public string SupplierId { get; set; }
@@ -177,6 +192,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string Email { get; set; }
 
             public string Phone { get; set; }
+        }
+
+        private sealed class ContactTable
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string EmailAddress { get; set; }
+            public string TelephoneNumber { get; set; }
         }
 
         private sealed class SupplierAddressTable
