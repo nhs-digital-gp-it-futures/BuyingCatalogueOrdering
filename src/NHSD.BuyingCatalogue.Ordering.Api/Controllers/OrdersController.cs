@@ -75,7 +75,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            return Ok(new OrderSummaryModel
+            OrderSummaryModel orderSummaryModel = new OrderSummaryModel
             {
                 OrderId = orderId,
                 OrganisationId = order.OrganisationId,
@@ -92,7 +92,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     SectionModel.AdditionalServices,
                     SectionModel.FundingSource
                 }
-            });
+            };
+
+            return Ok(orderSummaryModel);
         }
 
         [HttpPost]

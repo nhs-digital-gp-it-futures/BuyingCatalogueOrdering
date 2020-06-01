@@ -20,7 +20,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
             };
         }
 
-        internal static void FromModel(this Contact contact, PrimaryContactModel model)
+        internal static Contact FromModel(this Contact contact, PrimaryContactModel model)
         {
             if (contact is null)
                 contact = new Contact();
@@ -32,6 +32,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
             contact.LastName = model.LastName;
             contact.Email = model.EmailAddress;
             contact.Phone = model.TelephoneNumber;
+
+            return contact;
         }
     }
 }

@@ -25,7 +25,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
             };
         }
 
-        internal static void FromModel(this Address address, AddressModel model)
+        internal static Address FromModel(this Address address, AddressModel model)
         {
             if(address is null)
                 address = new Address();
@@ -42,6 +42,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
             address.County = model.County;
             address.Postcode = model.Postcode;
             address.Country = model.Country;
+
+            return address;
         }
     }
 }

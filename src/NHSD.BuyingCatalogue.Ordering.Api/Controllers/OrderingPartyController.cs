@@ -95,8 +95,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             order.OrganisationName = model.Name;
             order.OrganisationOdsCode = model.OdsCode;
-            order.OrganisationContact.FromModel(model.PrimaryContact);
-            order.OrganisationAddress.FromModel(model.Address);
+            order.OrganisationContact = order.OrganisationContact.FromModel(model.PrimaryContact);
+            order.OrganisationAddress = order.OrganisationAddress.FromModel(model.Address);
 
             var name = User.Identity.Name;
             order.SetLastUpdatedBy(User.GetUserId(), name);
