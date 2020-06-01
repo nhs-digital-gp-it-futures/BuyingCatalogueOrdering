@@ -27,7 +27,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             _settings = settings;
             _context = context;
 
-            _orderCommencementDateUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/commencement-date";
+            _orderCommencementDateUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/commencement-date";
         }
 
         [When(@"the user makes a request to retrieve the order commencement date section with the ID (.*)")]

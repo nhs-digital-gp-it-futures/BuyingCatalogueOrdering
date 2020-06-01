@@ -9,7 +9,7 @@ using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
-    [Route("api/v1/orders/{orderId}/commencement-date")]
+    [Route("api/v1/orders/{orderId}/sections/commencement-date")]
     [ApiController]
     [Produces("application/json")]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
