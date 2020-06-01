@@ -15,8 +15,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
                 OrganisationId = Guid.NewGuid(),
                 OrganisationName = "Organisation Name",
                 OrganisationOdsCode = "Ods Code",
-                OrganisationAddress = new Address { AddressId = 1, Line1 = "Line1", Line2 = "Line2", Line3 = "Line3", Town = "Leeds",County = "W Yorks", Postcode = "LS1 123", Country = "W YORKS"},
-                OrganisationContact = new Contact { ContactId = 1, FirstName = "Fred", LastName = "Robinson", Email = "f@emai.com", Phone = "12345678912"},
+                OrganisationAddress = AddressBuilder.Create().WithLine1("1 Some Ordering Party").Build(),
                 Created = DateTime.UtcNow,
                 LastUpdated = DateTime.UtcNow,
                 LastUpdatedBy = Guid.NewGuid(),
@@ -24,18 +23,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
                 OrderStatus = new OrderStatus() { OrderStatusId = 1, Name = "Submitted" },
                 SupplierId = "Some supplier id",
                 SupplierName = "Some supplier name",
-                SupplierAddress = new Address
-                {
-                    Line1 = "Some address line one",
-                    Postcode = "LS1 1SX"
-                },
-                SupplierContact = new Contact
-                {
-                    FirstName = "Sam",
-                    LastName = "Smith",
-                    Email = "sam.smith@email.com",
-                    Phone = "0123456789"
-                }
+                SupplierAddress = AddressBuilder.Create().WithLine1("1 Some Supplier").Build()
             };
             _order.SetDescription(OrderDescription.Create("Some Description").Value);
         }
@@ -89,13 +77,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _order.OrderStatus = orderStatus;
             return this;
         }
-        
+
         internal OrderBuilder WithOrganisationContact(Contact organisationContact)
         {
             _order.OrganisationContact = organisationContact;
             return this;
         }
-        
+
         internal OrderBuilder WithSupplierId(string supplierId)
         {
             _order.SupplierId = supplierId;
@@ -117,6 +105,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         internal OrderBuilder WithSupplierContact(Contact supplierContact)
         {
             _order.SupplierContact = supplierContact;
+            return this;
+        }
+
+        internal OrderBuilder WithCommencementDate(DateTime? commencementDate)
+        {
+            _order.CommencementDate = commencementDate;
             return this;
         }
 

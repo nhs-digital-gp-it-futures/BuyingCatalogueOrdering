@@ -186,8 +186,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .Create()
                 .WithOrderId(orderId)
                 .WithOrganisationId(organisationId)
-                .WithOrganisationContact(hasOrganisationContact ? new Contact { ContactId = 1, FirstName = "Fred", LastName = "Robinson", Email = "f@emai.com", Phone = "12345678912" } : null)
+                .WithOrganisationContact(hasOrganisationContact ? ContactBuilder.Create().Build() : null)
                 .Build();
+
+            var orderingPartyAddress = repositoryOrder.OrganisationAddress;
 
             return (order: repositoryOrder,
                 expectedOrderingParty: new OrderingPartyModel
@@ -196,17 +198,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     OdsCode = repositoryOrder.OrganisationOdsCode,
                     Address = new AddressModel
                     {
-                        Line1 = repositoryOrder.OrganisationAddress.Line1,
-                        Line2 = repositoryOrder.OrganisationAddress.Line2,
-                        Line3 = repositoryOrder.OrganisationAddress.Line3,
-                        Line4 = repositoryOrder.OrganisationAddress.Line4,
-                        Line5 = repositoryOrder.OrganisationAddress.Line5,
-                        Town = repositoryOrder.OrganisationAddress.Town,
-                        County = repositoryOrder.OrganisationAddress.County,
-                        Postcode = repositoryOrder.OrganisationAddress.Postcode,
-                        Country = repositoryOrder.OrganisationAddress.Country
+                        Line1 = orderingPartyAddress.Line1,
+                        Line2 = orderingPartyAddress.Line2,
+                        Line3 = orderingPartyAddress.Line3,
+                        Line4 = orderingPartyAddress.Line4,
+                        Line5 = orderingPartyAddress.Line5,
+                        Town = orderingPartyAddress.Town,
+                        County = orderingPartyAddress.County,
+                        Postcode = orderingPartyAddress.Postcode,
+                        Country = orderingPartyAddress.Country
                     },
-                    PrimaryContact = repositoryOrder.OrganisationContact is null ? null : new PrimaryContactModel
+                    PrimaryContact = !hasOrganisationContact ? null : new PrimaryContactModel
                     {
                         FirstName = repositoryOrder.OrganisationContact.FirstName,
                         LastName = repositoryOrder.OrganisationContact.LastName,

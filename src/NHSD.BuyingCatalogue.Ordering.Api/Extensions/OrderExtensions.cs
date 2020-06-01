@@ -13,5 +13,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
         {
             return order?.SupplierContact != null;
         }
+
+        public static bool IsCommencementDateSectionComplete(this Order order)
+        {
+            return order?.CommencementDate != null;
+        }
     }
 }

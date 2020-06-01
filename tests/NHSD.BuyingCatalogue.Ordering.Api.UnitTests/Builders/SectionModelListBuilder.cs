@@ -5,10 +5,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
     internal sealed class SectionModelListBuilder
     {
-        private readonly SectionModel _description;
+        private SectionModel _description;
         private SectionModel _orderingParty;
         private SectionModel _supplier;
-        private readonly SectionModel _commencementDate;
+        private SectionModel _commencementDate;
         private readonly SectionModel _associatedServices;
         private readonly SectionModel _serviceRecipients;
         private readonly SectionModel _catalogueSolutions;
@@ -33,15 +33,27 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return new SectionModelListBuilder();
         }
 
-        public SectionModelListBuilder WithSupplier(SectionModel supplier)
+        public SectionModelListBuilder WithDescription(SectionModel description)
         {
-            _supplier = supplier;
+            _description = description;
             return this;
         }
 
         public SectionModelListBuilder WithOrderingParty(SectionModel orderingParty)
         {
             _orderingParty = orderingParty;
+            return this;
+        }
+
+        public SectionModelListBuilder WithSupplier(SectionModel supplier)
+        {
+            _supplier = supplier;
+            return this;
+        }
+
+        public SectionModelListBuilder WithCommencementDate(SectionModel commencementDate)
+        {
+            _commencementDate = commencementDate;
             return this;
         }
 
