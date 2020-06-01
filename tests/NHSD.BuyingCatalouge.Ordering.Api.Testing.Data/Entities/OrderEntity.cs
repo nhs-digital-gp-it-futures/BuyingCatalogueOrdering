@@ -61,8 +61,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 SupplierName,
                 CommencementDate,
                 SupplierAddressId,
-                SupplierContactId,
-                CommencementDate
+                SupplierContactId
             )
             VALUES
             (
@@ -83,8 +82,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 @SupplierName,
                 @CommencementDate,
                 @SupplierAddressId,
-                @SupplierContactId,
-                @CommencementDate
+                @SupplierContactId
             );";
 
         public static async Task<OrderEntity> FetchOrderByOrderId(string connectionString, string orderId)
