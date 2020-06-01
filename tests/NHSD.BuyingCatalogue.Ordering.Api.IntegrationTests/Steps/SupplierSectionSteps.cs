@@ -1,7 +1,7 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using NUnit.Framework;
@@ -105,8 +105,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var supplierTable = table.CreateInstance<SupplierSectionTable>();
             
-            _context.TryGetValue("SupplierAddress", out var address);
-            _context.TryGetValue("SupplierContact", out var contact);
+            _context.TryGetValue(ScenarioContextKeys.SupplierAddress, out var address);
+            _context.TryGetValue(ScenarioContextKeys.SupplierContact, out var contact);
 
             var data = new
             {
