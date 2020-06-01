@@ -132,6 +132,12 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             return this;
         }
 
+        public OrderEntityBuilder WithCommencementDate(DateTime? commencementDate)
+        {
+            _orderEntity.CommencementDate = commencementDate;
+            return this;
+        }
+
         public OrderEntity Build()
         {
             return _orderEntity;

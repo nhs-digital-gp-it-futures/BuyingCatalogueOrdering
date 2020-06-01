@@ -23,9 +23,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpGet]
-        public ActionResult Get()
+        public async Task<ActionResult> Get(string orderId)
         {
-            var result = new CommencementDateModel { CommencementDate = DateTime.UtcNow };
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            if (order is null)
+            {
+                return NotFound();
+            }
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
+            var result = new CommencementDateModel { CommencementDate = order.CommencementDate };
 
             return Ok(result);
         }

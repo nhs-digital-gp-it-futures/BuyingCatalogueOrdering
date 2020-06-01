@@ -59,6 +59,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 LastUpdatedByName,
                 SupplierId,
                 SupplierName,
+                CommencementDate,
                 SupplierAddressId,
                 SupplierContactId
             )
@@ -79,6 +80,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 @LastUpdatedByName,
                 @SupplierId,
                 @SupplierName,
+                @CommencementDate,
                 @SupplierAddressId,
                 @SupplierContactId
             );";

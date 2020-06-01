@@ -82,6 +82,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithSupplierName(ordersTableItem.SupplierName)
                     .WithSupplierAddressId(supplierAddressId)
                     .WithSupplierContactId(supplierContactId)
+                    .WithCommencementDate(ordersTableItem.CommencementDate)
                     .Build();
 
                 await order.InsertAsync(_settings.ConnectionString);
@@ -221,6 +222,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string SupplierAddressPostcode { get; set; }
 
             public string SupplierContactEmail { get; set; }
+
+            public DateTime? CommencementDate { get; set; }
 
         }
     }

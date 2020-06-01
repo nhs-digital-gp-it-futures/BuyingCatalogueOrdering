@@ -63,6 +63,53 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             result.Should().BeOfType<NotFoundResult>();
         }
 
+        [Test]
+        public async Task Get_WithCommencementDate_ReturnsOkResult()
+        {
+            var context = CommencementDateControllerTestContext.Setup();
+            context.Order.CommencementDate = DateTime.Now;
+            var result = await context.Controller.Get("myOrder");
+            result.Should().BeOfType<OkObjectResult>();
+
+            var okResult = result as OkObjectResult;
+            okResult.Value.Should().BeOfType<CommencementDateModel>();
+            var model = okResult.Value as CommencementDateModel;
+            model.CommencementDate.Should().Be(context.Order.CommencementDate);
+        }
+
+        [Test]
+        public async Task Get_NullCommencementDate_ReturnsOkResult()
+        {
+            var context = CommencementDateControllerTestContext.Setup();
+            context.Order.CommencementDate = null;
+            var result = await context.Controller.Get("myOrder");
+            result.Should().BeOfType<OkObjectResult>();
+
+            var okResult = result as OkObjectResult;
+            okResult.Value.Should().BeOfType<CommencementDateModel>();
+            var model = okResult.Value as CommencementDateModel;
+            model.CommencementDate.Should().Be(context.Order.CommencementDate);
+        }
+
+        [Test]
+        public async Task Get_OrderNotFound_ReturnsNotFound()
+        {
+            var context = CommencementDateControllerTestContext.Setup();
+            context.Order = null;
+            var result = await context.Controller.Get("myOrder");
+            result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        public async Task Get_InvalidPrimaryOrganisationId_ReturnsForbid()
+        {
+            var context = CommencementDateControllerTestContext.Setup();
+            context.Order.OrganisationId = Guid.NewGuid();
+            context.Order.CommencementDate = DateTime.Now;
+            var result = await context.Controller.Get("myOrder");
+            result.Should().BeOfType<ForbidResult>();
+        }
+
         private sealed class CommencementDateControllerTestContext
         {
             private CommencementDateControllerTestContext()
