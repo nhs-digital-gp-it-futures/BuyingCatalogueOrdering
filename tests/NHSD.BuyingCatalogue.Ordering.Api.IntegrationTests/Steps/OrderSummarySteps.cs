@@ -64,7 +64,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Then(@"the order Summary Section (.*) has status (.*)")]
-        public async Task ThenTheOrderSummarySectionsHaveTheFollowingValues(string sectionId,string status)
+        public async Task ThenTheOrderSummarySectionHasTheValue(string sectionId, string status)
         {
             var response = await _response.ReadBodyAsJsonAsync();
 
