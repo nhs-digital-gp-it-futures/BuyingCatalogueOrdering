@@ -1,6 +1,6 @@
 ﻿CREATE TABLE dbo.[Order]
 (
-    OrderId NVARCHAR(10) NOT NULL PRIMARY KEY,
+    OrderId NVARCHAR(10) NOT NULL,
     [Description] NVARCHAR(100) NOT NULL,
     OrganisationId UNIQUEIDENTIFIER NOT NULL,
     OrganisationName NVARCHAR(256) NULL,
@@ -19,6 +19,7 @@
     LastUpdatedBy UNIQUEIDENTIFIER NOT NULL,
     LastUpdatedByName NVARCHAR(256) NULL,
     
+    CONSTRAINT PK_OrderId PRIMARY KEY (OrderId),
     CONSTRAINT FK_Order_OrderStatus FOREIGN KEY (OrderStatusId) REFERENCES OrderStatus (OrderStatusId),
     CONSTRAINT FK_Order_OrganisationAddress FOREIGN KEY (OrganisationAddressId) REFERENCES [Address] (AddressId),
     CONSTRAINT FK_Order_OrganisationBillingAddress FOREIGN KEY (OrganisationBillingAddressId) REFERENCES [Address] (AddressId),
