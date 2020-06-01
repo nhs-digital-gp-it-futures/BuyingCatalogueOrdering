@@ -4,5 +4,4 @@
     [Name] NVARCHAR(30) NULL,
 
     CONSTRAINT PK_OrderStatusId PRIMARY KEY (OrderStatusId)
-
 )
