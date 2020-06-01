@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Assist;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 {
@@ -12,18 +14,41 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     internal sealed class CommencementDateSteps
     {
         private readonly Request _request;
+        private readonly Response _response;
         private readonly Settings _settings;
 
         private readonly string _orderCommencementDateUrl;
         private readonly ScenarioContext _context;
 
-        public CommencementDateSteps(Request request, Settings settings, ScenarioContext context)
+        public CommencementDateSteps(Request request, Response response, Settings settings, ScenarioContext context)
         {
             _request = request;
+            _response = response;
             _settings = settings;
             _context = context;
 
             _orderCommencementDateUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/commencement-date";
+        }
+
+        [When(@"the user makes a request to retrieve the order commencement date section with the ID (.*)")]
+        public async Task WhenAGetRequestIsMadeForAnOrdersCommencementDateWithOrderId(string orderId)
+        {
+            await _request.GetAsync(string.Format(_orderCommencementDateUrl, orderId));
+        }
+
+        [Then(@"the order commencement date is returned")]
+        public async Task ThenTheOrderCommencementDateIsReturned(Table table)
+        {
+            var expected = table.CreateSet<CommencementDateTable>().FirstOrDefault();
+
+            var response = await _response.ReadBodyAsJsonAsync();
+
+            var actual = new CommencementDateTable
+            {
+                CommencementDate = response.Value<DateTime?>("commencementDate")
+            };
+
+            actual.Should().BeEquivalentTo(expected);
         }
 
         [Given(@"the user sets the commencement date to today")]
@@ -82,6 +107,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var actual = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
             actual.CommencementDate.HasValue.Should().BeTrue();
             actual.CommencementDate.Value.Date.Should().Be(DateTime.Today.Date - TimeSpan.FromDays(days));
+        }
+
+        private sealed class CommencementDateTable
+        {
+            public DateTime? CommencementDate { get; set; }
         }
     }
 }
