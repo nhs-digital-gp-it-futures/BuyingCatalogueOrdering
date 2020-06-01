@@ -120,6 +120,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _request.PutJsonAsync(string.Format(_orderingPartyUrl, orderId), payload);
         }
 
+        [When(@"the user makes a request to update the order party with order ID (.*) with no model")]
+        public async Task WhenTheUserMakesARequestToUpdateTheOrderPartyWithOrderIdWithNoModel(string orderId)
+        {
+            await _request.PutJsonAsync(string.Format(_orderingPartyUrl, orderId), null);
+        }
+
         [Then(@"the ordering-party is returned")]
         public async Task ThenTheOrdering_PartyOrganisationIsReturned(Table table)
         {

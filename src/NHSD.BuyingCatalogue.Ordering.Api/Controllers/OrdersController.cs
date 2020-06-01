@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +18,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]
-    [Produces("application/json")]
+    [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class OrdersController : Controller
     {
@@ -25,7 +26,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         private readonly ICreateOrderService _createOrderService;
 
         public OrdersController(
-            IOrderRepository orderRepository,
+            IOrderRepository orderRepository, 
             ICreateOrderService createOrderService)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
@@ -96,6 +97,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult<CreateOrderResponseModel>> CreateOrderAsync([FromBody][Required] CreateOrderModel order)
         {
             if (order is null)

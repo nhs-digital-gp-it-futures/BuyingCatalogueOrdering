@@ -7,7 +7,6 @@ using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
-using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -51,6 +50,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpPut]
+        [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult> UpdateAsync(string orderId, SupplierModel model)
         {
             if (model is null)

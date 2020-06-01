@@ -116,7 +116,21 @@ Scenario: 6. A buyer user cannot update a supplier section for an organisation t
     Then a response with status code 403 is returned
 
 @4621
-Scenario: 7. Service Failure
+Scenario: 7. A user with read only permissions cannot update a supplier section
+    Given the user is logged in with the Readonly-Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
+    Given the user wants to update the SupplierAddress section for the address
+        | Line1     | Line2      | Line3       | Line4          | Line5           | Town         | County  | Postcode | Country        |
+        | New Line1 | Lower Flat | Rocks Close | Larger Village | Massive Village | Another Town | N Yorks | YO11 1AP | United Kingdom |
+    And the user wants to update the SupplierContact section for the contact
+        | FirstName | LastName | EmailAddress         | TelephoneNumber |
+        | Greg      | Smith    | Greg.smith@email.com | 23456234521     |
+    When the user makes a request to update the supplier with order ID C000014-01
+        | SupplierId | SupplierName     |
+        | Sup3       | Updated Supplier |
+    Then a response with status code 403 is returned
+
+@4621
+Scenario: 8. Service Failure
     Given the call to the database will fail
     Given the user wants to update the SupplierAddress section for the address
         | Line1     | Line2      | Line3       | Line4          | Line5           | Town         | County  | Postcode | Country        |
