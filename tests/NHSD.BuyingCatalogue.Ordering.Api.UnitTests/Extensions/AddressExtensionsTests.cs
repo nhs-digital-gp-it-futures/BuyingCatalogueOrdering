@@ -15,8 +15,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         [Test]
         public void ToModel_NullAddress_ReturnsNull()
         {
-            Address address = null;
-            address.ToModel().Should().BeNull();
+            AddressExtensions.ToModel(null).Should().BeNull();
         }
 
         [Test]
@@ -71,18 +70,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         {
             Address address = AddressBuilder
                 .Create()
-                .WithLine1(Guid.NewGuid().ToString())
-                .WithLine2(Guid.NewGuid().ToString())
-                .WithLine3(Guid.NewGuid().ToString())
-                .WithLine4(Guid.NewGuid().ToString())
-                .WithLine5(Guid.NewGuid().ToString())
-                .WithTown(Guid.NewGuid().ToString())
-                .WithCounty(Guid.NewGuid().ToString())
-                .WithPostcode(Guid.NewGuid().ToString())
-                .WithCountry(Guid.NewGuid().ToString())
                 .Build();
 
-            AddressModel expected = new AddressModel
+            AddressModel inputAddressModel = new AddressModel
             {
                 Line1 = Guid.NewGuid().ToString(),
                 Line2 = Guid.NewGuid().ToString(),
@@ -95,9 +85,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
                 Country = Guid.NewGuid().ToString()
             };
 
-            address.FromModel(expected);
+            var actualAddress = address.FromModel(inputAddressModel);
 
-            address.Should().BeEquivalentTo(expected);
+            actualAddress.Should().BeEquivalentTo(inputAddressModel);
+        }
+
+        [Test]
+        public void FromModel_NullAddress_ReturnsNewAddress()
+        {
+            var addressModel = new AddressModel();
+
+            var actualAddress = AddressExtensions.FromModel(null, addressModel);
+
+            actualAddress.Should().NotBeNull();
         }
     }
 }

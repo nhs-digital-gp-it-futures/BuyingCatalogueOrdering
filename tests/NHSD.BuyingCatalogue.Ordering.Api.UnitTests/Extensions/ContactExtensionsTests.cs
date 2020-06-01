@@ -15,8 +15,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         [Test]
         public void ToModel_NullContact_ReturnsNull()
         {
-            Contact contact = null;
-            contact.ToModel().Should().BeNull();
+            ContactExtensions.ToModel(null).Should().BeNull();
         }
 
         [Test]
@@ -61,13 +60,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         {
             Contact contact = ContactBuilder
                 .Create()
-                .WithFirstName(Guid.NewGuid().ToString())
-                .WithLastName(Guid.NewGuid().ToString())
-                .WithEmail(Guid.NewGuid().ToString())
-                .WithPhone(Guid.NewGuid().ToString())
                 .Build();
 
-            PrimaryContactModel updatedModel = new PrimaryContactModel
+            PrimaryContactModel inputPrimaryContactModel = new PrimaryContactModel
             {
                 FirstName = Guid.NewGuid().ToString(),
                 LastName = Guid.NewGuid().ToString(),
@@ -75,12 +70,27 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
                 TelephoneNumber = Guid.NewGuid().ToString()
             };
 
-            contact.FromModel(updatedModel);
+            var actualContact = contact.FromModel(inputPrimaryContactModel);
 
-            contact.FirstName.Should().BeEquivalentTo(updatedModel.FirstName);
-            contact.LastName.Should().BeEquivalentTo(updatedModel.LastName);
-            contact.Email.Should().BeEquivalentTo(updatedModel.EmailAddress);
-            contact.Phone.Should().BeEquivalentTo(updatedModel.TelephoneNumber);
+            Contact expectedContact = ContactBuilder
+                .Create()
+                .WithFirstName(inputPrimaryContactModel.FirstName)
+                .WithLastName(inputPrimaryContactModel.LastName)
+                .WithEmail(inputPrimaryContactModel.EmailAddress)
+                .WithPhone(inputPrimaryContactModel.TelephoneNumber)
+                .Build();
+
+            actualContact.Should().BeEquivalentTo(expectedContact);
+        }
+
+        [Test]
+        public void FromModel_NullContact_ReturnsNewContact()
+        {
+            var primaryContactModel = new PrimaryContactModel();
+
+            var actualContact = ContactExtensions.FromModel(null, primaryContactModel);
+
+            actualContact.Should().NotBeNull();
         }
     }
 }
