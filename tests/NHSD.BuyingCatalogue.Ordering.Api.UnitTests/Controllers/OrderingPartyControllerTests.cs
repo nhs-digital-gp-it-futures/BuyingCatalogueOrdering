@@ -186,7 +186,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .Create()
                 .WithOrderId(orderId)
                 .WithOrganisationId(organisationId)
-                .WithOrganisationContact(hasOrganisationContact ? new Contact { ContactId = 1, FirstName = "Fred", LastName = "Robinson", Email = "f@emai.com", Phone = "12345678912" } : null)
+                .WithOrganisationContact(hasOrganisationContact ? ContactBuilder.Create().Build() : null)
                 .Build();
 
             var orderingPartyAddress = repositoryOrder.OrganisationAddress;
@@ -208,7 +208,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         Postcode = orderingPartyAddress.Postcode,
                         Country = orderingPartyAddress.Country
                     },
-                    PrimaryContact = repositoryOrder.OrganisationContact is null ? null : new PrimaryContactModel
+                    PrimaryContact = !hasOrganisationContact ? null : new PrimaryContactModel
                     {
                         FirstName = repositoryOrder.OrganisationContact.FirstName,
                         LastName = repositoryOrder.OrganisationContact.LastName,

@@ -192,7 +192,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var createOrderRequest = new CreateOrderModel
             {
-                Description = "Test Order 1", OrganisationId = context.PrimaryOrganisationId
+                Description = "Test Order 1",
+                OrganisationId = context.PrimaryOrganisationId
             };
 
             using var controller = context.OrdersController;
@@ -202,7 +203,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var actual = response.Result;
 
             var expectation = new CreatedAtActionResult(nameof(controller.CreateOrderAsync).TrimAsync(), null,
-                new {orderId = newOrderId}, new CreateOrderResponseModel {OrderId = newOrderId});
+                new { orderId = newOrderId }, new CreateOrderResponseModel { OrderId = newOrderId });
 
             actual.Should().BeEquivalentTo(expectation);
         }
@@ -216,7 +217,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var createOrderModel = new CreateOrderModel
             {
-                Description = "Description1", OrganisationId = context.PrimaryOrganisationId
+                Description = "Description1",
+                OrganisationId = context.PrimaryOrganisationId
             };
 
             var response = await controller.CreateOrderAsync(createOrderModel);
@@ -230,11 +232,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = OrdersControllerTestContext.Setup();
             using var controller = context.OrdersController;
 
-            var errors = new List<ErrorDetails> {new ErrorDetails("TestErrorId", "TestField")};
+            var errors = new List<ErrorDetails> { new ErrorDetails("TestErrorId", "TestField") };
 
             var createOrderRequest = new CreateOrderModel
             {
-                Description = "Test Order 1", OrganisationId = context.PrimaryOrganisationId
+                Description = "Test Order 1",
+                OrganisationId = context.PrimaryOrganisationId
             };
 
             context.CreateOrderResult = Result.Failure<string>(errors);
@@ -245,8 +248,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var actual = response.Result;
 
             var expectedErrors =
-                new List<ErrorModel> {new ErrorModel("TestErrorId", "TestField")};
-            var expected = new BadRequestObjectResult(new CreateOrderResponseModel {Errors = expectedErrors});
+                new List<ErrorModel> { new ErrorModel("TestErrorId", "TestField") };
+            var expected = new BadRequestObjectResult(new CreateOrderResponseModel { Errors = expectedErrors });
             actual.Should().BeEquivalentTo(expected);
         }
 
@@ -264,7 +267,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             Assert.ThrowsAsync<ArgumentNullException>(CreateOrder);
         }
 
-        private static (Order order, OrderModel expectedOrder) CreateOrderTestData(string orderId, Guid organisationId,
+        private static (Order order, OrderModel expectedOrder) CreateOrderTestData(
+            string orderId, 
+            Guid organisationId,
             string description)
         {
             var repositoryOrder = OrderBuilder
@@ -352,7 +357,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 {
                     ControllerContext = new ControllerContext
                     {
-                        HttpContext = new DefaultHttpContext {User = ClaimsPrincipal}
+                        HttpContext = new DefaultHttpContext { User = ClaimsPrincipal }
                     }
                 };
             }
