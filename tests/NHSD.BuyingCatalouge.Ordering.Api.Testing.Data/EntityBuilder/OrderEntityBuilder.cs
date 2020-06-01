@@ -22,7 +22,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
                 LastUpdatedByName = "Alice Smith",
                 Created = DateTime.UtcNow,
                 SupplierId = null,
-                SupplierName = null
+                SupplierName = null,
+                CommencementDate = null
             };
         }
 

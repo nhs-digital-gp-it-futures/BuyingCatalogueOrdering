@@ -12,7 +12,6 @@ using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
-using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -25,7 +24,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         private readonly IOrderRepository _orderRepository;
         private readonly ICreateOrderService _createOrderService;
 
-        public OrdersController(IOrderRepository orderRepository , ICreateOrderService createOrderService)
+        public OrdersController(
+            IOrderRepository orderRepository,
+            ICreateOrderService createOrderService)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
             _createOrderService = createOrderService ?? throw new ArgumentNullException(nameof(createOrderService));
@@ -63,8 +64,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         public async Task<ActionResult<OrderSummaryModel>> GetOrderSummaryAsync(string orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
-            
-
             if (order is null)
             {
                 return NotFound();
@@ -86,7 +85,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     SectionModel.Description,
                     SectionModel.OrderingParty.WithStatus(order.IsOrderingPartySectionComplete() ? "complete" : "incomplete"),
                     SectionModel.Supplier.WithStatus(order.IsSupplierSectionComplete() ? "complete" : "incomplete"),
-                    SectionModel.CommencementDate,
+                    SectionModel.CommencementDate.WithStatus(order.IsCommencementDateSectionComplete() ? "complete" : "incomplete"),
                     SectionModel.AssociatedServices,
                     SectionModel.ServiceRecipients,
                     SectionModel.CatalogueSolutions,
