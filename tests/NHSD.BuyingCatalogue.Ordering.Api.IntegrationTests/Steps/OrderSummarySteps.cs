@@ -62,7 +62,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             actual.Sections.Should().BeEquivalentTo(expected);
         }
-
+        
         private sealed class OrderSummaryTable
         {
             public string OrderId { get; set; }
