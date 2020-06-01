@@ -38,6 +38,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             _orderOrganisationsUrl = _settings.OrderingApiBaseUrl + "/api/v1/organisations/{0}/orders";
         }
 
+        [Given(@"the order with orderId (.*) has a primary contact")]
+        public async Task ThenTheOrderHasAPrimaryContact(string orderId)
+        {
+            var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
+            order.OrganisationContactId.Should().NotBeNull();
+        }
+
+        [Given(@"the order with orderId (.*) does not have a primary contact")]
+        public async Task ThenTheOrderDoesNotHaveAPrimaryContact(string orderId)
+        {
+            var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
+            order.OrganisationContactId.Should().BeNull();
+        }
+
         [Given(@"Orders exist")]
         public async Task GivenOrdersExist(Table table)
         {
