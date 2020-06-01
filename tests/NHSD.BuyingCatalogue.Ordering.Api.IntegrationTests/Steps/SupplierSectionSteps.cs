@@ -165,14 +165,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Given(@"the user wants to update the supplier address section")]
         public void WhenTheUserWantsToUpdateTheSupplierAddressSection(Table table)
         {
-            var address = table.CreateSet<SupplierAddressTable>().FirstOrDefault();
+            var address = table.CreateInstance<SupplierAddressTable>();
             _context[ScenarioContextKeys.SupplierAddress] = address;
         }
         
         [Given(@"the user wants to update the supplier contact section")]
         public void WhenTheUserWantsToUpdateTheSectionForTheContact(Table table)
         {
-            var contact = table.CreateSet<ContactTable>().FirstOrDefault();
+            var contact = table.CreateInstance<ContactTable>();
             _context[ScenarioContextKeys.SupplierContact] = contact;
         }
 
