@@ -79,7 +79,6 @@ Scenario: 3. Get the order summary when the order has a primary supplier contact
         | funding-source      | incomplete |
 
 @4619
-@ignore
 Scenario: 4. Get the order summary when the order has a commencement date
     Given Orders exist
         | OrderId    | Description   | OrganisationId                       | CommencementDate |
