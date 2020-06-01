@@ -82,7 +82,7 @@ Scenario: 8. A buyer user cannot update an orders description for an organisatio
     Then a response with status code 403 is returned
 
 @5322
-Scenario: 9. A user with read only permissions, cannot updated an orders description
+Scenario: 9. A user with read only permissions, cannot update an orders description
     Given the user is logged in with the Readonly-Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
     When the user makes a request to update the description with the ID C000014-01
         | Description         |

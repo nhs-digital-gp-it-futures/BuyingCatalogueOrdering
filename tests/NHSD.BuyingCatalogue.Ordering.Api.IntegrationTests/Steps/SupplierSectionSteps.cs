@@ -104,15 +104,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public async Task WhenTheUserMakesARequestToUpdateTheSupplierWithOrderId(string orderId, Table table)
         {
             var supplierTable = table.CreateInstance<SupplierSectionTable>();
-            var addressTable = _context["SupplierAddress"];
-            var contactTable = _context["SupplierContact"];
+            
+            _context.TryGetValue("SupplierAddress", out var address);
+            _context.TryGetValue("SupplierContact", out var contact);
 
             var data = new
             {
                 supplierTable.SupplierId,
                 Name = supplierTable.SupplierName,
-                Address = addressTable,
-                PrimaryContact = contactTable
+                Address = address,
+                PrimaryContact = contact
             };
 
             await _request.PutJsonAsync(string.Format(_orderSupplierSectionUrl, orderId), data);
