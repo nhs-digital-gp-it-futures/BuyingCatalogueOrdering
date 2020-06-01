@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -16,6 +14,7 @@ using NUnit.Framework;
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
+    [Parallelizable(ParallelScope.All)]
     internal sealed class CommencementDateControllerTests
     {
         [Test]
@@ -63,12 +62,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             result.Should().BeOfType<NotFoundResult>();
         }
 
-        [Test]
-        public async Task Get_WithCommencementDate_ReturnsOkResult()
+        [TestCase("01/20/2012")]
+        [TestCase(null)]
+        public async Task GetAsync_WithCommencementDate_ReturnsOkResult(DateTime? commencementDate)
         {
             var context = CommencementDateControllerTestContext.Setup();
-            context.Order.CommencementDate = DateTime.Now;
-            var result = await context.Controller.Get("myOrder");
+            context.Order.CommencementDate = commencementDate;
+            var result = await context.Controller.GetAsync("myOrder");
             result.Should().BeOfType<OkObjectResult>();
 
             var okResult = result as OkObjectResult;
@@ -78,36 +78,28 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task Get_NullCommencementDate_ReturnsOkResult()
-        {
-            var context = CommencementDateControllerTestContext.Setup();
-            context.Order.CommencementDate = null;
-            var result = await context.Controller.Get("myOrder");
-            result.Should().BeOfType<OkObjectResult>();
-
-            var okResult = result as OkObjectResult;
-            okResult.Value.Should().BeOfType<CommencementDateModel>();
-            var model = okResult.Value as CommencementDateModel;
-            model.CommencementDate.Should().Be(context.Order.CommencementDate);
-        }
-
-        [Test]
-        public async Task Get_OrderNotFound_ReturnsNotFound()
+        public async Task GetAsync_OrderNotFound_ReturnsNotFound()
         {
             var context = CommencementDateControllerTestContext.Setup();
             context.Order = null;
-            var result = await context.Controller.Get("myOrder");
+            var result = await context.Controller.GetAsync("myOrder");
             result.Should().BeOfType<NotFoundResult>();
         }
 
         [Test]
-        public async Task Get_InvalidPrimaryOrganisationId_ReturnsForbid()
+        public async Task GetAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
         {
             var context = CommencementDateControllerTestContext.Setup();
             context.Order.OrganisationId = Guid.NewGuid();
             context.Order.CommencementDate = DateTime.Now;
-            var result = await context.Controller.Get("myOrder");
+            var result = await context.Controller.GetAsync("myOrder");
             result.Should().BeOfType<ForbidResult>();
+        }
+
+        [Test]
+        public void Ctor_NullRepository_ThrowsException()
+        {
+            Assert.Throws<ArgumentNullException>(() => new CommencementDateController(null));
         }
 
         private sealed class CommencementDateControllerTestContext

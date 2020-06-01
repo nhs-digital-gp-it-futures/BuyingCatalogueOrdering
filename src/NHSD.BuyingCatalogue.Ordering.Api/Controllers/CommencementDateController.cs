@@ -23,7 +23,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> Get(string orderId)
+        public async Task<ActionResult> GetAsync(string orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
