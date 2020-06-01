@@ -53,34 +53,22 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var expected = table.CreateSet<SectionTable>();
 
-            var actual = await GetSectionsTableAsync();
-
-            actual.Sections.Should().BeEquivalentTo(expected);
-        }
-
-        [Then(@"the response contains these complete order summary (.*)")]
-        public async Task ThenTheResponseContainsTheseCompleteOrderSummarySections(string sections)
-        {
-            var sectionsTable = await GetSectionsTableAsync();
-
-
-        }
-
-        private async Task<SectionsTable> GetSectionsTableAsync()
-        {
             var response = await _response.ReadBodyAsJsonAsync();
 
             var actual = new SectionsTable
             {
                 Sections = response.SelectToken("sections").ToObject<IEnumerable<SectionTable>>()
             };
-            return actual;
+
+            actual.Sections.Should().BeEquivalentTo(expected);
         }
 
         private sealed class OrderSummaryTable
         {
             public string OrderId { get; set; }
+
             public Guid OrganisationId { get; set; }
+
             public string Description { get; set; }
         }
 
