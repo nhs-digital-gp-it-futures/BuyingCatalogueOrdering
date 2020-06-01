@@ -1,5 +1,8 @@
 ﻿CREATE TABLE dbo.OrderStatus
 (
-    OrderStatusId INT IDENTITY(1,1) PRIMARY KEY, 
-    [Name] NVARCHAR(30) NULL
+    OrderStatusId INT IDENTITY(1,1), 
+    [Name] NVARCHAR(30) NULL,
+
+    CONSTRAINT PK_OrderStatusId PRIMARY KEY (OrderStatusId)
+
 )
