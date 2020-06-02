@@ -65,13 +65,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected);
         }
 
-        [Given(@"the user wants to update the (.*) section for the contact")]
-        public void WhenTheUserWantsToUpdateTheSectionForTheContact(string section, Table table)
-        {
-            var contact = table.CreateSet<ContactTable>().FirstOrDefault();
-            _context[section] = contact;
-        }
-
         private sealed class ContactTable
         {
             public string FirstName { get; set; }

@@ -74,6 +74,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpPut]
+        [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult> UpdateAsync(string orderId, OrderingPartyModel model)
         {
             if (model is null)

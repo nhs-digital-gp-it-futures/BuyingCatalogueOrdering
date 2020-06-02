@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using NUnit.Framework;
@@ -104,15 +105,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public async Task WhenTheUserMakesARequestToUpdateTheSupplierWithOrderId(string orderId, Table table)
         {
             var supplierTable = table.CreateInstance<SupplierSectionTable>();
-            var addressTable = _context["SupplierAddress"];
-            var contactTable = _context["SupplierContact"];
+            
+            _context.TryGetValue(ScenarioContextKeys.SupplierAddress, out var address);
+            _context.TryGetValue(ScenarioContextKeys.SupplierContact, out var contact);
 
             var data = new
             {
                 supplierTable.SupplierId,
                 Name = supplierTable.SupplierName,
-                Address = addressTable,
-                PrimaryContact = contactTable
+                Address = address,
+                PrimaryContact = contact
             };
 
             await _request.PutJsonAsync(string.Format(_orderSupplierSectionUrl, orderId), data);
@@ -160,6 +162,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(supplier);
         }
 
+        [Given(@"the user wants to update the supplier address section")]
+        public void WhenTheUserWantsToUpdateTheSupplierAddressSection(Table table)
+        {
+            var address = table.CreateInstance<SupplierAddressTable>();
+            _context[ScenarioContextKeys.SupplierAddress] = address;
+        }
+        
+        [Given(@"the user wants to update the supplier contact section")]
+        public void WhenTheUserWantsToUpdateTheSectionForTheContact(Table table)
+        {
+            var contact = table.CreateInstance<ContactTable>();
+            _context[ScenarioContextKeys.SupplierContact] = contact;
+        }
+
         private sealed class SupplierSectionTable
         {
             public string SupplierId { get; set; }
@@ -176,6 +192,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string Email { get; set; }
 
             public string Phone { get; set; }
+        }
+
+        private sealed class ContactTable
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string EmailAddress { get; set; }
+            public string TelephoneNumber { get; set; }
         }
 
         private sealed class SupplierAddressTable

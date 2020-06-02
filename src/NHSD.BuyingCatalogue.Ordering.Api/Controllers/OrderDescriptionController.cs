@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
     [Route("api/v1/orders/{orderId}/sections/description")]
     [ApiController]
-    [Produces("application/json")]
+    [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class OrderDescriptionController : Controller
     {
@@ -49,6 +50,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpPut]
+        [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult> UpdateAsync([FromRoute][Required]string orderId, [FromBody][Required] OrderDescriptionModel model)
         {
             if (model is null)

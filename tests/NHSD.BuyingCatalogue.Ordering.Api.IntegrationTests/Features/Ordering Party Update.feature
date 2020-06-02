@@ -76,30 +76,44 @@ Scenario: 2. Updating an ordering party with boundary values results in persiste
     And the order with orderId C000014-01 has LastUpdated time present and it is the current time
 
 @4616
-Scenario: 3. A non existent orderId returns not found
-    When the user makes a request to retrieve the ordering-party section with the ID INVALID
-    Then a response with status code 404 is returned
+Scenario: 3. Updating an ordering party, with a non existent model returns not found
+    When the user makes a request to update the order party with order ID C000014-01 with no model
+    Then a response with status code 400 is returned
 
 @4616
-Scenario: 4. If a user is not authorised then they cannot access the ordering-party
+Scenario: 4. If a user is not authorised then they cannot update the ordering-party
     Given no user is logged in
-    When the user makes a request to retrieve the ordering-party section with the ID C000014-01
+    And an order party update request exist for order ID C000014-01
+    And the order party update request for order ID C000014-01 has a Name of TestCare Center
+    When the user makes a request to update the order party on the order with the ID C000014-01
     Then a response with status code 401 is returned
 
 @4616
-Scenario: 5. A non buyer user cannot access the ordering-party
+Scenario: 5. A non buyer user cannot update the ordering-party
     Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
-    When the user makes a request to retrieve the ordering-party section with the ID C000014-01
+    And an order party update request exist for order ID C000014-01
+    And the order party update request for order ID C000014-01 has a Name of TestCare Center
+    When the user makes a request to update the order party on the order with the ID C000014-01
     Then a response with status code 403 is returned
 
 @4616
-Scenario: 6. A buyer user cannot access the ordering-party for an organisation they don't belong to
+Scenario: 6. A buyer user cannot update the ordering-party for an organisation they don't belong to
     Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
-    When the user makes a request to retrieve the ordering-party section with the ID C000014-01
+    And an order party update request exist for order ID C000014-01
+    And the order party update request for order ID C000014-01 has a Name of TestCare Center
+    When the user makes a request to update the order party on the order with the ID C000014-01
     Then a response with status code 403 is returned
 
 @4616
-Scenario: 7. Service Failure
+Scenario: 7. A user with read only permissions, cannot update an ordering-party
+    Given the user is logged in with the Readonly-Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
+    And an order party update request exist for order ID C000014-01
+    And the order party update request for order ID C000014-01 has a Name of TestCare Center
+    When the user makes a request to update the order party on the order with the ID C000014-01
+    Then a response with status code 403 is returned
+
+@4616
+Scenario: 8. Service Failure
     Given the call to the database will fail
     When the user makes a request to retrieve the ordering-party section with the ID C000014-01
     Then a response with status code 500 is returned
