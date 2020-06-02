@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using static System.Int32;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -23,13 +22,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
 
         public async Task<IEnumerable<Order>> ListOrdersByOrganisationIdAsync(Guid organisationId)
         {
-            return await _context.Order.Include(x => x.OrderStatus).Where(o => o.OrganisationId == organisationId)
+            return await _context.Order
+                .Include(x => x.OrderStatus)
+                .Include(x => x.OrganisationAddress)
+                .Include(x => x.OrganisationContact)
+                .Include(x => x.SupplierAddress)
+                .Include(x => x.SupplierContact)
+                .Where(o => o.OrganisationId == organisationId)
                 .ToListAsync();
         }
 
         public async Task<Order> GetOrderByIdAsync(string orderId)
         {
-            return await _context.Order.FindAsync(orderId);
+        	if (string.IsNullOrWhiteSpace(orderId))
+            	return null;
+        	
+            var order = await _context.Order.FindAsync(orderId);
+            if (order != null)
+            {
+                await _context.Entry(order).Reference(x => x.OrderStatus).LoadAsync();
+                await _context.Entry(order).Reference(x => x.OrganisationAddress).LoadAsync();
+                await _context.Entry(order).Reference(x => x.OrganisationContact).LoadAsync();
+                await _context.Entry(order).Reference(x => x.SupplierAddress).LoadAsync();
+                await _context.Entry(order).Reference(x => x.SupplierContact).LoadAsync();
+            }
+
+            return order;
         }
 
         public async Task UpdateOrderAsync(Order order)
@@ -56,14 +74,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
                 throw new ArgumentNullException(nameof(order));
             }
 
-            using ( var dbContextTransaction = _context.Database.BeginTransaction())
+            using (var dbContextTransaction = await _context.Database.BeginTransactionAsync())
             {
                 if (order.OrderId == null)
                 {
-                    order.OrderId = await GetIncremenedOrderId();
+                    order.OrderId = await GetIncrementedOrderId();
                 }
 
-                order.OrderStatus = await  _context.OrderStatus.FindAsync(order.OrderStatus.OrderStatusId) ?? order.OrderStatus;
+                order.OrderStatus = await _context.OrderStatus.FindAsync(order.OrderStatus.OrderStatusId) ?? order.OrderStatus;
 
                 _context.Order.Add(order);
                 await _context.SaveChangesAsync();
@@ -73,14 +91,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
             return order.OrderId;
         }
 
-        private async Task<string> GetIncremenedOrderId()
+        private async Task<string> GetIncrementedOrderId()
         {
             var resultOrderId = DefaultOrderId;
             var latestOrderId = await GetLatestOrderIdByCreationDate();
             if (!string.IsNullOrEmpty(latestOrderId))
             {
                 var numberSection = latestOrderId.Substring(1, 6);
-                var orderNumber = Parse(s: numberSection, System.Globalization.CultureInfo.InvariantCulture);
+                var orderNumber = int.Parse(numberSection, CultureInfo.InvariantCulture);
                 resultOrderId = $"C{orderNumber + 1:D6}-01";
             }
             return resultOrderId;

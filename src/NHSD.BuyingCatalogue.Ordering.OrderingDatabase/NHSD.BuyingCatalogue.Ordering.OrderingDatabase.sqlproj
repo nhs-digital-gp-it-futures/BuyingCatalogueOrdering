@@ -72,6 +72,8 @@
   <ItemGroup>
     <Build Include="Tables\OrderStatus.sql" />
     <Build Include="Tables\Order.sql" />
+    <Build Include="Tables\Contact.sql" />
+    <Build Include="Tables\Address.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Deployment\PostDeployment.sql" />

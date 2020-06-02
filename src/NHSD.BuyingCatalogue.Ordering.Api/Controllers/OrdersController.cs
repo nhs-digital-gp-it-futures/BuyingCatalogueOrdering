@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,14 +18,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]
-    [Produces("application/json")]
+    [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class OrdersController : Controller
     {
         private readonly IOrderRepository _orderRepository;
         private readonly ICreateOrderService _createOrderService;
 
-        public OrdersController(IOrderRepository orderRepository , ICreateOrderService createOrderService)
+        public OrdersController(
+            IOrderRepository orderRepository, 
+            ICreateOrderService createOrderService)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
             _createOrderService = createOrderService ?? throw new ArgumentNullException(nameof(createOrderService));
@@ -59,10 +62,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpGet]
         [Route("{orderId}/summary")]
-        public async Task<ActionResult> GetOrderSummaryAsync(string orderId)
+        public async Task<ActionResult<OrderSummaryModel>> GetOrderSummaryAsync(string orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
-
             if (order is null)
             {
                 return NotFound();
@@ -74,63 +76,30 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            return Ok(new OrderSummaryModel
+            OrderSummaryModel orderSummaryModel = new OrderSummaryModel
             {
                 OrderId = orderId,
                 OrganisationId = order.OrganisationId,
                 Description = order.Description.Value,
                 Sections = new List<SectionModel>
                 {
-                    new SectionModel
-                    {
-                        Id = "description",
-                        Status = "complete"
-                    },
-                    new SectionModel
-                    {
-                        Id = "ordering-party",
-                        Status = "incomplete"
-                    },
-                    new SectionModel
-                    {
-                        Id = "supplier",
-                        Status = "incomplete"
-                    },
-                    new SectionModel
-                    {
-                        Id = "commencement-date",
-                        Status = "incomplete"
-                    },
-                    new SectionModel
-                    {
-                        Id = "associated-services",
-                        Status = "incomplete"
-                    },
-                    new SectionModel
-                    {
-                        Id = "service-recipients",
-                        Status = "incomplete"
-                    },
-                    new SectionModel
-                    {
-                        Id = "catalogue-solutions",
-                        Status = "incomplete"
-                    },
-                    new SectionModel
-                    {
-                        Id = "additional-services",
-                        Status = "incomplete"
-                    },
-                    new SectionModel
-                    {
-                        Id = "funding-source",
-                        Status = "incomplete"
-                    }
+                    SectionModel.Description,
+                    SectionModel.OrderingParty.WithStatus(order.IsOrderingPartySectionComplete() ? "complete" : "incomplete"),
+                    SectionModel.Supplier.WithStatus(order.IsSupplierSectionComplete() ? "complete" : "incomplete"),
+                    SectionModel.CommencementDate.WithStatus(order.IsCommencementDateSectionComplete() ? "complete" : "incomplete"),
+                    SectionModel.AssociatedServices,
+                    SectionModel.ServiceRecipients,
+                    SectionModel.CatalogueSolutions,
+                    SectionModel.AdditionalServices,
+                    SectionModel.FundingSource
                 }
-            });
+            };
+
+            return Ok(orderSummaryModel);
         }
 
         [HttpPost]
+        [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult<CreateOrderResponseModel>> CreateOrderAsync([FromBody][Required] CreateOrderModel order)
         {
             if (order is null)

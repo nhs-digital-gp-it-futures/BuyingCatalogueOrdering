@@ -82,7 +82,15 @@ Scenario: 8. A buyer user cannot update an orders description for an organisatio
     Then a response with status code 403 is returned
 
 @5322
-Scenario: 9. Service Failure
+Scenario: 9. A user with read only permissions, cannot update an orders description
+    Given the user is logged in with the Readonly-Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
+    When the user makes a request to update the description with the ID C000014-01
+        | Description         |
+        | Another Description |
+    Then a response with status code 403 is returned
+
+@5322
+Scenario: 10. Service Failure
     Given the call to the database will fail
     When the user makes a request to update the description with the ID C000014-01
         | Description         |
@@ -90,7 +98,7 @@ Scenario: 9. Service Failure
     Then a response with status code 500 is returned
 
 @5322
-Scenario: 10. Update order description to 100 characters should be successful
+Scenario: 11. Update order description to 100 characters should be successful
     When the user makes a request to update the description with the ID C000014-02
         | Description              |
         | #A string of length 100# |

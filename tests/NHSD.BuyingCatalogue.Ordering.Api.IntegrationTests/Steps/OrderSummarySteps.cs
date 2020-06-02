@@ -66,7 +66,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private sealed class OrderSummaryTable
         {
             public string OrderId { get; set; }
+
             public Guid OrganisationId { get; set; }
+
             public string Description { get; set; }
         }
 

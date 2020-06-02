@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using TechTalk.SpecFlow;
@@ -23,7 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             _context[ScenarioContextKeys.AccessToken] = null;
         }
 
-        [Given(@"the user is logged in with the (Buyer|Authority) role for organisation (.*)")]
+        [Given(@"the user is logged in with the (Buyer|Authority|Readonly-Buyer) role for organisation (.*)")]
         public void TheUserIsLoggedInWithRoleForOrganisation(string role, string organisationId)
         {
             var builder = new BearerTokenBuilder()
@@ -39,8 +40,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 .WithClaim("email", "BobSmith@email.com")
                 .WithClaim("email_verified", "true")
                 .WithClaim("primaryOrganisationId", organisationId)
-                .WithClaim("organisationFunction", role);
+                .WithClaim("organisationFunction", role)
+                .WithClaim(ClaimTypes.Name, "Test User")
+                .WithClaim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString());
 
+            if (role.Equals("Readonly-Buyer", StringComparison.InvariantCulture))
+            {
+                builder.WithClaim("Ordering", "view");
+            }
             if (role.Equals("Buyer", StringComparison.InvariantCultureIgnoreCase))
             {
                 builder = builder.WithClaim("Ordering", "Manage");

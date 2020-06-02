@@ -9,15 +9,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 
         private OrderBuilder()
         {
-            _order = new Order()
+            _order = new Order
             {
                 OrderId = "C000014-01",
                 OrganisationId = Guid.NewGuid(),
+                OrganisationName = "Organisation Name",
+                OrganisationOdsCode = "Ods Code",
+                OrganisationAddress = AddressBuilder.Create().WithLine1("1 Some Ordering Party").Build(),
                 Created = DateTime.UtcNow,
                 LastUpdated = DateTime.UtcNow,
                 LastUpdatedBy = Guid.NewGuid(),
                 LastUpdatedByName = "Bob Smith",
-                OrderStatus = new OrderStatus() {OrderStatusId = 1, Name = "Submitted"}
+                OrderStatus = new OrderStatus() { OrderStatusId = 1, Name = "Submitted" },
+                SupplierId = "Some supplier id",
+                SupplierName = "Some supplier name",
+                SupplierAddress = AddressBuilder.Create().WithLine1("1 Some Supplier").Build()
             };
             _order.SetDescription(OrderDescription.Create("Some Description").Value);
         }
@@ -69,6 +75,42 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         internal OrderBuilder WithOrderStatus(OrderStatus orderStatus)
         {
             _order.OrderStatus = orderStatus;
+            return this;
+        }
+
+        internal OrderBuilder WithOrganisationContact(Contact organisationContact)
+        {
+            _order.OrganisationContact = organisationContact;
+            return this;
+        }
+
+        internal OrderBuilder WithSupplierId(string supplierId)
+        {
+            _order.SupplierId = supplierId;
+            return this;
+        }
+
+        internal OrderBuilder WithSupplierName(string supplierName)
+        {
+            _order.SupplierName = supplierName;
+            return this;
+        }
+
+        internal OrderBuilder WithSupplierAddress(Address supplierAddress)
+        {
+            _order.SupplierAddress = supplierAddress;
+            return this;
+        }
+
+        internal OrderBuilder WithSupplierContact(Contact supplierContact)
+        {
+            _order.SupplierContact = supplierContact;
+            return this;
+        }
+
+        internal OrderBuilder WithCommencementDate(DateTime? commencementDate)
+        {
+            _order.CommencementDate = commencementDate;
             return this;
         }
 
