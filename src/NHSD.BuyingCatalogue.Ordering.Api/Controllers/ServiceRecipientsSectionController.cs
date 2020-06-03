@@ -18,7 +18,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [HttpGet]
         public ActionResult GetAll(string orderId)
         {
-            ServiceRecipientsModel model;
+            IEnumerable<ServiceRecipientModel> model;
 
             if (_cannedData.Keys.Contains(orderId))
             {
@@ -26,16 +26,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
             else
             {
-                model = new ServiceRecipientsModel
+                model = new List<ServiceRecipientModel>
                 {
-                    ServiceRecipients = new List<ServiceRecipientModel>
+                    new ServiceRecipientModel
                     {
-                        new ServiceRecipientModel
-                        {
-                            ServiceRecipientId = "Service Rec Id",
-                            Name = "Some name",
-                            OdsCode = "ODS"
-                        }
+                        ServiceRecipientId = "Service Rec Id",
+                        Name = "Some name",
+                        OdsCode = "ODS"
                     }
                 };
             }
@@ -45,13 +42,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpPut]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public ActionResult Update(string orderId, ServiceRecipientsModel model)
+        public ActionResult Update(string orderId, IEnumerable<ServiceRecipientModel> model)
         {
             _cannedData[orderId] = model ?? throw new ArgumentNullException(nameof(model));
-            
+
             return NoContent();
         }
 
-        private static readonly Dictionary<string, ServiceRecipientsModel> _cannedData = new Dictionary<string, ServiceRecipientsModel>();
+        private static readonly Dictionary<string, IEnumerable<ServiceRecipientModel>> _cannedData = new Dictionary<string, IEnumerable<ServiceRecipientModel>>();
     }
 }
