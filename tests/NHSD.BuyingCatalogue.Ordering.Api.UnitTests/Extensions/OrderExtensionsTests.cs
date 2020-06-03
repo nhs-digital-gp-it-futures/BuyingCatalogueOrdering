@@ -92,6 +92,5 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
             var actual = OrderExtensions.IsServiceRecipientsSectionComplete(order);
             actual.Should().BeFalse();
         }
-
     }
 }
