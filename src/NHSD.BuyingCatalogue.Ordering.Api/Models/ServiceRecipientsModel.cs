@@ -1,9 +1,9 @@
-﻿namespace NHSD.BuyingCatalogue.Ordering.Api.Models
+﻿using System.Collections.Generic;
+
+namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
     public sealed class ServiceRecipientsModel
     {
-        public string ServiceRecipientId { get; set; }
-        public string Name { get; set; }
-        public string OdsCode { get; set; }
+        public IEnumerable<ServiceRecipientModel> ServiceRecipients { get; set; }
     }
 }

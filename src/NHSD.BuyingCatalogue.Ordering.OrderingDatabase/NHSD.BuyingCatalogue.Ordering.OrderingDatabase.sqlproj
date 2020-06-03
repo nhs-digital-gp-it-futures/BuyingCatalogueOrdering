@@ -74,6 +74,7 @@
     <Build Include="Tables\Order.sql" />
     <Build Include="Tables\Contact.sql" />
     <Build Include="Tables\Address.sql" />
+    <Build Include="Tables\ServiceRecipient.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Deployment\PostDeployment.sql" />

@@ -16,9 +16,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     public sealed class ServiceRecipientsSectionController : ControllerBase
     {
         [HttpGet]
-        public ActionResult Get(string orderId)
+        public ActionResult GetAll(string orderId)
         {
-            var model = new ServiceRecipientsModel();
+            ServiceRecipientsModel model;
 
             if (_cannedData.Keys.Contains(orderId))
             {
@@ -26,9 +26,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
             else
             {
-                model.ServiceRecipientId = "Service Rec Id";
-                model.Name = "Some name";
-                model.OdsCode = "ODS";
+                model = new ServiceRecipientsModel
+                {
+                    ServiceRecipients = new List<ServiceRecipientModel>
+                    {
+                        new ServiceRecipientModel
+                        {
+                            ServiceRecipientId = "Service Rec Id",
+                            Name = "Some name",
+                            OdsCode = "ODS"
+                        }
+                    }
+                };
             }
 
             return Ok(model);
@@ -38,17 +47,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [Authorize(Policy = PolicyName.CanManageOrders)]
         public ActionResult Update(string orderId, ServiceRecipientsModel model)
         {
-            if (model is null)
-            {
-                throw new ArgumentNullException(nameof(model));
-            }
-
-            _cannedData[orderId] = new ServiceRecipientsModel
-            {
-                ServiceRecipientId = model.ServiceRecipientId,
-                Name = model.Name,
-                OdsCode = model.OdsCode
-            };
+            _cannedData[orderId] = model ?? throw new ArgumentNullException(nameof(model));
             
             return NoContent();
         }
