@@ -35,6 +35,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpPut]
+        [Authorize(Policy = PolicyName.CanManageOrders)]
         public ActionResult Update(string orderId, ServiceRecipientsModel model)
         {
             if (model is null)
