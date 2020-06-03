@@ -33,6 +33,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public string LastUpdatedByName { get; set; }
 
+        public bool ServiceRecipientsViewed { get; set; }
+
         public string SupplierId { get; set; }
 
         public string SupplierName { get; set; }
@@ -61,7 +63,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 SupplierName,
                 CommencementDate,
                 SupplierAddressId,
-                SupplierContactId
+                SupplierContactId,
+                ServiceRecipientsViewed
             )
             VALUES
             (
@@ -82,7 +85,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 @SupplierName,
                 @CommencementDate,
                 @SupplierAddressId,
-                @SupplierContactId
+                @SupplierContactId,
+                @ServiceRecipientsViewed
             );";
 
         public static async Task<OrderEntity> FetchOrderByOrderId(string connectionString, string orderId)
@@ -106,7 +110,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                           CommencementDate,
                           LastUpdatedByName,
                           SupplierId,
-                          SupplierName
+                          SupplierName,
+                          ServiceRecipientsViewed
                          FROM dbo.[Order]
                          WHERE OrderId = @orderId;", new { orderId }));
         }

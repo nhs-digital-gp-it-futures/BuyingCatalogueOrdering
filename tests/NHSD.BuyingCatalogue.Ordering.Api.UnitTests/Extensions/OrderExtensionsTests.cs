@@ -67,5 +67,28 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
             var actual = OrderExtensions.IsCommencementDateSectionComplete(null);
             actual.Should().BeFalse();
         }
+
+        [Test]
+        public void IsServiceRecipientsSectionComplete_NullOrder_ReturnsFalse()
+        {
+            var actual = OrderExtensions.IsServiceRecipientsSectionComplete(null);
+            actual.Should().BeFalse();
+        }
+
+        [Test]
+        public void IsServiceRecipientsSectionComplete_ServiceRecipientsViewed_ReturnsTrue()
+        {
+            var order = OrderBuilder.Create().WithServiceRecipientsViewed(true).Build();
+            var actual = OrderExtensions.IsServiceRecipientsSectionComplete(order);
+            actual.Should().BeTrue();
+        }
+
+        [Test]
+        public void IsServiceRecipientsSectionComplete_ServiceRecipientsViewedFalse_ReturnsFalse()
+        {
+            var order = OrderBuilder.Create().WithServiceRecipientsViewed(false).Build();
+            var actual = OrderExtensions.IsServiceRecipientsSectionComplete(order);
+            actual.Should().BeFalse();
+        }
     }
 }

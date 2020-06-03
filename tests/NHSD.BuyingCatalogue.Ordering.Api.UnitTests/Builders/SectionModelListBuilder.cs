@@ -10,7 +10,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         private SectionModel _supplier;
         private SectionModel _commencementDate;
         private readonly SectionModel _associatedServices;
-        private readonly SectionModel _serviceRecipients;
+        private SectionModel _serviceRecipients;
         private readonly SectionModel _catalogueSolutions;
         private readonly SectionModel _additionalServices;
         private readonly SectionModel _fundingSource;
@@ -54,6 +54,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         public SectionModelListBuilder WithCommencementDate(SectionModel commencementDate)
         {
             _commencementDate = commencementDate;
+            return this;
+        }
+
+        public SectionModelListBuilder WithServiceRecipients(SectionModel serviceRecipients)
+        {
+            _serviceRecipients = serviceRecipients;
             return this;
         }
 

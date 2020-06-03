@@ -114,6 +114,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
+        internal OrderBuilder WithServiceRecipientsViewed(bool serviceRecipientsViewed)
+        {
+            _order.ServiceRecipientsViewed = serviceRecipientsViewed;
+            return this;
+        }
+
         internal Order Build() => _order;
     }
 }
