@@ -15,8 +15,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [HttpGet]
         public ActionResult GetAll()
         {
-            var solution = new CatalogueSolutionModel {Name = "The Big Kahuna"};
-            var model = new[] { solution };
+            var model = System.Array.Empty<CatalogueSolutionModel>();
             return Ok(model);
         }
 
