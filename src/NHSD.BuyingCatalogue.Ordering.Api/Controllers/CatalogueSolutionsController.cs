@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mime;
-using System.Threading.Tasks;
+﻿using System.Net.Mime;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
@@ -17,7 +13,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     public sealed class CatalogueSolutionsController : ControllerBase
     {
         [HttpGet]
-        public ActionResult Get()
+        public ActionResult GetAll()
         {
             var solution = new CatalogueSolutionModel {Name = "The Big Kahuna"};
             var model = new[] { solution };
