@@ -101,7 +101,7 @@ Scenario: 4. Get the order summary when the order has a commencement date
         | funding-source      | incomplete |
 
 @7412
-Scenario: 5. Get the order summary when the order has a ServiceRecipientsViewed set 
+Scenario: 5. Get the order summary after the user has viewed the service recipients section 
     Given Orders exist
         | OrderId    | Description   | OrganisationId                       | ServiceRecipientsViewed |
         | C000015-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                    |
