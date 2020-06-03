@@ -9,6 +9,7 @@
     OrganisationBillingAddressId INT NULL,
     OrganisationContactId INT NULL,
     OrderStatusId INT NOT NULL,
+    ServiceRecipientsViewed bit DEFAULT 0,
     SupplierId NVARCHAR(6) NULL,
     SupplierName NVARCHAR(255) NULL,
     SupplierAddressId INT NULL,
