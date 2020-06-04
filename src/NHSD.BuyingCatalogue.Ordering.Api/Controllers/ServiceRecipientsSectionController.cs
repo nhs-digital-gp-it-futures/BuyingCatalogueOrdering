@@ -18,11 +18,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class ServiceRecipientsSectionController : ControllerBase
     {
+        private readonly IOrderRepository _orderRepository;
         private readonly IServiceRecipientRepository _serviceRecipientRepository;
 
-        public ServiceRecipientsSectionController(IServiceRecipientRepository serviceRecipientRepository)
+        public ServiceRecipientsSectionController(IServiceRecipientRepository serviceRecipientRepository, IOrderRepository orderRepository)
         {
             _serviceRecipientRepository = serviceRecipientRepository;
+            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
         }
 
         [HttpGet]
@@ -53,8 +55,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpPut]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public ActionResult Update(string orderId, ServiceRecipientsModel model)
+        public async Task<ActionResult> UpdateAsync(string orderId, ServiceRecipientsModel model)
         {
+            if (model is null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+
+            if (order is null)
+            {
+                return NotFound();
+            }
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
             _cannedData[orderId] = model ?? throw new ArgumentNullException(nameof(model));
 
             return NoContent();
