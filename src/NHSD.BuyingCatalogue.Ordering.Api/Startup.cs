@@ -50,6 +50,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             IdentityModelEventSource.ShowPII = _environment.IsDevelopment();
 
             services.AddTransient<IOrderRepository, OrderRepository>();
+            services.AddTransient<IServiceRecipientRepository, ServiceRecipientRepository>();
             services.AddTransient<ICreateOrderService, CreateOrderService>();
             services.RegisterHealthChecks(connectionString);
 
