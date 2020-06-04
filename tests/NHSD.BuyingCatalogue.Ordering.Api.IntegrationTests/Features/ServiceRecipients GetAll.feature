@@ -20,9 +20,9 @@ Scenario: 1. Get the service recipients from an exisiting ordering ID
     When the user makes a request to retrieve the service-recipients section with order ID C000014-01
     Then a response with status code 200 is returned
     And the service recipients are returned
-        | OdsCode | Name                      | OrderId    |
-        | Ods1    | Updated Service Recipient | C000014-01 |
-        | Ods3    | Service Recipients        | C000014-01 |
+        | OdsCode | Name                      |
+        | Ods1    | Updated Service Recipient |
+        | Ods3    | Service Recipients        |
 
 @7412
 Scenario: 2. If an order does not exist, return not found
