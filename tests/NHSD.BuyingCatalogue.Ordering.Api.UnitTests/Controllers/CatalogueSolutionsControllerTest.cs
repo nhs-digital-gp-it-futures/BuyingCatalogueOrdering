@@ -35,7 +35,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order = null;
             var result = await context.Controller.GetAllAsync("myOrder");
-            result.Should().BeOfType<NotFoundResult>();
+            result.Should().BeEquivalentTo(new ActionResult<CatalogueSolutionsModel>(new NotFoundResult()));
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             context.Order.OrganisationId = Guid.NewGuid();
             context.Order.CommencementDate = DateTime.Now;
             var result = await context.Controller.GetAllAsync("myOrder");
-            result.Should().BeOfType<ForbidResult>();
+            result.Should().BeEquivalentTo(new ActionResult<CatalogueSolutionsModel>(new ForbidResult()));
         }
 
         [Test]
