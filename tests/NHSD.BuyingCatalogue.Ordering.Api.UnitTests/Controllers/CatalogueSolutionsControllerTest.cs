@@ -16,8 +16,36 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
     [TestFixture]
     public sealed class CatalogueSolutionsControllerTest
     {
+
         [Test]
-        public async Task GetAllAsync_WithCommencementDate_ReturnsOkResult()
+        public async Task UpdateAsync_OrderNotFound_ReturnsNotFound()
+        {
+            var context = CatalogueSolutionsControllerTestContext.Setup();
+            context.Order = null;
+            var result = await context.Controller.UpdateAsync("myOrder");
+            result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        public async Task UpdateAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
+        {
+            var context = CatalogueSolutionsControllerTestContext.Setup();
+            context.Order.OrganisationId = Guid.NewGuid();
+            var result = await context.Controller.UpdateAsync("myOrder");
+            result.Should().BeOfType<ForbidResult>();
+        }
+
+        [Test]
+        public async Task UpdateAsync_ForExistingOrder_UpdatesCatalogueSolutionsViewed()
+        {
+            var context = CatalogueSolutionsControllerTestContext.Setup();
+            var result = await context.Controller.UpdateAsync("myOrder");
+            result.Should().BeOfType<NoContentResult>();
+            context.Order.CatalogueSolutionsViewed.Should().BeTrue();
+        }
+
+        [Test]
+        public async Task GetAllAsync_WithDescription_ReturnsOkResult()
         {
             var expectedDescription = "A description";
             var context = CatalogueSolutionsControllerTestContext.Setup();
@@ -43,7 +71,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order.OrganisationId = Guid.NewGuid();
-            context.Order.CommencementDate = DateTime.Now;
             var result = await context.Controller.GetAllAsync("myOrder");
             result.Should().BeEquivalentTo(new ActionResult<CatalogueSolutionsModel>(new ForbidResult()));
         }
@@ -62,6 +89,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 Order = new Order { OrganisationId = PrimaryOrganisationId };
                 OrderRepositoryMock = new Mock<IOrderRepository>();
                 OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
+                OrderRepositoryMock.Setup(x => x.UpdateOrderAsync(It.IsAny<Order>())).Callback<Order>(x => Order = x);
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]
                 {
                     new Claim("Ordering", "Manage"),
