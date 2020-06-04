@@ -18,21 +18,31 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class ServiceRecipientsSectionController : ControllerBase
     {
+        private readonly IOrderRepository _orderRepository;
         private readonly IServiceRecipientRepository _serviceRecipientRepository;
 
-        public ServiceRecipientsSectionController(IServiceRecipientRepository serviceRecipientRepository)
+        public ServiceRecipientsSectionController(IOrderRepository orderRepository,
+            IServiceRecipientRepository serviceRecipientRepository)
         {
+            _orderRepository = orderRepository;
             _serviceRecipientRepository = serviceRecipientRepository;
         }
 
         [HttpGet]
         public async Task<ActionResult<ServiceRecipientsModel>> GetAll(string orderId)
         {
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+
+            if (order is null)
+            {
+                return NotFound();
+            }
+
             var serviceRecipients = (await _serviceRecipientRepository.ListServiceRecipientsByOrderId(orderId)).ToList();
 
             var primaryOrganisationId = User.GetPrimaryOrganisationId();
 
-            if (primaryOrganisationId != serviceRecipients.First().Order.OrganisationId)
+            if (primaryOrganisationId != order.OrganisationId)
             {
                 return Forbid();
             }
