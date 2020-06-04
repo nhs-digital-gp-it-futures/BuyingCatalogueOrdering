@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
@@ -15,32 +18,37 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class ServiceRecipientsSectionController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult GetAll(string orderId)
+        private readonly IServiceRecipientRepository _serviceRecipientRepository;
+
+        public ServiceRecipientsSectionController(IServiceRecipientRepository serviceRecipientRepository)
         {
-            ServiceRecipientsModel model;
+            _serviceRecipientRepository = serviceRecipientRepository;
+        }
 
-            if (_cannedData.Keys.Contains(orderId))
+        [HttpGet]
+        public async Task<ActionResult<ServiceRecipientsModel>> GetAll(string orderId)
+        {
+            var serviceRecipients = (await _serviceRecipientRepository.ListServiceRecipientsByOrderId(orderId)).ToList();
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+
+            if (primaryOrganisationId != serviceRecipients.First().Order.OrganisationId)
             {
-                model = _cannedData[orderId];
-            }
-            else
-            {
-                model = new ServiceRecipientsModel
-                {
-                    ServiceRecipients = new List<ServiceRecipientModel>
-                    {
-                        new ServiceRecipientModel
-                        {
-                            ServiceRecipientId = "Service Rec Id",
-                            Name = "Some name",
-                            OdsCode = "ODS"
-                        }
-                    }
-                };
+                return Forbid();
             }
 
-            return Ok(model);
+            var recipientModelList = serviceRecipients.Select(recipient => new ServiceRecipientModel
+            {
+                OdsCode = recipient.OdsCode,
+                Name = recipient.Name
+            }).ToList();
+
+            var model = new ServiceRecipientsModel
+            {
+                ServiceRecipients = recipientModelList
+            };
+
+            return model;
         }
 
         [HttpPut]
