@@ -9,6 +9,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -83,11 +84,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            _cannedData[orderId] = model ?? throw new ArgumentNullException(nameof(model));
+            var serviceRecipients = model.ServiceRecipients.Select(recipient => new ServiceRecipient
+            {
+                Name = recipient.Name, OdsCode = recipient.OdsCode, Order = order
+            });
 
+            await _serviceRecipientRepository.UpdateServiceRecipientsAsync(order, serviceRecipients);
             return NoContent();
         }
-
-        private static readonly Dictionary<string, ServiceRecipientsModel> _cannedData = new Dictionary<string, ServiceRecipientsModel>();
     }
 }
