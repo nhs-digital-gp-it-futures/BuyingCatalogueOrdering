@@ -24,12 +24,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         public ServiceRecipientsSectionController(IOrderRepository orderRepository,
             IServiceRecipientRepository serviceRecipientRepository)
         {
-            _orderRepository = orderRepository;
-            _serviceRecipientRepository = serviceRecipientRepository;
+            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            _serviceRecipientRepository = serviceRecipientRepository ??
+                                          throw new ArgumentNullException(nameof(serviceRecipientRepository));
         }
 
         [HttpGet]
-        public async Task<ActionResult<ServiceRecipientsModel>> GetAll(string orderId)
+        public async Task<ActionResult<ServiceRecipientsModel>> GetAllAsync(string orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
 
