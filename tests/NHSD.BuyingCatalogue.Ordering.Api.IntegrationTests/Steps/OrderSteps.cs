@@ -84,6 +84,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithLastUpdatedBy(ordersTableItem.LastUpdatedBy)
                     .WithLastUpdatedName(ordersTableItem.LastUpdatedByName)
                     .WithLastUpdated(ordersTableItem.LastUpdated != DateTime.MinValue ? ordersTableItem.LastUpdated : DateTime.UtcNow)
+                    .WithServiceRecipientsViewed(ordersTableItem.ServiceRecipientsViewed)
                     .WithSupplierId(ordersTableItem.SupplierId)
                     .WithSupplierName(ordersTableItem.SupplierName)
                     .WithSupplierAddressId(supplierAddressId)
@@ -230,6 +231,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string SupplierContactEmail { get; set; }
 
             public DateTime CommencementDate { get; set; }
+
+            public bool ServiceRecipientsViewed { get; set; }
         }
     }
 }

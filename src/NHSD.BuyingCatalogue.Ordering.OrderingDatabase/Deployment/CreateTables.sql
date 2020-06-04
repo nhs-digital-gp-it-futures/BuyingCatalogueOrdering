@@ -2,3 +2,4 @@
 :r ../Tables/Contact.sql
 :r ../Tables/Address.sql
 :r ../Tables/Order.sql
+:r ../Tables/ServiceRecipient.sql
