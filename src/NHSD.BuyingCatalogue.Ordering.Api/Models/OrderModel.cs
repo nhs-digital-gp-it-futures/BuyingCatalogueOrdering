@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
     public sealed class OrderModel

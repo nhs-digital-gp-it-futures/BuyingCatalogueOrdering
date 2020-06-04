@@ -32,4 +32,3 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
         }
     }
 }
-
