@@ -33,6 +33,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHSD.BuyingCatalouge.Orderi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHSD.BuyingCatalogue.Ordering.Domain.UnitTests", "tests\NHSD.BuyingCatalogue.Ordering.Domain.UnitTests\NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.csproj", "{B0EA4A17-4EE3-4557-842D-BDFA0136F5D3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0FA9669C-2656-4842-A2BB-C7ECE46B5CFD}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
