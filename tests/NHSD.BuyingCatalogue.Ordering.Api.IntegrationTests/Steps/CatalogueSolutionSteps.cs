@@ -45,7 +45,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var response = await _response.ReadBodyAsJsonAsync();
             var solutionToken = response.SelectToken("catalogueSolutions");
-            var solutions = solutionToken.Select(x => new {name = x.Value<string>("name")});
+            var solutions = solutionToken.Select(x => new { name = x.Value<string>("name") });
             solutions.Should().BeEmpty();
         }
     }

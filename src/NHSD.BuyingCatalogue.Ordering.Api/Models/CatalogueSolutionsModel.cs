@@ -2,7 +2,7 @@
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
-    internal sealed class CatalogueSolutionsModel
+    public sealed class CatalogueSolutionsModel
     {
         public string OrderDescription { get; set; }
 

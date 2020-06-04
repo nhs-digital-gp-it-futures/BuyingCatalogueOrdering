@@ -24,7 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetAllAsync(string orderId)
+        public async Task<ActionResult<CatalogueSolutionsModel>> GetAllAsync(string orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
@@ -39,7 +39,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             var solutionList = Array.Empty<CatalogueSolutionModel>();
-            return Ok(new CatalogueSolutionsModel { OrderDescription = order.Description.Value, CatalogueSolutions = solutionList});
+            return new CatalogueSolutionsModel { OrderDescription = order.Description.Value, CatalogueSolutions = solutionList};
         }
 
         [HttpPut]

@@ -17,23 +17,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
     public sealed class CatalogueSolutionsControllerTest
     {
         [Test]
-        public async Task GetAsync_WithCommencementDate_ReturnsOkResult()
+        public async Task GetAllAsync_WithCommencementDate_ReturnsOkResult()
         {
             var expectedDescription = "A description";
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order.SetDescription(OrderDescription.Create(expectedDescription).Value);
             var result = await context.Controller.GetAllAsync("myOrder");
-            result.Should().BeOfType<OkObjectResult>();
-
-            var okResult = result as OkObjectResult;
-            okResult.Value.Should().BeOfType<CatalogueSolutionsModel>();
-            var model = okResult.Value as CatalogueSolutionsModel;
+            result.Value.Should().BeOfType<CatalogueSolutionsModel>();
+            var model = result.Value;
             model.CatalogueSolutions.Should().BeEmpty();
             model.OrderDescription.Should().Be(expectedDescription);
         }
 
         [Test]
-        public async Task GetAsync_OrderNotFound_ReturnsNotFound()
+        public async Task GetAllAsync_OrderNotFound_ReturnsNotFound()
         {
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order = null;
@@ -42,7 +39,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
+        public async Task GetAllAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
         {
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order.OrganisationId = Guid.NewGuid();
