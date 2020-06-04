@@ -16,6 +16,7 @@ indent_style = space
 indent_size = 4
 insert_final_newline = true
 charset = utf-8-bom
+end_of_line = lf
 
 # XML project files
 [*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,projitems,shproj}]
@@ -48,6 +49,10 @@ trim_trailing_whitespace = false
 # YAML Files
 [*.{yml,yaml}]
 indent_size = 2
+
+# Feature files
+[*.feature]
+insert_final_newline = true
 
 ###############################
 # .NET Coding Conventions     #

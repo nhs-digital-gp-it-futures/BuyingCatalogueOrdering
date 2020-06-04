@@ -3,7 +3,7 @@
     public static class ApplicationClaimTypes
     {
         /// <summary>
-        /// The claim for accessing the order form
+        ///     The claim for accessing the order form
         /// </summary>
         public const string Ordering = "ordering";
     }

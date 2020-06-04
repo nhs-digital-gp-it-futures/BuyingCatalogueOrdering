@@ -4,8 +4,6 @@ using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Domain.Results;
-using Microsoft.AspNetCore.Http;
-
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
 {
