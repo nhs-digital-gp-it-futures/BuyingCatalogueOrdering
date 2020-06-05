@@ -5,7 +5,6 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 
-
 namespace NHSD.BuyingCatalogue.Ordering.Api
 {
     public sealed class Program

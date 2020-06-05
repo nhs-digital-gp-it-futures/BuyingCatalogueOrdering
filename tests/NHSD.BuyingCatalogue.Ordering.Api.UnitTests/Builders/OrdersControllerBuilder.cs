@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
@@ -18,7 +17,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         {
             _ordersRepository = Mock.Of<IOrderRepository>();
             _createOrderService = Mock.Of<ICreateOrderService>();
-
         }
 
         internal static OrdersControllerBuilder Create()
