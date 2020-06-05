@@ -51,7 +51,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
 
             foreach (ServiceRecipient recipient in serviceRecipientsToAdd)
             {
-                _context.ServiceRecipient.Add(recipient);
+                _context.ServiceRecipient.Update(recipient);
             }
 
             await _context.SaveChangesAsync();

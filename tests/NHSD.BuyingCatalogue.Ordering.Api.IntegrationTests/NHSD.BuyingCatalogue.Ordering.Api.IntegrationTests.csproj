@@ -15,6 +15,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\ServiceRecipients GetAll - Copy.feature.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
@@ -43,6 +47,13 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\NHSD.BuyingCatalogue.Ordering.Api\NHSD.BuyingCatalogue.Ordering.Api.csproj" />
     <ProjectReference Include="..\NHSD.BuyingCatalouge.Ordering.Api.Testing.Data\NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\ServiceRecipients Put.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
   </ItemGroup>
 
 </Project>

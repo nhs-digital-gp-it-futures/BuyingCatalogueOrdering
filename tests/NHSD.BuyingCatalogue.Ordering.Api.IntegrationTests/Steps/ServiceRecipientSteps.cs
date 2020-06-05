@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
@@ -50,14 +52,29 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _request.GetAsync(string.Format(_serviceRecipientUrl, orderId));
         }
 
+        [When(@"the user makes a request to set the service-recipients section with order ID (.*)")]
+        public async Task WhenTheUserMakesARequestToRetrieveTheService_RecipientsSectionWithOrderID(string orderId, Table table)
+        {
+            var payload = new ServiceRecipientsTable { ServiceRecipients = table.CreateSet<ServiceRecipientTable>() };
+            await _request.PutJsonAsync(string.Format(_serviceRecipientUrl, orderId),payload);
+        }
+
+
         [Then(@"the service recipients are returned")]
         public async Task ThenTheServiceRecipientsAreReturned(Table table)
         {
             var expected = table.CreateSet<ServiceRecipientTable>();
 
+            var payload = new ServiceRecipientsTable {ServiceRecipients = table.CreateSet<ServiceRecipientTable>() };
+
             var serviceRecipients = (await _response.ReadBodyAsJsonAsync()).SelectToken("serviceRecipients").Select(CreateServiceRecipients);
 
             expected.Should().BeEquivalentTo(serviceRecipients, conf => conf.Excluding(x => x.OrderId));
+        }
+
+        private sealed class ServiceRecipientsTable
+        {
+            public IEnumerable<ServiceRecipientTable> ServiceRecipients { get; set; }
         }
 
         private static ServiceRecipientTable CreateServiceRecipients(JToken token)
