@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
@@ -15,32 +18,49 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class ServiceRecipientsSectionController : ControllerBase
     {
-        [HttpGet]
-        public ActionResult GetAll(string orderId)
+        private readonly IOrderRepository _orderRepository;
+        private readonly IServiceRecipientRepository _serviceRecipientRepository;
+
+        public ServiceRecipientsSectionController(IOrderRepository orderRepository,
+            IServiceRecipientRepository serviceRecipientRepository)
         {
-            ServiceRecipientsModel model;
+            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            _serviceRecipientRepository = serviceRecipientRepository ??
+                                          throw new ArgumentNullException(nameof(serviceRecipientRepository));
+        }
 
-            if (_cannedData.Keys.Contains(orderId))
+        [HttpGet]
+        public async Task<ActionResult<ServiceRecipientsModel>> GetAllAsync(string orderId)
+        {
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+
+            if (order is null)
             {
-                model = _cannedData[orderId];
-            }
-            else
-            {
-                model = new ServiceRecipientsModel
-                {
-                    ServiceRecipients = new List<ServiceRecipientModel>
-                    {
-                        new ServiceRecipientModel
-                        {
-                            ServiceRecipientId = "Service Rec Id",
-                            Name = "Some name",
-                            OdsCode = "ODS"
-                        }
-                    }
-                };
+                return NotFound();
             }
 
-            return Ok(model);
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
+            var serviceRecipients =
+                (await _serviceRecipientRepository.ListServiceRecipientsByOrderIdAsync(orderId)).ToList();
+
+            var recipientModelList = serviceRecipients.Select(recipient => new ServiceRecipientModel
+            {
+                OdsCode = recipient.OdsCode,
+                Name = recipient.Name
+            }).ToList();
+
+            var model = new ServiceRecipientsModel
+            {
+                ServiceRecipients = recipientModelList
+            };
+
+            return model;
         }
 
         [HttpPut]
