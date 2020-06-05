@@ -20,12 +20,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
     [Parallelizable(ParallelScope.All)]
     internal sealed class ServiceRecipientsSectionControllerTests
     {
-        [Test]
-        public void Ctor_NullRepository_Throws()
+        [TestCase(false, true)]
+        [TestCase(true, false)]
+        [TestCase(false, false)]
+        public void Ctor_NullRepository_Throws(bool hasOrderRepository, bool hasServiceRepository)
         {
+            var context = ServiceRecipientsTestContext.Setup(); 
+            var orderRepository = context.OrderRepositoryMock.Object;
+            var serviceRecipientRepository = context.ServiceRecipientRepositoryMock.Object;
+
+            if (!hasOrderRepository)
+                orderRepository = null;
+            if (!hasServiceRepository)
+                serviceRecipientRepository = null;
+
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var _ = new ServiceRecipientsSectionController(null, null);
+                var _ = new ServiceRecipientsSectionController(orderRepository, serviceRecipientRepository);
             });
         }
 
@@ -77,9 +88,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             context.ServiceRecipients = serviceRecipients.Select(x => x.serviceRecipient).ToList();
 
-            var expected = new ServiceRecipientsModel();
+        
             var expectedList = serviceRecipients.Select(x => x.expectedModel);
-            expected.ServiceRecipients = expectedList;
+
+            var expected = new ServiceRecipientsModel
+            {
+                ServiceRecipients = expectedList
+            };
 
             var response = await context.Controller.GetAllAsync(orderId);
             response.Should().BeEquivalentTo(new ActionResult<ServiceRecipientsModel>(expected));
@@ -112,6 +127,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             response.Should().BeEquivalentTo(new ActionResult<ServiceRecipientsModel>(expected));
         }
 
+        [Test]
+        public async Task GetAllAsync_VerifyRepositoryMethods_CalledOnce()
+        {
+            var context = ServiceRecipientsTestContext.Setup();
+
+            await context.Controller.GetAllAsync(string.Empty);
+
+            context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(string.Empty), Times.Once);
+            context.ServiceRecipientRepositoryMock.Verify(x => x.ListServiceRecipientsByOrderIdAsync(string.Empty),
+                Times.Once);
+        }
+
         private static (ServiceRecipient serviceRecipient, ServiceRecipientModel expectedModel)
             CreateServiceRecipientData(string odsCode, string orderId)
         {
@@ -137,7 +164,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
                 ServiceRecipientRepositoryMock = new Mock<IServiceRecipientRepository>();
                 ServiceRecipients = new List<ServiceRecipient>();
-                ServiceRecipientRepositoryMock.Setup(x => x.ListServiceRecipientsByOrderId(It.IsAny<string>()))
+                ServiceRecipientRepositoryMock.Setup(x => x.ListServiceRecipientsByOrderIdAsync(It.IsAny<string>()))
                     .ReturnsAsync(() => ServiceRecipients);
 
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]

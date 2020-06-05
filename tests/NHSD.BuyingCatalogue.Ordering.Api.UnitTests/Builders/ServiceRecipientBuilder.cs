@@ -11,7 +11,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _serviceRecipient = new ServiceRecipient
             {
                 Name = "Some name",
-                Order = new Order()
+                Order = OrderBuilder.Create().Build()
             };
         }
 

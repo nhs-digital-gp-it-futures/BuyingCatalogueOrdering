@@ -39,14 +39,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return NotFound();
             }
 
-            var serviceRecipients = (await _serviceRecipientRepository.ListServiceRecipientsByOrderId(orderId)).ToList();
-
             var primaryOrganisationId = User.GetPrimaryOrganisationId();
 
             if (primaryOrganisationId != order.OrganisationId)
             {
                 return Forbid();
             }
+
+            var serviceRecipients =
+                (await _serviceRecipientRepository.ListServiceRecipientsByOrderIdAsync(orderId)).ToList();
 
             var recipientModelList = serviceRecipients.Select(recipient => new ServiceRecipientModel
             {

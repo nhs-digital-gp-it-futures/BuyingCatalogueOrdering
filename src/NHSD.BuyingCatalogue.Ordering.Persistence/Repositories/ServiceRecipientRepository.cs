@@ -17,7 +17,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<ServiceRecipient>> ListServiceRecipientsByOrderId(string orderId)
+        public async Task<IEnumerable<ServiceRecipient>> ListServiceRecipientsByOrderIdAsync(string orderId)
         {
             return await _context.ServiceRecipient
                 .Include(x => x.Order)

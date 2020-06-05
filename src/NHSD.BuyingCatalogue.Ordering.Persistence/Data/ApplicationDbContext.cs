@@ -27,6 +27,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new OrderConfiguration());
+            modelBuilder.Entity<ServiceRecipient>(x => x.HasKey(y => y.OdsCode));
         }
     }
 }
