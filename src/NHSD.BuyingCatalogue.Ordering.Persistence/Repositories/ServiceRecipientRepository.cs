@@ -18,7 +18,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<ServiceRecipient>> ListServiceRecipientsByOrderId(string orderId)
+        public async Task<IEnumerable<ServiceRecipient>> ListServiceRecipientsByOrderIdAsync(string orderId)
         {
             return await _context.ServiceRecipient
                 .Include(x => x.Order)
@@ -38,7 +38,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
             }
 
             var serviceRecipientsToAdd = recipientsUpdates.ToList();
-            var serviceRecipientsToRemove = (await ListServiceRecipientsByOrderId(order.OrderId)).ToList();
+            var serviceRecipientsToRemove = (await ListServiceRecipientsByOrderIdAsync(order.OrderId)).ToList();
 
             var noChangeServiceRecipients = serviceRecipientsToRemove.Select(s => s.OdsCode).Intersect(serviceRecipientsToAdd.Select(s => s.OdsCode));
             serviceRecipientsToRemove.RemoveAll(s => noChangeServiceRecipients.Contains(s.OdsCode));

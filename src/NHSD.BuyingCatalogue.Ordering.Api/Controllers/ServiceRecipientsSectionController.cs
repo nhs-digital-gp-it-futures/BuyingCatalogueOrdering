@@ -25,12 +25,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         public ServiceRecipientsSectionController(IOrderRepository orderRepository,
             IServiceRecipientRepository serviceRecipientRepository)
         {
-            _orderRepository = orderRepository;
-            _serviceRecipientRepository = serviceRecipientRepository;
+            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            _serviceRecipientRepository = serviceRecipientRepository ??
+                                          throw new ArgumentNullException(nameof(serviceRecipientRepository));
         }
 
         [HttpGet]
-        public async Task<ActionResult<ServiceRecipientsModel>> GetAll(string orderId)
+        public async Task<ActionResult<ServiceRecipientsModel>> GetAllAsync(string orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
 
@@ -39,14 +40,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return NotFound();
             }
 
-            var serviceRecipients = (await _serviceRecipientRepository.ListServiceRecipientsByOrderId(orderId)).ToList();
-
             var primaryOrganisationId = User.GetPrimaryOrganisationId();
 
             if (primaryOrganisationId != order.OrganisationId)
             {
                 return Forbid();
             }
+
+            var serviceRecipients =
+                (await _serviceRecipientRepository.ListServiceRecipientsByOrderIdAsync(orderId)).ToList();
 
             var recipientModelList = serviceRecipients.Select(recipient => new ServiceRecipientModel
             {
@@ -72,6 +74,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
+
 
             if (order is null)
             {

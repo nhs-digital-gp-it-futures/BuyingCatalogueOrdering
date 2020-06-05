@@ -5,7 +5,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class ServiceRecipient
     {
-        [Key]
         public string OdsCode { get; set; }
 
         [ForeignKey("OrderId")]
