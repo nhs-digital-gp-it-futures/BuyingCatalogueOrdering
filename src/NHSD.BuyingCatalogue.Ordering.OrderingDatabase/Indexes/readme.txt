@@ -1,1 +1,0 @@
-This can be removed once we  have some scripts in this directory
