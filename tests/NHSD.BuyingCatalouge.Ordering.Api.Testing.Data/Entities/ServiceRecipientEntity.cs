@@ -1,4 +1,7 @@
-﻿namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 {
     public sealed class ServiceRecipientEntity : EntityBase
     {
@@ -19,5 +22,15 @@
                 @Name,
                 @OrderId
             );";
+
+        public static async Task<IEnumerable<ServiceRecipientEntity>> FetchServiceRecipientsByOrderId(string connectionString, string orderId)
+        {
+            return (await SqlRunner.QueryAsync<ServiceRecipientEntity>(connectionString, @"SELECT
+                          OdsCode,
+                          Name,
+                          OrderId
+                         FROM dbo.ServiceRecipient
+                         WHERE OrderId = @orderId;", new { orderId }));
+        }
     }
 }

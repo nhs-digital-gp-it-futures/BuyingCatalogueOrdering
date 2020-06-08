@@ -139,6 +139,49 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 Times.Once);
         }
 
+        [TestCase(null)]
+        [TestCase("INVALID")]
+        public async Task UpdateAsync_OrderDoesNotExist_ReturnsNotFound(string orderId)
+        {
+            var context = ServiceRecipientsTestContext.Setup();
+            context.Order = null;
+
+            var response = await context.Controller.UpdateAsync(orderId, DefaultServiceRecipientsModel);
+            response.Should().BeEquivalentTo(new NotFoundResult());
+        }
+
+        [Test]
+        public async Task UpdateAsync_OrganisationIdDoesNotMatch_ReturnsForbidden()
+        {
+            var context = ServiceRecipientsTestContext.Setup();
+            context.Order.OrganisationId = Guid.NewGuid();
+
+            var response = await context.Controller.UpdateAsync("myOrder", DefaultServiceRecipientsModel);
+            response.Should().BeEquivalentTo(new ForbidResult());
+        }
+
+        [Test]
+        public async Task UpdateAsync_VerifyRepositoryMethods_CalledOnce()
+        {
+            var context = ServiceRecipientsTestContext.Setup();
+
+            await context.Controller.UpdateAsync(context.Order.OrderId,DefaultServiceRecipientsModel);
+
+            context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(context.Order.OrderId), Times.Once);
+            context.ServiceRecipientRepositoryMock.Verify(x => x.UpdateServiceRecipientsAsync(context.Order,It.IsAny<IEnumerable<ServiceRecipient>>()), Times.Once);
+        }
+
+        private static ServiceRecipientsModel DefaultServiceRecipientsModel
+        {
+            get
+            {
+                var service = ServiceRecipientsModelBuilder.Create()
+                    .WithServiceRecipientModel(ServiceRecipientModelBuilder.Create().Build())
+                    .Build();
+                return service;
+            }
+        }
+
         private static (ServiceRecipient serviceRecipient, ServiceRecipientModel expectedModel)
             CreateServiceRecipientData(string odsCode, string orderId)
         {

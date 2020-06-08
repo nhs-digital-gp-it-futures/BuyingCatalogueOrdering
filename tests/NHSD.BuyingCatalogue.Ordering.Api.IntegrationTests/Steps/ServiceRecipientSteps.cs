@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json.Linq;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
+using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
@@ -70,6 +71,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var serviceRecipients = (await _response.ReadBodyAsJsonAsync()).SelectToken("serviceRecipients").Select(CreateServiceRecipients);
 
             expected.Should().BeEquivalentTo(serviceRecipients, conf => conf.Excluding(x => x.OrderId));
+        }
+
+        [Then(@"the persisted service recipients for OrderId (.*) are")]
+        public async Task ThenTheServiceRecipientsAreReturned(string orderId ,Table table)
+        {
+            var expected = table.CreateSet<ServiceRecipientTable>();
+            var actual = await ServiceRecipientEntity.FetchServiceRecipientsByOrderId(_settings.ConnectionString,orderId);
+            expected.Should().BeEquivalentTo(actual, conf => conf.Excluding(x => x.OrderId));
         }
 
         private sealed class ServiceRecipientsTable

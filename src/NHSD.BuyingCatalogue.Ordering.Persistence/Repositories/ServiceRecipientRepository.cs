@@ -40,19 +40,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
             var serviceRecipientsToAdd = recipientsUpdates.ToList();
             var serviceRecipientsToRemove = (await ListServiceRecipientsByOrderIdAsync(order.OrderId)).ToList();
 
-            var noChangeServiceRecipients = serviceRecipientsToRemove.Select(s => s.OdsCode).Intersect(serviceRecipientsToAdd.Select(s => s.OdsCode));
+            var noChangeServiceRecipients = serviceRecipientsToRemove.Select(s => s.OdsCode)
+                    .Intersect(serviceRecipientsToAdd.Select(s => s.OdsCode))
+                    .ToList();
+
             serviceRecipientsToRemove.RemoveAll(s => noChangeServiceRecipients.Contains(s.OdsCode));
             serviceRecipientsToAdd.RemoveAll(s => noChangeServiceRecipients.Contains(s.OdsCode));
 
-            foreach (ServiceRecipient recipient in serviceRecipientsToRemove)
-            {
-                _context.ServiceRecipient.Remove(recipient);
-            }
-
-            foreach (ServiceRecipient recipient in serviceRecipientsToAdd)
-            {
-                _context.ServiceRecipient.Update(recipient);
-            }
+            _context.ServiceRecipient.RemoveRange(serviceRecipientsToRemove);
+            _context.ServiceRecipient.AddRange(serviceRecipientsToAdd);
 
             await _context.SaveChangesAsync();
         }

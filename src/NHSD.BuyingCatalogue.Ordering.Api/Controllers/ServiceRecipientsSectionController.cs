@@ -93,6 +93,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             });
 
             await _serviceRecipientRepository.UpdateServiceRecipientsAsync(order, serviceRecipients);
+
+            var name = User.Identity.Name;
+            order.SetLastUpdatedBy(User.GetUserId(), name);
+
+            await _orderRepository.UpdateOrderAsync(order);
+
             return NoContent();
         }
     }
