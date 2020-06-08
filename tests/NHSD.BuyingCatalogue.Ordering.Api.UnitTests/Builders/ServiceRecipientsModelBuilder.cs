@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NUnit.Framework.Internal;
 
-namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
+namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
     internal sealed class ServiceRecipientsModelBuilder
     {
