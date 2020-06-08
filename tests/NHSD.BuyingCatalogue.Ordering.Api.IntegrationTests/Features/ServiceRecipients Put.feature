@@ -5,9 +5,9 @@
 
 Background:
     Given Orders exist
-        | OrderId    | Description         | OrderStatusId | LastUpdatedByName | LastUpdatedBy                        | OrganisationId                       |
-        | C000014-01 | Some Description    | 1             | Bob Smith         | 335392e4-4bb1-413b-9de5-36a85c9c0422 | 4af62b99-638c-4247-875e-965239cd0c48 |
-        | C000014-02 | Another Description | 2             | Alice Smith       | a11a46f9-ce6f-448a-95c2-fde6e61c804a | 4af62b99-638c-4247-875e-965239cd0c48 |
+        | OrderId    | Description         | OrganisationId                       |
+        | C000014-01 | Some Description    | 4af62b99-638c-4247-875e-965239cd0c48 |
+        | C000014-02 | Another Description | 4af62b99-638c-4247-875e-965239cd0c48 |
     And Service Recipients exist
         | OdsCode | Name                      | OrderId    |
         | Ods2    | Another Name              | C000014-02 |
@@ -28,8 +28,8 @@ Scenario: 1. the user selects service recipients when no other recipients exist
         | OrderId    | OdsCode | Name         |
         | C000014-02 | Ods2    | Another Name |
     And the order with orderId C000014-01 has LastUpdated time present and it is the current time
-     
 
+@7412
 Scenario: 2. the user selects service recipients excluding an existing recipient
     Given Service Recipients exist
         | OdsCode | Name               | OrderId    |
@@ -46,7 +46,7 @@ Scenario: 2. the user selects service recipients excluding an existing recipient
         | C000014-02 | Ods2    | Another Name |
     And the order with orderId C000014-01 has LastUpdated time present and it is the current time
 
-
+@7412
 Scenario: 3. the user selects service recipients including an existing recipient
     Given Service Recipients exist
         | OdsCode | Name               | OrderId    |
@@ -65,8 +65,7 @@ Scenario: 3. the user selects service recipients including an existing recipient
         | C000014-02 | Ods2    | Another Name |
     And the order with orderId C000014-01 has LastUpdated time present and it is the current time
 
-
-
+@7412
 Scenario: 4. the user selects  no services recipients all recipients are removed
     Given Service Recipients exist
         | OdsCode | Name               | OrderId    |
@@ -80,7 +79,6 @@ Scenario: 4. the user selects  no services recipients all recipients are removed
         | OrderId    | OdsCode | Name         |
         | C000014-02 | Ods2    | Another Name |
     And the order with orderId C000014-01 has LastUpdated time present and it is the current time
-
 
 @7412
 Scenario: 5. If an order does not exist, return not found
