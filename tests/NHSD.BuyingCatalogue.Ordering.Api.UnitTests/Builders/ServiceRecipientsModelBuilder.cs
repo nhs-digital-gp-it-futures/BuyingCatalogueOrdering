@@ -5,14 +5,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
     internal sealed class ServiceRecipientsModelBuilder
     {
-        private readonly ServiceRecipientsModel _serviceRecipientsModel;
         private readonly List<ServiceRecipientModel> ServiceRecipientModelList = new List<ServiceRecipientModel>();
+
         private ServiceRecipientsModelBuilder()
         {
-            _serviceRecipientsModel = new ServiceRecipientsModel()
-            {
-                ServiceRecipients = new List<ServiceRecipientModel>()
-            };
         }
 
         internal static ServiceRecipientsModelBuilder Create() => new ServiceRecipientsModelBuilder();
@@ -25,9 +21,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 
         internal ServiceRecipientsModel Build()
         {
-            _serviceRecipientsModel.ServiceRecipients = ServiceRecipientModelList;
-            return _serviceRecipientsModel;
+            return new ServiceRecipientsModel()
+            {
+                ServiceRecipients = ServiceRecipientModelList
+            };
         }
-
     }
 }

@@ -4,31 +4,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
     internal sealed class ServiceRecipientModelBuilder
     {
-        private readonly ServiceRecipientModel _serviceRecipientModel;
+        private string _name;
+        private string _odsCode;
 
         private ServiceRecipientModelBuilder()
         {
-            _serviceRecipientModel = new ServiceRecipientModel
-            {
-                Name = "Some name",
-                OdsCode =  "Ods1"
-            };
+            _name = "Some Name";
+            _odsCode ="Ods1";
         }
 
         internal static ServiceRecipientModelBuilder Create() => new ServiceRecipientModelBuilder();
 
         internal ServiceRecipientModelBuilder WithOdsCode(string odsCode)
         {
-            _serviceRecipientModel.OdsCode = odsCode;
+            _odsCode = odsCode;
             return this;
         }
 
         internal ServiceRecipientModelBuilder WithName(string name)
         {
-            _serviceRecipientModel.Name = name;
+            _name = name;
             return this;
         }
 
-        internal ServiceRecipientModel Build() => _serviceRecipientModel;
+        internal ServiceRecipientModel Build()
+        {
+            return  new ServiceRecipientModel {Name = _name, OdsCode = _odsCode};
+        }
     }
 }
