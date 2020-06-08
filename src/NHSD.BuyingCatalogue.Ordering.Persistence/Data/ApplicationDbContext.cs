@@ -7,16 +7,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 {
     public sealed class ApplicationDbContext : DbContext
     {
-        public static readonly ILoggerFactory DbLoggerFactory
-            = LoggerFactory.Create(builder =>
-            {
-                builder
-                    .AddFilter((category, level) =>
-                        category == DbLoggerCategory.Database.Command.Name
-                        && level == LogLevel.Information)
-                    .AddConsole();
-            });
-
         public DbSet<Order> Order { get; set; }
 
         public DbSet<OrderStatus> OrderStatus { get; set; }
@@ -25,18 +15,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (optionsBuilder is null)
-                throw new ArgumentNullException(nameof(optionsBuilder));
-
-            base.OnConfiguring(optionsBuilder);
-
-            optionsBuilder
-                .UseLoggerFactory(DbLoggerFactory)
-                .EnableSensitiveDataLogging();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
