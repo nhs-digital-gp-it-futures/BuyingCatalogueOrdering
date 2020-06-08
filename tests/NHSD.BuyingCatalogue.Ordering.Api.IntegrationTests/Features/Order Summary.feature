@@ -122,6 +122,7 @@ Scenario: 5. Get the order summary after the user has viewed the service recipie
         | additional-services | incomplete |       |
         | funding-source      | incomplete |       |
 
+@4629
 Scenario: 6. Get the order summary that includes a list of service recipients
     Given Orders exist
         | OrderId    | Description   | OrganisationId                       | ServiceRecipientsViewed |

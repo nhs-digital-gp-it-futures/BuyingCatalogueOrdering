@@ -57,7 +57,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             var response = await _response.ReadBodyAsJsonAsync();
 
-            JToken sections = response.SelectToken("sections");
+            var sections = response.SelectToken("sections");
             Assert.IsNotNull(sections);
 
             var actual = new SectionsTable
