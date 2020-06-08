@@ -223,6 +223,59 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             actual.Should().BeEquivalentTo(expected);
         }
 
+        [TestCase]
+        public async Task GetOrderSummaryAsync_ServiceRecipientCount_ReturnsCountOfTwo()
+        {
+            var order = OrderBuilder.Create().Build();
+
+            var context = OrdersControllerTestContext.Setup(order.OrganisationId);
+            context.Order = order;
+            context.ServiceRecipientListCount = 2;
+
+            using var controller = context.OrdersController;
+
+            string expectedOrderId = context.Order.OrderId;
+
+            var response = (await controller.GetOrderSummaryAsync(expectedOrderId)).Result as OkObjectResult;
+            Assert.IsNotNull(response);
+
+            var actual = response.Value.As<OrderSummaryModel>();
+
+            var expected = OrderSummaryModelBuilder
+                .Create()
+                .WithOrderId(expectedOrderId)
+                .WithOrganisationId(order.OrganisationId)
+                .WithSections(SectionModelListBuilder
+                    .Create()
+                    .WithServiceRecipients(
+                        SectionModel
+                            .ServiceRecipients
+                            .WithStatus("incomplete")
+                            .WithCount(context.ServiceRecipientListCount))
+                    .Build())
+                .Build();
+
+            actual.Should().BeEquivalentTo(expected);
+        }
+
+        [TestCase]
+        public async Task GetOrderSummaryAsync_ServiceRecipientRepository_CalledOnce()
+        {
+            var order = OrderBuilder.Create().Build();
+
+            var context = OrdersControllerTestContext.Setup(order.OrganisationId);
+            context.Order = order;
+            context.ServiceRecipientListCount = 2;
+
+            using var controller = context.OrdersController;
+
+            string expectedOrderId = context.Order.OrderId;
+
+            await controller.GetOrderSummaryAsync(expectedOrderId);
+
+            context.ServiceRecipientRepositoryMock.Verify(x => x.GetCountByOrderIdAsync(expectedOrderId), Times.Once);
+        }
+
         [Test]
         public async Task CreateOrderAsync_CreateOrderSuccessfulResult_ReturnsOrderId()
         {
@@ -386,6 +439,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
 
                 ServiceRecipientRepositoryMock = new Mock<IServiceRecipientRepository>();
+                ServiceRecipientRepositoryMock
+                    .Setup(x => x.GetCountByOrderIdAsync(It.IsNotNull<string>()))
+                    .ReturnsAsync(() => ServiceRecipientListCount);
 
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
                     new[]
@@ -414,6 +470,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             internal Guid NameIdentity { get; }
 
             internal Guid PrimaryOrganisationId { get; }
+
+            internal int ServiceRecipientListCount { get; set; }
 
             private ClaimsPrincipal ClaimsPrincipal { get; }
 
