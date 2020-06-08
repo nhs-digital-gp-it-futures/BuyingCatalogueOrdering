@@ -25,6 +25,11 @@ spec:
           {{- with .Values.db }}
           - name: DB_NAME
             value: {{ .name | quote }}
+          - name: SA_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: {{ .saUserNameSecret.name }}
+                key: {{ .saUserNameSecret.key }}
           - name: SA_PASSWORD
             valueFrom:
               secretKeyRef:
