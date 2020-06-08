@@ -20,7 +20,7 @@ if [ $STATUS -ne 0 ]; then
     exit 1
 fi
 
-/sqlpackage/sqlpackage /Action:publish /SourceFile:NHSD.BuyingCatalogue.Ordering.OrderingDatabase.Deployment.dacpac /TargetServerName:$DB_SERVER,$PORT /TargetDatabaseName:$DB_NAME /TargetUser:sa /TargetPassword:$SA_PASSWORD
-/opt/mssql-tools/bin/sqlcmd -S $DB_SERVER,$PORT -U sa -P $SA_PASSWORD -d $DB_NAME -I -i "PostDeployment.sql"
+/sqlpackage/sqlpackage /Action:publish /SourceFile:NHSD.BuyingCatalogue.Ordering.OrderingDatabase.Deployment.dacpac /TargetServerName:$DB_SERVER,$PORT /TargetDatabaseName:$DB_NAME /TargetUser:$SA_USERNAME /TargetPassword:$SA_PASSWORD
+/opt/mssql-tools/bin/sqlcmd -S $DB_SERVER,$PORT -U $SA_USERNAME -P $SA_PASSWORD -d $DB_NAME -I -i "PostDeployment.sql"
 
 printf "\nDatabase setup complete"
