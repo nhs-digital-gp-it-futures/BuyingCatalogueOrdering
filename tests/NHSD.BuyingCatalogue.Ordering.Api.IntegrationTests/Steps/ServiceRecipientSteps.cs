@@ -73,12 +73,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             expected.Should().BeEquivalentTo(serviceRecipients, conf => conf.Excluding(x => x.OrderId));
         }
 
-        [Then(@"the persisted service recipients for OrderId (.*) are")]
-        public async Task ThenTheServiceRecipientsAreReturned(string orderId ,Table table)
+        [Then(@"the persisted service recipients are")]
+        public async Task ThenThePersistedServiceRecipientsAreReturned(Table table)
         {
             var expected = table.CreateSet<ServiceRecipientTable>();
-            var actual = await ServiceRecipientEntity.FetchServiceRecipientsByOrderId(_settings.ConnectionString,orderId);
-            expected.Should().BeEquivalentTo(actual, conf => conf.Excluding(x => x.OrderId));
+            var actual = await ServiceRecipientEntity.FetchAllServiceRecipients(_settings.ConnectionString);
+            expected.Should().BeEquivalentTo(actual);
         }
 
         private sealed class ServiceRecipientsTable

@@ -25,7 +25,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
                 .Where(s => s.Order.OrderId == orderId).ToListAsync();
         }
 
-        public async Task UpdateServiceRecipientsAsync(Order order, IEnumerable<ServiceRecipient> recipientsUpdates)
+        public async Task UpdateAsync(Order order, IEnumerable<ServiceRecipient> recipientsUpdates)
         {
             if (order == null)
             {

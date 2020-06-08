@@ -7,7 +7,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Application.Persistence
     public interface IServiceRecipientRepository
     {
         Task<IEnumerable<ServiceRecipient>> ListServiceRecipientsByOrderIdAsync(string orderId);
-        Task UpdateServiceRecipientsAsync(Order order, IEnumerable<ServiceRecipient> recipientsUpdates);
+        Task UpdateAsync(Order order, IEnumerable<ServiceRecipient> recipientsUpdates);
     }
 }
 

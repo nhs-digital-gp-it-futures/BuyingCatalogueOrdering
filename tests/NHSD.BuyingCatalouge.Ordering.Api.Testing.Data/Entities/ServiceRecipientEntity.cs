@@ -23,14 +23,13 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 @OrderId
             );";
 
-        public static async Task<IEnumerable<ServiceRecipientEntity>> FetchServiceRecipientsByOrderId(string connectionString, string orderId)
+        public static async Task<IEnumerable<ServiceRecipientEntity>> FetchAllServiceRecipients(string connectionString)
         {
             return (await SqlRunner.QueryAsync<ServiceRecipientEntity>(connectionString, @"SELECT
                           OdsCode,
                           Name,
                           OrderId
-                         FROM dbo.ServiceRecipient
-                         WHERE OrderId = @orderId;", new { orderId }));
+                         FROM dbo.ServiceRecipient;"));
         }
     }
 }
