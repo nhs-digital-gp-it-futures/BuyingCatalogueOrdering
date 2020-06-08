@@ -7,5 +7,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Application.Persistence
     public interface IServiceRecipientRepository
     {
         Task<IEnumerable<ServiceRecipient>> ListServiceRecipientsByOrderIdAsync(string orderId);
+        
+        Task<int> GetCountByOrderIdAsync(string orderId);
     }
 }

@@ -25,12 +25,51 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
     internal sealed class OrdersControllerTests
     {
         [Test]
-        public void Constructor_NullRepository_Throws()
+        public void Constructor_Null_Service_Repository_ThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() =>
+            static void Test()
             {
-                var _ = new OrdersController(null, null);
-            });
+                var _ = OrdersControllerBuilder
+                    .Create()
+                    .WithOrderRepository(null)
+                    .WithCreateOrderService(Mock.Of<ICreateOrderService>())
+                    .WithServiceRecipientRepository(Mock.Of<IServiceRecipientRepository>())
+                    .Build();
+            }
+
+            Assert.Throws<ArgumentNullException>(Test);
+        }
+
+        [Test]
+        public void Constructor_Repository_Null_Repository_ThrowsArgumentNullException()
+        {
+            static void Test()
+            {
+                var _ = OrdersControllerBuilder
+                    .Create()
+                    .WithOrderRepository(Mock.Of<IOrderRepository>())
+                    .WithCreateOrderService(null)
+                    .WithServiceRecipientRepository(Mock.Of<IServiceRecipientRepository>())
+                    .Build();
+            }
+
+            Assert.Throws<ArgumentNullException>(Test);
+        }
+
+        [Test]
+        public void Constructor_Repository_Service_Null_ThrowsArgumentNullException()
+        {
+            static void Test()
+            {
+                var _ = OrdersControllerBuilder
+                    .Create()
+                    .WithOrderRepository(Mock.Of<IOrderRepository>())
+                    .WithCreateOrderService(Mock.Of<ICreateOrderService>())
+                    .WithServiceRecipientRepository(null)
+                    .Build();
+            }
+
+            Assert.Throws<ArgumentNullException>(Test);
         }
 
         [Test]
@@ -168,7 +207,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.SupplierSectionStatusCases))]
         [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.CommencementDateSectionStatusCases))]
         [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.ServiceRecipientsSectionStatusCases))]
-        public async Task GetOrderSummaryAsync_ChangeOrderData_ReturnsExpectedSummary(Order order,
+        public async Task GetOrderSummaryAsync_ChangeOrderData_ReturnsExpectedSummary(
+            Order order,
             OrderSummaryModel expected)
         {
             var context = OrdersControllerTestContext.Setup(order.OrganisationId);
@@ -269,7 +309,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         private static (Order order, OrderModel expectedOrder) CreateOrderTestData(
-            string orderId, 
+            string orderId,
             Guid organisationId,
             string description)
         {
@@ -345,6 +385,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
                 OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
 
+                ServiceRecipientRepositoryMock = new Mock<IServiceRecipientRepository>();
+
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
                     new[]
                     {
@@ -354,12 +396,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         new Claim(ClaimTypes.NameIdentifier, NameIdentity.ToString())
                     }, "mock"));
 
-                OrdersController = new OrdersController(OrderRepositoryMock.Object, CreateOrderServiceMock.Object)
+                OrdersController = OrdersControllerBuilder
+                    .Create()
+                    .WithOrderRepository(OrderRepositoryMock.Object)
+                    .WithServiceRecipientRepository(ServiceRecipientRepositoryMock.Object)
+                    .WithCreateOrderService(CreateOrderServiceMock.Object)
+                    .Build();
+
+                OrdersController.ControllerContext = new ControllerContext
                 {
-                    ControllerContext = new ControllerContext
-                    {
-                        HttpContext = new DefaultHttpContext { User = ClaimsPrincipal }
-                    }
+                    HttpContext = new DefaultHttpContext { User = ClaimsPrincipal }
                 };
             }
 
@@ -369,11 +415,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             internal Guid PrimaryOrganisationId { get; }
 
-            internal ClaimsPrincipal ClaimsPrincipal { get; }
+            private ClaimsPrincipal ClaimsPrincipal { get; }
 
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
 
             internal Mock<ICreateOrderService> CreateOrderServiceMock { get; }
+
+            internal Mock<IServiceRecipientRepository> ServiceRecipientRepositoryMock { get; }
 
             internal Result<string> CreateOrderResult { get; set; } = Result.Success("NewOrderId");
 
@@ -504,7 +552,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                             .Create()
                             .WithOrganisationId(organisationId)
                             .WithSections(SectionModelListBuilder.Create()
-                                .WithServiceRecipients(SectionModel.ServiceRecipients.WithStatus("complete"))
+                                .WithServiceRecipients(
+                                    SectionModel
+                                        .ServiceRecipients
+                                        .WithStatus("complete")
+                                        .WithCount(0))
                                 .Build())
                             .Build());
 
@@ -517,8 +569,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         OrderSummaryModelBuilder
                             .Create()
                             .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create()
-                                .WithServiceRecipients(SectionModel.ServiceRecipients.WithStatus("incomplete"))
+                            .WithSections(SectionModelListBuilder
+                                .Create()
+                                .WithServiceRecipients(
+                                    SectionModel
+                                        .ServiceRecipients
+                                        .WithStatus("incomplete")
+                                        .WithCount(0))
                                 .Build())
                             .Build());
                 }

@@ -4,31 +4,38 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
     internal sealed class ServiceRecipientBuilder
     {
-        private readonly ServiceRecipient _serviceRecipient;
+        private string _odsCode;
+        private readonly string _name;
+        private string _orderId;
 
         private ServiceRecipientBuilder()
         {
-            _serviceRecipient = new ServiceRecipient
-            {
-                Name = "Some name",
-                Order = OrderBuilder.Create().Build()
-            };
+            _name = "Some name";
         }
 
         internal static ServiceRecipientBuilder Create() => new ServiceRecipientBuilder();
 
         internal ServiceRecipientBuilder WithOdsCode(string odsCode)
         {
-            _serviceRecipient.OdsCode = odsCode;
+            _odsCode = odsCode;
             return this;
         }
 
         internal ServiceRecipientBuilder WithOrderId(string orderId)
         {
-            _serviceRecipient.Order.OrderId = orderId;
+            _orderId = orderId;
             return this;
         }
 
-        internal ServiceRecipient Build() => _serviceRecipient;
+        internal ServiceRecipient Build() => 
+            new ServiceRecipient
+            {
+                OdsCode = _odsCode,
+                Name = _name,
+                Order = OrderBuilder
+                    .Create()
+                    .WithOrderId(_orderId)
+                    .Build()
+            };
     }
 }

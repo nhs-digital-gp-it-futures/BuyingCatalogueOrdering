@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
             return await _context.ServiceRecipient
                 .Include(x => x.Order)
                 .Where(s => s.Order.OrderId == orderId).ToListAsync();
+        }
+
+        public async Task<int> GetCountByOrderIdAsync(string orderId)
+        {
+            if (orderId is null)
+            {
+                throw new ArgumentNullException(nameof(orderId));
+            }
+
+            return await _context.ServiceRecipient
+                .Where(x => x.Order.OrderId == orderId)
+                .CountAsync();
         }
     }
 }
