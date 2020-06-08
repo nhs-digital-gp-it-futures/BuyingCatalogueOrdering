@@ -12,7 +12,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 
         public DbSet<ServiceRecipient> ServiceRecipient { get; set; }
 
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) 
+            : base(options)
         {
         }
 
