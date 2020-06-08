@@ -70,19 +70,21 @@ Scenario: 4. the user selects  no services recipients all recipients are removed
 
 @7412
 Scenario: 5. the user selects service recipients and the order is updated with the users details 
-    Given the user TestUser2 with id 3e66fe27-2115-4de5-ae75-03aca134610d is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
-    When the user makes a request to set the service-recipients section with order ID C000014-01
+    Given Orders exist
+        | OrderId    | Description      | OrganisationId                       | LastUpdatedByName | LastUpdatedBy                        |
+        | C000014-03 | Some Description | 4af62b99-638c-4247-875e-965239cd0c48 | OldUserName       | 3e66fe27-2115-4de5-ae75-03aca134610d |
+    When the user makes a request to set the service-recipients section with order ID C000014-03
         | OdsCode | Name                |
-        | Ods4    | Service Recipients2 |
+        | Ods7    | Service Recipients2 |
     Then a response with status code 204 is returned
      And the persisted service recipients are
         | OrderId    | OdsCode | Name                |
-        | C000014-01 | Ods4    | Service Recipients2 |
         | C000014-02 | Ods2    | Another Name        |
-     And the order with orderId C000014-01 is updated in the database with data
+        | C000014-03 | Ods7    | Service Recipients2 |
+     And the order with orderId C000014-03 is updated in the database with data
         | LastUpdatedByName | LastUpdatedBy                        |
-        | TestUser2         | 3e66fe27-2115-4de5-ae75-03aca134610d |
-     And the order with orderId C000014-01 has LastUpdated time present and it is the current time
+        | Bob Smith         | 7B195137-6A59-4854-B118-62B39A3101EF |
+     And the order with orderId C000014-03 has LastUpdated time present and it is the current time
 
 @7412
 Scenario: 6. If an order does not exist, return not found

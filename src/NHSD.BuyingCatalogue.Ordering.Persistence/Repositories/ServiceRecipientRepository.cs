@@ -25,31 +25,37 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
                 .Where(s => s.Order.OrderId == orderId).ToListAsync();
         }
 
-        public async Task UpdateAsync(Order order, IEnumerable<ServiceRecipient> recipientsUpdates)
+        public async Task DeleteAllByOrderId(string orderId)
         {
-            if (order == null)
-            {
-                throw new ArgumentNullException(nameof(order));
-            }
+            var existingServiceRecipients = (await ListServiceRecipientsByOrderIdAsync(orderId)).ToList();
+            _context.ServiceRecipient.RemoveRange(existingServiceRecipients);
+            await _context.SaveChangesAsync();
+        }
 
+        public async Task UpdateAsync(string orderId, IEnumerable<ServiceRecipient> recipientsUpdates)
+        {
             if (recipientsUpdates == null)
             {
                 throw new ArgumentNullException(nameof(recipientsUpdates));
             }
 
-            var serviceRecipientsToAdd = recipientsUpdates.ToList();
-            var serviceRecipientsToRemove = (await ListServiceRecipientsByOrderIdAsync(order.OrderId)).ToList();
+            var updateServiceRecipients = recipientsUpdates.ToList();
+            var existingServiceRecipients = (await ListServiceRecipientsByOrderIdAsync(orderId)).ToList();
 
-            var noChangeServiceRecipients = serviceRecipientsToRemove.Select(s => s.OdsCode)
-                    .Intersect(serviceRecipientsToAdd.Select(s => s.OdsCode))
-                    .ToList();
+            if (!updateServiceRecipients.Any())
+            {
+                _context.ServiceRecipient.RemoveRange(existingServiceRecipients);
+            }
+            else
+            {
+                var noChangeServiceRecipients = existingServiceRecipients.Intersect(updateServiceRecipients).ToList();
 
-            serviceRecipientsToRemove.RemoveAll(s => noChangeServiceRecipients.Contains(s.OdsCode));
-            serviceRecipientsToAdd.RemoveAll(s => noChangeServiceRecipients.Contains(s.OdsCode));
+                var existingServiceRecipientsToRemove = existingServiceRecipients.Except(noChangeServiceRecipients);
+                var updateServiceRecipientsToAdd = updateServiceRecipients.Except(noChangeServiceRecipients);
 
-            _context.ServiceRecipient.RemoveRange(serviceRecipientsToRemove);
-            _context.ServiceRecipient.AddRange(serviceRecipientsToAdd);
-
+                _context.ServiceRecipient.RemoveRange(existingServiceRecipientsToRemove);
+                _context.ServiceRecipient.AddRange(updateServiceRecipientsToAdd);
+            }
             await _context.SaveChangesAsync();
         }
     }

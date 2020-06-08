@@ -61,44 +61,5 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var token = builder.BuildToken();
             _context[ScenarioContextKeys.AccessToken] = token;
         }
-
-        [Given(@"the user (.*) with id (.*)is logged in with the (Buyer|Authority|Readonly-Buyer) role for organisation (.*)")]
-        public void TheUserIsLoggedInWithNameIdRoleForOrganisation(string userName,string userId,string role, string organisationId)
-        {
-            var builder = new BearerTokenBuilder()
-                .WithSigningCertificate(EmbeddedResourceReader.GetCertificate())
-                .IssuedBy(_settings.Authority)
-                .ForSubject(userId)
-                .WithClaim("client_id", "PasswordClient")
-                .WithClaim("preferred_username", "BobSmith@email.com")
-                .WithClaim("unique_name", "BobSmith@email.com")
-                .WithClaim("given_name", "Bob")
-                .WithClaim("family_name", "Smith")
-                .WithClaim("name", userName)
-                .WithClaim("email", "BobSmith@email.com")
-                .WithClaim("email_verified", "true")
-                .WithClaim("primaryOrganisationId", organisationId)
-                .WithClaim("organisationFunction", role)
-                .WithClaim(ClaimTypes.Name, userName)
-                .WithClaim(ClaimTypes.NameIdentifier, userId);
-
-            if (role.Equals("Readonly-Buyer", StringComparison.InvariantCulture))
-            {
-                builder.WithClaim("Ordering", "view");
-            }
-            if (role.Equals("Buyer", StringComparison.InvariantCultureIgnoreCase))
-            {
-                builder = builder.WithClaim("Ordering", "Manage");
-            }
-            else if (role.Equals("Authority", StringComparison.InvariantCultureIgnoreCase))
-            {
-                builder = builder.WithClaim("Organisation", "Manage");
-                builder = builder.WithClaim("Account", "Manage");
-            }
-
-            var token = builder.BuildToken();
-            _context[ScenarioContextKeys.AccessToken] = token;
-        }
-
     }
 }

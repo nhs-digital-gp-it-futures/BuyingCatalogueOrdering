@@ -89,9 +89,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             var serviceRecipients = model.ServiceRecipients.Select(recipient => new ServiceRecipient
             {
                 Name = recipient.Name, OdsCode = recipient.OdsCode, Order = order
-            });
+            }).ToList();
 
-            await _serviceRecipientRepository.UpdateAsync(order,serviceRecipients);
+            await _serviceRecipientRepository.UpdateAsync(order.OrderId,serviceRecipients);
 
             var name = User.Identity.Name;
             order.SetLastUpdatedBy(User.GetUserId(), name);

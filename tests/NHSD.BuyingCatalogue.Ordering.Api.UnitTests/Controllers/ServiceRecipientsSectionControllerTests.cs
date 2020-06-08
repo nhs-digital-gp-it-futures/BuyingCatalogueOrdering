@@ -168,9 +168,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             await context.Controller.UpdateAsync(context.Order.OrderId,DefaultServiceRecipientsModel);
 
             context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(context.Order.OrderId), Times.Once);
-            context.ServiceRecipientRepositoryMock.Verify(x => x.UpdateAsync(context.Order,It.IsAny<IEnumerable<ServiceRecipient>>()), Times.Once);
-        }
-
+            context.ServiceRecipientRepositoryMock.Verify(x => x.UpdateAsync(context.Order.OrderId, It.IsAny<IEnumerable<ServiceRecipient>>()), Times.Once);
+        } 
+        
         private static ServiceRecipientsModel DefaultServiceRecipientsModel
         {
             get
