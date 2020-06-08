@@ -21,8 +21,8 @@ Scenario: 1. the user selects service recipients when no other recipients exist
         | Ods4    | Service Recipients2 |
     Then a response with status code 204 is returned
      And the persisted service recipients for OrderId C000014-01 are
-        | OrderId    | OdsCode | Name               |
-        | C000014-01 | Ods3    | Service Recipients |
+        | OrderId    | OdsCode | Name                |
+        | C000014-01 | Ods3    | Service Recipients  |
         | C000014-01 | Ods4    | Service Recipients2 |
      And the persisted service recipients for OrderId C000014-02 are
         | OrderId    | OdsCode | Name         |
