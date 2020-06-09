@@ -20,7 +20,7 @@ Scenario: 1. the user selects service recipients when no other recipients exist
         | Ods3    | Service Recipients  |
         | Ods4    | Service Recipients2 |
     Then a response with status code 204 is returned
-     And the persisted service recipients are
+    And the persisted service recipients are
         | OrderId    | OdsCode | Name                |
         | C000014-01 | Ods3    | Service Recipients  |
         | C000014-01 | Ods4    | Service Recipients2 |
@@ -35,7 +35,7 @@ Scenario: 2. the user selects service recipients excluding an existing recipient
         | OdsCode | Name                |
         | Ods4    | Service Recipients2 |
     Then a response with status code 204 is returned
-     And the persisted service recipients are
+    And the persisted service recipients are
         | OrderId    | OdsCode | Name                |
         | C000014-01 | Ods4    | Service Recipients2 |
         | C000014-02 | Ods2    | Another Name        |
@@ -50,7 +50,7 @@ Scenario: 3. the user selects service recipients including an existing recipient
         | Ods3    | Service Recipients  |
         | Ods4    | Service Recipients2 |
     Then a response with status code 204 is returned
-     And the persisted service recipients are
+    And the persisted service recipients are
         | OrderId    | OdsCode | Name                |
         | C000014-01 | Ods3    | Service Recipients  |
         | C000014-01 | Ods4    | Service Recipients2 |
@@ -64,12 +64,12 @@ Scenario: 4. the user selects  no services recipients all recipients are removed
     When the user makes a request to set the service-recipients section with order ID C000014-01
         | OdsCode | Name                |
     Then a response with status code 204 is returned
-     And the persisted service recipients are
+    And the persisted service recipients are
         | OrderId    | OdsCode | Name         |
         | C000014-02 | Ods2    | Another Name |
 
 @7412
-Scenario: 5. the user selects service recipients and the order is updated with the users details 
+Scenario: 5. the user selects service recipients and the order is updated with the users details
     Given Orders exist
         | OrderId    | Description      | OrganisationId                       | LastUpdatedByName | LastUpdatedBy                        |
         | C000014-03 | Some Description | 4af62b99-638c-4247-875e-965239cd0c48 | OldUserName       | 3e66fe27-2115-4de5-ae75-03aca134610d |
@@ -77,14 +77,14 @@ Scenario: 5. the user selects service recipients and the order is updated with t
         | OdsCode | Name                |
         | Ods7    | Service Recipients2 |
     Then a response with status code 204 is returned
-     And the persisted service recipients are
+    And the persisted service recipients are
         | OrderId    | OdsCode | Name                |
         | C000014-02 | Ods2    | Another Name        |
         | C000014-03 | Ods7    | Service Recipients2 |
-     And the order with orderId C000014-03 is updated in the database with data
+    And the order with orderId C000014-03 is updated in the database with data
         | LastUpdatedByName | LastUpdatedBy                        |
         | Bob Smith         | 7B195137-6A59-4854-B118-62B39A3101EF |
-     And the order with orderId C000014-03 has LastUpdated time present and it is the current time
+    And the order with orderId C000014-03 has LastUpdated time present and it is the current time
 
 @7412
 Scenario: 6. If an order does not exist, return not found
@@ -124,3 +124,13 @@ Scenario: 10. Service Failure
         | OdsCode | Name         |
         | Ods2    | Another Name |
     Then a response with status code 500 is returned
+
+@7412
+Scenario: 11. the user selects service recipients and the order marks the service recipient section as viewed
+    When the user makes a request to set the service-recipients section with order ID C000014-02
+        | OdsCode | Name                |
+        | Ods7    | Service Recipients2 |
+    Then a response with status code 204 is returned
+    And the order with orderId C000014-02 is updated in the database with data
+        | ServiceRecipientsViewed |
+        | True                    |

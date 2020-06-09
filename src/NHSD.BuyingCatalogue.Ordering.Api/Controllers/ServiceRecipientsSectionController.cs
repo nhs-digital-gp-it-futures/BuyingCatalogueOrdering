@@ -74,7 +74,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
-
             if (order is null)
             {
                 return NotFound();
@@ -88,13 +87,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             var serviceRecipients = model.ServiceRecipients.Select(recipient => new ServiceRecipient
             {
-                Name = recipient.Name, OdsCode = recipient.OdsCode, Order = order
+                Name = recipient.Name,
+                OdsCode = recipient.OdsCode,
+                Order = order
             }).ToList();
 
-            await _serviceRecipientRepository.UpdateAsync(order.OrderId,serviceRecipients);
+            await _serviceRecipientRepository.UpdateAsync(order.OrderId, serviceRecipients);
 
-            var name = User.Identity.Name;
-            order.SetLastUpdatedBy(User.GetUserId(), name);
+            order.ServiceRecipientsViewed = true;
+            order.SetLastUpdatedBy(User.GetUserId(), User.GetUserName());
 
             await _orderRepository.UpdateOrderAsync(order);
 
