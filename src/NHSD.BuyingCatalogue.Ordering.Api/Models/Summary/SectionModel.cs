@@ -18,6 +18,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models.Summary
 
         public string Status { get; private set; }
 
+        public int? Count { get; private set; }
+
         private SectionModel(string id, string status = "incomplete")
         {
             Id = id ?? throw new ArgumentNullException(nameof(id));
@@ -27,6 +29,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models.Summary
         public SectionModel WithStatus(string status)
         {
             Status = status ?? throw new ArgumentNullException(nameof(status));
+            return this;
+        }
+
+        public SectionModel WithCount(int count)
+        {
+            Count = count;
             return this;
         }
     }

@@ -66,7 +66,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
-        internal OrderBuilder WithLastUpdatedBy(string lastUpdatedByName)
+        internal OrderBuilder WithLastUpdatedByName(string lastUpdatedByName)
         {
             _order.LastUpdatedByName = lastUpdatedByName;
             return this;
