@@ -1,0 +1,73 @@
+# Default values for ordapi-db-deploy.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+useLocalImage: false
+
+image:
+  repository: gpitfuturesdevacr.azurecr.io/nhsd/buying-catalogue/ordapi-db-deploy
+  pullPolicy: Always
+
+imagePullSecrets: 
+nameOverride: "ordapi-db-deploy"
+fullnameOverride: "gpitfutures-bc-ordapi-db-deploy"
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+resources: 
+  requests:
+    cpu: 25m
+    memory: 64Mi
+  limits:
+    cpu: 1000m
+    memory: 500Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+db:
+  name:
+  serverConfig:
+    name:
+    key:
+  serverPortConfig:
+    name:
+    key:
+  saUserNameSecret: 
+    name:
+    key:
+  saPasswordSecret: 
+    name:
+    key:
+  dbPasswordSecret:
+    name:
+    key:
+  sqlPackageArgs: ""
+
+env:
+  configmap:
+  secrets:
+  values:    
