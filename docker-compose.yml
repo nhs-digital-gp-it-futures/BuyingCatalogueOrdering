@@ -1,25 +1,51 @@
 version: '3.5'
 
+x-networked: &networked
+  networks:
+    - nhsd_bcnetwork
+
+x-depends-on-db: &dependsOnDb
+  <<: *networked
+  depends_on:
+    - nhsd.buyingcatalogue.ordering.api.ordering.db
+
+x-sa-password: &saPassword
+  - SA_PASSWORD: "MyTestPassword123!"
+
 services:
   nhsd.buyingcatalogue.ordering.api.ordering.db:
-    image: ${REGISTRY:-nhsd}/buying-catalogue/ordering-api-ordering-db:${TAG:-latest}
-    build: 
-      context: src/NHSD.BuyingCatalogue.Ordering.OrderingDatabase
+    <<: *networked
+    image: mcr.microsoft.com/mssql/server:2019-latest
     container_name: ordering_api_ordering_db
     volumes:
       - nhsd_ordering_db_volume:/var/opt/mssql/
-    networks:
-      - nhsd_bcnetwork
     environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=MyTestPassword123!
-      - MSSQL_PID=Express
-      - DB_NAME=${NHSD_LOCAL_DB_NAME:-CatalogueOrdering}
-      - NHSD_PASSWORD=DisruptTheMarket1!
+      <<: *saPassword
+      ACCEPT_EULA: "Y"
+    healthcheck:
+      test: '/opt/mssql-tools/bin/sqlcmd -b -d CatalogueOrdering -U sa -P $${SA_PASSWORD} -Q "IF NOT EXISTS (SELECT * FROM dbo.[Order]) THROW 50000, ''Not ready'', 0;"'
+      interval: 20s
+      retries: 4
+      start_period: 40s
+      timeout: 10s
     ports:
       - "${NHSD_LOCAL_DB_PORT:-1552}:1433"
 
+  dacpac.deploy:
+    <<: *dependsOnDb
+    image: ${REGISTRY:-nhsd}/buying-catalogue/ordapi-db-deploy:${TAG:-latest}
+    container_name: ordering_api_ordering_db_deploy
+    build:
+      context: "."
+      dockerfile: "src/NHSD.BuyingCatalogue.Ordering.OrderingDatabase.Deployment/Dockerfile"
+    environment:
+      <<: *saPassword
+      DB_NAME: "CatalogueOrdering"
+      DB_SERVER: nhsd.buyingcatalogue.ordering.api.ordering.db
+      NHSD_PASSWORD: "DisruptTheMarket1!"
+      
   nhsd.buyingcatalogue.ordering.api:
+    <<: *dependsOnDb
     image: ${REGISTRY:-nhsd}/buying-catalogue/ordering-api:${TAG:-latest}
     container_name: ordering_api
     build: 
@@ -27,11 +53,9 @@ services:
       dockerfile: src/NHSD.BuyingCatalogue.Ordering.Api/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - CONNECTIONSTRINGS__ORDERINGDB=Data Source=nhsd.buyingcatalogue.ordering.api.ordering.db;Initial Catalog=CatalogueOrdering;MultipleActiveResultSets=true;User ID=NHSD;Password=DisruptTheMarket1!
+      - CONNECTIONSTRINGS__ORDERINGDB=Data Source=nhsd.buyingcatalogue.ordering.api.ordering.db;Initial Catalog=CatalogueOrdering;MultipleActiveResultSets=true;User ID=NHSD-ORDAPI;Password=DisruptTheMarket1!
       - BYPASSIDENTITY=True
       - PATHBASE=/ordapi
-    networks:
-      - nhsd_bcnetwork
     ports:
       - "8076:80"
 

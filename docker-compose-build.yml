@@ -1,16 +1,16 @@
 version: '3.5'
 
 services:
-
-  nhsd.buyingcatalogue.ordering.api.ordering.db:
-    image: ${REGISTRY:-nhsd}/buying-catalogue/ordering-api-ordering-db:${TAG:-latest}
-    container_name: ordering_api_ordering_db
-    build: 
-      context: src/NHSD.BuyingCatalogue.Ordering.OrderingDatabase
-
   nhsd.buyingcatalogue.ordering.api:
     image: ${REGISTRY:-nhsd}/buying-catalogue/ordering-api:${TAG:-latest}
     container_name: ordering_api
     build: 
       context: .
       dockerfile: src/NHSD.BuyingCatalogue.Ordering.Api/Dockerfile
+
+  dacpac.deploy:
+    image: ${REGISTRY:-nhsd}/buying-catalogue/ordapi-db-deploy:${TAG:-latest}
+    container_name: ordering_api_ordering_db_deploy
+    build:
+          context: "."
+          dockerfile: "src/NHSD.BuyingCatalogue.Ordering.OrderingDatabase.Deployment/Dockerfile"
