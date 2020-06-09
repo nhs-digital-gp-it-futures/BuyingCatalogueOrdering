@@ -9,6 +9,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -65,13 +66,39 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpPut]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public ActionResult Update(string orderId, ServiceRecipientsModel model)
+        public async Task<ActionResult> UpdateAsync(string orderId, ServiceRecipientsModel model)
         {
-            _cannedData[orderId] = model ?? throw new ArgumentNullException(nameof(model));
+            if (model is null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+
+            if (order is null)
+            {
+                return NotFound();
+            }
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
+            var serviceRecipients = model.ServiceRecipients.Select(recipient => new ServiceRecipient
+            {
+                Name = recipient.Name, OdsCode = recipient.OdsCode, Order = order
+            }).ToList();
+
+            await _serviceRecipientRepository.UpdateAsync(order.OrderId,serviceRecipients);
+
+            var name = User.Identity.Name;
+            order.SetLastUpdatedBy(User.GetUserId(), name);
+
+            await _orderRepository.UpdateOrderAsync(order);
 
             return NoContent();
         }
-
-        private static readonly Dictionary<string, ServiceRecipientsModel> _cannedData = new Dictionary<string, ServiceRecipientsModel>();
     }
 }

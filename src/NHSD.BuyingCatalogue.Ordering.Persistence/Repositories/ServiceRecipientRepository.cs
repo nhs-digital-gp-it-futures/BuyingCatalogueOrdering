@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,40 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
             return await _context.ServiceRecipient
                 .Include(x => x.Order)
                 .Where(s => s.Order.OrderId == orderId).ToListAsync();
+        }
+
+        public async Task DeleteAllByOrderId(string orderId)
+        {
+            var existingServiceRecipients = (await ListServiceRecipientsByOrderIdAsync(orderId)).ToList();
+            _context.ServiceRecipient.RemoveRange(existingServiceRecipients);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(string orderId, IEnumerable<ServiceRecipient> recipientsUpdates)
+        {
+            if (recipientsUpdates == null)
+            {
+                throw new ArgumentNullException(nameof(recipientsUpdates));
+            }
+
+            var updateServiceRecipients = recipientsUpdates.ToList();
+            var existingServiceRecipients = (await ListServiceRecipientsByOrderIdAsync(orderId)).ToList();
+
+            if (!updateServiceRecipients.Any())
+            {
+                _context.ServiceRecipient.RemoveRange(existingServiceRecipients);
+            }
+            else
+            {
+                var noChangeServiceRecipients = existingServiceRecipients.Intersect(updateServiceRecipients).ToList();
+
+                var existingServiceRecipientsToRemove = existingServiceRecipients.Except(noChangeServiceRecipients);
+                var updateServiceRecipientsToAdd = updateServiceRecipients.Except(noChangeServiceRecipients);
+
+                _context.ServiceRecipient.RemoveRange(existingServiceRecipientsToRemove);
+                _context.ServiceRecipient.AddRange(updateServiceRecipientsToAdd);
+            }
+            await _context.SaveChangesAsync();
         }
     }
 }
