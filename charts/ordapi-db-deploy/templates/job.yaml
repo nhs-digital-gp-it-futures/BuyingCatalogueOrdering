@@ -50,6 +50,8 @@ spec:
               configMapKeyRef:
                 name: {{ .serverPortConfig.name }}
                 key: {{ .serverPortConfig.key }}
+          - name: "SQLPACKAGEARGS"
+            value: {{ .sqlPackageArgs }}
           {{- end }}
           {{- if .Values.env.values -}}
           {{- range .Values.env.values }}
