@@ -24,48 +24,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
     [Parallelizable(ParallelScope.All)]
     internal sealed class OrdersControllerTests
     {
-        [Test]
-        public void Constructor_Null_Service_Repository_ThrowsArgumentNullException()
+        [TestCase(true, false, false)]
+        [TestCase(false, true, false)]
+        [TestCase(false, false, true)]
+        public void Constructor_NullParameter_ThrowsArgumentNullException(
+            bool isOrderRepositoryNull,
+            bool isCreateOrderServiceNull,
+            bool isServiceRecipientRepositoryNull)
         {
-            static void Test()
+            void Test()
             {
                 var _ = OrdersControllerBuilder
                     .Create()
-                    .WithOrderRepository(null)
-                    .WithCreateOrderService(Mock.Of<ICreateOrderService>())
-                    .WithServiceRecipientRepository(Mock.Of<IServiceRecipientRepository>())
-                    .Build();
-            }
-
-            Assert.Throws<ArgumentNullException>(Test);
-        }
-
-        [Test]
-        public void Constructor_Repository_Null_Repository_ThrowsArgumentNullException()
-        {
-            static void Test()
-            {
-                var _ = OrdersControllerBuilder
-                    .Create()
-                    .WithOrderRepository(Mock.Of<IOrderRepository>())
-                    .WithCreateOrderService(null)
-                    .WithServiceRecipientRepository(Mock.Of<IServiceRecipientRepository>())
-                    .Build();
-            }
-
-            Assert.Throws<ArgumentNullException>(Test);
-        }
-
-        [Test]
-        public void Constructor_Repository_Service_Null_ThrowsArgumentNullException()
-        {
-            static void Test()
-            {
-                var _ = OrdersControllerBuilder
-                    .Create()
-                    .WithOrderRepository(Mock.Of<IOrderRepository>())
-                    .WithCreateOrderService(Mock.Of<ICreateOrderService>())
-                    .WithServiceRecipientRepository(null)
+                    .WithOrderRepository(isOrderRepositoryNull ? null : Mock.Of<IOrderRepository>())
+                    .WithCreateOrderService(isCreateOrderServiceNull ? null : Mock.Of<ICreateOrderService>())
+                    .WithServiceRecipientRepository(isServiceRecipientRepositoryNull ? null : Mock.Of<IServiceRecipientRepository>())
                     .Build();
             }
 
