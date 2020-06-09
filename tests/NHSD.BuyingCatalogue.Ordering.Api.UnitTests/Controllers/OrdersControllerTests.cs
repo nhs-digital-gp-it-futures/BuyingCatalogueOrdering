@@ -77,7 +77,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = OrdersControllerTestContext.Setup();
 
-            using var controller = context.OrdersController;
+            var controller = context.OrdersController;
 
             var result = await controller.GetAllAsync(context.PrimaryOrganisationId) as OkObjectResult;
             var orders = result.Value as List<OrderModel>;
@@ -97,7 +97,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             context.Orders = orders.Select(x => x.order);
 
-            using var controller = context.OrdersController;
+            var controller = context.OrdersController;
 
             var result = await controller.GetAllAsync(context.PrimaryOrganisationId) as OkObjectResult;
             var ordersResult = result.Value as List<OrderModel>;
@@ -117,7 +117,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             context.Orders = orders.Select(x => x.order);
 
-            using var controller = context.OrdersController;
+            var controller = context.OrdersController;
 
             var result = await controller.GetAllAsync(otherOrganisationId);
             result.Should().BeOfType<ForbidResult>();
@@ -136,7 +136,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             context.Orders = orders.Select(x => x.order);
 
-            using var controller = context.OrdersController;
+            var controller = context.OrdersController;
 
             var result = await controller.GetAllAsync(context.PrimaryOrganisationId) as OkObjectResult;
             var ordersResult = result.Value as List<OrderModel>;
@@ -149,7 +149,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = OrdersControllerTestContext.Setup();
 
-            using var controller = context.OrdersController;
+            var controller = context.OrdersController;
 
             await controller.GetAllAsync(context.PrimaryOrganisationId);
 
@@ -162,7 +162,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = OrdersControllerTestContext.Setup();
 
-            using var controller = context.OrdersController;
+            var controller = context.OrdersController;
 
             var response = await controller.GetOrderSummaryAsync("INVALID");
             response.Should().BeEquivalentTo(new ActionResult<OrderSummaryModel>(new NotFoundResult()));
@@ -179,7 +179,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             context.Order = order;
 
-            using var controller = context.OrdersController;
+            var controller = context.OrdersController;
 
             var response = await controller.GetOrderSummaryAsync(orderId);
             response.Should().BeEquivalentTo(new ActionResult<OrderSummaryModel>(new OkObjectResult(expected)));
@@ -196,7 +196,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             context.Order = order;
 
-            using var controller = context.OrdersController;
+            var controller = context.OrdersController;
 
             var response = await controller.GetOrderSummaryAsync(orderId);
             response.Should().BeEquivalentTo(new ActionResult<OrderSummaryModel>(new ForbidResult()));
@@ -214,7 +214,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = OrdersControllerTestContext.Setup(order.OrganisationId);
             context.Order = order;
 
-            using var controller = context.OrdersController;
+            var controller = context.OrdersController;
 
             var response = (await controller.GetOrderSummaryAsync(context.Order.OrderId)).Result as OkObjectResult;
             Assert.IsNotNull(response);
@@ -232,7 +232,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             context.Order = order;
             context.ServiceRecipientListCount = 2;
 
-            using var controller = context.OrdersController;
+            var controller = context.OrdersController;
 
             string expectedOrderId = context.Order.OrderId;
 
@@ -267,7 +267,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             context.Order = order;
             context.ServiceRecipientListCount = 2;
 
-            using var controller = context.OrdersController;
+            var controller = context.OrdersController;
 
             string expectedOrderId = context.Order.OrderId;
 
@@ -290,7 +290,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 OrganisationId = context.PrimaryOrganisationId
             };
 
-            using var controller = context.OrdersController;
+            var controller = context.OrdersController;
 
             var response = await controller.CreateOrderAsync(createOrderRequest);
 
@@ -307,7 +307,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = OrdersControllerTestContext.Setup();
 
-            using var controller = context.OrdersController;
+            var controller = context.OrdersController;
 
             var createOrderModel = new CreateOrderModel
             {
@@ -315,7 +315,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 OrganisationId = context.PrimaryOrganisationId
             };
 
-            var response = await controller.CreateOrderAsync(createOrderModel);
+            await controller.CreateOrderAsync(createOrderModel);
 
             context.CreateOrderServiceMock.Verify(x => x.CreateAsync(It.IsAny<CreateOrderRequest>()), Times.Once);
         }
@@ -324,7 +324,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task CreateOrderAsync_CreateOrderFailureResult_ReturnsBadRequest()
         {
             var context = OrdersControllerTestContext.Setup();
-            using var controller = context.OrdersController;
+            var controller = context.OrdersController;
 
             var errors = new List<ErrorDetails> { new ErrorDetails("TestErrorId", "TestField") };
 
@@ -354,7 +354,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             async Task<ActionResult<CreateOrderResponseModel>> CreateOrder()
             {
-                using var controller = context.OrdersController;
+                var controller = context.OrdersController;
                 return await controller.CreateOrderAsync(null);
             }
 

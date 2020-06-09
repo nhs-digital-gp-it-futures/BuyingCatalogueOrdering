@@ -20,7 +20,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
-    public sealed class OrdersController : Controller
+    public sealed class OrdersController : ControllerBase
     {
         private readonly IOrderRepository _orderRepository;
         private readonly ICreateOrderService _createOrderService;
