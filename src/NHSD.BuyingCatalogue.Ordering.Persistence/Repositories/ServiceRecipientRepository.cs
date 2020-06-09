@@ -25,13 +25,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
                 .Where(s => s.Order.OrderId == orderId).ToListAsync();
         }
 
-        public async Task DeleteAllByOrderId(string orderId)
-        {
-            var existingServiceRecipients = (await ListServiceRecipientsByOrderIdAsync(orderId)).ToList();
-            _context.ServiceRecipient.RemoveRange(existingServiceRecipients);
-            await _context.SaveChangesAsync();
-        }
-
         public async Task UpdateAsync(string orderId, IEnumerable<ServiceRecipient> recipientsUpdates)
         {
             if (recipientsUpdates == null)

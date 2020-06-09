@@ -89,7 +89,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     SectionModel.CommencementDate.WithStatus(order.IsCommencementDateSectionComplete() ? "complete" : "incomplete"),
                     SectionModel.AssociatedServices,
                     SectionModel.ServiceRecipients.WithStatus(order.IsServiceRecipientsSectionComplete() ? "complete" : "incomplete"),
-                    SectionModel.CatalogueSolutions,
+                    SectionModel.CatalogueSolutions.WithStatus(order.IsCatalogueSolutionsSectionComplete() ? "complete" : "incomplete"),
                     SectionModel.AdditionalServices,
                     SectionModel.FundingSource
                 }

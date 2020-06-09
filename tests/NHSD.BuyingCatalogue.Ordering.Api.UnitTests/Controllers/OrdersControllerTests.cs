@@ -168,6 +168,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.SupplierSectionStatusCases))]
         [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.CommencementDateSectionStatusCases))]
         [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.ServiceRecipientsSectionStatusCases))]
+        [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.CatalogueSolutionsSectionStatusCases))]
         public async Task GetOrderSummaryAsync_ChangeOrderData_ReturnsExpectedSummary(Order order,
             OrderSummaryModel expected)
         {
@@ -523,6 +524,43 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                             .Build());
                 }
             }
+
+            internal static IEnumerable<TestCaseData> CatalogueSolutionsSectionStatusCases
+            {
+                get
+                {
+                    var organisationId = Guid.NewGuid();
+
+                    yield return new TestCaseData(
+                        OrderBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithCatalogueSolutionsViewed(true)
+                            .Build(),
+                        OrderSummaryModelBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithSections(SectionModelListBuilder.Create()
+                                .WithCatalogueSolutions(SectionModel.CatalogueSolutions.WithStatus("complete"))
+                                .Build())
+                            .Build());
+
+                    yield return new TestCaseData(
+                        OrderBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithCatalogueSolutionsViewed(false)
+                            .Build(),
+                        OrderSummaryModelBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithSections(SectionModelListBuilder.Create()
+                                .WithCatalogueSolutions(SectionModel.CatalogueSolutions.WithStatus("incomplete"))
+                                .Build())
+                            .Build());
+                }
+            }
+
         }
     }
 }
