@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography.X509Certificates;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NHSD.BuyingCatalogue.Ordering.Domain;
@@ -11,8 +12,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
         {
             if(builder is null)
                 throw new ArgumentNullException(nameof(builder));
-
-            builder.HasKey(x => x.OdsCode);
+            builder.HasKey(x => new { x.OrderId, x.OdsCode });
         }
     }
 }
