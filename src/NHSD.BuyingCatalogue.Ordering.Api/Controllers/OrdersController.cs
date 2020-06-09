@@ -27,7 +27,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         private readonly IServiceRecipientRepository _serviceRecipientRepository;
 
         public OrdersController(
-            IOrderRepository orderRepository,
+            IOrderRepository orderRepository, 
             ICreateOrderService createOrderService,
             IServiceRecipientRepository serviceRecipientRepository)
         {

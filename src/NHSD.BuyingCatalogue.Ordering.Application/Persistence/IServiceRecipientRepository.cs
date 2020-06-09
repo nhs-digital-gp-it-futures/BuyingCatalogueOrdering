@@ -9,5 +9,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Application.Persistence
         Task<IEnumerable<ServiceRecipient>> ListServiceRecipientsByOrderIdAsync(string orderId);
         
         Task<int> GetCountByOrderIdAsync(string orderId);
+        
+        Task UpdateAsync(string orderId, IEnumerable<ServiceRecipient> recipientsUpdates);
     }
 }
