@@ -25,6 +25,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
                 .Where(s => s.Order.OrderId == orderId).ToListAsync();
         }
 
+        public async Task<int> GetCountByOrderIdAsync(string orderId)
+        {
+            if (orderId is null)
+            {
+                throw new ArgumentNullException(nameof(orderId));
+            }
+
+            return await _context.ServiceRecipient
+                .Where(x => x.Order.OrderId == orderId)
+                .CountAsync();
+        }
+        
         public async Task DeleteAllByOrderId(string orderId)
         {
             var existingServiceRecipients = (await ListServiceRecipientsByOrderIdAsync(orderId)).ToList();

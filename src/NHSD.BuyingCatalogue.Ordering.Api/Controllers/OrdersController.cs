@@ -20,17 +20,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
-    public sealed class OrdersController : Controller
+    public sealed class OrdersController : ControllerBase
     {
         private readonly IOrderRepository _orderRepository;
         private readonly ICreateOrderService _createOrderService;
+        private readonly IServiceRecipientRepository _serviceRecipientRepository;
 
         public OrdersController(
             IOrderRepository orderRepository, 
-            ICreateOrderService createOrderService)
+            ICreateOrderService createOrderService,
+            IServiceRecipientRepository serviceRecipientRepository)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
             _createOrderService = createOrderService ?? throw new ArgumentNullException(nameof(createOrderService));
+            _serviceRecipientRepository = serviceRecipientRepository ?? throw new ArgumentNullException(nameof(serviceRecipientRepository));
         }
 
         [HttpGet]
@@ -38,14 +41,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         public async Task<ActionResult> GetAllAsync(Guid organisationId)
         {
             var primaryOrganisationId = User.GetPrimaryOrganisationId();
-
             if (primaryOrganisationId != organisationId)
             {
                 return Forbid();
             }
             
             var orders = await _orderRepository.ListOrdersByOrganisationIdAsync(organisationId);
-
             var orderModelResult = orders.Select(order => new OrderModel
                 {
                 OrderId = order.OrderId,
@@ -76,6 +77,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
+            int serviceRecipientsCount = await _serviceRecipientRepository.GetCountByOrderIdAsync(orderId);
+
             OrderSummaryModel orderSummaryModel = new OrderSummaryModel
             {
                 OrderId = orderId,
@@ -88,7 +91,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     SectionModel.Supplier.WithStatus(order.IsSupplierSectionComplete() ? "complete" : "incomplete"),
                     SectionModel.CommencementDate.WithStatus(order.IsCommencementDateSectionComplete() ? "complete" : "incomplete"),
                     SectionModel.AssociatedServices,
-                    SectionModel.ServiceRecipients.WithStatus(order.IsServiceRecipientsSectionComplete() ? "complete" : "incomplete"),
+                    SectionModel
+                        .ServiceRecipients
+                        .WithStatus(order.IsServiceRecipientsSectionComplete() ? "complete" : "incomplete")
+                        .WithCount(serviceRecipientsCount),
                     SectionModel.CatalogueSolutions,
                     SectionModel.AdditionalServices,
                     SectionModel.FundingSource

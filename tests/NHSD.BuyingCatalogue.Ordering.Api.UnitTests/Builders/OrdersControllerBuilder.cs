@@ -1,22 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using Moq;
+﻿using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
-using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
     internal sealed class OrdersControllerBuilder
     {
-        private IOrderRepository _ordersRepository;
+        private IOrderRepository _orderRepository;
+        private IServiceRecipientRepository _serviceRecipientRepository;
         private ICreateOrderService _createOrderService;
 
         private OrdersControllerBuilder()
         {
-            _ordersRepository = Mock.Of<IOrderRepository>();
-            _createOrderService = Mock.Of<ICreateOrderService>();
         }
 
         internal static OrdersControllerBuilder Create()
@@ -24,12 +20,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return new OrdersControllerBuilder();
         }
 
-        internal OrdersControllerBuilder WithListOrders(IEnumerable<Order> result)
+        internal OrdersControllerBuilder WithOrderRepository(IOrderRepository orderRepository)
         {
-            var mockOrderRepository = new Mock<IOrderRepository>();
-            mockOrderRepository.Setup(x => x.ListOrdersByOrganisationIdAsync(It.IsAny<Guid>())).ReturnsAsync(result);
+            _orderRepository = orderRepository;
+            return this;
+        }
 
-            _ordersRepository = mockOrderRepository.Object;
+        internal OrdersControllerBuilder WithServiceRecipientRepository(IServiceRecipientRepository serviceRecipientRepository)
+        {
+            _serviceRecipientRepository = serviceRecipientRepository;
             return this;
         }
 
@@ -41,7 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 
         internal OrdersController Build()
         {
-            return new OrdersController(_ordersRepository, _createOrderService);
+            return new OrdersController(_orderRepository, _createOrderService, _serviceRecipientRepository);
         }
     }
 }
