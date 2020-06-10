@@ -90,5 +90,28 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
             var actual = OrderExtensions.IsServiceRecipientsSectionComplete(order);
             actual.Should().BeFalse();
         }
+
+        [Test]
+        public void IsCatalogueSolutionsSectionComplete_NullOrder_ReturnsFalse()
+        {
+            var actual = OrderExtensions.IsCatalogueSolutionsSectionComplete(null);
+            actual.Should().BeFalse();
+        }
+
+        [Test]
+        public void IsCatalogueSolutionsSectionComplete_CatalogueSolutionsViewed_ReturnsTrue()
+        {
+            var order = OrderBuilder.Create().WithCatalogueSolutionsViewed(true).Build();
+            var actual = OrderExtensions.IsCatalogueSolutionsSectionComplete(order);
+            actual.Should().BeTrue();
+        }
+
+        [Test]
+        public void IsCatalogueSolutionsSectionComplete_CatalogueSolutionsNotViewed_ReturnsFalse()
+        {
+            var order = OrderBuilder.Create().WithCatalogueSolutionsViewed(false).Build();
+            var actual = OrderExtensions.IsCatalogueSolutionsSectionComplete(order);
+            actual.Should().BeFalse();
+        }
     }
 }

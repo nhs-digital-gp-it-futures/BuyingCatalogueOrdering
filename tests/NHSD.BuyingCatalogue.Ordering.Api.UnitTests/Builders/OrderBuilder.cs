@@ -120,6 +120,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
+        internal OrderBuilder WithCatalogueSolutionsViewed(bool catalogueSolutionsViewed)
+        {
+            _order.CatalogueSolutionsViewed = catalogueSolutionsViewed;
+            return this;
+        }
+
         internal Order Build() => _order;
     }
 }
