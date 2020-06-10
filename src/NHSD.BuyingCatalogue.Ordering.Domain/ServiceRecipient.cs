@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
@@ -7,9 +6,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
     {
         public string OdsCode { get; set; }
 
+        public string OrderId { get; set; }
+
         [ForeignKey("OrderId")]
         public Order Order { get; set; }
-
+        
         public string Name { get; set; }
     }
 }
