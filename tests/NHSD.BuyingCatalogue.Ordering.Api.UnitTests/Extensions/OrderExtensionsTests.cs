@@ -99,7 +99,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public void IsCatalogueSolutionsSectionComplete_ServiceRecipientsViewed_ReturnsTrue()
+        public void IsCatalogueSolutionsSectionComplete_CatalogueSolutionsViewedViewed_ReturnsTrue()
         {
             var order = OrderBuilder.Create().WithCatalogueSolutionsViewed(true).Build();
             var actual = OrderExtensions.IsCatalogueSolutionsSectionComplete(order);
@@ -107,7 +107,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public void IsCatalogueSolutionsSectionComplete_ServiceRecipientsViewedFalse_ReturnsFalse()
+        public void IsCatalogueSolutionsSectionComplete_CatalogueSolutionsViewedFalse_ReturnsFalse()
         {
             var order = OrderBuilder.Create().WithCatalogueSolutionsViewed(false).Build();
             var actual = OrderExtensions.IsCatalogueSolutionsSectionComplete(order);
