@@ -219,6 +219,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
+        public async Task UpdateAsync_NoServiceRecipients_SetsCatalogueSolutionsViewedFalse()
+        {
+            var context = ServiceRecipientsTestContext.Setup();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(context.PrimaryOrganisationId)
+                .WithCatalogueSolutionsViewed(true)
+                .Build();
+
+            var service = ServiceRecipientsModelBuilder.Create().Build();
+
+            string expectedOrderId = context.Order.OrderId;
+            await context.Controller.UpdateAsync(expectedOrderId, service);
+
+            context.Order.CatalogueSolutionsViewed.Should().BeFalse();
+        }
+
+        [Test]
         public async Task UpdateAsync_OrderRepository_UpdateOrderAsyncCalledOnce()
         {
             var context = ServiceRecipientsTestContext.Setup();

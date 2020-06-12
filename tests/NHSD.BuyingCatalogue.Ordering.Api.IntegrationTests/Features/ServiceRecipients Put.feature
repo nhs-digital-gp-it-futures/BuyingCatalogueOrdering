@@ -57,7 +57,7 @@ Scenario: 3. the user selects service recipients including an existing recipient
         | C000014-02 | Ods2    | Another Name        |
 
 @7412
-Scenario: 4. the user selects  no services recipients all recipients are removed
+Scenario: 4. the user selects no services recipients all recipients are removed
     Given Service Recipients exist
         | OdsCode | Name               | OrderId    |
         | Ods3    | Service Recipients | C000014-01 |
@@ -67,6 +67,7 @@ Scenario: 4. the user selects  no services recipients all recipients are removed
     And the persisted service recipients are
         | OrderId    | OdsCode | Name         |
         | C000014-02 | Ods2    | Another Name |
+    And the order with ID C000014-01 has catalogue solutions viewed set to false
 
 @7412
 Scenario: 5. the user selects service recipients and the order is updated with the users details

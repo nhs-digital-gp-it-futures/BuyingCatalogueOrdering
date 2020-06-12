@@ -94,6 +94,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             await _serviceRecipientRepository.UpdateAsync(order.OrderId, serviceRecipients);
 
+            if (serviceRecipients.Count is 0)
+            {
+                order.CatalogueSolutionsViewed = false;
+            }
+
             order.ServiceRecipientsViewed = true;
             order.SetLastUpdatedBy(User.GetUserId(), User.GetUserName());
 
