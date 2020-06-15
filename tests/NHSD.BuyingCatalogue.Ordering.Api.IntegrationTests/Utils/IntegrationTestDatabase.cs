@@ -31,5 +31,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
             using IDbConnection databaseConnection = new SqlConnection(connectionString);
             await databaseConnection.ExecuteAsync("ALTER ROLE db_datawriter DROP MEMBER [NHSD-ORDAPI];");
         }
+
+        public static async Task DenyAccessForNhsdUser(string connectionString)
+        {
+            using IDbConnection databaseConnection = new SqlConnection(connectionString);
+            await databaseConnection.ExecuteAsync("DENY CONNECT TO [NHSD-ORDAPI];");
+        }
     }
 }
