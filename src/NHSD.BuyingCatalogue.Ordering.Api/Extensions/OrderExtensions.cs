@@ -18,5 +18,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
         {
             return order?.CommencementDate != null;
         }
+
+        public static bool IsServiceRecipientsSectionComplete(this Order order)
+        {
+            if (order == null)
+            {
+                return false;
+            }
+            return order.ServiceRecipientsViewed;
+        }
+
+        public static bool IsCatalogueSolutionsSectionComplete(this Order order)
+        {
+            if (order == null)
+            {
+                return false;
+            }
+            return order.CatalogueSolutionsViewed;
+        }
     }
 }

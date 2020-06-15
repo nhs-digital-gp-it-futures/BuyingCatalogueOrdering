@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -84,6 +83,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithLastUpdatedBy(ordersTableItem.LastUpdatedBy)
                     .WithLastUpdatedName(ordersTableItem.LastUpdatedByName)
                     .WithLastUpdated(ordersTableItem.LastUpdated != DateTime.MinValue ? ordersTableItem.LastUpdated : DateTime.UtcNow)
+                    .WithServiceRecipientsViewed(ordersTableItem.ServiceRecipientsViewed)
+                    .WithCatalogueSolutionsViewed(ordersTableItem.CatalogueSolutionsViewed)
                     .WithSupplierId(ordersTableItem.SupplierId)
                     .WithSupplierName(ordersTableItem.SupplierName)
                     .WithSupplierAddressId(supplierAddressId)
@@ -230,6 +231,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string SupplierContactEmail { get; set; }
 
             public DateTime CommencementDate { get; set; }
+
+            public bool ServiceRecipientsViewed { get; set; }
+
+            public bool CatalogueSolutionsViewed { get; set; }
         }
     }
 }

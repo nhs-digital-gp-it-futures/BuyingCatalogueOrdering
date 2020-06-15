@@ -66,7 +66,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
-        internal OrderBuilder WithLastUpdatedBy(string lastUpdatedByName)
+        internal OrderBuilder WithLastUpdatedByName(string lastUpdatedByName)
         {
             _order.LastUpdatedByName = lastUpdatedByName;
             return this;
@@ -111,6 +111,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         internal OrderBuilder WithCommencementDate(DateTime? commencementDate)
         {
             _order.CommencementDate = commencementDate;
+            return this;
+        }
+
+        internal OrderBuilder WithServiceRecipientsViewed(bool serviceRecipientsViewed)
+        {
+            _order.ServiceRecipientsViewed = serviceRecipientsViewed;
+            return this;
+        }
+
+        internal OrderBuilder WithCatalogueSolutionsViewed(bool catalogueSolutionsViewed)
+        {
+            _order.CatalogueSolutionsViewed = catalogueSolutionsViewed;
             return this;
         }
 

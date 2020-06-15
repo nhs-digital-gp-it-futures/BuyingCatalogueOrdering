@@ -67,5 +67,51 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
             var actual = OrderExtensions.IsCommencementDateSectionComplete(null);
             actual.Should().BeFalse();
         }
+
+        [Test]
+        public void IsServiceRecipientsSectionComplete_NullOrder_ReturnsFalse()
+        {
+            var actual = OrderExtensions.IsServiceRecipientsSectionComplete(null);
+            actual.Should().BeFalse();
+        }
+
+        [Test]
+        public void IsServiceRecipientsSectionComplete_ServiceRecipientsViewed_ReturnsTrue()
+        {
+            var order = OrderBuilder.Create().WithServiceRecipientsViewed(true).Build();
+            var actual = OrderExtensions.IsServiceRecipientsSectionComplete(order);
+            actual.Should().BeTrue();
+        }
+
+        [Test]
+        public void IsServiceRecipientsSectionComplete_ServiceRecipientsViewedFalse_ReturnsFalse()
+        {
+            var order = OrderBuilder.Create().WithServiceRecipientsViewed(false).Build();
+            var actual = OrderExtensions.IsServiceRecipientsSectionComplete(order);
+            actual.Should().BeFalse();
+        }
+
+        [Test]
+        public void IsCatalogueSolutionsSectionComplete_NullOrder_ReturnsFalse()
+        {
+            var actual = OrderExtensions.IsCatalogueSolutionsSectionComplete(null);
+            actual.Should().BeFalse();
+        }
+
+        [Test]
+        public void IsCatalogueSolutionsSectionComplete_CatalogueSolutionsViewed_ReturnsTrue()
+        {
+            var order = OrderBuilder.Create().WithCatalogueSolutionsViewed(true).Build();
+            var actual = OrderExtensions.IsCatalogueSolutionsSectionComplete(order);
+            actual.Should().BeTrue();
+        }
+
+        [Test]
+        public void IsCatalogueSolutionsSectionComplete_CatalogueSolutionsNotViewed_ReturnsFalse()
+        {
+            var order = OrderBuilder.Create().WithCatalogueSolutionsViewed(false).Build();
+            var actual = OrderExtensions.IsCatalogueSolutionsSectionComplete(order);
+            actual.Should().BeFalse();
+        }
     }
 }

@@ -31,6 +31,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public OrderStatus OrderStatus { get; set; }
 
+        public bool ServiceRecipientsViewed { get; set; }
+
+        public bool CatalogueSolutionsViewed { get; set; }
+
         public string SupplierId { get; set; } 
 
         public string SupplierName { get; set; }

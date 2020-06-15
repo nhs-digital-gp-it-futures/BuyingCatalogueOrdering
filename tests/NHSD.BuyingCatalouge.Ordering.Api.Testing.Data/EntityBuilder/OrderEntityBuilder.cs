@@ -23,7 +23,9 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
                 Created = DateTime.UtcNow,
                 SupplierId = null,
                 SupplierName = null,
-                CommencementDate = null
+                CommencementDate = null,
+                ServiceRecipientsViewed = false,
+                CatalogueSolutionsViewed = false
             };
         }
 
@@ -136,6 +138,18 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
         public OrderEntityBuilder WithCommencementDate(DateTime? commencementDate)
         {
             _orderEntity.CommencementDate = commencementDate;
+            return this;
+        }
+
+        public OrderEntityBuilder WithServiceRecipientsViewed(bool serviceRecipientsViewed)
+        {
+            _orderEntity.ServiceRecipientsViewed = serviceRecipientsViewed;
+            return this;
+        }
+
+        public OrderEntityBuilder WithCatalogueSolutionsViewed(bool catalogueSolutionsViewed)
+        {
+            _orderEntity.CatalogueSolutionsViewed = catalogueSolutionsViewed;
             return this;
         }
 

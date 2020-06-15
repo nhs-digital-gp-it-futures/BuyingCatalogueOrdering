@@ -6,7 +6,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
     internal sealed class OrderSummaryModelBuilder
     {
-        private readonly string _orderId;
+        private string _orderId;
         private readonly string _description;
         private Guid _organisationId;
         private IEnumerable<SectionModel> _sections;
@@ -22,6 +22,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         public static OrderSummaryModelBuilder Create()
         {
             return new OrderSummaryModelBuilder();
+        }
+
+        public OrderSummaryModelBuilder WithOrderId(string orderId)
+        {
+            _orderId = orderId;
+            return this;
         }
 
         public OrderSummaryModelBuilder WithOrganisationId(Guid organisationId)

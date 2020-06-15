@@ -10,6 +10,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 
         public DbSet<OrderStatus> OrderStatus { get; set; }
 
+        public DbSet<ServiceRecipient> ServiceRecipient { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) 
             : base(options)
         {
@@ -25,6 +27,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new OrderConfiguration());
+            modelBuilder.ApplyConfiguration(new ServiceRecipientConfiguration());
         }
     }
 }
