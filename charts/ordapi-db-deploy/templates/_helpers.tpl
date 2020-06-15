@@ -68,7 +68,7 @@ Defines which image:tag and what pull policy to use
 {{- define "ordapi-db-deploy.image.properties" -}}
 {{- $localImageName := .Values.image.repository | replace "gpitfuturesdevacr.azurecr.io/" "" -}}
 {{- $imageName := ternary $localImageName (printf "%s:%s" .Values.image.repository .Chart.AppVersion) .Values.useLocalImage -}}
-{{- $imagePullPolicy := ternary "IfNotPresent" "Always" .Values.useLocalImage -}}
+{{- $imagePullPolicy := "IfNotPresent" -}}
 image: {{ $imageName | quote }}
 imagePullPolicy: {{ $imagePullPolicy | quote }}
 {{- end }}
