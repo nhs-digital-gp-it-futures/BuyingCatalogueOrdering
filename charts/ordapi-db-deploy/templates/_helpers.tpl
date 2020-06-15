@@ -14,7 +14,7 @@ If release name contains chart name it will be used as a full name.
 {{- define "ordapi-db-deploy.fullname" -}}
 {{- $name := include "ordapi-db-deploy.chart" . -}}
 
-{{- printf "%s-%s-%d" .Release.Name $name .Release.Revision | trunc 63 | trimSuffix "-"  -}}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-"  -}}
 {{- end -}}
 
 {{/*
