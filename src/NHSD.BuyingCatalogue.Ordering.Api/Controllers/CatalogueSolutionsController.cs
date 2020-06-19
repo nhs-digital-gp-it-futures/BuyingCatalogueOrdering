@@ -17,7 +17,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class CatalogueSolutionsController : ControllerBase
     {
-        static private readonly Dictionary<string, OrderItemModel> CatalogueSolutionOrderItems = new Dictionary<string, OrderItemModel>();
+        private static readonly Dictionary<string, OrderItemModel> CatalogueSolutionOrderItems = new Dictionary<string, OrderItemModel>();
 
         private readonly IOrderRepository _orderRepository;
         
@@ -75,7 +75,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [Route("{orderItemId}")]
         public ActionResult<OrderItemModel> GetOrderItem(string orderId, string orderItemId)
         {
-            var orderItemKey = $"{orderId}_{orderItemId}";
+            var orderItemKey = GetOrderItemKey(orderId,orderItemId);
 
             if (CatalogueSolutionOrderItems.ContainsKey(orderItemKey))
             {
@@ -85,15 +85,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             {
                 return new OrderItemModel
                 {
-                    serviceRecipientModel = new ServiceRecipientModel
+                    ServiceRecipient = new ServiceRecipientModel
                     {
                         OdsCode = "OX3"
                     },
-                    CatalogueItemId = orderItemId,
+                    SolutionId = orderItemId,
                     CurrencyCode = "GBP",
-                    DeliverDate = "2020-04-27",
+                    DeliveryDate = "2020-04-27",
                     EstimationPeriod = "month",
-                    ItemUnit = new ItemUnit { Description = "per consultation", Name = "consultation" },
+                    ItemUnitModel = new ItemUnitModel { Description = "per consultation", Name = "consultation" },
                     Price = 0.1m,
                     ProvisioningType = "OnDemand",
                     Quantity = 3,
@@ -105,7 +105,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [HttpPut]
         [Route("{orderItemId}")]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public ActionResult UpdateOrderItem(string orderId, string orderItemId,UpdateOrderItemModel updateOrderItemModel)
+        public ActionResult UpdateOrderItem(string orderId, string orderItemId, UpdateOrderItemModel updateOrderItemModel)
         {
             if (updateOrderItemModel == null)
             {
@@ -118,27 +118,31 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 var item = CatalogueSolutionOrderItems[orderItemKey];
                 item.Price = updateOrderItemModel.Price;
                 item.Quantity = updateOrderItemModel.Quantity;
-                item.DeliverDate = updateOrderItemModel.DeliverDate;
+                item.DeliveryDate = updateOrderItemModel.DeliverDate;
                 item.EstimationPeriod = updateOrderItemModel.EstimationPeriod;
+                return NoContent();
             }
-            return NoContent();
+            else
+            {
+                return NotFound();
+            }
         }
 
         [HttpPost]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public ActionResult CreateOrderItem(string orderId,OrderItemModel orderItemModel)
+        public ActionResult CreateOrderItem(string orderId, OrderItemModel orderItemModel)
         {
             if (orderItemModel == null)
             {
                 throw new ArgumentNullException(nameof(orderItemModel));
             }
 
-            CatalogueSolutionOrderItems[GetOrderItemKey(orderId, orderItemModel.CatalogueItemId)] = orderItemModel;
+            CatalogueSolutionOrderItems[GetOrderItemKey(orderId, orderItemModel.SolutionId)] = orderItemModel;
 
             return NoContent();
         }
 
-        public static string GetOrderItemKey(string orderId, string orderItemId)
+        private static string GetOrderItemKey(string orderId, string orderItemId)
         {
             return  $"{orderId}_{orderItemId}";
         }
