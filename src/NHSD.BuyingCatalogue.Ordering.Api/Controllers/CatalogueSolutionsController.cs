@@ -17,7 +17,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class CatalogueSolutionsController : ControllerBase
     {
-        private static readonly Dictionary<string, OrderItemModel> CatalogueSolutionOrderItems = new Dictionary<string, OrderItemModel>();
+        private static readonly Dictionary<string, CreateOrderItemModel> CatalogueSolutionOrderItems = new Dictionary<string, CreateOrderItemModel>();
 
         private readonly IOrderRepository _orderRepository;
         
@@ -73,7 +73,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpGet]
         [Route("{orderItemId}")]
-        public ActionResult<OrderItemModel> GetOrderItem(string orderId, string orderItemId)
+        public ActionResult<CreateOrderItemModel> GetOrderItem(string orderId, string orderItemId)
         {
             var orderItemKey = GetOrderItemKey(orderId,orderItemId);
 
@@ -83,7 +83,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
             else
             {
-                return new OrderItemModel
+                return new CreateOrderItemModel
                 {
                     ServiceRecipient = new ServiceRecipientModel
                     {
@@ -130,14 +130,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpPost]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public ActionResult CreateOrderItem(string orderId, OrderItemModel orderItemModel)
+        public ActionResult CreateOrderItem(string orderId, CreateOrderItemModel createOrderItemModel)
         {
-            if (orderItemModel == null)
+            if (createOrderItemModel == null)
             {
-                throw new ArgumentNullException(nameof(orderItemModel));
+                throw new ArgumentNullException(nameof(createOrderItemModel));
             }
 
-            CatalogueSolutionOrderItems[GetOrderItemKey(orderId, orderItemModel.SolutionId)] = orderItemModel;
+            CatalogueSolutionOrderItems[GetOrderItemKey(orderId, createOrderItemModel.SolutionId)] = createOrderItemModel;
 
             return NoContent();
         }

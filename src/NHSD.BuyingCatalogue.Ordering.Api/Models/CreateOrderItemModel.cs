@@ -1,6 +1,6 @@
 ﻿namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
-    public class OrderItemModel
+    public class CreateOrderItemModel
     {
         public ServiceRecipientModel ServiceRecipient { get; set; }
         public string SolutionId { get; set; }
