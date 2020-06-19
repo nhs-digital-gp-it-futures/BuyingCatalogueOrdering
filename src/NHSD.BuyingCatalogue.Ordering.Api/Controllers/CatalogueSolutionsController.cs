@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -16,8 +17,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class CatalogueSolutionsController : ControllerBase
     {
-        private readonly IOrderRepository _orderRepository;
+        static private readonly Dictionary<string, OrderItemModel> CatalogueSolutionOrderItems = new Dictionary<string, OrderItemModel>();
 
+        private readonly IOrderRepository _orderRepository;
+        
         public CatalogueSolutionsController(IOrderRepository orderRepository)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
@@ -41,6 +44,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             var solutionList = Array.Empty<CatalogueSolutionModel>();
             return new CatalogueSolutionsModel { OrderDescription = order.Description.Value, CatalogueSolutions = solutionList};
         }
+
 
         [HttpPut]
         [Authorize(Policy = PolicyName.CanManageOrders)]
@@ -66,6 +70,78 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             await _orderRepository.UpdateOrderAsync(order);
             return NoContent();
+        }
+
+        [HttpGet]
+        [Route("{orderItemId}")]
+        public ActionResult<OrderItemModel> GetOrderItem(string orderId, string orderItemId)
+        {
+            var orderItemKey = $"{orderId}_{orderItemId}";
+
+            if (CatalogueSolutionOrderItems.ContainsKey(orderItemKey))
+            {
+                return CatalogueSolutionOrderItems[orderItemKey];
+            }
+            else
+            {
+                return new OrderItemModel
+                {
+                    serviceRecipientModel = new ServiceRecipientModel
+                    {
+                        OdsCode = "OX3"
+                    },
+                    CatalogueItemId = orderItemId,
+                    CurrencyCode = "GBP",
+                    DeliverDate = "2020-04-27",
+                    EstimationPeriod = "month",
+                    ItemUnit = new ItemUnit { Description = "per consultation", Name = "consultation" },
+                    Price = 0.1m,
+                    ProvisioningType = "OnDemand",
+                    Quantity = 3,
+                    Type = "flat"
+                };
+            }
+        }
+
+        [HttpPut]
+        [Route("{orderItemId}")]
+        [Authorize(Policy = PolicyName.CanManageOrders)]
+        public ActionResult UpdateOrderItem(string orderId, string orderItemId,UpdateOrderItemModel updateOrderItemModel)
+        {
+            if (updateOrderItemModel == null)
+            {
+                throw new ArgumentNullException(nameof(updateOrderItemModel));
+            }
+
+            var orderItemKey = GetOrderItemKey(orderId, orderItemId);
+            if (CatalogueSolutionOrderItems.ContainsKey(orderItemKey))
+            {
+                var item = CatalogueSolutionOrderItems[orderItemKey];
+                item.Price = updateOrderItemModel.Price;
+                item.Quantity = updateOrderItemModel.Quantity;
+                item.DeliverDate = updateOrderItemModel.DeliverDate;
+                item.EstimationPeriod = updateOrderItemModel.EstimationPeriod;
+            }
+            return NoContent();
+        }
+
+        [HttpPost]
+        [Authorize(Policy = PolicyName.CanManageOrders)]
+        public ActionResult CreateOrderItem(string orderId,OrderItemModel orderItemModel)
+        {
+            if (orderItemModel == null)
+            {
+                throw new ArgumentNullException(nameof(orderItemModel));
+            }
+
+            CatalogueSolutionOrderItems[GetOrderItemKey(orderId, orderItemModel.CatalogueItemId)] = orderItemModel;
+
+            return NoContent();
+        }
+
+        public static string GetOrderItemKey(string orderId, string orderItemId)
+        {
+            return  $"{orderId}_{orderItemId}";
         }
     }
 }
