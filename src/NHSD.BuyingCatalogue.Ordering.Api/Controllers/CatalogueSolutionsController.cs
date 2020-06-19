@@ -45,7 +45,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             return new CatalogueSolutionsModel { OrderDescription = order.Description.Value, CatalogueSolutions = solutionList};
         }
 
-
         [HttpPut]
         [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult> UpdateAsync(string orderId)
