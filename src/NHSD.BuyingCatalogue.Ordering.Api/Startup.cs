@@ -54,6 +54,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             services.AddTransient<ICreateOrderService, CreateOrderService>();
             services.RegisterHealthChecks(connectionString);
 
+            services.AddSwaggerDocumentation();
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
                 {
@@ -110,16 +112,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 opts.GetLevel = SerilogRequestLoggingOptions.GetLevel;
             });
 
-            if (_environment.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
             var pathBase = _configuration.GetValue<string>("PathBase");
             if (!string.IsNullOrWhiteSpace(pathBase))
             {
                 Log.Logger.Information($"USING PATH BASE {pathBase}");
                 app.UsePathBase(pathBase);
+            }
+
+            if (_environment.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+                app.UseSwaggerDocumentation(pathBase);
             }
 
             app.UseRouting();
