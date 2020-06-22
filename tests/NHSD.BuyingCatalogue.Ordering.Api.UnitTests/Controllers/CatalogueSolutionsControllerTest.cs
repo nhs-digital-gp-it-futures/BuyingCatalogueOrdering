@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
+using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
@@ -78,7 +80,31 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public void Ctor_NullRepository_ThrowsException()
         {
-            Assert.Throws<ArgumentNullException>(() => new CatalogueSolutionsController(null));
+            static void Test()
+            {
+                CatalogueSolutionsControllerBuilder
+                    .Create()
+                    .WithOrderRepository(null)
+                    .WithCreateOrderItemService(Mock.Of<ICreateOrderItemService>())
+                    .Build();
+            }
+
+            Assert.Throws<ArgumentNullException>(Test);
+        }
+
+        [Test]
+        public void Ctor_NullService_ThrowsException()
+        {
+            static void Test()
+            {
+                CatalogueSolutionsControllerBuilder
+                    .Create()
+                    .WithOrderRepository(Mock.Of<IOrderRepository>())
+                    .WithCreateOrderItemService(null)
+                    .Build();
+            }
+
+            Assert.Throws<ArgumentNullException>(Test);
         }
 
         private sealed class CatalogueSolutionsControllerTestContext
@@ -98,12 +124,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
                 }, "mock"));
 
-                Controller = new CatalogueSolutionsController(OrderRepositoryMock.Object)
+                Controller = CatalogueSolutionsControllerBuilder
+                    .Create()
+                    .WithOrderRepository(OrderRepositoryMock.Object)
+                    .Build();
+
+                Controller.ControllerContext = new ControllerContext
                 {
-                    ControllerContext = new ControllerContext
-                    {
-                        HttpContext = new DefaultHttpContext { User = ClaimsPrincipal }
-                    }
+                    HttpContext = new DefaultHttpContext { User = ClaimsPrincipal }
                 };
             }
 

@@ -12,8 +12,11 @@ using Microsoft.IdentityModel.Tokens;
 using NHSD.BuyingCatalogue.Ordering.Api.ActionFilters;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Logging;
+using NHSD.BuyingCatalogue.Ordering.Api.Services;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
+using NHSD.BuyingCatalogue.Ordering.Application.Services;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
@@ -49,9 +52,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             
             IdentityModelEventSource.ShowPII = _environment.IsDevelopment();
 
+            services.AddHttpContextAccessor();
             services.AddTransient<IServiceRecipientRepository, ServiceRecipientRepository>();
             services.AddTransient<IOrderRepository, OrderRepository>();
-            services.AddTransient<ICreateOrderService, CreateOrderService>();
+
+            services
+                .AddTransient<IIdentityService, IdentityService>()
+                .AddTransient<ICreateOrderService, CreateOrderService>()
+                .AddTransient<ICreateOrderItemService, CreateOrderItemService>();
+
             services.RegisterHealthChecks(connectionString);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
