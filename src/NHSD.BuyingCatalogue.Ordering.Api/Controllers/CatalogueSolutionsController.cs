@@ -118,7 +118,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 var item = CatalogueSolutionOrderItems[orderItemKey];
                 item.Price = updateOrderItemModel.Price;
                 item.Quantity = updateOrderItemModel.Quantity;
-                item.DeliveryDate = updateOrderItemModel.DeliverDate;
+                item.DeliveryDate = updateOrderItemModel.DeliveryDate;
                 item.EstimationPeriod = updateOrderItemModel.EstimationPeriod;
                 return NoContent();
             }
