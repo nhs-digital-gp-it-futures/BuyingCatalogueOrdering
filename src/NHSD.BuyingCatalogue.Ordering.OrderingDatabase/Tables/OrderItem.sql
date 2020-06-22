@@ -14,7 +14,7 @@
     CurrencyCode nvarchar(3) NOT NULL,
     Quantity int NOT NULL,
     EstimationPeriodId int NULL,
-    DeliveryDate date NOT NULL,
+    DeliveryDate date NULL,
     Price decimal(18,3) NULL,
     Created datetime2 CONSTRAINT DF_OrderItem_Created DEFAULT GETUTCDATE() NOT NULL,
     LastUpdated datetime2 CONSTRAINT DF_OrderItem_LastUpdated DEFAULT GETUTCDATE() NOT NULL,
