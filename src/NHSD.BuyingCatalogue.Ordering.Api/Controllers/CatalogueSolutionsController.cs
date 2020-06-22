@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -16,8 +17,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class CatalogueSolutionsController : ControllerBase
     {
-        private readonly IOrderRepository _orderRepository;
+        private static readonly Dictionary<string, CreateOrderItemModel> CatalogueSolutionOrderItems = new Dictionary<string, CreateOrderItemModel>();
 
+        private readonly IOrderRepository _orderRepository;
+        
         public CatalogueSolutionsController(IOrderRepository orderRepository)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
@@ -66,6 +69,82 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             await _orderRepository.UpdateOrderAsync(order);
             return NoContent();
+        }
+
+        [HttpGet]
+        [Route("{orderItemId}")]
+        public ActionResult<CreateOrderItemModel> GetOrderItem(string orderId, string orderItemId)
+        {
+            var orderItemKey = GetOrderItemKey(orderId,orderItemId);
+
+            if (CatalogueSolutionOrderItems.ContainsKey(orderItemKey))
+            {
+                return CatalogueSolutionOrderItems[orderItemKey];
+            }
+            else
+            {
+                return new CreateOrderItemModel
+                {
+                    ServiceRecipient = new ServiceRecipientModel
+                    {
+                        OdsCode = "OX3"
+                    },
+                    SolutionId = orderItemId,
+                    CurrencyCode = "GBP",
+                    DeliveryDate = "2020-04-27",
+                    EstimationPeriod = "month",
+                    ItemUnitModel = new ItemUnitModel { Description = "per consultation", Name = "consultation" },
+                    Price = 0.1m,
+                    ProvisioningType = "OnDemand",
+                    Quantity = 3,
+                    Type = "flat"
+                };
+            }
+        }
+
+        [HttpPut]
+        [Route("{orderItemId}")]
+        [Authorize(Policy = PolicyName.CanManageOrders)]
+        public ActionResult UpdateOrderItem(string orderId, string orderItemId, UpdateOrderItemModel updateOrderItemModel)
+        {
+            if (updateOrderItemModel == null)
+            {
+                throw new ArgumentNullException(nameof(updateOrderItemModel));
+            }
+
+            var orderItemKey = GetOrderItemKey(orderId, orderItemId);
+            if (CatalogueSolutionOrderItems.ContainsKey(orderItemKey))
+            {
+                var item = CatalogueSolutionOrderItems[orderItemKey];
+                item.Price = updateOrderItemModel.Price;
+                item.Quantity = updateOrderItemModel.Quantity;
+                item.DeliveryDate = updateOrderItemModel.DeliveryDate;
+                item.EstimationPeriod = updateOrderItemModel.EstimationPeriod;
+                return NoContent();
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Policy = PolicyName.CanManageOrders)]
+        public ActionResult CreateOrderItem(string orderId, CreateOrderItemModel createOrderItemModel)
+        {
+            if (createOrderItemModel == null)
+            {
+                throw new ArgumentNullException(nameof(createOrderItemModel));
+            }
+
+            CatalogueSolutionOrderItems[GetOrderItemKey(orderId, createOrderItemModel.SolutionId)] = createOrderItemModel;
+
+            return NoContent();
+        }
+
+        private static string GetOrderItemKey(string orderId, string orderItemId)
+        {
+            return  $"{orderId}_{orderItemId}";
         }
     }
 }
