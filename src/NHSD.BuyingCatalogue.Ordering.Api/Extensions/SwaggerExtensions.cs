@@ -21,7 +21,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
                 {
                     Version = Version,
                     Title = "Ordering API",
-                    Description = "Ordering API for the NHS Buying Catalogue"
+                    Description = "NHS Digital GP IT Buying Catalogue HTTP Ordering API"
                 });
             });
 
@@ -44,7 +44,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 
             app.UseSwaggerUI(options =>
             {
-                options.SwaggerEndpoint($"{ (endpointPrefix) }/swagger/{Version}/swagger.json", "Ordering API");
+                options.SwaggerEndpoint($"{ (endpointPrefix) }/swagger/{Version}/swagger.json", $"Buying Catalogue Ordering API {Version}");
             });
 
             return app;
