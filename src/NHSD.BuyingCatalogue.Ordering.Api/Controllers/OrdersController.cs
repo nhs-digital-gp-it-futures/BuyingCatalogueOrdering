@@ -88,7 +88,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 TotalRecurringCostPerMonth = 100m,
                 TotalRecurringCostPerYear = 1200m,
                 TotalOwnershipCost = 3700m,
-                UnusedServiceRecipients = new []
+                ServiceRecipients = new []
                 {
                     new ServiceRecipientModel
                     {

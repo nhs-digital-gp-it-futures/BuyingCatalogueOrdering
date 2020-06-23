@@ -10,7 +10,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
         public SupplierModel Supplier { get; set; }
         public DateTime? CommencementDate { get; set; }
         public IEnumerable<OrderItemModel> OrderItems { get; set; }
-        public IEnumerable<ServiceRecipientModel> UnusedServiceRecipients { get; set; }
+        public IEnumerable<ServiceRecipientModel> ServiceRecipients { get; set; }
         public decimal TotalOneOffCost { get; set; }
         public decimal TotalRecurringCostPerMonth { get; set; }
         public decimal TotalRecurringCostPerYear { get; set; }
