@@ -75,6 +75,15 @@
     <Build Include="Tables\Contact.sql" />
     <Build Include="Tables\Address.sql" />
     <Build Include="Tables\ServiceRecipient.sql" />
+    <Build Include="Tables\OrderItem.sql" />
+    <Build Include="Tables\ProvisioningType.sql" />
+    <Build Include="Tables\CatalogueItemType.sql" />
+    <Build Include="Tables\CataloguePriceType.sql" />
+    <Build Include="Tables\TimeUnit.sql" />
+    <None Include="Deployment\InsertCatalogueItemTypes.sql" />
+    <None Include="Deployment\InsertCataloguePriceTypes.sql" />
+    <None Include="Deployment\InsertProvisioningTypes.sql" />
+    <None Include="Deployment\InsertTimeUnits.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Deployment\PostDeployment.sql" />
