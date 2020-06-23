@@ -1,6 +1,6 @@
 ﻿CREATE TABLE dbo.OrderItem
 (
-    OrderItemId int IDENTITY(1,1) NOT NULL,
+    OrderItemId int IDENTITY(1, 1) NOT NULL,
     OrderId nvarchar(10) NOT NULL,
     CatalogueItemId nvarchar(14) NOT NULL,
     CatalogueItemTypeId int NOT NULL,
@@ -15,7 +15,7 @@
     Quantity int NOT NULL,
     EstimationPeriodId int NULL,
     DeliveryDate date NULL,
-    Price decimal(18,3) NULL,
+    Price decimal(18, 3) NULL,
     Created datetime2 CONSTRAINT DF_OrderItem_Created DEFAULT GETUTCDATE() NOT NULL,
     LastUpdated datetime2 CONSTRAINT DF_OrderItem_LastUpdated DEFAULT GETUTCDATE() NOT NULL,
     CONSTRAINT PK_OrderItem PRIMARY KEY (OrderItemId),
@@ -25,4 +25,4 @@
     CONSTRAINT FK_OrderItem_CataloguePriceType_CataloguePriceTypeId FOREIGN KEY (CataloguePriceTypeId) REFERENCES dbo.CataloguePriceType(CataloguePriceTypeId),
     CONSTRAINT FK_OrderItem_TimeUnit_TimeUnitId FOREIGN KEY (TimeUnitId) REFERENCES dbo.TimeUnit(TimeUnitId),
     CONSTRAINT FK_OrderItem_TimeUnit_EstimationPeriodId FOREIGN KEY (EstimationPeriodId) REFERENCES dbo.TimeUnit(TimeUnitId)
-)
+);
