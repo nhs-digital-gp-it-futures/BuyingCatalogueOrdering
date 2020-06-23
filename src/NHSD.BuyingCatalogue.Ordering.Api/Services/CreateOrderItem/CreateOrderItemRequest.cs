@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Query.Internal;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
@@ -18,17 +19,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 
         public string CatalogueItemName { get; }
 
-        public ProvisioningType ProvisioningType { get; }
+        public string ProvisioningTypeName { get; }
 
-        public CataloguePriceUnit CataloguePriceUnit { get; }
+        public string CataloguePriceUnitTierName { get; }
 
-        public TimeUnit PriceUnit { get; }
+        public string CataloguePriceUnitDescription { get; }
+
+        public string PriceTimeUnitName { get; }
 
         public string CurrencyCode { get; }
 
         public int Quantity { get; }
 
-        public TimeUnit EstimationPeriod { get; }
+        public string EstimationPeriodName { get; }
 
         public DateTime? DeliveryDate { get; }
 
@@ -37,20 +40,33 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
         public CreateOrderItemRequest(
             Order order, 
             string odsCode,
+            string catalogueItemId,
             CatalogueItemType catalogueItemType,
-            CataloguePriceUnit cataloguePriceUnit)
+            string catalogueItemName,
+            string provisioningTypeName,
+            string cataloguePriceUnitTierName,
+            string cataloguePriceUnitDescription,
+            string priceTimeUnitName,
+            string currencyCode,
+            int quantity,
+            string estimationPeriodName,
+            DateTime? deliveryDate,
+            decimal? price)
         {
-            if (string.IsNullOrWhiteSpace(odsCode))
-            {
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(odsCode));
-            }
-
             Order = order ?? throw new ArgumentNullException(nameof(order));
             OdsCode = odsCode;
+            CatalogueItemId = catalogueItemId;
             CatalogueItemType = catalogueItemType ?? throw new ArgumentNullException(nameof(catalogueItemType));
-            CataloguePriceUnit = cataloguePriceUnit ?? throw new ArgumentNullException(nameof(cataloguePriceUnit));
+            CatalogueItemName = catalogueItemName;
+            ProvisioningTypeName = provisioningTypeName;
+            CataloguePriceUnitTierName = cataloguePriceUnitTierName;
+            CataloguePriceUnitDescription = cataloguePriceUnitDescription;
+            PriceTimeUnitName = priceTimeUnitName;
+            CurrencyCode = currencyCode;
+            Quantity = quantity;
+            EstimationPeriodName = estimationPeriodName;
+            DeliveryDate = deliveryDate;
+            Price = price;
         }
     }
-
-
 }

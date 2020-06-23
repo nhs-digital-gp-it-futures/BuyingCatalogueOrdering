@@ -9,12 +9,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         public static readonly TimeUnit PerMonth = new TimeUnit(1, "month", "per month");
         public static readonly TimeUnit PerYear = new TimeUnit(2, "year", "per year");
 
-        public int Id { get; }
-
-        public string Name { get; }
-
-        public string Description { get; }
-
         private TimeUnit(
             int id, 
             string name, 
@@ -25,18 +19,22 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             Description = description ?? throw new ArgumentNullException(nameof(description));
         }
 
+        public int Id { get; }
+
+        public string Name { get; }
+
+        public string Description { get; }
+
         internal static IEnumerable<TimeUnit> List() => 
             new[] { PerMonth, PerYear };
 
-        internal static TimeUnit FromName(string name)
+        public static TimeUnit FromName(string name)
         {
-            if (name is null)
-                throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name))
+                return null;
 
-            var timeUnit = List()
-                .SingleOrDefault(s => name.Equals(s.Name, StringComparison.CurrentCultureIgnoreCase));
-
-            return timeUnit;
+            return List().SingleOrDefault(
+                timeUnit => name.Equals(timeUnit.Name, StringComparison.CurrentCultureIgnoreCase));
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Application.Services;
 using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Domain.Results;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 {
@@ -18,31 +19,39 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             _identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
         }
 
-        public async Task CreateAsync(CreateOrderItemRequest createOrderItemRequest)
+        public async Task<Result> CreateAsync(CreateOrderItemRequest request)
         {
-            if (createOrderItemRequest is null)
-                throw new ArgumentNullException(nameof(createOrderItemRequest));
+            if (request is null)
+                throw new ArgumentNullException(nameof(request));
 
-            Order order = createOrderItemRequest.Order;
+            var provisioningType = ProvisioningType.FromName(request.ProvisioningTypeName);
+            var cataloguePriceUnit = CataloguePriceUnit.Create(request.CataloguePriceUnitTierName, request.CataloguePriceUnitDescription);
+
+            var priceTimeUnit = TimeUnit.FromName(request.PriceTimeUnitName);
+            var estimationPeriod = TimeUnit.FromName(request.EstimationPeriodName);
+
             var orderItem = new OrderItem(
-                createOrderItemRequest.OdsCode, 
-                createOrderItemRequest.CatalogueItemId,
-                createOrderItemRequest.CatalogueItemType,
-                createOrderItemRequest.CatalogueItemName,
-                createOrderItemRequest.ProvisioningType,
-                createOrderItemRequest.CataloguePriceUnit,
-                createOrderItemRequest.PriceUnit,
-                createOrderItemRequest.CurrencyCode,
-                createOrderItemRequest.Quantity,
-                createOrderItemRequest.EstimationPeriod,
-                createOrderItemRequest.DeliveryDate,
-                createOrderItemRequest.Price);
+                request.OdsCode, 
+                request.CatalogueItemId,
+                request.CatalogueItemType,
+                request.CatalogueItemName,
+                provisioningType,
+                cataloguePriceUnit,
+                priceTimeUnit,
+                request.CurrencyCode,
+                request.Quantity,
+                estimationPeriod,
+                request.DeliveryDate,
+                request.Price);
 
+            Order order = request.Order;
             order.AddOrderItem(orderItem, 
                 _identityService.GetUserIdentity(), 
                 _identityService.GetUserName());
 
             await _orderRepository.UpdateOrderAsync(order);
+
+            return Result.Success();
         }
     }
 }

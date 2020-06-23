@@ -113,9 +113,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             {
                 PrimaryOrganisationId = Guid.NewGuid();
                 Order = new Order { OrganisationId = PrimaryOrganisationId };
+
                 OrderRepositoryMock = new Mock<IOrderRepository>();
                 OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
                 OrderRepositoryMock.Setup(x => x.UpdateOrderAsync(It.IsAny<Order>())).Callback<Order>(x => Order = x);
+
+                CreateOrderItemService = new Mock<ICreateOrderItemService>();
+
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]
                 {
                     new Claim("Ordering", "Manage"),
@@ -127,6 +131,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 Controller = CatalogueSolutionsControllerBuilder
                     .Create()
                     .WithOrderRepository(OrderRepositoryMock.Object)
+                    .WithCreateOrderItemService(CreateOrderItemService.Object)
                     .Build();
 
                 Controller.ControllerContext = new ControllerContext
@@ -140,6 +145,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             internal ClaimsPrincipal ClaimsPrincipal { get; }
 
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
+
+            internal Mock<ICreateOrderItemService> CreateOrderItemService { get; }
 
             internal Order Order { get; set; }
 

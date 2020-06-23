@@ -1,9 +1,10 @@
 ﻿using System.Threading.Tasks;
+using NHSD.BuyingCatalogue.Ordering.Domain.Results;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 {
     public interface ICreateOrderItemService
     {
-        Task CreateAsync(CreateOrderItemRequest createOrderItemRequest);
+        Task<Result> CreateAsync(CreateOrderItemRequest createOrderItemRequest);
     }
 }

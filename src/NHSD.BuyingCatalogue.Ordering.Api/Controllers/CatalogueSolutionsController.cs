@@ -96,7 +96,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 },
                 SolutionId = orderItemId,
                 CurrencyCode = "GBP",
-                DeliveryDate = "2020-04-27",
+                DeliveryDate = DateTime.UtcNow,
                 EstimationPeriod = "month",
                 ItemUnitModel = new ItemUnitModel { Description = "per consultation", Name = "consultation" },
                 Price = 0.1m,
@@ -124,13 +124,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            var request = new CreateOrderItemRequest(
-                order,
-                model?.ServiceRecipient?.OdsCode,
-                CatalogueItemType.Solution,
-                null);
-
-            await _createOrderItemService.CreateAsync(request);
+            await _createOrderItemService.CreateAsync(model.ToRequest(order, CatalogueItemType.Solution));
 
             return Ok();
         }
