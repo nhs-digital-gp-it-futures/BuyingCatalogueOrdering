@@ -53,7 +53,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var controller = context.OrdersController;
 
             var result = await controller.GetAllAsync(context.PrimaryOrganisationId) as OkObjectResult;
-            var orders = result.Value as List<OrderModel>;
+            var orders = result.Value as List<OrderListItemModel>;
             orders.Should().BeEmpty();
         }
 
@@ -63,7 +63,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             string orderDescription)
         {
             var context = OrdersControllerTestContext.Setup();
-            var orders = new List<(Order order, OrderModel expected)>
+            var orders = new List<(Order order, OrderListItemModel expected)>
             {
                 CreateOrderTestData(orderId, context.PrimaryOrganisationId, orderDescription)
             };
@@ -73,7 +73,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var controller = context.OrdersController;
 
             var result = await controller.GetAllAsync(context.PrimaryOrganisationId) as OkObjectResult;
-            var ordersResult = result.Value as List<OrderModel>;
+            var ordersResult = result.Value as List<OrderListItemModel>;
             ordersResult.Should().ContainSingle();
             ordersResult.Should().BeEquivalentTo(orders.Select(x => x.expected));
         }
@@ -83,7 +83,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var otherOrganisationId = Guid.NewGuid();
             var context = OrdersControllerTestContext.Setup();
-            var orders = new List<(Order order, OrderModel expected)>
+            var orders = new List<(Order order, OrderListItemModel expected)>
             {
                 CreateOrderTestData("C0000014-01", otherOrganisationId, "A description")
             };
@@ -101,7 +101,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = OrdersControllerTestContext.Setup();
 
-            var orders = new List<(Order order, OrderModel expected)>
+            var orders = new List<(Order order, OrderListItemModel expected)>
             {
                 CreateOrderTestData("C0000014-01", context.PrimaryOrganisationId, "Some Description"),
                 CreateOrderTestData("C000012-01", context.PrimaryOrganisationId, "Another Description")
@@ -112,7 +112,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var controller = context.OrdersController;
 
             var result = await controller.GetAllAsync(context.PrimaryOrganisationId) as OkObjectResult;
-            var ordersResult = result.Value as List<OrderModel>;
+            var ordersResult = result.Value as List<OrderListItemModel>;
             ordersResult.Count.Should().Be(2);
             ordersResult.Should().BeEquivalentTo(orders.Select(x => x.expected));
         }
@@ -334,7 +334,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             Assert.ThrowsAsync<ArgumentNullException>(CreateOrder);
         }
 
-        private static (Order order, OrderModel expectedOrder) CreateOrderTestData(
+        private static (Order order, OrderListItemModel expectedOrder) CreateOrderTestData(
             string orderId,
             Guid organisationId,
             string description)
@@ -347,7 +347,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .Build();
 
             return (order: repositoryOrder,
-                expectedOrder: new OrderModel
+                expectedOrder: new OrderListItemModel
                 {
                     OrderId = repositoryOrder.OrderId,
                     Description = repositoryOrder.Description.Value,
