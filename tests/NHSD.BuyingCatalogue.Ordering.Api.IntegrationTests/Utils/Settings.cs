@@ -10,7 +10,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
             ConnectionString = config.GetConnectionString("OrderingDb");
             OrderingApiBaseUrl = config.GetValue<string>("OrderingApiBaseUrl");
             Authority = config.GetValue<string>("Authority");
-            TestTimeOutInSeconds = config.GetValue<int>("TestTimeOutInSeconds");
+            OrderingApiHealthCheckTimeout = config.GetValue<int>("OrderingApiHealthCheckTimeout");
         }
 
         public string OrderingDbAdminConnectionString { get; }
@@ -21,6 +21,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
 
         public string Authority { get; }
 
-        public int TestTimeOutInSeconds { get; }
+        public int OrderingApiHealthCheckTimeout { get; }
     }
 }

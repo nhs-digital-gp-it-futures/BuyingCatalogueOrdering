@@ -6,12 +6,12 @@ using TechTalk.SpecFlow;
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
 {
     [Binding]
-    public sealed class DatabaseHealthCheck
+    public sealed class OrderingApiHealthCheck
     {
         internal async Task AwaitApiRunningAsync(Settings settings)
         {
             var _baseUrl = settings.OrderingApiBaseUrl;
-            TimeSpan testTimeOut = TimeSpan.FromSeconds(settings.TestTimeOutInSeconds);
+            TimeSpan testTimeOut = TimeSpan.FromSeconds(settings.OrderingApiHealthCheckTimeout);
 
             await AwaitApiRunningAsync(($"{_baseUrl}/health/live"), testTimeOut);
             await AwaitApiRunningAsync(($"{_baseUrl}/health/ready"), testTimeOut);

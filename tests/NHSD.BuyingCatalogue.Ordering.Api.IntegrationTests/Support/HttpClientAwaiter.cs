@@ -15,7 +15,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
                 {
                     try
                     {
-                        using var response = await httpClient.GetAsync(new Uri(address)).ConfigureAwait(false);
+                        using var response = await httpClient.GetAsync(new Uri(address));
                         if (response.IsSuccessStatusCode)
                         {
                             return true;
@@ -26,7 +26,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
                         // Ignore exceptions, just retry
                     }
 
-                    await Task.Delay(1000).ConfigureAwait(false);
+                    await Task.Delay(1000);
                 }
             }
 
