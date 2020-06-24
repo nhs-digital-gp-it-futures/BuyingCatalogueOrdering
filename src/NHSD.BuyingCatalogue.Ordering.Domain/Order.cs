@@ -65,11 +65,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             LastUpdated = DateTime.UtcNow;
         }
 
-        public void AddOrderItem(OrderItem orderItem, Guid userId, string name)
+        public void AddOrderItem(
+            OrderItem orderItem, 
+            Guid userId, 
+            string name)
         {
             if (orderItem is null)
                 throw new ArgumentNullException(nameof(orderItem));
-            
+
             _orderItems.Add(orderItem);
 
             SetLastUpdatedBy(userId, name);

@@ -5,6 +5,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 {
     public interface ICreateOrderItemService
     {
-        Task<Result> CreateAsync(CreateOrderItemRequest createOrderItemRequest);
+        Task<Result<int>> CreateAsync(CreateOrderItemRequest createOrderItemRequest);
     }
 }

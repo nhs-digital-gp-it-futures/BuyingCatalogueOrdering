@@ -6,9 +6,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class ProvisioningType
     {
-        public static readonly ProvisioningType OnDemand = new ProvisioningType(1, nameof(OnDemand));
+        public static readonly ProvisioningType Patient = new ProvisioningType(1, nameof(Patient));
         public static readonly ProvisioningType Declarative = new ProvisioningType(2, nameof(Declarative));
-        public static readonly ProvisioningType Patient = new ProvisioningType(3, nameof(Patient));
+        public static readonly ProvisioningType OnDemand = new ProvisioningType(3, nameof(OnDemand));
 
         private ProvisioningType(
             int id, 
@@ -30,10 +30,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             if (name is null)
                 throw new ArgumentNullException(nameof(name));
 
-            var provisioningType = List()
-                .SingleOrDefault(s => name.Equals(s.Name, StringComparison.CurrentCultureIgnoreCase));
-
-            return provisioningType;
+            return List()
+                .SingleOrDefault(s => 
+                    name.Equals(s.Name, StringComparison.CurrentCultureIgnoreCase));
         }
+
+        public static ProvisioningType FromId(int id) => 
+            List().SingleOrDefault(item => id == item.Id);
     }
 }

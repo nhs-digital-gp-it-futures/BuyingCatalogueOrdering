@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +10,9 @@ using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
+using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Domain.Results;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -94,7 +97,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 {
                     OdsCode = "OX3"
                 },
-                SolutionId = orderItemId,
+                CatalogueSolutionId = orderItemId,
                 CurrencyCode = "GBP",
                 DeliveryDate = DateTime.UtcNow,
                 EstimationPeriod = "month",
@@ -108,7 +111,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpPost]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult> CreateOrderItemAsync(
+        public async Task<ActionResult<CreateOrderItemResponseModel>> CreateOrderItemAsync(
             string orderId, 
             CreateOrderItemModel model)
         {
@@ -124,9 +127,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            await _createOrderItemService.CreateAsync(model.ToRequest(order, CatalogueItemType.Solution));
+            var createOrderItemResponse = new CreateOrderItemResponseModel();
 
-            return Ok();
+            var result = await _createOrderItemService.CreateAsync(model.ToRequest(order, CatalogueItemType.Solution));
+            if (result.IsSuccess)
+            {
+                createOrderItemResponse.OrderItemId = result.Value;
+                return CreatedAtAction(nameof(GetOrderItem).TrimAsync(), null, new { orderId, orderItemId = createOrderItemResponse.OrderItemId }, createOrderItemResponse);
+            }
+
+            createOrderItemResponse.Errors = result.Errors.Select(x => new ErrorModel(x.Id, x.Field));
+            return BadRequest(createOrderItemResponse);
         }
 
         [HttpPut]

@@ -1,6 +1,4 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore.Query.Internal;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
@@ -20,6 +18,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
         public string CatalogueItemName { get; }
 
         public string ProvisioningTypeName { get; }
+        public string CataloguePriceTypeName { get; }
 
         public string CataloguePriceUnitTierName { get; }
 
@@ -44,6 +43,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             CatalogueItemType catalogueItemType,
             string catalogueItemName,
             string provisioningTypeName,
+            string cataloguePriceTypeName,
             string cataloguePriceUnitTierName,
             string cataloguePriceUnitDescription,
             string priceTimeUnitName,
@@ -59,6 +59,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             CatalogueItemType = catalogueItemType ?? throw new ArgumentNullException(nameof(catalogueItemType));
             CatalogueItemName = catalogueItemName;
             ProvisioningTypeName = provisioningTypeName;
+            CataloguePriceTypeName = cataloguePriceTypeName;
             CataloguePriceUnitTierName = cataloguePriceUnitTierName;
             CataloguePriceUnitDescription = cataloguePriceUnitDescription;
             PriceTimeUnitName = priceTimeUnitName;

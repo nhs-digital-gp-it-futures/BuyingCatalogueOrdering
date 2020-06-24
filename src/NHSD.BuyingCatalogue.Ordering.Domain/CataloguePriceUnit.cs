@@ -8,11 +8,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
     {
         public string TierName { get; }
 
-        private string Description { get; }
+        public string Description { get; }
+
+        private CataloguePriceUnit()
+        {
+        }
 
         private CataloguePriceUnit(
             string tierName, 
-            string description)
+            string description) : this()
         {
             TierName = tierName;
             Description = description;

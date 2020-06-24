@@ -36,5 +36,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             return List().SingleOrDefault(
                 timeUnit => name.Equals(timeUnit.Name, StringComparison.CurrentCultureIgnoreCase));
         }
+
+        public static TimeUnit FromId(int id) => 
+            List().SingleOrDefault(timeUnit => id == timeUnit.Id);
     }
 }

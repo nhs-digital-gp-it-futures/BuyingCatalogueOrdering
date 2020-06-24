@@ -19,5 +19,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
         }
+
+        internal static IEnumerable<CatalogueItemType> List() => 
+            new[] { Solution, AdditionalService, AssociatedService };
+
+        public static CatalogueItemType FromId(int id)
+        {
+            return List().SingleOrDefault(
+                catalogueItemType => catalogueItemType.Id.Equals(id));
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Application.Services;
@@ -19,12 +20,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             _identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
         }
 
-        public async Task<Result> CreateAsync(CreateOrderItemRequest request)
+        public async Task<Result<int>> CreateAsync(CreateOrderItemRequest request)
         {
             if (request is null)
                 throw new ArgumentNullException(nameof(request));
 
             var provisioningType = ProvisioningType.FromName(request.ProvisioningTypeName);
+            var cataloguePriceType = CataloguePriceType.FromName(request.CataloguePriceTypeName);
             var cataloguePriceUnit = CataloguePriceUnit.Create(request.CataloguePriceUnitTierName, request.CataloguePriceUnitDescription);
 
             var priceTimeUnit = TimeUnit.FromName(request.PriceTimeUnitName);
@@ -36,6 +38,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
                 request.CatalogueItemType,
                 request.CatalogueItemName,
                 provisioningType,
+                cataloguePriceType,
                 cataloguePriceUnit,
                 priceTimeUnit,
                 request.CurrencyCode,
@@ -51,7 +54,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 
             await _orderRepository.UpdateOrderAsync(order);
 
-            return Result.Success();
+            return Result.Success(orderItem.OrderItemId);
         }
     }
 }

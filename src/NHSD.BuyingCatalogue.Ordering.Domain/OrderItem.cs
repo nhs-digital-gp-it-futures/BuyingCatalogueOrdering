@@ -16,9 +16,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public ProvisioningType ProvisioningType { get; }
 
+        public CataloguePriceType CataloguePriceType { get; }
+
         public CataloguePriceUnit CataloguePriceUnit { get; }
 
-        public TimeUnit PriceUnit { get; }
+        public TimeUnit PriceTimeUnit { get; }
 
         public string CurrencyCode { get; }
 
@@ -30,20 +32,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public decimal? Price { get; }
 
+        private OrderItem()
+        {
+        }
+
         public OrderItem(
             string odsCode, 
             string catalogueItemId, 
             CatalogueItemType catalogueItemType, 
             string catalogueItemName,
             ProvisioningType provisioningType, 
+            CataloguePriceType cataloguePriceType,
             CataloguePriceUnit cataloguePriceUnit,
-            TimeUnit priceUnit,
+            TimeUnit priceTimeUnit,
             string currencyCode, 
             int quantity,
             TimeUnit estimationPeriod,
             DateTime? deliveryDate,
-            decimal? price
-            )
+            decimal? price) : this()
         {
             if (string.IsNullOrWhiteSpace(odsCode))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(odsCode));
@@ -62,8 +68,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             CatalogueItemType = catalogueItemType ?? throw new ArgumentNullException(nameof(catalogueItemType));
             CatalogueItemName = catalogueItemName;
             ProvisioningType = provisioningType ?? throw new ArgumentNullException(nameof(provisioningType));
+            CataloguePriceType = cataloguePriceType ?? throw new ArgumentNullException(nameof(cataloguePriceType));
             CataloguePriceUnit = cataloguePriceUnit ?? throw new ArgumentNullException(nameof(cataloguePriceUnit));
-            PriceUnit = priceUnit;
+            PriceTimeUnit = priceTimeUnit;
             CurrencyCode = currencyCode;
             Quantity = quantity;
             EstimationPeriod = estimationPeriod;

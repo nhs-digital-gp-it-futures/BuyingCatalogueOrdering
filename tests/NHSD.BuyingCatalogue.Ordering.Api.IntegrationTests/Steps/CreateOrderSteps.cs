@@ -14,7 +14,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private readonly ScenarioContext _context;
         private readonly Response _response;
         private readonly Request _request;
-        private readonly Settings _settings;
         private readonly string _orderingUrl;
 
         public CreateOrderSteps(ScenarioContext context, Response response, Request request, Settings settings)
@@ -22,8 +21,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             _context = context;
             _response = response;
             _request = request;
-            _settings = settings;
-            _orderingUrl = settings.OrderingApiBaseUrl + "/api/v1/orders";
+            _orderingUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{orderId}/sections/catalogue-solutions";
         }
 
         [When(@"a POST request is made to create an order")]
