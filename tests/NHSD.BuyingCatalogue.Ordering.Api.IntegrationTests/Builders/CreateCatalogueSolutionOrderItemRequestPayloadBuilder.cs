@@ -1,6 +1,6 @@
 ﻿using System;
-using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Data;
-using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests.Payloads;
+using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
 {
@@ -13,7 +13,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
         private int _quantity;
         private TimeUnit? _estimationPeriod;
         private ProvisioningType _provisioningType;
-        private CataloguePriceType _priceType;
+        private CataloguePriceType _cataloguePriceType;
         private string _currencyCode;
         private string _itemUnitName;
         private string _itemUnitNameDescription;
@@ -28,7 +28,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
             _quantity = 5;
             _estimationPeriod = TimeUnit.Month;
             _provisioningType = ProvisioningType.OnDemand;
-            _priceType = CataloguePriceType.Flat;
+            _cataloguePriceType = CataloguePriceType.Flat;
             _currencyCode = "GBP";
             _itemUnitName = "consultation";
             _itemUnitNameDescription = "per consultation";
@@ -80,9 +80,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
             return this;
         }
 
-        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithPriceType(CataloguePriceType priceType)
+        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithCataloguePriceType(CataloguePriceType cataloguePriceType)
         {
-            _priceType = priceType;
+            _cataloguePriceType = cataloguePriceType;
             return this;
         }
 
@@ -121,7 +121,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
                 Quantity = _quantity,
                 EstimationPeriod = _estimationPeriod,
                 ProvisioningType = _provisioningType,
-                PriceType = _priceType,
+                CataloguePriceType = _cataloguePriceType,
                 CurrencyCode = _currencyCode,
                 ItemUnitName = _itemUnitName,
                 ItemUnitNameDescription = _itemUnitNameDescription,

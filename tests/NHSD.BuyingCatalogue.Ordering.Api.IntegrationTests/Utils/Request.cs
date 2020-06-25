@@ -21,8 +21,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
         public async Task GetAsync(string url, params object[] pathSegments)
             => _response.Result = await CreateCommonRequest(url, pathSegments).GetAsync();
 
-        public async Task PostJsonAsync(string url, object payload, params object[] pathSegments)
-            => _response.Result = await CreateCommonRequest(url, pathSegments).PostJsonAsync(payload);
+        public async Task<Response> PostJsonAsync(string url, object payload, params object[] pathSegments)
+        {
+            _response.Result = await CreateCommonRequest(url, pathSegments).PostJsonAsync(payload);
+            return _response;
+        }
 
         public async Task PutJsonAsync(string url, object payload, params object[] pathSegments)
             => _response.Result = await CreateCommonRequest(url, pathSegments).PutJsonAsync(payload);

@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders;
-using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Data;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests.Payloads;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
+using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
+using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 {
@@ -31,77 +31,63 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 
         public CreateCatalogueSolutionOrderItemRequestPayload Payload { get; set; }
 
-        public async Task ExecuteAsync()
+        public async Task<CreateCatalogueSolutionOrderItemResponse> ExecuteAsync()
         {
-            await _request.PostJsonAsync(_createCatalogueSolutionOrderItemUrl, new
+            object payload = null;
+            if (Payload != null)
             {
-                ServiceRecipient = new 
+                payload = new
                 {
-                    Payload.OdsCode
-                },
-                Payload.CatalogueSolutionId,
-                Payload.CatalogueSolutionName,
-                Payload.DeliveryDate,
-                Payload.Quantity,
-                EstimationPeriod = Payload.EstimationPeriod != null ? Enum.GetName(typeof(TimeUnit), Payload.EstimationPeriod) : null,
-                ProvisioningType = Enum.GetName(typeof(ProvisioningType), Payload.ProvisioningType),
-                Type = Enum.GetName(typeof(CataloguePriceType), Payload.PriceType),
-                Payload.CurrencyCode,
-                ItemUnitModel = new
-                {
-                    Name = Payload.ItemUnitName,
-                    Description = Payload.ItemUnitNameDescription
-                },
-                Payload.Price
-            });
+                    ServiceRecipient = new {Payload.OdsCode},
+                    Payload.CatalogueSolutionId,
+                    Payload.CatalogueSolutionName,
+                    Payload.DeliveryDate,
+                    Payload.Quantity,
+                    EstimationPeriod = Payload.EstimationPeriod?.ToString(),
+                    ProvisioningType = Payload.ProvisioningType?.ToString(),
+                    Type = Payload.CataloguePriceType?.ToString(),
+                    Payload.CurrencyCode,
+                    ItemUnitModel =
+                        new
+                        {
+                            Name = Payload.ItemUnitName, 
+                            Description = Payload.ItemUnitNameDescription
+                        },
+                    Payload.Price
+                };
+            }
+
+            var response = await _request.PostJsonAsync(_createCatalogueSolutionOrderItemUrl, payload);
+            
+            return new CreateCatalogueSolutionOrderItemResponse(response);
         }
 
-        public void AssertPayload(OrderItemEntity orderItem)
+        public void AssertPayload(OrderItemEntity actual)
         {
-            var actual = new
-            {
-                orderItem.OdsCode,
-                CatalogueSolutionId = orderItem.CatalogueItemId,
-                CatalogueSolutionName = orderItem.CatalogueItemName,
-                orderItem.DeliveryDate,
-                orderItem.Quantity,
-                EstimationPeriod = orderItem.EstimationPeriodId != null ? (TimeUnit)orderItem.EstimationPeriodId : (TimeUnit?) null,
-                ProvisioningType = (ProvisioningType)orderItem.ProvisioningTypeId,
-                PriceType = (CataloguePriceType)orderItem.CataloguePriceTypeId,
-                orderItem.CurrencyCode,
-                ItemUnitName = orderItem.PricingUnitTierName,
-                ItemUnitNameDescription = orderItem.PricingUnitDescription,
-                orderItem.Price,
-            };
+            var expected = OrderItemEntityBuilder
+                .Create()
+                .WithOrderId(OrderId)
+                .WithOdsCode(Payload.OdsCode)
+                .WithCatalogueItemId(Payload.CatalogueSolutionId)
+                .WithCatalogueItemType(CatalogueItemType.Solution)
+                .WithCatalogueItemName(Payload.CatalogueSolutionName)
+                .WithDeliveryDate(Payload.DeliveryDate)
+                .WithQuantity(Payload.Quantity.GetValueOrDefault())
+                .WithEstimationPeriod(Payload.EstimationPeriod)
+                .WithProvisioningType(Payload.ProvisioningType.GetValueOrDefault())
+                .WithCataloguePriceType(Payload.CataloguePriceType.GetValueOrDefault())
+                .WithCurrencyCode(Payload.CurrencyCode)
+                .WithPricingUnitTierName(Payload.ItemUnitName)
+                .WithPricingUnitDescription(Payload.ItemUnitNameDescription)
+                .WithPrice(Payload.Price)
+                .Build();
 
-            actual.Should().BeEquivalentTo(Payload);
+            actual.Should().BeEquivalentTo(expected, 
+                config => 
+                    config
+                        .Excluding(entity => entity.OrderItemId)
+                        .Excluding(entity => entity.Created)
+                        .Excluding(entity => entity.LastUpdated));
         }
-    }
-
-    internal sealed class CreateCatalogueSolutionOrderItemRequestPayload
-    {
-        public string OdsCode { get; set; }
-
-        public string CatalogueSolutionId { get; set; }
-
-        public string CatalogueSolutionName { get; set; }
-
-        public DateTime? DeliveryDate { get; set; }
-
-        public int Quantity { get; set; }
-
-        public TimeUnit? EstimationPeriod { get; set; }
-
-        public ProvisioningType ProvisioningType { get; set; }
-
-        public CataloguePriceType PriceType { get; set; }
-
-        public string CurrencyCode { get; set; }
-
-        public string ItemUnitName { get; set; }
-
-        public string ItemUnitNameDescription { get; set; }
-
-        public decimal? Price { get; set; }
     }
 }

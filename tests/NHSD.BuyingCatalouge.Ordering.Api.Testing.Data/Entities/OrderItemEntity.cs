@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
 
 namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 {
@@ -13,27 +14,27 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public string CatalogueItemId { get; set; }
 
-        public string CatalogueItemTypeId { get; set; }
+        public CatalogueItemType CatalogueItemType { get; set; }
 
         public string CatalogueItemName { get; set; }
 
         public string OdsCode { get; set; }
 
-        public int ProvisioningTypeId { get; set; }
+        public ProvisioningType ProvisioningType { get; set; }
 
-        public int CataloguePriceTypeId { get; set; }
+        public CataloguePriceType CataloguePriceType { get; set; }
 
         public string PricingUnitTierName { get; set; }
 
         public string PricingUnitDescription { get; set; }
 
-        public int? TimeUnitId { get; set; }
+        public TimeUnit? TimeUnit { get; set; }
 
         public string CurrencyCode { get; set; }
 
         public int Quantity { get; set; }
 
-        public int? EstimationPeriodId { get; set; }
+        public TimeUnit? EstimationPeriod { get; set; }
 
         public DateTime? DeliveryDate { get; set; }
 
@@ -68,17 +69,17 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
             (
                 @OrderId,
                 @CatalogueItemId,
-                @CatalogueItemTypeId,
+                @CatalogueItemType,
                 @CatalogueItemName,
                 @OdsCode,
-                @ProvisioningTypeId,
-                @CataloguePriceTypeId,
+                @ProvisioningType,
+                @CataloguePriceType,
                 @PricingUnitTierName,
                 @PricingUnitDescription,
-                @TimeUnitId,
+                @TimeUnit,
                 @CurrencyCode,
                 @Quantity,
-                @EstimationPeriodId,
+                @EstimationPeriod,
                 @DeliveryDate,
                 @Price,
                 @Created,
@@ -91,17 +92,17 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 SELECT  OrderItemId,
                         OrderId,
                         CatalogueItemId,
-                        CatalogueItemTypeId,
+                        CatalogueItemTypeId AS CatalogueItemType,
                         CatalogueItemName,
                         OdsCode,
-                        ProvisioningTypeId,
-                        CataloguePriceTypeId,
+                        ProvisioningTypeId AS ProvisioningType,
+                        CataloguePriceTypeId AS CataloguePriceType,
                         PricingUnitTierName,
                         PricingUnitDescription,
-                        TimeUnitId,
+                        TimeUnitId AS TimeUnit,
                         CurrencyCode,
                         Quantity,
-                        EstimationPeriodId,
+                        EstimationPeriodId AS EstimationPeriod,
                         DeliveryDate,
                         Price,
                         Created,
