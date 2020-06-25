@@ -5,7 +5,7 @@
     CatalogueItemId nvarchar(14) NOT NULL,
     CatalogueItemTypeId int NOT NULL,
     CatalogueItemName nvarchar(255) NOT NULL,
-    OdsCode nvarchar(8) NOT NULL,
+    OdsCode nvarchar(8) NULL,
     ProvisioningTypeId int NOT NULL,
     CataloguePriceTypeId int NOT NULL,
     PricingUnitTierName nvarchar(20) NULL,
@@ -24,5 +24,6 @@
     CONSTRAINT FK_OrderItem_ProvisioningType_ProvisioningTypeId FOREIGN KEY (ProvisioningTypeId) REFERENCES dbo.ProvisioningType(ProvisioningTypeId),
     CONSTRAINT FK_OrderItem_CataloguePriceType_CataloguePriceTypeId FOREIGN KEY (CataloguePriceTypeId) REFERENCES dbo.CataloguePriceType(CataloguePriceTypeId),
     CONSTRAINT FK_OrderItem_TimeUnit_TimeUnitId FOREIGN KEY (TimeUnitId) REFERENCES dbo.TimeUnit(TimeUnitId),
-    CONSTRAINT FK_OrderItem_TimeUnit_EstimationPeriodId FOREIGN KEY (EstimationPeriodId) REFERENCES dbo.TimeUnit(TimeUnitId)
+    CONSTRAINT FK_OrderItem_TimeUnit_EstimationPeriodId FOREIGN KEY (EstimationPeriodId) REFERENCES dbo.TimeUnit(TimeUnitId),
+    CONSTRAINT FK_OrderItem_ServiceRecipient_OdsCode FOREIGN KEY (OrderId, OdsCode) REFERENCES dbo.ServiceRecipient(OrderId, OdsCode)
 );
