@@ -28,5 +28,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             return List().SingleOrDefault(
                 catalogueItemType => catalogueItemType.Id.Equals(id));
         }
+
+        public bool Equals(CatalogueItemType other)
+        {
+            if (other is null)
+                return false;
+
+            if (ReferenceEquals(this, other))
+                return true;
+
+            return Id == other.Id;
+        }
+
+        public override bool Equals(object obj) => Equals(obj as CatalogueItemType);
+
+        public override int GetHashCode() => Id;
     }
 }

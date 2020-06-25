@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
-    public sealed class TimeUnit
+    public sealed class TimeUnit : IEquatable<TimeUnit>
     {
         public static readonly TimeUnit PerMonth = new TimeUnit(1, "month", "per month");
         public static readonly TimeUnit PerYear = new TimeUnit(2, "year", "per year");
@@ -39,5 +39,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public static TimeUnit FromId(int id) => 
             List().SingleOrDefault(timeUnit => id == timeUnit.Id);
+
+        public bool Equals(TimeUnit other)
+        {
+            if (other is null)
+                return false;
+
+            if (ReferenceEquals(this, other))
+                return true;
+
+            return Id == other.Id;
+        }
+
+        public override bool Equals(object obj) => Equals(obj as TimeUnit);
+
+        public override int GetHashCode() => Id;
     }
 }

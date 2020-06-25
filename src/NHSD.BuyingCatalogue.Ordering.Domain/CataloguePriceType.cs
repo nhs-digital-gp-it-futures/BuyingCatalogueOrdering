@@ -36,5 +36,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public static CataloguePriceType FromId(int id) => 
             List().SingleOrDefault(item => id == item.Id);
+
+        public bool Equals(CataloguePriceType other)
+        {
+            if (other is null)
+                return false;
+
+            if (ReferenceEquals(this, other))
+                return true;
+
+            return Id == other.Id;
+        }
+
+        public override bool Equals(object obj) => Equals(obj as CataloguePriceType);
+
+        public override int GetHashCode() => Id;
     }
 }

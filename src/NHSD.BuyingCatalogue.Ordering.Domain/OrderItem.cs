@@ -4,7 +4,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class OrderItem : IEquatable<OrderItem>
     {
-        public int OrderItemId { get; }
+        private int? _orderItemId = null;
+
+        public int OrderItemId => 
+            _orderItemId.GetValueOrDefault();
 
         public string OdsCode { get; }
 
@@ -86,7 +89,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             if (ReferenceEquals(this, other))
                 return true;
 
-            return OrderItemId == other.OrderItemId;
+            if (!_orderItemId.HasValue || !other._orderItemId.HasValue)
+                return false;
+
+            return _orderItemId == other.OrderItemId;
         }
 
         public override bool Equals(object obj)
