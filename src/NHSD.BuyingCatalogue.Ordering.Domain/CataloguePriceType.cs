@@ -9,9 +9,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         public static readonly CataloguePriceType Flat = new CataloguePriceType(1, nameof(Flat));
         public static readonly CataloguePriceType Tiered = new CataloguePriceType(2, nameof(Tiered));
 
-        private CataloguePriceType(
-            int id, 
-            string name)
+        private CataloguePriceType(int id, string name)
         {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));

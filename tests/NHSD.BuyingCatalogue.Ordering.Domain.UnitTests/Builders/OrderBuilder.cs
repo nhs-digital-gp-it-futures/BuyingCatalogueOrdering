@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders
 {
@@ -8,9 +7,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders
         private Guid _lastUpdatedBy;
         private string _lastUpdatedByName;
 
-        /// <summary>
-        /// Initialises a new instance of the <see cref="OrderBuilder"/> class.
-        /// </summary>
         private OrderBuilder()
         {
             _lastUpdatedBy = Guid.NewGuid();

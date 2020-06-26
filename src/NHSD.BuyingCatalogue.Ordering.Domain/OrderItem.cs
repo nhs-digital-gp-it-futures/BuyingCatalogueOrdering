@@ -4,7 +4,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class OrderItem : IEquatable<OrderItem>
     {
+#pragma warning disable 649
         private int _orderItemId;
+#pragma warning restore 649
 
         /// <summary>
         /// Gets the unique ID for this instance.
@@ -53,15 +55,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         }
 
         public OrderItem(
-            string odsCode, 
-            string catalogueItemId, 
-            CatalogueItemType catalogueItemType, 
+            string odsCode,
+            string catalogueItemId,
+            CatalogueItemType catalogueItemType,
             string catalogueItemName,
-            ProvisioningType provisioningType, 
+            ProvisioningType provisioningType,
             CataloguePriceType cataloguePriceType,
             CataloguePriceUnit cataloguePriceUnit,
             TimeUnit priceTimeUnit,
-            string currencyCode, 
+            string currencyCode,
             int quantity,
             TimeUnit estimationPeriod,
             DateTime? deliveryDate,

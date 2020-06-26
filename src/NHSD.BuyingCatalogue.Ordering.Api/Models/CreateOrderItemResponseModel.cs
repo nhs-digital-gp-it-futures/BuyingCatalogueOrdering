@@ -2,7 +2,7 @@
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
-    public class CreateOrderItemResponseModel
+    public sealed class CreateOrderItemResponseModel
     {
         public int? OrderItemId { get; set; }
 
