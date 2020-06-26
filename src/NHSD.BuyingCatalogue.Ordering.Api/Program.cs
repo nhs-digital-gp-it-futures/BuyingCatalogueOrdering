@@ -15,6 +15,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Information)
                 .Enrich.FromLogContext()
 #if DEBUG
                 .WriteTo.Debug()

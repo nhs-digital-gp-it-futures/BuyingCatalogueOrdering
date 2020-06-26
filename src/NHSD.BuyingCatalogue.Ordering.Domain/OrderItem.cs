@@ -4,10 +4,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class OrderItem : IEquatable<OrderItem>
     {
-        private int? _orderItemId = null;
+        private int _orderItemId;
 
-        public int OrderItemId => 
-            _orderItemId.GetValueOrDefault();
+        /// <summary>
+        /// Gets the unique ID for this instance.
+        /// </summary>
+        /// <remarks>
+        /// A private field (<see cref="_orderItemId"/>) is used here as EF core will set this value
+        /// when an <see cref="OrderItem"/> is persisted to the database. To mimic this functionality
+        /// in the unit tests use the name of this field to set it via reflection.
+        /// </remarks>
+        public int OrderItemId
+        {
+            get
+            {
+                return _orderItemId;
+            }
+        }
 
         public string OdsCode { get; }
 
@@ -81,6 +94,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             Price = price;
         }
 
+        private bool IsTransient() => OrderItemId == default;
+
         public bool Equals(OrderItem other)
         {
             if (other is null)
@@ -89,20 +104,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             if (ReferenceEquals(this, other))
                 return true;
 
-            if (!_orderItemId.HasValue || !other._orderItemId.HasValue)
+            if (IsTransient() || other.IsTransient())
                 return false;
 
-            return _orderItemId == other.OrderItemId;
+            return OrderItemId == other.OrderItemId;
         }
 
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as OrderItem);
-        }
+        public override bool Equals(object obj) => Equals(obj as OrderItem);
 
-        public override int GetHashCode()
-        {
-            return OrderItemId;
-        }
+        public override int GetHashCode() => OrderItemId;
     }
 }

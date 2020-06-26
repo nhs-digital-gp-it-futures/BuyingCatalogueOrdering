@@ -7,6 +7,9 @@ Background:
     Given Orders exist
         | OrderId    | Description      | OrganisationId                       | LastUpdatedByName | LastUpdatedBy                        |
         | C000014-01 | Some Description | 4af62b99-638c-4247-875e-965239cd0c48 | Tom Smith         | 335392e4-4bb1-413b-9de5-36a85c9c0422 |
+    And Service Recipients exist
+        | OdsCode | Name              | OrderId    |
+        | ODS1    | Service Recipient | C000014-01 |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @7840

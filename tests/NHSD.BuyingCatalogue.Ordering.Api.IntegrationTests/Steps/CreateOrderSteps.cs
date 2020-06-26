@@ -21,7 +21,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             _context = context;
             _response = response;
             _request = request;
-            _orderingUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{orderId}/sections/catalogue-solutions";
+            _orderingUrl = settings.OrderingApiBaseUrl + "/api/v1/orders";
         }
 
         [When(@"a POST request is made to create an order")]
