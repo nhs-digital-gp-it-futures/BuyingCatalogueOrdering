@@ -5,8 +5,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 {
     public sealed class CreateOrderItemRequest
     {
-        public int OrderItemId { get; }
-
         public Order Order { get; }
 
         public string OdsCode { get; }
@@ -18,6 +16,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
         public string CatalogueItemName { get; }
 
         public string ProvisioningTypeName { get; }
+
         public string CataloguePriceTypeName { get; }
 
         public string CataloguePriceUnitTierName { get; }

@@ -41,7 +41,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var controller = context.SupplierSectionController;
             var response = await controller.GetAsync(orderId);
 
-            response.Should().BeEquivalentTo(new ActionResult<SupplierModel>(new NotFoundResult()));
+            response.Should().BeEquivalentTo(new ActionResult<CreateOrderItemModel>(new ForbidResult()));
         }
 
         [Test]

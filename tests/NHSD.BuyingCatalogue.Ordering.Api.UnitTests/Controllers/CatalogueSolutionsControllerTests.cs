@@ -18,7 +18,7 @@ using NUnit.Framework;
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
-    public sealed class CatalogueSolutionsControllerTest
+    public sealed class CatalogueSolutionsControllerTests
     {
         [Test]
         public async Task UpdateAsync_OrderNotFound_ReturnsNotFound()
