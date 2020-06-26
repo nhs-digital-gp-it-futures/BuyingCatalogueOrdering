@@ -27,7 +27,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         private readonly IOrderRepository _orderRepository;
         private readonly ICreateOrderItemService _createOrderItemService;
-        
+
         public CatalogueSolutionsController(
             IOrderRepository orderRepository,
             ICreateOrderItemService createOrderItemService)
@@ -52,7 +52,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             var solutionList = Array.Empty<CatalogueSolutionModel>();
-            return new CatalogueSolutionsModel { OrderDescription = order.Description.Value, CatalogueSolutions = solutionList};
+            return new CatalogueSolutionsModel { OrderDescription = order.Description.Value, CatalogueSolutions = solutionList };
         }
 
         [HttpPut]
@@ -60,7 +60,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         public async Task<ActionResult> UpdateAsync(string orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
-            
+
             if (order is null)
             {
                 return NotFound();
@@ -85,7 +85,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [Route("{orderItemId}")]
         public ActionResult<CreateOrderItemModel> GetOrderItem(string orderId, string orderItemId)
         {
-            var orderItemKey = GetOrderItemKey(orderId,orderItemId);
+            var orderItemKey = GetOrderItemKey(orderId, orderItemId);
 
             if (CatalogueSolutionOrderItems.ContainsKey(orderItemKey))
             {
@@ -98,9 +98,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 {
                     OdsCode = "OX3"
                 },
-            	CatalogueSolutionId = orderItemId,
+                CatalogueSolutionId = orderItemId,
                 CurrencyCode = "GBP",
-            	DeliveryDate = DateTime.UtcNow,
+                DeliveryDate = DateTime.UtcNow,
                 EstimationPeriod = "month",
                 ItemUnitModel = new ItemUnitModel { Description = "per consultation", Name = "consultation" },
                 Price = 0.1m,
@@ -113,7 +113,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [HttpPost]
         [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult<CreateOrderItemResponseModel>> CreateOrderItemAsync(
-            string orderId, 
+            string orderId,
             CreateOrderItemModel model)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
@@ -167,7 +167,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         private static string GetOrderItemKey(string orderId, string orderItemId)
         {
-            return  $"{orderId}_{orderItemId}";
+            return $"{orderId}_{orderItemId}";
         }
     }
 }
