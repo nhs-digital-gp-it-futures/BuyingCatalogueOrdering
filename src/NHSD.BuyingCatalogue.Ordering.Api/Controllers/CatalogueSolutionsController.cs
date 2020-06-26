@@ -20,13 +20,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
+	[SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Swagger doesn't allow static functions. Suppression will be removed when the proper implementation is added")]
     public sealed class CatalogueSolutionsController : ControllerBase
     {
         private static readonly Dictionary<string, CreateOrderItemModel> CatalogueSolutionOrderItems = new Dictionary<string, CreateOrderItemModel>();
 
         private readonly IOrderRepository _orderRepository;
         private readonly ICreateOrderItemService _createOrderItemService;
-
+        
         public CatalogueSolutionsController(
             IOrderRepository orderRepository,
             ICreateOrderItemService createOrderItemService)
@@ -97,9 +98,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 {
                     OdsCode = "OX3"
                 },
-                CatalogueSolutionId = orderItemId,
+            	CatalogueSolutionId = orderItemId,
                 CurrencyCode = "GBP",
-                DeliveryDate = DateTime.UtcNow,
+            	DeliveryDate = DateTime.UtcNow,
                 EstimationPeriod = "month",
                 ItemUnitModel = new ItemUnitModel { Description = "per consultation", Name = "consultation" },
                 Price = 0.1m,
@@ -111,33 +112,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpPost]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult<CreateOrderItemResponseModel>> CreateOrderItemAsync(
-            string orderId, 
-            CreateOrderItemModel model)
-        {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
-            if (order is null)
-            {
-                return NotFound();
-            }
-
-            var primaryOrganisationId = User.GetPrimaryOrganisationId();
-            if (primaryOrganisationId != order.OrganisationId)
-            {
-                return Forbid();
-            }
-
-            var createOrderItemResponse = new CreateOrderItemResponseModel();
-
-            var result = await _createOrderItemService.CreateAsync(model.ToRequest(order, CatalogueItemType.Solution));
-            if (result.IsSuccess)
-            {
-                createOrderItemResponse.OrderItemId = result.Value;
-                return CreatedAtAction(nameof(GetOrderItem).TrimAsync(), null, new { orderId, orderItemId = createOrderItemResponse.OrderItemId }, createOrderItemResponse);
-            }
-
-            createOrderItemResponse.Errors = result.Errors.Select(x => new ErrorModel(x.Id, x.Field));
-            return BadRequest(createOrderItemResponse);
         }
 
         [HttpPut]

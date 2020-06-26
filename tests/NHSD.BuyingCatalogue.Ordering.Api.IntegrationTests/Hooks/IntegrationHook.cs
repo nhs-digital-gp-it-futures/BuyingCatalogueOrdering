@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using BoDi;
 using Microsoft.Extensions.Configuration;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
@@ -13,10 +14,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
     public sealed class IntegrationHook
     {
         private readonly IObjectContainer _objectContainer;
+        private readonly OrderingApiHealthCheck _orderingApiHealthCheck;
+        private static bool _firstScenario = true;
 
-        public IntegrationHook(IObjectContainer objectContainer)
+        public IntegrationHook(IObjectContainer objectContainer, OrderingApiHealthCheck orderingApiHealthCheck)
         {
             _objectContainer = objectContainer ?? throw new ArgumentNullException(nameof(objectContainer));
+            _orderingApiHealthCheck = orderingApiHealthCheck;
         }
 
         [BeforeScenario]
@@ -24,6 +28,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
         {
             RegisterTestConfiguration();
             RegisterCustomValueRetrievers();
+
+            if (_firstScenario)
+            {
+                _firstScenario = false;
+                await _orderingApiHealthCheck.AwaitApiRunningAsync(_objectContainer.Resolve<Settings>());
+            }
 
             await ResetDatabaseAsync();
         }
