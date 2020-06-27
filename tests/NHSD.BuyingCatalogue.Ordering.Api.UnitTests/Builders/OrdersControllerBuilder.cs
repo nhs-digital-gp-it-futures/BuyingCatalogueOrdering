@@ -1,6 +1,6 @@
 ﻿using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
+using NHSD.BuyingCatalogue.Ordering.Application.Services.CreateOrder;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {

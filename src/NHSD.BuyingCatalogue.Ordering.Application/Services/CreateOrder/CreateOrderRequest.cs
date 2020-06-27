@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
+namespace NHSD.BuyingCatalogue.Ordering.Application.Services.CreateOrder
 {
     public sealed class CreateOrderRequest
     {

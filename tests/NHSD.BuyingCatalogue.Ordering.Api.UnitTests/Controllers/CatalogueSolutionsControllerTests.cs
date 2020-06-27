@@ -8,9 +8,10 @@ using Microsoft.AspNetCore.Routing;
 using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
+using NHSD.BuyingCatalogue.Ordering.Application.Services.CreateOrderItem;
+using NHSD.BuyingCatalogue.Ordering.Application.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Domain.Results;
 using NUnit.Framework;
@@ -260,6 +261,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     x.CreateAsync(It.IsNotNull<CreateOrderItemRequest>()), Times.Once);
         }
 
+        [Test]
+        public async Task UpdateOrderItemAsync_UpdateOrderItemModel_ReturnsNotContext()
+        {
+            var context = CatalogueSolutionsControllerTestContext.Setup();
+
+            const string orderId = "C10000-01";
+            int orderItemId = 1;
+
+            var result = await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, new UpdateOrderItemModel());
+
+            result.Result.Should().BeOfType<NoContentResult>();
+        }
+
         private sealed class CatalogueSolutionsControllerTestContext
         {
             private CatalogueSolutionsControllerTestContext()
@@ -280,6 +294,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 CreateOrderItemService.Setup(x => x.CreateAsync(It.IsNotNull<CreateOrderItemRequest>()))
                     .ReturnsAsync(() => NewOrderItemId);
 
+                UpdateOrderItemResult = Result.Success();
+
+                UpdateOrderItemService = new Mock<IUpdateOrderItemService>();
+                UpdateOrderItemService.Setup(x => x.UpdateAsync(It.IsNotNull<UpdateOrderItemRequest>()))
+                    .ReturnsAsync(() => UpdateOrderItemResult);
+
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]
                 {
                     new Claim("Ordering", "Manage"),
@@ -292,6 +312,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     .Create()
                     .WithOrderRepository(OrderRepositoryMock.Object)
                     .WithCreateOrderItemService(CreateOrderItemService.Object)
+                    .WithUpdateOrderItemService(UpdateOrderItemService.Object)
                     .Build();
 
                 Controller.ControllerContext = new ControllerContext
@@ -301,16 +322,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             }
 
             internal Guid PrimaryOrganisationId { get; }
-
-            internal ClaimsPrincipal ClaimsPrincipal { get; }
+            private ClaimsPrincipal ClaimsPrincipal { get; }
 
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
 
             internal Mock<ICreateOrderItemService> CreateOrderItemService { get; }
 
+            private Mock<IUpdateOrderItemService> UpdateOrderItemService { get; }
+
             internal Order Order { get; set; }
 
             internal Result<int> NewOrderItemId { get; set; }
+
+            internal Result UpdateOrderItemResult { get; set; }
 
             internal CatalogueSolutionsController Controller { get; }
 

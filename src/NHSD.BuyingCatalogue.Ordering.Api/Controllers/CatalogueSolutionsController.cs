@@ -8,8 +8,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
+using NHSD.BuyingCatalogue.Ordering.Application.Services.CreateOrderItem;
+using NHSD.BuyingCatalogue.Ordering.Application.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Domain;
@@ -27,13 +28,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         private readonly IOrderRepository _orderRepository;
         private readonly ICreateOrderItemService _createOrderItemService;
+        private readonly IUpdateOrderItemService _updateOrderItemService;
 
         public CatalogueSolutionsController(
             IOrderRepository orderRepository,
-            ICreateOrderItemService createOrderItemService)
+            ICreateOrderItemService createOrderItemService,
+            IUpdateOrderItemService updateOrderItemService)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
             _createOrderItemService = createOrderItemService ?? throw new ArgumentNullException(nameof(createOrderItemService));
+            _updateOrderItemService = updateOrderItemService ?? throw new ArgumentNullException(nameof(updateOrderItemService));
         }
 
         [HttpGet]
@@ -143,13 +147,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [HttpPut]
         [Route("{orderItemId:int}")]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult> UpdateOrderItemAsync(
+        public async Task<ActionResult<UpdateOrderItemResponseModel>> UpdateOrderItemAsync(
             string orderId, 
             int orderItemId, 
-            UpdateOrderItemModel updateOrderItemModel)
+            UpdateOrderItemModel model)
         {
-            if (updateOrderItemModel is null)
-                throw new ArgumentNullException(nameof(updateOrderItemModel));
+            if (model is null)
+                throw new ArgumentNullException(nameof(model));
 
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
@@ -159,24 +163,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (primaryOrganisationId != order.OrganisationId)
                 return Forbid();
 
-            var orderItem = order.OrderItems.FirstOrDefault(item => orderItemId.Equals(item.OrderItemId));
+            var orderItem = order.OrderItems.FirstOrDefault(
+                item => orderItemId.Equals(item.OrderItemId) 
+                        && CatalogueItemType.Solution.Equals(item.CatalogueItemType));
+
             if (orderItem is null)
                 return NotFound();
 
-            var estimationPeriod = TimeUnit.FromName(updateOrderItemModel.EstimationPeriod);
+            var result = await _updateOrderItemService.UpdateAsync(
+                new UpdateOrderItemRequest(
+                    model.DeliveryDate,
+                    model.EstimationPeriod,
+                    order,
+                    orderItemId,
+                    model.Price,
+                    model.Quantity));
 
-            order.UpdateOrderItem(
-                orderItemId, 
-                updateOrderItemModel.DeliveryDate, 
-                updateOrderItemModel.Quantity, 
-                estimationPeriod,
-                updateOrderItemModel.Price,
-                User.GetUserId(),
-                User.GetUserName());
+            if (result.IsSuccess)
+                return NoContent();
 
-            await _orderRepository.UpdateOrderAsync(order);
+            var updateOrderItemResponse =
+                new UpdateOrderItemResponseModel
+                {
+                    Errors = result.Errors.Select(x => new ErrorModel(x.Id, x.Field))
+                };
 
-            return NoContent();
+            return BadRequest(updateOrderItemResponse);
         }
 
         private static string GetOrderItemKey(string orderId, string orderItemId)

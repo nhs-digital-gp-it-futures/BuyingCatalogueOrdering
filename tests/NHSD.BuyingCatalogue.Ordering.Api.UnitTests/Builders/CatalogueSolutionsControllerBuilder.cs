@@ -1,6 +1,7 @@
 ﻿using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
+using NHSD.BuyingCatalogue.Ordering.Application.Services.CreateOrderItem;
+using NHSD.BuyingCatalogue.Ordering.Application.Services.UpdateOrderItem;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
@@ -8,6 +9,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
     {
         private IOrderRepository _orderRepository;
         private ICreateOrderItemService _createOrderItemService;
+        private IUpdateOrderItemService _updateOrderItemService;
 
         private CatalogueSolutionsControllerBuilder()
         {
@@ -30,7 +32,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
+        internal CatalogueSolutionsControllerBuilder WithUpdateOrderItemService(IUpdateOrderItemService updateOrderItemService)
+        {
+            _updateOrderItemService = updateOrderItemService;
+            return this;
+        }
+
         internal CatalogueSolutionsController Build() => 
-            new CatalogueSolutionsController(_orderRepository, _createOrderItemService);
+            new CatalogueSolutionsController(
+                _orderRepository, 
+                _createOrderItemService, 
+                _updateOrderItemService);
     }
 }
