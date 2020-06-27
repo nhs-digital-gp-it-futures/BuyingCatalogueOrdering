@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests.Payloads;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
+using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 {
@@ -14,6 +17,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
     {
         private readonly Request _request;
         private readonly string _createCatalogueSolutionOrderItemUrl;
+
+        private static readonly IDictionary<string, Func<CreateCatalogueSolutionOrderItemRequestPayload>> PayloadFactory =
+            new Dictionary<string, Func<CreateCatalogueSolutionOrderItemRequestPayload>>()
+            {
+                {
+                    "complete", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().Build()
+                }
+            };
 
         public CreateCatalogueSolutionOrderItemRequest(
             Request request,
@@ -29,7 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 
         public string OrderId { get; set; }
 
-        public CreateCatalogueSolutionOrderItemRequestPayload Payload { get; set; }
+        public CreateCatalogueSolutionOrderItemRequestPayload Payload { get; private set; }
 
         public async Task<CreateCatalogueSolutionOrderItemResponse> ExecuteAsync()
         {
@@ -60,6 +71,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             var response = await _request.PostJsonAsync(_createCatalogueSolutionOrderItemUrl, payload);
             
             return new CreateCatalogueSolutionOrderItemResponse(response);
+        }
+
+        public void SetPayload(string key)
+        {
+            if (key is null)
+                throw new ArgumentNullException(nameof(key));
+
+            if (!PayloadFactory.TryGetValue(key, out var factory))
+                Assert.Fail("Unexpected create catalogue solution order item payload type.");
+
+            Payload = factory();
         }
 
         public void AssertPayload(OrderItemEntity actual)

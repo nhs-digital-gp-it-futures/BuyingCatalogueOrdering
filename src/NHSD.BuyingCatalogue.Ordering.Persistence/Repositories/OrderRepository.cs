@@ -45,6 +45,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
                 await _context.Entry(order).Reference(x => x.OrganisationContact).LoadAsync();
                 await _context.Entry(order).Reference(x => x.SupplierAddress).LoadAsync();
                 await _context.Entry(order).Reference(x => x.SupplierContact).LoadAsync();
+                await _context.Entry(order).Collection(x => x.OrderItems).LoadAsync();
             }
 
             return order;

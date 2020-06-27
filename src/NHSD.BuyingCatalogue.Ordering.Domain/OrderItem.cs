@@ -14,7 +14,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         /// <remarks>
         /// A private field (<see cref="_orderItemId"/>) is used here as EF core will set this value
         /// when an <see cref="OrderItem"/> is persisted to the database. To mimic this functionality
-        /// in the unit tests use the name of this field to set it via reflection.
+        /// in the unit tests use the name of this field to set it via reflection. Do not need to
+        /// convert this to an auto property as recommended by ReSharper.
+        /// ReSharper disable once ConvertToAutoProperty
         /// </remarks>
         public int OrderItemId
         {
@@ -42,13 +44,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public string CurrencyCode { get; }
 
-        public int Quantity { get; }
+        public int Quantity { get; private set; }
 
-        public TimeUnit EstimationPeriod { get; }
+        public TimeUnit EstimationPeriod { get; private set; }
 
-        public DateTime? DeliveryDate { get; }
+        public DateTime? DeliveryDate { get; private set; }
 
-        public decimal? Price { get; }
+        public decimal? Price { get; private set; }
 
         private OrderItem()
         {
@@ -69,9 +71,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             DateTime? deliveryDate,
             decimal? price) : this()
         {
-            if (string.IsNullOrWhiteSpace(odsCode))
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(odsCode));
-
             if (string.IsNullOrWhiteSpace(catalogueItemId))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(catalogueItemId));
 
@@ -93,6 +92,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             Quantity = quantity;
             EstimationPeriod = estimationPeriod;
             DeliveryDate = deliveryDate;
+            Price = price;
+        }
+
+        internal void ChangePrice(
+            DateTime? deliveryDate, 
+            int quantity, 
+            TimeUnit estimationPeriod, 
+            decimal? price)
+        {
+            DeliveryDate = deliveryDate;
+            Quantity = quantity;
+            EstimationPeriod = estimationPeriod;
             Price = price;
         }
 

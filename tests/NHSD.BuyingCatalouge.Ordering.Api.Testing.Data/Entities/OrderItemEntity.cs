@@ -84,7 +84,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 @Price,
                 @Created,
                 @LastUpdated
-            );";
+            );
+            SELECT SCOPE_IDENTITY();";
 
         public static async Task<IEnumerable<OrderItemEntity>> FetchAllAsync(string connectionString)
         {

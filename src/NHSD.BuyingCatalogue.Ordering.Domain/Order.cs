@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
@@ -74,6 +75,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 throw new ArgumentNullException(nameof(orderItem));
 
             _orderItems.Add(orderItem);
+
+            SetLastUpdatedBy(userId, name);
+        }
+
+        public void UpdateOrderItem(
+            int orderItemId,
+            DateTime? deliveryDate, 
+            int quantity, 
+            TimeUnit estimationPeriod, 
+            decimal? price,
+            Guid userId, 
+            string name)
+        {
+            var orderItem = _orderItems.FirstOrDefault(item => orderItemId.Equals(item.OrderItemId));
+
+            orderItem?.ChangePrice(
+                deliveryDate, 
+                quantity, 
+                estimationPeriod, 
+                price);
 
             SetLastUpdatedBy(userId, name);
         }

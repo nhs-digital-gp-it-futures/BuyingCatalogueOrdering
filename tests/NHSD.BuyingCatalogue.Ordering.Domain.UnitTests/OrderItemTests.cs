@@ -12,22 +12,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         [TestCase(null)]
         [TestCase("")]
         [TestCase("    ")]
-        public void Constructor_NullOrEmptyOdsCode_ThrowsArgumentException(string odsCodeInput)
-        {
-            void Test()
-            {
-                OrderItemBuilder
-                    .Create()
-                    .WithOdsCode(odsCodeInput)
-                    .Build();
-            }
-
-            Assert.Throws<ArgumentException>(Test);
-        }
-
-        [TestCase(null)]
-        [TestCase("")]
-        [TestCase("    ")]
         public void Constructor_NullOrEmptyCatalogueItemId_ThrowsArgumentException(string catalogueItemIdInput)
         {
             void Test()

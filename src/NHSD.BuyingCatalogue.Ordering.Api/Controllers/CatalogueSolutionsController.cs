@@ -73,11 +73,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             order.CatalogueSolutionsViewed = true;
-
-            var name = User.Identity.Name;
-            order.SetLastUpdatedBy(User.GetUserId(), name);
+            order.SetLastUpdatedBy(User.GetUserId(), User.GetUserName());
 
             await _orderRepository.UpdateOrderAsync(order);
+
             return NoContent();
         }
 
@@ -142,27 +141,42 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpPut]
-        [Route("{orderItemId}")]
+        [Route("{orderItemId:int}")]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public ActionResult UpdateOrderItem(string orderId, string orderItemId, UpdateOrderItemModel updateOrderItemModel)
+        public async Task<ActionResult> UpdateOrderItemAsync(
+            string orderId, 
+            int orderItemId, 
+            UpdateOrderItemModel updateOrderItemModel)
         {
-            if (updateOrderItemModel == null)
-            {
+            if (updateOrderItemModel is null)
                 throw new ArgumentNullException(nameof(updateOrderItemModel));
-            }
 
-            var orderItemKey = GetOrderItemKey(orderId, orderItemId);
-            if (CatalogueSolutionOrderItems.ContainsKey(orderItemKey))
-            {
-                var item = CatalogueSolutionOrderItems[orderItemKey];
-                item.Price = updateOrderItemModel.Price;
-                item.Quantity = updateOrderItemModel.Quantity;
-                item.DeliveryDate = updateOrderItemModel.DeliveryDate;
-                item.EstimationPeriod = updateOrderItemModel.EstimationPeriod;
-                return NoContent();
-            }
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            if (order is null)
+                return NotFound();
 
-            return NotFound();
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+                return Forbid();
+
+            var orderItem = order.OrderItems.FirstOrDefault(item => orderItemId.Equals(item.OrderItemId));
+            if (orderItem is null)
+                return NotFound();
+
+            var estimationPeriod = TimeUnit.FromName(updateOrderItemModel.EstimationPeriod);
+
+            order.UpdateOrderItem(
+                orderItemId, 
+                updateOrderItemModel.DeliveryDate, 
+                updateOrderItemModel.Quantity, 
+                estimationPeriod,
+                updateOrderItemModel.Price,
+                User.GetUserId(),
+                User.GetUserName());
+
+            await _orderRepository.UpdateOrderAsync(order);
+
+            return NoContent();
         }
 
         private static string GetOrderItemKey(string orderId, string orderItemId)

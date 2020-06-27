@@ -6,6 +6,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
 {
     public sealed class OrderItemEntityBuilder
     {
+        private int _orderItemId;
         private string _orderId;
         private string _odsCode;
         private string _catalogueItemId;
@@ -99,6 +100,12 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
                 orderItemEntity.PricingUnitTierName,
                 orderItemEntity.PricingUnitDescription,
                 orderItemEntity.Price);
+        }
+
+        public OrderItemEntityBuilder WithOrderItemId(int orderItemId)
+        {
+            _orderItemId = orderItemId;
+            return this;
         }
 
         public OrderItemEntityBuilder WithOrderId(string orderId)
@@ -195,6 +202,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
         {
             return new OrderItemEntity
             {
+                OrderItemId = _orderItemId,
                 OrderId = _orderId,
                 OdsCode = _odsCode,
                 CatalogueItemId = _catalogueItemId,
@@ -209,7 +217,9 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
                 TimeUnit = _timeUnit,
                 PricingUnitTierName = _pricingUnitTierName,
                 PricingUnitDescription = _pricingUnitDescription,
-                Price = _price
+                Price = _price,
+                Created = DateTime.UtcNow,
+                LastUpdated = DateTime.UtcNow
             };
         }
     }
