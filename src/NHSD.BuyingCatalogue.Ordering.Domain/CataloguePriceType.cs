@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
-    public sealed class CataloguePriceType
+    public sealed class CataloguePriceType : IEquatable<CataloguePriceType>
     {
         public static readonly CataloguePriceType Flat = new CataloguePriceType(1, nameof(Flat));
         public static readonly CataloguePriceType Tiered = new CataloguePriceType(2, nameof(Tiered));
