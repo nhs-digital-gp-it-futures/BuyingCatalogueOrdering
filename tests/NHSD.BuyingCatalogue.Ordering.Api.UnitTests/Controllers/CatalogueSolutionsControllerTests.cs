@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -13,6 +15,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Domain.Results;
+using NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
@@ -48,16 +51,85 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetAllAsync_WithDescription_ReturnsOkResult()
+        public async Task GetAllAsync_WithDescriptionAndNoSolution_ReturnsOkResult()
         {
-            var expectedDescription = "A description";
+            const string expectedDescription = "A description";
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order.SetDescription(OrderDescription.Create(expectedDescription).Value);
+
             var result = await context.Controller.GetAllAsync("myOrder");
             result.Value.Should().BeOfType<CatalogueSolutionsModel>();
             var model = result.Value;
             model.CatalogueSolutions.Should().BeEmpty();
             model.OrderDescription.Should().Be(expectedDescription);
+        }
+
+        [Test]
+        public async Task GetAllAsync_WithSolution_ReturnsOkayResult()
+        {
+            const string expectedDescription = "A description";
+
+            var context = CatalogueSolutionsControllerTestContext.Setup();
+
+            context.Order.SetDescription(OrderDescription.Create(expectedDescription).Value);
+
+            var serviceRecipients = new List<(string Ods, string Name)>
+            {
+                ("eu", "EU test")
+            };
+            context.Order.SetServiceRecipient(serviceRecipients, Guid.Empty, string.Empty);
+
+            var orderItem = OrderItemBuilder.Create().WithOdsCode(serviceRecipients[0].Ods).Build();
+            context.Order.AddOrderItem(orderItem, Guid.Empty, string.Empty);
+
+            var result = await context.Controller.GetAllAsync("myOrder");
+            result.Value.Should().BeOfType<CatalogueSolutionsModel>();
+            var model = result.Value;
+            model.CatalogueSolutions.Count().Should().Be(1);
+
+            var expectedCatalogueSolutionList = new List<CatalogueSolutionModel>
+            {
+                CreateCatalogueSolutionModel(orderItem, serviceRecipients[0])
+            };
+
+            model.OrderDescription.Should().Be(expectedDescription);
+            model.CatalogueSolutions.Should().BeEquivalentTo(expectedCatalogueSolutionList);
+        }
+
+        [Test]
+        public async Task GetAllAsync_MultipleSolutions_ReturnsOkayResult()
+        {
+            var context = CatalogueSolutionsControllerTestContext.Setup();
+
+            const string expectedDescription = "A description";
+            context.Order.SetDescription(OrderDescription.Create(expectedDescription).Value);
+
+            var serviceRecipients = new List<(string Ods, string Name)>
+            {
+                ("eu", "EU test"),
+                ("auz", null)
+            };
+
+            context.Order.SetServiceRecipient(serviceRecipients, Guid.Empty, string.Empty);
+
+            var orderItem1 = OrderItemBuilder.Create().WithOdsCode(serviceRecipients[0].Ods).Build();
+            var orderItem2 = OrderItemBuilder.Create().WithOdsCode(serviceRecipients[1].Ods).Build();
+            context.Order.AddOrderItem(orderItem1, Guid.Empty, string.Empty);
+            context.Order.AddOrderItem(orderItem2, Guid.Empty, string.Empty);
+
+            var result = await context.Controller.GetAllAsync("myOrder");
+            result.Value.Should().BeOfType<CatalogueSolutionsModel>();
+            var model = result.Value;
+
+            model.OrderDescription.Should().Be(expectedDescription);
+            model.CatalogueSolutions.Count().Should().Be(2);
+            var expectedCatalogueSolutionList = new List<CatalogueSolutionModel>
+            {
+                CreateCatalogueSolutionModel(orderItem1, serviceRecipients[0]),
+                CreateCatalogueSolutionModel(orderItem2, serviceRecipients[1])
+            };
+
+            model.CatalogueSolutions.Should().BeEquivalentTo(expectedCatalogueSolutionList);
         }
 
         [Test]
@@ -223,7 +295,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             {
                 Errors = new []
                 {
-                    new ErrorModel(error.Id, error.Field) 
+                    new ErrorModel(error.Id, error.Field)
                 }
             };
 
@@ -256,7 +328,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             await context.Controller.CreateOrderItemAsync(orderId, new CreateOrderItemModel());
 
-            context.CreateOrderItemService.Verify(x => 
+            context.CreateOrderItemService.Verify(x =>
                     x.CreateAsync(It.IsNotNull<CreateOrderItemRequest>()), Times.Once);
         }
 
@@ -318,6 +390,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             {
                 return new CatalogueSolutionsControllerTestContext();
             }
+        }
+        private static CatalogueSolutionModel CreateCatalogueSolutionModel(OrderItem orderItem, (string Ods, string Name) serviceRecipient)
+        {
+            return new CatalogueSolutionModel
+            {
+                OrderItemId = orderItem.OrderItemId,
+                SolutionName = orderItem.CatalogueItemName,
+                ServiceRecipient = new GetServiceRecipientModel
+                {
+                    OdsCode = serviceRecipient.Ods,
+                    Name = serviceRecipient.Name
+                }
+            };
         }
     }
 }

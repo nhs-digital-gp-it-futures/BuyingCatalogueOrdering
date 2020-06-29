@@ -5,6 +5,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Assist;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 {
@@ -38,13 +39,30 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Then(@"the catalogue solutions response contains the order description (.*)")]
-        public async Task AnEmptyListIsReturned(string description)
+        public async Task OrderDescriptionIsReturned(string description)
         {
             var response = await _response.ReadBodyAsJsonAsync();
             var actual = response.Value<string>("orderDescription");
             actual.Should().Be(description);
         }
 
+        [Then(@"the catalogue solutions response contains solutions")]
+        public async Task ThenTheCatalogueSolutionsResponseContainsSolutions(Table table)
+        {
+            var expected = table.CreateSet<CatalogueSolution>();
+
+            var response = await _response.ReadBodyAsJsonAsync();
+            var solutionToken = response.SelectToken("catalogueSolutions");
+            var solutions = solutionToken.Select(x => new CatalogueSolution
+            {
+                SolutionName = x.Value<string>("solutionName"),
+                ServiceRecipientName = x.SelectToken("serviceRecipient").Value<string>("name"),
+                ServiceRecipientOdsCode = x.SelectToken("serviceRecipient").Value<string>("odsCode")
+            });
+
+            expected.Should().BeEquivalentTo(solutions);
+        }
+        
         [Then(@"the catalogue solutions response contains no solutions")]
         public async Task TheCatalogueSolutionsResponseContainsNoSolutions()
         {
@@ -59,6 +77,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var actual = (await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId)).CatalogueSolutionsViewed;
             actual.Should().Be(viewed);
+        }
+
+        private sealed class CatalogueSolution
+        {
+            public string SolutionName { get; set; }
+            public string ServiceRecipientName { get; set; }
+            public string ServiceRecipientOdsCode { get; set; }
         }
     }
 }

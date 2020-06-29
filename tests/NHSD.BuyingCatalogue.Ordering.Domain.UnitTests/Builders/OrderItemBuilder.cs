@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders
 {
-    internal sealed class OrderItemBuilder
+    public sealed class OrderItemBuilder
     {
         private int? _orderItemId;
         private string _odsCode;
