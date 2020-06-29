@@ -21,6 +21,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
         private string _pricingUnitTierName;
         private string _pricingUnitDescription;
         private decimal? _price;
+        private DateTime _created;
+        private DateTime _lastUpdated;
 
         private OrderItemEntityBuilder(
             string orderId,
@@ -37,7 +39,9 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             TimeUnit? timeUnit,
             string pricingUnitTierName,
             string pricingUnitDescription,
-            decimal? price)
+            decimal? price,
+            DateTime created,
+            DateTime lastUpdated)
         {
             _orderId = orderId;
             _odsCode = odsCode;
@@ -54,6 +58,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             _pricingUnitTierName = pricingUnitTierName;
             _pricingUnitDescription = pricingUnitDescription;
             _price = price;
+            _created = created;
+            _lastUpdated = lastUpdated;
         }
 
         private OrderItemEntityBuilder() : this(
@@ -71,7 +77,9 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             null,
             "consultation",
             "per consultation",
-            1.5m)
+            1.5m,
+            DateTime.UtcNow,
+            DateTime.UtcNow)
         {
         }
 
@@ -98,7 +106,9 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
                 orderItemEntity.TimeUnit,
                 orderItemEntity.PricingUnitTierName,
                 orderItemEntity.PricingUnitDescription,
-                orderItemEntity.Price);
+                orderItemEntity.Price,
+                orderItemEntity.Created,
+                orderItemEntity.LastUpdated);
         }
 
         public OrderItemEntityBuilder WithOrderId(string orderId)
@@ -209,7 +219,9 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
                 TimeUnit = _timeUnit,
                 PricingUnitTierName = _pricingUnitTierName,
                 PricingUnitDescription = _pricingUnitDescription,
-                Price = _price
+                Price = _price,
+                Created = _created,
+                LastUpdated = _lastUpdated
             };
         }
     }

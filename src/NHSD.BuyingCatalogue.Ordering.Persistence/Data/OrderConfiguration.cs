@@ -17,6 +17,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 
             builder.HasMany(x => x.OrderItems)
                 .WithOne();
+
+            builder.HasMany(x => x.ServiceRecipients)
+                .WithOne(x => x.Order);
         }
     }
 }
