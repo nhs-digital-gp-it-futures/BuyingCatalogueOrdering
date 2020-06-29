@@ -24,6 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         private DateTime? _commencementDate;
         private bool _serviceRecipientsViewed;
         private bool _catalogueSolutionsViewed;
+        private readonly OrderStatus _orderStatus = new OrderStatus { OrderStatusId = 1, Name = "Submitted" };
         private readonly IList<OrderItem> _orderItems = new List<OrderItem>();
 
         private OrderBuilder()
@@ -154,7 +155,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
                 Created = _created,
                 LastUpdated = _lastUpdated,
                 LastUpdatedBy = _lastUpdatedBy,
-                LastUpdatedByName = _lastUpdatedByName
+                LastUpdatedByName = _lastUpdatedByName,
+                OrderStatus = _orderStatus
             };
 
             order.SetDescription(OrderDescription.Create(_orderDescription).Value);

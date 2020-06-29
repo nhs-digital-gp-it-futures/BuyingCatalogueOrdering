@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.Design;
 using System.Linq;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain
@@ -94,9 +95,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 deliveryDate, 
                 quantity, 
                 estimationPeriod, 
-                price);
-
-            SetLastUpdatedBy(userId, name);
+                price,
+                () => SetLastUpdatedBy(userId, name));
         }
     }
 }

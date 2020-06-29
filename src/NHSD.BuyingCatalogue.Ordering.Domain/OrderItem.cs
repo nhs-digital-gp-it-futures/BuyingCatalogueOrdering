@@ -99,12 +99,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             DateTime? deliveryDate, 
             int quantity, 
             TimeUnit estimationPeriod, 
-            decimal? price)
+            decimal? price,
+            Action onPropertyChangedCallback)
         {
+            bool changed = !Equals(DeliveryDate, deliveryDate);
+            changed = changed || !Equals(Quantity, quantity);
+            changed = changed || !Equals(EstimationPeriod, estimationPeriod);
+            changed = changed || !Equals(Price, price);
+
             DeliveryDate = deliveryDate;
             Quantity = quantity;
             EstimationPeriod = estimationPeriod;
             Price = price;
+
+            if (changed)
+                onPropertyChangedCallback?.Invoke();
         }
 
         private bool IsTransient() => OrderItemId == default;

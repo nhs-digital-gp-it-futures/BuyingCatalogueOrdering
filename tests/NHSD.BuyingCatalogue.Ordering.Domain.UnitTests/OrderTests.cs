@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders;
 using NUnit.Framework;
@@ -70,6 +71,82 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             order.AddOrderItem(orderItem, Guid.Empty, lastUpdatedByName);
 
             order.LastUpdatedByName.Should().Be(lastUpdatedByName);
+        }
+
+        [Test]
+        public void UpdateOrderItem_OrderItemNotFound_NoOrderItemChange()
+        {
+            const int orderItemId = 1;
+            const int unknownOrderItemId = 123;
+
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithOrderItemId(orderItemId)
+                .WithPriceTimeUnit(TimeUnit.PerYear)
+                .Build();
+
+            var order = OrderBuilder
+                .Create()
+                .WithOrderItem(orderItem)
+                .Build();
+
+            order.UpdateOrderItem(
+                unknownOrderItemId,
+                DateTime.UtcNow.AddDays(1),
+                orderItem.Quantity + 1,
+                TimeUnit.PerMonth,
+                orderItem.Price + 1m,
+                Guid.Empty,
+                string.Empty);
+
+            var expected = new
+            {
+                orderItem.DeliveryDate,
+                orderItem.Quantity,
+                orderItem.PriceTimeUnit,
+                orderItem.Price
+            };
+
+            orderItem.Should().BeEquivalentTo(expected);
+        }
+
+        [Test]
+        public void UpdateOrderItem_OrderItemNotFound_NoOrderChange()
+        {
+            const int orderItemId = 1;
+            const int unknownOrderItemId = 123;
+
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithOrderItemId(orderItemId)
+                .WithPriceTimeUnit(TimeUnit.PerYear)
+                .Build();
+
+            var order = OrderBuilder
+                .Create()
+                .WithLastUpdatedBy(Guid.NewGuid())
+                .WithLastUpdatedByName(Guid.NewGuid().ToString())
+                .WithLastUpdated(new DateTime(2020, 06, 29))
+                .WithOrderItem(orderItem)
+                .Build();
+
+            var expected = new
+            {
+                order.LastUpdatedBy,
+                order.LastUpdatedByName,
+                order.LastUpdated
+            };
+
+            order.UpdateOrderItem(
+                unknownOrderItemId,
+                DateTime.UtcNow.AddDays(1),
+                orderItem.Quantity + 1,
+                TimeUnit.PerMonth,
+                orderItem.Price + 1m,
+                Guid.NewGuid(),
+                Guid.NewGuid().ToString());
+
+            order.Should().BeEquivalentTo(expected);
         }
     }
 }
