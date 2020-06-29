@@ -1,7 +1,7 @@
 ﻿using System;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
-namespace NHSD.BuyingCatalogue.Ordering.Application.Services.CreateOrderItem
+namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 {
     public sealed class CreateOrderItemRequest
     {

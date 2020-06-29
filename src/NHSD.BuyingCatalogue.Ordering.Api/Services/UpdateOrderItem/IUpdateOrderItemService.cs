@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.Ordering.Domain.Results;
 
-namespace NHSD.BuyingCatalogue.Ordering.Application.Services.UpdateOrderItem
+namespace NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem
 {
     public interface IUpdateOrderItemService
     {

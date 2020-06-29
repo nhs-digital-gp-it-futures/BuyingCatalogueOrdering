@@ -1,7 +1,7 @@
 ﻿using System;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
-namespace NHSD.BuyingCatalogue.Ordering.Application.Services.UpdateOrderItem
+namespace NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem
 {
     public sealed class UpdateOrderItemRequest
     {

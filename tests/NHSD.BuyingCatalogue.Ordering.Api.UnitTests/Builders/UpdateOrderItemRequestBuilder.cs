@@ -1,5 +1,5 @@
 ﻿using System;
-using NHSD.BuyingCatalogue.Ordering.Application.Services.UpdateOrderItem;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders

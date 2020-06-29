@@ -1,5 +1,5 @@
 ﻿using System;
-using NHSD.BuyingCatalogue.Ordering.Application.Services.CreateOrder;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {

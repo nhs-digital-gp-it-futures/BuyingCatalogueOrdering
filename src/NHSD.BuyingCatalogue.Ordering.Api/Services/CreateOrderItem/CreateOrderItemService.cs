@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
+using NHSD.BuyingCatalogue.Ordering.Application.Services;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Domain.Results;
 
-namespace NHSD.BuyingCatalogue.Ordering.Application.Services.CreateOrderItem
+namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 {
     public sealed class CreateOrderItemService : ICreateOrderItemService
     {
