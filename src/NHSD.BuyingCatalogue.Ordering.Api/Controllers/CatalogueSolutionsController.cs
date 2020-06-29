@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -55,8 +55,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            var solutionList = Array.Empty<CatalogueSolutionModel>();
-            return new CatalogueSolutionsModel { OrderDescription = order.Description.Value, CatalogueSolutions = solutionList };
+            var serviceRecipients = order.ServiceRecipients;
+            var catalogueSolutionModel = order.OrderItems.Where(y => y.CatalogueItemType.Equals(CatalogueItemType.Solution))
+                .Select(x => new CatalogueSolutionModel
+            {
+                OrderItemId = x.OrderItemId,
+                SolutionName = x.CatalogueItemName,
+                ServiceRecipient = new GetServiceRecipientModel
+                {
+                    OdsCode = x.OdsCode,
+                    Name = serviceRecipients.FirstOrDefault(serviceRecipient => string.Equals(x.OdsCode,
+                        serviceRecipient.OdsCode, StringComparison.Ordinal))?.Name
+                }
+            });
+
+            return new CatalogueSolutionsModel { OrderDescription = order.Description.Value, CatalogueSolutions = catalogueSolutionModel };
         }
 
         [HttpPut]

@@ -2,6 +2,8 @@
 {
     public sealed class CatalogueSolutionModel
     {
-        public string Name { get; set; }
+        public int OrderItemId { get; set; }
+        public string SolutionName { get; set; }
+        public GetServiceRecipientModel ServiceRecipient { get; set; }
     }
 }
