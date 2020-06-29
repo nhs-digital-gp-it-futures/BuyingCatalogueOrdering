@@ -16,7 +16,6 @@ using NHSD.BuyingCatalogue.Ordering.Application.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Application.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Domain.Results;
-using NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
