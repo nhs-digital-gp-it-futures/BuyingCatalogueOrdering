@@ -353,7 +353,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task UpdateOrderItemAsync_UnknownOrder_ReturnsNotFound()
         {
             const string orderId = "C10000-01";
-            int orderItemId = 1;
+            const int orderItemId = 1;
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order = null;
@@ -367,7 +367,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task UpdateOrderItemAsync_OrderRepository_CalledOnce()
         {
             const string orderId = "C10000-01";
-            int orderItemId = 1;
+            const int orderItemId = 1;
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order = OrderBuilder
@@ -390,7 +390,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task UpdateOrderItemAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
         {
             const string orderId = "C10000-01";
-            int orderItemId = 1;
+            const int orderItemId = 1;
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order.OrganisationId = Guid.NewGuid();
@@ -404,7 +404,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task UpdateOrderItemAsync_EmptyOrderItems_ReturnsNotFound()
         {
             const string orderId = "C10000-01";
-            int orderItemId = 1;
+            const int orderItemId = 1;
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
 
@@ -417,7 +417,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task UpdateOrderItemAsync_AdditionalServiceOrderItem_ReturnsNotFound()
         {
             const string orderId = "C10000-01";
-            int orderItemId = 1;
+            const int orderItemId = 1;
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order = OrderBuilder
@@ -440,7 +440,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task UpdateOrderItemAsync_UpdateOrderItemModel_ReturnsNotContent()
         {
             const string orderId = "C10000-01";
-            int orderItemId = 1;
+            const int orderItemId = 1;
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order = OrderBuilder
@@ -463,7 +463,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task UpdateOrderItemAsync_UpdateOrderItemService_CalledOnce()
         {
             const string orderId = "C10000-01";
-            int orderItemId = 1;
+            const int orderItemId = 1;
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order = OrderBuilder
@@ -489,7 +489,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task UpdateOrderItemAsync_Error_ReturnsBadRequest()
         {
             const string orderId = "C10000-01";
-            int orderItemId = 1;
+            const int orderItemId = 1;
             var error = new ErrorDetails("TestError", "TestField");
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
@@ -514,7 +514,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task UpdateOrderItemAsync_Error_ReturnsError()
         {
             const string orderId = "C10000-01";
-            int orderItemId = 1;
+            const int orderItemId = 1;
             var error = new ErrorDetails("TestError", "TestField");
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
