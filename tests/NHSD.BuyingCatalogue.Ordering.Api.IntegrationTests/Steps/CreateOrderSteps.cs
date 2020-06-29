@@ -11,14 +11,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     [Binding]
     internal sealed class CreateOrderSteps
     {
-        private readonly ScenarioContext _context;
         private readonly Response _response;
         private readonly Request _request;
         private readonly string _orderingUrl;
 
-        public CreateOrderSteps(ScenarioContext context, Response response, Request request, Settings settings)
+        public CreateOrderSteps(
+            Response response, 
+            Request request, 
+            Settings settings)
         {
-            _context = context;
             _response = response;
             _request = request;
             _orderingUrl = settings.OrderingApiBaseUrl + "/api/v1/orders";

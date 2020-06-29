@@ -6,7 +6,6 @@ using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests.Payloads;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses;
-using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using NUnit.Framework;
@@ -18,18 +17,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     internal sealed class CreateCatalogueSolutionOrderItemSteps
     {
         private readonly Request _request;
-        private readonly Response _response;
         private readonly Settings _settings;
         private CreateCatalogueSolutionOrderItemRequest _createCatalogueSolutionOrderItemRequest;
         private CreateCatalogueSolutionOrderItemResponse _createCatalogueSolutionOrderItemResponse;
 
         public CreateCatalogueSolutionOrderItemSteps(
             Request request,
-            Response response,
             Settings settings)
         {
             _request = request;
-            _response = response;
             _settings = settings;
         }
 

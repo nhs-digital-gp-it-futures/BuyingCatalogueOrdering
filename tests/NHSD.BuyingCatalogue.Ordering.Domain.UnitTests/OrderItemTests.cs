@@ -76,7 +76,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         [Test]
         public void Constructor_NullCatalogueItemType_ThrowsArgumentNullException()
         {
-            void Test()
+            static void Test()
             {
                 OrderItemBuilder
                     .Create()
