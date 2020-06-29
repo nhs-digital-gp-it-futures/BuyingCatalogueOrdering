@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
@@ -11,35 +13,67 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     internal sealed class OrderItemSteps
     {
         private readonly Settings _settings;
+        private readonly OrderItemReferenceList _orderItemReferenceList;
 
-        public OrderItemSteps(Settings settings)
+        public OrderItemSteps(
+            Settings settings,
+            OrderItemReferenceList orderItemReferenceList)
         {
-            _settings = settings;
+            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            _orderItemReferenceList = orderItemReferenceList ?? throw new ArgumentNullException(nameof(orderItemReferenceList));
         }
 
-        [Given(@"Order Items exist")]
-        public async Task GivenOrderItemExist(Table table)
+        [Given(@"Order items exist")]
+        public async Task GivenOrderItemsExist(Table table)
         {
-            foreach (var orderItemTable in table.CreateSet<OrderItemTable>())
+            foreach (var orderItemTableItem in table.CreateSet<OrderItemTable>())
             {
-                var orderItem = OrderItemEntityBuilder
+                var orderItemEntity = OrderItemEntityBuilder
                     .Create()
-                    .WithOrderId(orderItemTable.OrderId)
-                    .WithCatalogueItemName(orderItemTable.CatalogueItemName)
-                    .WithCatalogueItemType(orderItemTable.CatalogueItemTypeEnum)
-                    .WithOdsCode(orderItemTable.OdsCode)
+                    .WithOrderId(orderItemTableItem.OrderId)
+                    .WithCatalogueItemName(orderItemTableItem.CatalogueItemName)
+                    .WithCatalogueItemType(orderItemTableItem.CatalogueItemType)
+                    .WithOdsCode(orderItemTableItem.OdsCode)
                     .Build();
 
-                await orderItem.InsertAsync(_settings.ConnectionString);
+                var orderItemId = await orderItemEntity.InsertAsync<int>(_settings.ConnectionString);
+                orderItemEntity.OrderItemId = orderItemId;
+
+                _orderItemReferenceList.Add(orderItemEntity.CatalogueItemName, orderItemEntity);
             }
         }
 
         private sealed class OrderItemTable
         {
             public string OrderId { get; set; }
-            public string CatalogueItemName { get; set; }
-            public CatalogueItemType CatalogueItemTypeEnum { get; set; }
+
             public string OdsCode { get; set; }
+
+            public string CatalogueItemId { get; set; }
+
+            public CatalogueItemType CatalogueItemType { get; set; }
+
+            public string CatalogueItemName { get; set; }
+
+            public ProvisioningType ProvisioningType { get; set; }
+
+            public CataloguePriceType CataloguePriceType { get; set; }
+
+            public string CataloguePriceUnitName { get; set; }
+
+            public string CataloguePriceUnitDescription { get; set; }
+
+            public TimeUnit PriceTimeUnit { get; set; }
+
+            public string CurrencyCode { get; set; }
+
+            public int Quantity { get; private set; }
+
+            public TimeUnit EstimationPeriod { get; set; }
+
+            public DateTime? DeliveryDate { get; set; }
+
+            public decimal? Price { get; set; }
         }
     }
 }

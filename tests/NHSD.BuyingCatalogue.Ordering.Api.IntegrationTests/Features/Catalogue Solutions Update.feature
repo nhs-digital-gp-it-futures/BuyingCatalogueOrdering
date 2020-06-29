@@ -11,8 +11,8 @@ Background:
         | OdsCode | Name              | OrderId    |
         | ODS1    | Service Recipient | C000014-01 |
     And Order items exist
-        | OrderId    | OdsCode | CatalogueItemName |
-        | C000014-01 | ODS1    | Order Item 1      |
+        | OrderId    | OdsCode | CatalogueItemName | CatalogueItemType |
+        | C000014-01 | ODS1    | Order Item 1      | Solution          |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @7859
