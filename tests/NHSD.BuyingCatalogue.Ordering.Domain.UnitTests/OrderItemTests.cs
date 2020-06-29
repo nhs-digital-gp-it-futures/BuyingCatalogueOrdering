@@ -90,7 +90,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         [Test]
         public void Constructor_NullProvisioningType_ThrowsArgumentNullException()
         {
-            void Test()
+            static void Test()
             {
                 OrderItemBuilder
                     .Create()
@@ -104,7 +104,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         [Test]
         public void Constructor_NullCataloguePriceType_ThrowsArgumentNullException()
         {
-            void Test()
+            static void Test()
             {
                 OrderItemBuilder
                     .Create()
@@ -118,7 +118,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         [Test]
         public void Constructor_NullCataloguePriceUnit_ThrowsArgumentNullException()
         {
-            void Test()
+            static void Test()
             {
                 OrderItemBuilder
                     .Create()
@@ -187,7 +187,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         [Test]
         public void GetHashCode_MatchOrderItemId()
         {
-            var expected = 123;
+            const int expected = 123;
 
             var orderItem = OrderItemBuilder
                 .Create()
