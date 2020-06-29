@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class Order
     {
+        private readonly List<OrderItem> _orderItems = new List<OrderItem>();
+
         public string OrderId { get; set; }
 
         public OrderDescription Description { get; private set; }
@@ -47,6 +50,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public DateTime? CommencementDate { get; set; }
 
+        public IReadOnlyList<OrderItem> OrderItems => 
+            _orderItems.AsReadOnly();
+
         public void SetDescription(OrderDescription orderDescription)
         {
             Description = orderDescription ?? throw new ArgumentNullException(nameof(orderDescription));
@@ -57,6 +63,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             LastUpdatedBy = userId;
             LastUpdatedByName = name ?? throw new ArgumentNullException(nameof(name));
             LastUpdated = DateTime.UtcNow;
+        }
+
+        public void AddOrderItem(
+            OrderItem orderItem, 
+            Guid userId, 
+            string name)
+        {
+            if (orderItem is null)
+                throw new ArgumentNullException(nameof(orderItem));
+
+            _orderItems.Add(orderItem);
+
+            SetLastUpdatedBy(userId, name);
         }
     }
 }

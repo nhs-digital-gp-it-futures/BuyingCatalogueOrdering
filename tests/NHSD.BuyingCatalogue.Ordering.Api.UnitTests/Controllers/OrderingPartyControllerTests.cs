@@ -34,7 +34,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var controller = context.OrderingPartyController;
 
             var response = await controller.GetAsync("INVALID");
-            response.Should().BeEquivalentTo(new ActionResult<OrderingPartyModel>(new NotFoundResult()));
+
+            response.Result.Should().BeOfType<NotFoundResult>();
         }
 
         [Test]
@@ -50,7 +51,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var controller = context.OrderingPartyController;
 
             var result = await controller.GetAsync(orderId);
-            result.Should().BeEquivalentTo(new ActionResult<OrderingPartyModel>(new ForbidResult()));
+
+            result.Result.Should().BeOfType<ForbidResult>();
         }
 
         [Test]
@@ -59,15 +61,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             const string orderId = "C0000014-01";
             var context = OrderingPartyTestContext.Setup();
 
-            (Order order, OrderingPartyModel expectedOrderingParty) = CreateOrderingPartyTestData(orderId, context.PrimaryOrganisationId, false);
+            (Order order, OrderingPartyModel _) = CreateOrderingPartyTestData(orderId, context.PrimaryOrganisationId, false);
 
             context.Order = order;
 
             var controller = context.OrderingPartyController;
 
             var result = await controller.GetAsync(orderId);
-            result.Should()
-                .BeEquivalentTo(new ActionResult<OrderingPartyModel>(new OkObjectResult(expectedOrderingParty)));
+
+            result.Result.Should().BeOfType<OkResult>();
         }
 
         [Test]

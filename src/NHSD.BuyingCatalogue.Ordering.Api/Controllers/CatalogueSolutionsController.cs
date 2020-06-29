@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
+using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -22,10 +26,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         private static readonly Dictionary<string, CreateOrderItemModel> CatalogueSolutionOrderItems = new Dictionary<string, CreateOrderItemModel>();
 
         private readonly IOrderRepository _orderRepository;
-        
-        public CatalogueSolutionsController(IOrderRepository orderRepository)
+        private readonly ICreateOrderItemService _createOrderItemService;
+
+        public CatalogueSolutionsController(
+            IOrderRepository orderRepository,
+            ICreateOrderItemService createOrderItemService)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            _createOrderItemService = createOrderItemService ?? throw new ArgumentNullException(nameof(createOrderItemService));
         }
 
         [HttpGet]
@@ -44,7 +52,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             var solutionList = Array.Empty<CatalogueSolutionModel>();
-            return new CatalogueSolutionsModel { OrderDescription = order.Description.Value, CatalogueSolutions = solutionList};
+            return new CatalogueSolutionsModel { OrderDescription = order.Description.Value, CatalogueSolutions = solutionList };
         }
 
         [HttpPut]
@@ -52,7 +60,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         public async Task<ActionResult> UpdateAsync(string orderId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
-            
+
             if (order is null)
             {
                 return NotFound();
@@ -77,31 +85,60 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [Route("{orderItemId}")]
         public ActionResult<CreateOrderItemModel> GetOrderItem(string orderId, string orderItemId)
         {
-            var orderItemKey = GetOrderItemKey(orderId,orderItemId);
+            var orderItemKey = GetOrderItemKey(orderId, orderItemId);
 
             if (CatalogueSolutionOrderItems.ContainsKey(orderItemKey))
             {
                 return CatalogueSolutionOrderItems[orderItemKey];
             }
-            else
+
+            return new CreateOrderItemModel
             {
-                return new CreateOrderItemModel
+                ServiceRecipient = new ServiceRecipientModel
                 {
-                    ServiceRecipient = new ServiceRecipientModel
-                    {
-                        OdsCode = "OX3"
-                    },
-                    SolutionId = orderItemId,
-                    CurrencyCode = "GBP",
-                    DeliveryDate = "2020-04-27",
-                    EstimationPeriod = "month",
-                    ItemUnitModel = new ItemUnitModel { Description = "per consultation", Name = "consultation" },
-                    Price = 0.1m,
-                    ProvisioningType = "OnDemand",
-                    Quantity = 3,
-                    Type = "flat"
-                };
+                    OdsCode = "OX3"
+                },
+                CatalogueSolutionId = orderItemId,
+                CurrencyCode = "GBP",
+                DeliveryDate = DateTime.UtcNow,
+                EstimationPeriod = "month",
+                ItemUnitModel = new ItemUnitModel { Description = "per consultation", Name = "consultation" },
+                Price = 0.1m,
+                ProvisioningType = "OnDemand",
+                Quantity = 3,
+                Type = "flat"
+            };
+        }
+
+        [HttpPost]
+        [Authorize(Policy = PolicyName.CanManageOrders)]
+        public async Task<ActionResult<CreateOrderItemResponseModel>> CreateOrderItemAsync(
+            string orderId,
+            CreateOrderItemModel model)
+        {
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            if (order is null)
+            {
+                return NotFound();
             }
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
+            var createOrderItemResponse = new CreateOrderItemResponseModel();
+
+            var result = await _createOrderItemService.CreateAsync(model.ToRequest(order, CatalogueItemType.Solution));
+            if (result.IsSuccess)
+            {
+                createOrderItemResponse.OrderItemId = result.Value;
+                return CreatedAtAction(nameof(GetOrderItem).TrimAsync(), null, new { orderId, orderItemId = createOrderItemResponse.OrderItemId }, createOrderItemResponse);
+            }
+
+            createOrderItemResponse.Errors = result.Errors.Select(x => new ErrorModel(x.Id, x.Field));
+            return BadRequest(createOrderItemResponse);
         }
 
         [HttpPut]
@@ -124,29 +161,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 item.EstimationPeriod = updateOrderItemModel.EstimationPeriod;
                 return NoContent();
             }
-            else
-            {
-                return NotFound();
-            }
-        }
 
-        [HttpPost]
-        [Authorize(Policy = PolicyName.CanManageOrders)]
-        public ActionResult CreateOrderItem(string orderId, CreateOrderItemModel createOrderItemModel)
-        {
-            if (createOrderItemModel == null)
-            {
-                throw new ArgumentNullException(nameof(createOrderItemModel));
-            }
-
-            CatalogueSolutionOrderItems[GetOrderItemKey(orderId, createOrderItemModel.SolutionId)] = createOrderItemModel;
-
-            return NoContent();
+            return NotFound();
         }
 
         private static string GetOrderItemKey(string orderId, string orderItemId)
         {
-            return  $"{orderId}_{orderItemId}";
+            return $"{orderId}_{orderItemId}";
         }
     }
 }
