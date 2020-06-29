@@ -21,8 +21,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
         private string _pricingUnitTierName;
         private string _pricingUnitDescription;
         private decimal? _price;
-        private DateTime _created;
-        private DateTime _lastUpdated;
+        private readonly DateTime _created;
+        private readonly DateTime _lastUpdated;
 
         private OrderItemEntityBuilder(
             string orderId,

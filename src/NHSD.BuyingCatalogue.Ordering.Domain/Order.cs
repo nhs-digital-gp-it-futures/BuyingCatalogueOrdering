@@ -83,23 +83,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             SetLastUpdatedBy(userId, name);
         }
 
-        public void SetServiceRecipient(List<(string Ods, string Name)> serviceRecipients, Guid userId, string name)
+        public void SetServiceRecipient(List<(string Ods, string Name)> serviceRecipients, Guid userId, string lastUpdatedName)
         {
             if (serviceRecipients is null)
                 throw new ArgumentNullException(nameof(serviceRecipients));
 
             _serviceRecipients.Clear();
-            foreach (var recipient in serviceRecipients)
+
+            foreach ((string ods, string name) in serviceRecipients)
             {
                 _serviceRecipients.Add(new ServiceRecipient
                 {
-                    Name = recipient.Name,
-                    OdsCode = recipient.Ods,
+                    Name = name,
+                    OdsCode = ods,
                     Order = this
                 });
             }
 
-            SetLastUpdatedBy(userId, name);
+            SetLastUpdatedBy(userId, lastUpdatedName);
         }
     }
 }

@@ -53,7 +53,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task GetAllAsync_WithDescriptionAndNoSolution_ReturnsOkResult()
         {
-            var expectedDescription = "A description";
+            const string expectedDescription = "A description";
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order.SetDescription(OrderDescription.Create(expectedDescription).Value);
 
@@ -67,10 +67,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task GetAllAsync_WithSolution_ReturnsOkayResult()
         {
-            var expectedDescription = "A description";
+            const string expectedDescription = "A description";
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
-
 
             context.Order.SetDescription(OrderDescription.Create(expectedDescription).Value);
 
@@ -102,7 +101,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = CatalogueSolutionsControllerTestContext.Setup();
 
-            var expectedDescription = "A description";
+            const string  expectedDescription = "A description";
             context.Order.SetDescription(OrderDescription.Create(expectedDescription).Value);
 
             var serviceRecipients = new List<(string Ods, string Name)>
@@ -392,7 +391,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 return new CatalogueSolutionsControllerTestContext();
             }
         }
-        private CatalogueSolutionModel CreateCatalogueSolutionModel(OrderItem orderItem, (string Ods, string Name) serviceRecipient)
+        private static CatalogueSolutionModel CreateCatalogueSolutionModel(OrderItem orderItem, (string Ods, string Name) serviceRecipient)
         {
             return new CatalogueSolutionModel
             {

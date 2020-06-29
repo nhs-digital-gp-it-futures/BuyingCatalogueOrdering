@@ -17,7 +17,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             _settings = settings;
         }
 
-        [Given(@"OrderItem exist")]
+        [Given(@"Order Items exist")]
         public async Task GivenOrderItemExist(Table table)
         {
             foreach (var orderItemTable in table.CreateSet<OrderItemTable>())
