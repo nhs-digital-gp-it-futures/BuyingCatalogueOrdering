@@ -5,7 +5,7 @@ using NHSD.BuyingCatalogue.Ordering.Application.Services;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services
 {
-    public sealed class IdentityService : IIdentityService
+    internal sealed class IdentityService : IIdentityService
     {
         private readonly IHttpContextAccessor _context;
 
