@@ -134,6 +134,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public override bool Equals(object obj) => Equals(obj as OrderItem);
 
-        public override int GetHashCode() => OrderItemId;
+        public override int GetHashCode()
+        {
+            if (!IsTransient())
+                return OrderItemId;
+
+            return base.GetHashCode();
+        }
     }
 }

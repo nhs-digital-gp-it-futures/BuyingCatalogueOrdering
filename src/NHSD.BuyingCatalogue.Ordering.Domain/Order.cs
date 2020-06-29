@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.Design;
 using System.Linq;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain
@@ -75,9 +74,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             if (orderItem is null)
                 throw new ArgumentNullException(nameof(orderItem));
 
-            _orderItems.Add(orderItem);
-
-            SetLastUpdatedBy(userId, name);
+            if (!_orderItems.Contains(orderItem))
+            {
+                _orderItems.Add(orderItem);
+                SetLastUpdatedBy(userId, name);
+            }
         }
 
         public void UpdateOrderItem(

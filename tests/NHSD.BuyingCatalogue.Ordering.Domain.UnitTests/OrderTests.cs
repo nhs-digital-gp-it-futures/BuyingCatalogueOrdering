@@ -38,6 +38,33 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
+        public void AddOrderItem_AddSameOrderItem_ReturnsOneOrderItem()
+        {
+            var order = OrderBuilder.Create().Build();
+            var orderItem = OrderItemBuilder.Create().Build();
+
+            order.AddOrderItem(orderItem, Guid.Empty, String.Empty);
+            order.AddOrderItem(orderItem, Guid.Empty, String.Empty);
+
+            var expected = new List<OrderItem> { orderItem };
+            order.OrderItems.Should().BeEquivalentTo(expected);
+        }
+
+        [Test]
+        public void AddOrderItem_AddDifferentOrderItem_ReturnsTwoOrderItems()
+        {
+            var order = OrderBuilder.Create().Build();
+            var orderItem = OrderItemBuilder.Create().Build();
+            var orderItemSecond = OrderItemBuilder.Create().Build();
+
+            order.AddOrderItem(orderItem, Guid.Empty, String.Empty);
+            order.AddOrderItem(orderItemSecond, Guid.Empty, String.Empty);
+
+            var expected = new List<OrderItem> { orderItem, orderItemSecond };
+            order.OrderItems.Should().BeEquivalentTo(expected);
+        }
+
+        [Test]
         public void AddOrderItem_OrderItem_LastUpdatedByChanged()
         {
             var lastUpdatedBy = Guid.NewGuid();
@@ -56,6 +83,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
+        public void AddOrderItem_OrderItemAlreadyExists_LastUpdatedByNotChanged()
+        {
+            var lastUpdatedBy = Guid.NewGuid();
+
+            var orderItem = OrderItemBuilder.Create().Build();
+
+            var order = OrderBuilder
+                .Create()
+                .WithOrderItem(orderItem)
+                .WithLastUpdatedBy(lastUpdatedBy)
+                .Build();
+
+            order.AddOrderItem(orderItem, Guid.Empty, string.Empty);
+
+            order.LastUpdatedBy.Should().Be(lastUpdatedBy);
+        }
+
+        [Test]
         public void AddOrderItem_OrderItem_LastUpdatedByNameChanged()
         {
             var lastUpdatedByName = Guid.NewGuid().ToString();
@@ -69,6 +114,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             order.LastUpdatedByName.Should().NotBe(lastUpdatedByName);
 
             order.AddOrderItem(orderItem, Guid.Empty, lastUpdatedByName);
+
+            order.LastUpdatedByName.Should().Be(lastUpdatedByName);
+        }
+
+        [Test]
+        public void AddOrderItem_OrderItemAlreadyExists_LastUpdatedByNameNotChanged()
+        {
+            var lastUpdatedByName = Guid.NewGuid().ToString();
+
+            var orderItem = OrderItemBuilder.Create().Build();
+
+            var order = OrderBuilder
+                .Create()
+                .WithOrderItem(orderItem)
+                .WithLastUpdatedByName(lastUpdatedByName)
+                .Build();
+
+            order.AddOrderItem(orderItem, Guid.Empty, "Should not be set");
 
             order.LastUpdatedByName.Should().Be(lastUpdatedByName);
         }
