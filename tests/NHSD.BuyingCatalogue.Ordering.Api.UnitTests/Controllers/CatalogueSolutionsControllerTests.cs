@@ -101,7 +101,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = CatalogueSolutionsControllerTestContext.Setup();
 
-            const string  expectedDescription = "A description";
+            const string expectedDescription = "A description";
             context.Order.SetDescription(OrderDescription.Create(expectedDescription).Value);
 
             var serviceRecipients = new List<(string Ods, string Name)>
