@@ -1,6 +1,6 @@
-﻿﻿using System;
- using System.Collections.Generic;
- using NHSD.BuyingCatalogue.Ordering.Domain;
+﻿using System;
+using System.Collections.Generic;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
