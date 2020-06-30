@@ -338,7 +338,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             static async Task TestAsync()
             {
                 const string orderId = "C10000-01";
-                int orderItemId = 1;
+                const int orderItemId = 1;
 
                 var context = CatalogueSolutionsControllerTestContext.Setup();
                 context.Order = null;

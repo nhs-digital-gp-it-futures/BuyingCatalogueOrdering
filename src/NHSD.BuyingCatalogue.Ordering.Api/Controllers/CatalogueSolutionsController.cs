@@ -158,7 +158,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpPut]
-        [Route("{orderItemId:int}")]
+        [Route("{orderItemId}")]
         [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult<UpdateOrderItemResponseModel>> UpdateOrderItemAsync(
             string orderId, 

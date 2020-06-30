@@ -160,7 +160,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                     .Build();
             }
 
-
             internal UpdateOrderItemService UpdateOrderItemService { get; }
 
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
