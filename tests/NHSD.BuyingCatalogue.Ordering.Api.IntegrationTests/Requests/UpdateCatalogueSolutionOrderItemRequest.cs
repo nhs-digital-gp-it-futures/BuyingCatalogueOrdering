@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders;
-using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests.Payloads;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
-using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
@@ -86,7 +84,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                 throw new ArgumentNullException(nameof(key));
 
             if (!PayloadFactory.TryGetValue(key, out var factory))
-                Assert.Fail("Unexpected create catalogue solution order item payload type.");
+                Assert.Fail("Unexpected update catalogue solution order item payload type.");
 
             Payload = factory();
         }
