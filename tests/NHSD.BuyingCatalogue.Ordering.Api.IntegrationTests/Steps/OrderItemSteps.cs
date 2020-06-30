@@ -31,9 +31,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 var orderItemEntity = OrderItemEntityBuilder
                     .Create()
                     .WithOrderId(orderItemTableItem.OrderId)
+                    .WithCatalogueItemId(orderItemTableItem.CatalogueItemId)
                     .WithCatalogueItemName(orderItemTableItem.CatalogueItemName)
                     .WithCatalogueItemType(orderItemTableItem.CatalogueItemType)
                     .WithOdsCode(orderItemTableItem.OdsCode)
+                    .WithCurrencyCode(orderItemTableItem.CurrencyCode)
+                    .WithDeliveryDate(orderItemTableItem.DeliveryDate != DateTime.MinValue ? orderItemTableItem.DeliveryDate : DateTime.UtcNow)
+                    .WithEstimationPeriod(orderItemTableItem.EstimationPeriod)
+                    .WithPricingUnitTierName(orderItemTableItem.CataloguePriceUnitName)
+                    .WithPricingUnitDescription(orderItemTableItem.CataloguePriceUnitDescription)
+                    .WithPrice(orderItemTableItem.Price)
+                    .WithProvisioningType(orderItemTableItem.ProvisioningType)
+                    .WithQuantity(orderItemTableItem.Quantity)
                     .Build();
 
                 var orderItemId = await orderItemEntity.InsertAsync<int>(_settings.ConnectionString);
@@ -49,27 +58,25 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             public string OdsCode { get; set; }
 
-            public string CatalogueItemId { get; set; }
+            public string CatalogueItemId { get; set; } = "1000-001";
 
             public CatalogueItemType CatalogueItemType { get; set; }
 
             public string CatalogueItemName { get; set; }
 
-            public ProvisioningType ProvisioningType { get; set; }
+            public ProvisioningType ProvisioningType { get; set; } = ProvisioningType.Declarative;
 
-            public CataloguePriceType CataloguePriceType { get; set; }
+            public string CataloguePriceUnitName { get; set; } = "patient";
 
-            public string CataloguePriceUnitName { get; set; }
-
-            public string CataloguePriceUnitDescription { get; set; }
+            public string CataloguePriceUnitDescription { get; set; } = "per patient";
 
             public TimeUnit PriceTimeUnit { get; set; }
 
-            public string CurrencyCode { get; set; }
+            public string CurrencyCode { get; set; } = "GBP";
 
-            public int Quantity { get; private set; }
+            public int Quantity { get; private set; } = 1;
 
-            public TimeUnit EstimationPeriod { get; set; }
+            public TimeUnit? EstimationPeriod { get; set; } = null;
 
             public DateTime? DeliveryDate { get; set; }
 

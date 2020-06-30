@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Diagnostics.CodeAnalysis;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -21,11 +19,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
-    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Swagger doesn't allow static functions. Suppression will be removed when the proper implementation is added")]
     public sealed class CatalogueSolutionsController : ControllerBase
     {
-        private static readonly Dictionary<string, CreateOrderItemModel> CatalogueSolutionOrderItems = new Dictionary<string, CreateOrderItemModel>();
-
         private readonly IOrderRepository _orderRepository;
         private readonly ICreateOrderItemService _createOrderItemService;
         private readonly IUpdateOrderItemService _updateOrderItemService;
@@ -58,16 +53,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             var serviceRecipients = order.ServiceRecipients;
             var catalogueSolutionModel = order.OrderItems.Where(y => y.CatalogueItemType.Equals(CatalogueItemType.Solution))
                 .Select(x => new CatalogueSolutionModel
-            {
-                OrderItemId = x.OrderItemId,
-                SolutionName = x.CatalogueItemName,
-                ServiceRecipient = new GetServiceRecipientModel
                 {
-                    OdsCode = x.OdsCode,
-                    Name = serviceRecipients.FirstOrDefault(serviceRecipient => string.Equals(x.OdsCode,
-                        serviceRecipient.OdsCode, StringComparison.Ordinal))?.Name
-                }
-            });
+                    OrderItemId = x.OrderItemId,
+                    SolutionName = x.CatalogueItemName,
+                    ServiceRecipient = new GetServiceRecipientModel
+                    {
+                        OdsCode = x.OdsCode,
+                        Name = serviceRecipients.FirstOrDefault(serviceRecipient => string.Equals(x.OdsCode,
+                            serviceRecipient.OdsCode, StringComparison.Ordinal))?.Name
+                    }
+                });
 
             return new CatalogueSolutionsModel { OrderDescription = order.Description.Value, CatalogueSolutions = catalogueSolutionModel };
         }
@@ -99,30 +94,41 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpGet]
         [Route("{orderItemId}")]
-        public ActionResult<CreateOrderItemModel> GetOrderItem(string orderId, string orderItemId)
+        public async Task<ActionResult<GetOrderItemModel>> GetOrderItemAsync(string orderId, int orderItemId)
         {
-            var orderItemKey = GetOrderItemKey(orderId, orderItemId);
-
-            if (CatalogueSolutionOrderItems.ContainsKey(orderItemKey))
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            if (order is null)
             {
-                return CatalogueSolutionOrderItems[orderItemKey];
+                return NotFound();
             }
 
-            return new CreateOrderItemModel
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
+            var orderItem = order.OrderItems.FirstOrDefault(item =>
+                item.CatalogueItemType.Equals(CatalogueItemType.Solution) && item.OrderItemId == orderItemId);
+            if (orderItem is null)
+                return NotFound();
+
+            return new GetOrderItemModel
             {
                 ServiceRecipient = new ServiceRecipientModel
                 {
-                    OdsCode = "OX3"
+                    OdsCode = orderItem.OdsCode
                 },
-                CatalogueSolutionId = orderItemId,
-                CurrencyCode = "GBP",
-                DeliveryDate = DateTime.UtcNow,
-                EstimationPeriod = "month",
-                ItemUnitModel = new ItemUnitModel { Description = "per consultation", Name = "consultation" },
-                Price = 0.1m,
-                ProvisioningType = "OnDemand",
-                Quantity = 3,
-                Type = "flat"
+                CatalogueSolutionId = orderItem.CatalogueItemId,
+                CatalogueSolutionName = orderItem.CatalogueItemName,
+                CurrencyCode = orderItem.CurrencyCode,
+                DeliveryDate = orderItem.DeliveryDate,
+                EstimationPeriod = orderItem.EstimationPeriod.Name,
+                ItemUnitModel = new ItemUnitModel { Description = orderItem.CataloguePriceUnit.Description, Name = orderItem.CataloguePriceUnit.TierName },
+                Price = orderItem.Price,
+                ProvisioningType = orderItem.ProvisioningType.Name,
+                Quantity = orderItem.Quantity,
+                Type = orderItem.CataloguePriceType.Name
             };
         }
 
@@ -150,7 +156,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (result.IsSuccess)
             {
                 createOrderItemResponse.OrderItemId = result.Value;
-                return CreatedAtAction(nameof(GetOrderItem).TrimAsync(), null, new { orderId, orderItemId = createOrderItemResponse.OrderItemId }, createOrderItemResponse);
+                return CreatedAtAction(nameof(GetOrderItemAsync).TrimAsync(), null, new { orderId, orderItemId = createOrderItemResponse.OrderItemId }, createOrderItemResponse);
             }
 
             createOrderItemResponse.Errors = result.Errors.Select(x => new ErrorModel(x.Id, x.Field));
@@ -202,11 +208,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 };
 
             return BadRequest(updateOrderItemResponse);
-        }
-
-        private static string GetOrderItemKey(string orderId, string orderItemId)
-        {
-            return $"{orderId}_{orderItemId}";
         }
     }
 }

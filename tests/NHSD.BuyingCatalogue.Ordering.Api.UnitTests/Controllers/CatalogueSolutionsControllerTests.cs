@@ -543,6 +543,75 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             result.Result.As<ObjectResult>().Value.Should().BeEquivalentTo(expected);
         }
 
+        [Test]
+        public async Task GetOrderItemAsync_OrderIdIsInvalid_ReturnsNotFound()
+        {
+            var context = CatalogueSolutionsControllerTestContext.Setup();
+            context.Order = null;
+
+            var result = await context.Controller.GetOrderItemAsync("INVALID", 1);
+            result.Result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        public async Task GetOrderItemAsync_OrderItemIdIsInvalid_ReturnsNotFound()
+        {
+            var context = CatalogueSolutionsControllerTestContext.Setup();
+
+            var result = await context.Controller.GetOrderItemAsync("myOrder", -1);
+            result.Result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        public async Task GetOrderItemAsync_OrderItemExists_ReturnsResult()
+        {
+            var context = CatalogueSolutionsControllerTestContext.Setup();
+
+            var serviceRecipients = new List<(string Ods, string Name)>
+
+            {
+                ("eu", "EU test")
+            };
+
+            context.Order.SetServiceRecipient(serviceRecipients, Guid.Empty, string.Empty);
+
+            var orderItem = OrderItemBuilder.Create().WithOdsCode(serviceRecipients[0].Ods).Build();
+            context.Order.AddOrderItem(orderItem, Guid.Empty, string.Empty);
+
+            var result = await context.Controller.GetOrderItemAsync("myOrder", orderItem.OrderItemId);
+            result.Value.Should().BeOfType<GetOrderItemModel>();
+
+            var expected = new GetOrderItemModel
+            {
+                ServiceRecipient = new ServiceRecipientModel
+                {
+                    OdsCode = orderItem.OdsCode
+                },
+                CatalogueSolutionId = orderItem.CatalogueItemId,
+                CatalogueSolutionName = orderItem.CatalogueItemName,
+                CurrencyCode = orderItem.CurrencyCode,
+                DeliveryDate = orderItem.DeliveryDate,
+                EstimationPeriod = orderItem.EstimationPeriod.Name,
+                ItemUnitModel = new ItemUnitModel { Description = orderItem.CataloguePriceUnit.Description, Name = orderItem.CataloguePriceUnit.TierName },
+                Price = orderItem.Price,
+                ProvisioningType = orderItem.ProvisioningType.Name,
+                Quantity = orderItem.Quantity,
+                Type = orderItem.CataloguePriceType.Name
+            };
+
+            result.Value.Should().BeEquivalentTo(expected);
+        }
+
+        [Test]
+        public async Task GetOrderItemAsync_DoesNotHavePrimaryOrganisationId_ReturnsForbid()
+        {
+            var context = CatalogueSolutionsControllerTestContext.Setup();
+            context.Order.OrganisationId = Guid.NewGuid();
+            var result = await context.Controller.GetOrderItemAsync("myOrder", -1);
+
+            result.Result.Should().BeOfType<ForbidResult>();
+        }
+
         private sealed class CatalogueSolutionsControllerTestContext
         {
             private CatalogueSolutionsControllerTestContext()
