@@ -47,11 +47,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Then(@"the catalogue solutions response contains a single solution")]
         public async Task ThenTheCatalogueSolutionsResponseContainsASingleSolution(Table table)
         {
-            var expected = table.CreateSet<GetOrderItemModel>().FirstOrDefault();
+            var expected = table.CreateSet<GetOrderItem>().FirstOrDefault();
 
             var response = await _response.ReadBodyAsJsonAsync();
 
-            var actual = new GetOrderItemModel
+            var actual = new GetOrderItem
             {
                 ServiceRecipientOdsCode = response.SelectToken("serviceRecipient").Value<string>("odsCode"),
                 CatalogueSolutionId = response.Value<string>("catalogueSolutionId"),
@@ -70,7 +70,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected);
         }
 
-        private sealed class GetOrderItemModel
+        private sealed class GetOrderItem
         {
             public string ServiceRecipientOdsCode { get; set; }
             public string CatalogueSolutionId { get; set; }

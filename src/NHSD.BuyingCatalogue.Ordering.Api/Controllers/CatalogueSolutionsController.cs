@@ -94,7 +94,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpGet]
         [Route("{orderItemId}")]
-        public async Task<ActionResult<GetOrderItemModel>> GetOrderItemAsync(string orderId, int orderItemId)
+        public async Task<ActionResult<GetOrderItem>> GetOrderItemAsync(string orderId, int orderItemId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
@@ -113,7 +113,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (orderItem is null)
                 return NotFound();
 
-            return new GetOrderItemModel
+            return new GetOrderItem
             {
                 ServiceRecipient = new ServiceRecipientModel
                 {

@@ -2,7 +2,7 @@
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
-    public sealed class GetOrderItemModel
+    public sealed class GetOrderItem
     {
         public ServiceRecipientModel ServiceRecipient { get; set; }
 

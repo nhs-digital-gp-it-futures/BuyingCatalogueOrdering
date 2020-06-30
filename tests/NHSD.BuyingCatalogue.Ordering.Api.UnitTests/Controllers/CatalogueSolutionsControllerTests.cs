@@ -568,7 +568,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = CatalogueSolutionsControllerTestContext.Setup();
 
             var serviceRecipients = new List<(string Ods, string Name)>
-
             {
                 ("eu", "EU test")
             };
@@ -579,9 +578,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             context.Order.AddOrderItem(orderItem, Guid.Empty, string.Empty);
 
             var result = await context.Controller.GetOrderItemAsync("myOrder", orderItem.OrderItemId);
-            result.Value.Should().BeOfType<GetOrderItemModel>();
+            result.Value.Should().BeOfType<GetOrderItem>();
 
-            var expected = new GetOrderItemModel
+            var expected = new GetOrderItem
             {
                 ServiceRecipient = new ServiceRecipientModel
                 {
