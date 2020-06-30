@@ -222,7 +222,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             result.Result.As<CreatedAtActionResult>().Should().BeEquivalentTo(new
             {
-                ActionName = "GetOrderItem",
+                ActionName = "GetOrderItemModel",
                 ControllerName = (string)null,
                 RouteValues = new RouteValueDictionary
                 {
@@ -578,9 +578,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             context.Order.AddOrderItem(orderItem, Guid.Empty, string.Empty);
 
             var result = await context.Controller.GetOrderItemAsync("myOrder", orderItem.OrderItemId);
-            result.Value.Should().BeOfType<GetOrderItem>();
+            result.Value.Should().BeOfType<GetOrderItemModel>();
 
-            var expected = new GetOrderItem
+            var expected = new GetOrderItemModel
             {
                 ServiceRecipient = new ServiceRecipientModel
                 {
@@ -591,7 +591,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 CurrencyCode = orderItem.CurrencyCode,
                 DeliveryDate = orderItem.DeliveryDate,
                 EstimationPeriod = orderItem.EstimationPeriod.Name,
-                ItemUnitModel = new ItemUnitModel { Description = orderItem.CataloguePriceUnit.Description, Name = orderItem.CataloguePriceUnit.TierName },
+                ItemUnit = new ItemUnitModel { Description = orderItem.CataloguePriceUnit.Description, Name = orderItem.CataloguePriceUnit.TierName },
                 Price = orderItem.Price,
                 ProvisioningType = orderItem.ProvisioningType.Name,
                 Quantity = orderItem.Quantity,

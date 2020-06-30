@@ -94,7 +94,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpGet]
         [Route("{orderItemId}")]
-        public async Task<ActionResult<GetOrderItem>> GetOrderItemAsync(string orderId, int orderItemId)
+        public async Task<ActionResult<GetOrderItemModel>> GetOrderItemAsync(string orderId, int orderItemId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
@@ -113,7 +113,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (orderItem is null)
                 return NotFound();
 
-            return new GetOrderItem
+            return new GetOrderItemModel
             {
                 ServiceRecipient = new ServiceRecipientModel
                 {
@@ -124,7 +124,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 CurrencyCode = orderItem.CurrencyCode,
                 DeliveryDate = orderItem.DeliveryDate,
                 EstimationPeriod = orderItem.EstimationPeriod.Name,
-                ItemUnitModel = new ItemUnitModel { Description = orderItem.CataloguePriceUnit.Description, Name = orderItem.CataloguePriceUnit.TierName },
+                ItemUnit = new ItemUnitModel { Description = orderItem.CataloguePriceUnit.Description, Name = orderItem.CataloguePriceUnit.TierName },
                 Price = orderItem.Price,
                 ProvisioningType = orderItem.ProvisioningType.Name,
                 Quantity = orderItem.Quantity,

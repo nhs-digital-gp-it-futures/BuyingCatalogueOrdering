@@ -47,11 +47,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Then(@"the catalogue solutions response contains a single solution")]
         public async Task ThenTheCatalogueSolutionsResponseContainsASingleSolution(Table table)
         {
-            var expected = table.CreateSet<GetOrderItem>().FirstOrDefault();
+            var expected = table.CreateSet<GetOrderItemModel>().FirstOrDefault();
 
             var response = await _response.ReadBodyAsJsonAsync();
 
-            var actual = new GetOrderItem
+            var actual = new GetOrderItemModel
             {
                 ServiceRecipientOdsCode = response.SelectToken("serviceRecipient").Value<string>("odsCode"),
                 CatalogueSolutionId = response.Value<string>("catalogueSolutionId"),
@@ -59,8 +59,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 CurrencyCode = response.Value<string>("currencyCode"),
                 DeliveryDate = response.Value<DateTime?>("deliveryDate"),
                 EstimationPeriod = response.Value<string>("estimationPeriod"),
-                ItemUnitDescription = response.SelectToken("itemUnitModel").Value<string>("description"),
-                ItemUnitName = response.SelectToken("itemUnitModel").Value<string>("name"),
+                ItemUnitDescription = response.SelectToken("itemUnit").Value<string>("description"),
+                ItemUnitName = response.SelectToken("itemUnit").Value<string>("name"),
                 Price = response.Value<decimal?>("price"),
                 ProvisioningType = response.Value<string>("provisioningType"),
                 Quantity = response.Value<int>("quantity"),
@@ -70,7 +70,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected);
         }
 
-        private sealed class GetOrderItem
+        private sealed class GetOrderItemModel
         {
             public string ServiceRecipientOdsCode { get; set; }
             public string CatalogueSolutionId { get; set; }

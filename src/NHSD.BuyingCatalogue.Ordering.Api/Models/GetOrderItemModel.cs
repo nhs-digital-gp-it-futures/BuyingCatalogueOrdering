@@ -2,7 +2,7 @@
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
-    public sealed class GetOrderItem
+    public sealed class GetOrderItemModel
     {
         public ServiceRecipientModel ServiceRecipient { get; set; }
 
@@ -22,7 +22,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 
         public string CurrencyCode { get; set; }
 
-        public ItemUnitModel ItemUnitModel { get; set; }
+        public ItemUnitModel ItemUnit { get; set; }
 
         public decimal? Price { get; set; }
     }
