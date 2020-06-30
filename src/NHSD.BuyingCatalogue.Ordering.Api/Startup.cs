@@ -15,6 +15,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Logging;
 using NHSD.BuyingCatalogue.Ordering.Api.Services;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Application.Services;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
@@ -59,7 +60,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             services
                 .AddTransient<IIdentityService, IdentityService>()
                 .AddTransient<ICreateOrderService, CreateOrderService>()
-                .AddTransient<ICreateOrderItemService, CreateOrderItemService>();
+                .AddTransient<ICreateOrderItemService, CreateOrderItemService>()
+                .AddTransient<IUpdateOrderItemService, UpdateOrderItemService>();
 
             services.RegisterHealthChecks(connectionString);
 

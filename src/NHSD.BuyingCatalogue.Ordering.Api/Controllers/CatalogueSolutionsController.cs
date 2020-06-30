@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
@@ -27,13 +28,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         private readonly IOrderRepository _orderRepository;
         private readonly ICreateOrderItemService _createOrderItemService;
+        private readonly IUpdateOrderItemService _updateOrderItemService;
 
         public CatalogueSolutionsController(
             IOrderRepository orderRepository,
-            ICreateOrderItemService createOrderItemService)
+            ICreateOrderItemService createOrderItemService,
+            IUpdateOrderItemService updateOrderItemService)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
             _createOrderItemService = createOrderItemService ?? throw new ArgumentNullException(nameof(createOrderItemService));
+            _updateOrderItemService = updateOrderItemService ?? throw new ArgumentNullException(nameof(updateOrderItemService));
         }
 
         [HttpGet]
@@ -86,11 +90,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             order.CatalogueSolutionsViewed = true;
-
-            var name = User.Identity.Name;
-            order.SetLastUpdatedBy(User.GetUserId(), name);
+            order.SetLastUpdatedBy(User.GetUserId(), User.GetUserName());
 
             await _orderRepository.UpdateOrderAsync(order);
+
             return NoContent();
         }
 
@@ -157,25 +160,48 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [HttpPut]
         [Route("{orderItemId}")]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public ActionResult UpdateOrderItem(string orderId, string orderItemId, UpdateOrderItemModel updateOrderItemModel)
+        public async Task<ActionResult<UpdateOrderItemResponseModel>> UpdateOrderItemAsync(
+            string orderId, 
+            int orderItemId, 
+            UpdateOrderItemModel model)
         {
-            if (updateOrderItemModel == null)
-            {
-                throw new ArgumentNullException(nameof(updateOrderItemModel));
-            }
+            if (model is null)
+                throw new ArgumentNullException(nameof(model));
 
-            var orderItemKey = GetOrderItemKey(orderId, orderItemId);
-            if (CatalogueSolutionOrderItems.ContainsKey(orderItemKey))
-            {
-                var item = CatalogueSolutionOrderItems[orderItemKey];
-                item.Price = updateOrderItemModel.Price;
-                item.Quantity = updateOrderItemModel.Quantity;
-                item.DeliveryDate = updateOrderItemModel.DeliveryDate;
-                item.EstimationPeriod = updateOrderItemModel.EstimationPeriod;
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            if (order is null)
+                return NotFound();
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+                return Forbid();
+
+            var orderItem = order.OrderItems.FirstOrDefault(
+                item => orderItemId.Equals(item.OrderItemId) 
+                        && CatalogueItemType.Solution.Equals(item.CatalogueItemType));
+
+            if (orderItem is null)
+                return NotFound();
+
+            var result = await _updateOrderItemService.UpdateAsync(
+                new UpdateOrderItemRequest(
+                    model.DeliveryDate,
+                    model.EstimationPeriod,
+                    order,
+                    orderItemId,
+                    model.Price,
+                    model.Quantity));
+
+            if (result.IsSuccess)
                 return NoContent();
-            }
 
-            return NotFound();
+            var updateOrderItemResponse =
+                new UpdateOrderItemResponseModel
+                {
+                    Errors = result.Errors.Select(x => new ErrorModel(x.Id, x.Field))
+                };
+
+            return BadRequest(updateOrderItemResponse);
         }
 
         private static string GetOrderItemKey(string orderId, string orderItemId)

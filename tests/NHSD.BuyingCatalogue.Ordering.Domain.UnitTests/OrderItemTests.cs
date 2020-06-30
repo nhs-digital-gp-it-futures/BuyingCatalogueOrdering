@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders;
 using NUnit.Framework;
@@ -9,22 +10,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
     [Parallelizable(ParallelScope.All)]
     internal sealed class OrderItemTests
     {
-        [TestCase(null)]
-        [TestCase("")]
-        [TestCase("    ")]
-        public void Constructor_NullOrEmptyOdsCode_ThrowsArgumentException(string odsCodeInput)
-        {
-            void Test()
-            {
-                OrderItemBuilder
-                    .Create()
-                    .WithOdsCode(odsCodeInput)
-                    .Build();
-            }
-
-            Assert.Throws<ArgumentException>(Test);
-        }
-
         [TestCase(null)]
         [TestCase("")]
         [TestCase("    ")]
@@ -130,6 +115,62 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
+        public void ChangePrice_ChangeValues_ExpectedPropertiesUpdated()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithDeliveryDate(DateTime.UtcNow)
+                .WithEstimationPeriod(TimeUnit.PerYear)
+                .Build();
+
+            var expected = new
+            {
+                DeliveryDate = orderItem.DeliveryDate?.AddDays(1),
+                Quantity = orderItem.Quantity + 1,
+                EstimationPeriod = TimeUnit.PerMonth,
+                Price = orderItem.Price + 1m
+            };
+
+            orderItem.ChangePrice(
+                expected.DeliveryDate, 
+                expected.Quantity,
+                expected.EstimationPeriod, 
+                expected.Price, 
+                null);
+
+            orderItem.Should().BeEquivalentTo(expected);
+        }
+
+        [TestCase(0, 0, false, 0, 0)]
+        [TestCase(1, 0, false, 0, 1)]
+        [TestCase(0, 1, false, 0, 1)]
+        [TestCase(0, 0, true, 0, 1)]
+        [TestCase(0, 0, false, 1, 1)]
+        public void ChangePrice_Callback_ReturnsExpectedCallbackCount(
+            int deliveryDateChangeInput,
+            int quantityChangeInput,
+            bool estimationPeriodChangeInput,
+            decimal priceChangeInput,
+            int expectedCount)
+        {
+            int callbackCounter = 0;
+
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithEstimationPeriod(TimeUnit.PerYear)
+                .Build();
+
+            orderItem.ChangePrice(
+                orderItem.DeliveryDate?.AddDays(deliveryDateChangeInput), 
+                orderItem.Quantity + quantityChangeInput, 
+                estimationPeriodChangeInput ? TimeUnit.PerMonth : TimeUnit.PerYear, 
+                orderItem.Price + priceChangeInput, 
+                () => callbackCounter++);
+
+            callbackCounter.Should().Be(expectedCount);
+        }
+
+        [Test]
         public void Equals_NullOrderItem_AreNotEqual()
         {
             var orderItem = OrderItemBuilder
@@ -195,6 +236,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
                 .Build();
 
             orderItem.GetHashCode().Should().Be(expected);
+        }
+
+        [Test]
+        public void GetHashCode_TwoOrderItems_HashCodeNotEqual()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .Build();
+
+            var orderItemComparison = OrderItemBuilder
+                .Create()
+                .Build();
+
+            var actual = orderItem.GetHashCode();
+            var expected = orderItemComparison.GetHashCode();
+
+            actual.Should().NotBe(expected);
         }
     }
 }

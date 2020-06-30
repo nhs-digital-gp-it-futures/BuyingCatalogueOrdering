@@ -13,13 +13,13 @@ Background:
         | C000014-01 | eu      | EU Test  |
         | C000014-01 | auz     | AUZ Test |
         | C000014-01 | ods     | NULL     |
-    Given Order Items exist
-        | OrderId    | CatalogueItemName | CatalogueItemTypeEnum | OdsCode |
-        | C000014-01 | Sol 1             | Solution              | eu      |
-        | C000014-01 | Sol 2             | Solution              | auz     |
-        | C000014-01 | Sol 3             | Solution              | ods     |
-        | C000014-01 | Add Serv 1        | AdditionalService     | eu      |
-        | C000014-01 | Ass Serv 1        | AssociatedService     | auz     |
+    Given Order items exist
+        | OrderId    | CatalogueItemName | CatalogueItemType | OdsCode |
+        | C000014-01 | Sol 1             | Solution          | eu      |
+        | C000014-01 | Sol 2             | Solution          | auz     |
+        | C000014-01 | Sol 3             | Solution          | ods     |
+        | C000014-01 | Add Serv 1        | AdditionalService | eu      |
+        | C000014-01 | Ass Serv 1        | AssociatedService | auz     |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @4631
