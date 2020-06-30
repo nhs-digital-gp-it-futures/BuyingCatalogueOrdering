@@ -222,7 +222,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             result.Result.As<CreatedAtActionResult>().Should().BeEquivalentTo(new
             {
-                ActionName = "GetOrderItemModel",
+                ActionName = "GetOrderItem",
                 ControllerName = (string)null,
                 RouteValues = new RouteValueDictionary
                 {
