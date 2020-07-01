@@ -12,8 +12,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
             if(builder is null)
                 throw new ArgumentNullException(nameof(builder));
 
-            builder.Property(x => x.Description).HasConversion<string>(description => description.Value,
+            builder.Property(x => x.Description).HasConversion(description => description.Value,
                 data => OrderDescription.Create(data).Value);
+
+            builder.HasMany(x => x.OrderItems)
+                .WithOne();
+
+            builder.HasMany(x => x.ServiceRecipients)
+                .WithOne(x => x.Order);
         }
     }
 }

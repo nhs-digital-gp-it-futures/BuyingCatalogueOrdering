@@ -14,6 +14,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
             await databaseConnection.ExecuteAsync("GRANT CONNECT TO [NHSD-ORDAPI];");
             await databaseConnection.ExecuteAsync("ALTER ROLE db_datareader ADD MEMBER [NHSD-ORDAPI];");
             await databaseConnection.ExecuteAsync("ALTER ROLE db_datawriter ADD MEMBER [NHSD-ORDAPI];");
+            await databaseConnection.ExecuteAsync("DELETE FROM dbo.OrderItem;");
             await databaseConnection.ExecuteAsync("DELETE FROM dbo.ServiceRecipient;");
             await databaseConnection.ExecuteAsync("DELETE FROM dbo.[Order];");
             await databaseConnection.ExecuteAsync("DELETE FROM dbo.[Address];");

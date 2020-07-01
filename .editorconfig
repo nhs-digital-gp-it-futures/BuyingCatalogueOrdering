@@ -52,6 +52,11 @@ indent_size = 2
 
 # Feature files
 [*.feature]
+end_of_line = lf
+insert_final_newline = true
+
+# SQL files
+[*.sql]
 insert_final_newline = true
 
 ###############################

@@ -1,5 +1,4 @@
-﻿using Moq;
-using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
+﻿using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 

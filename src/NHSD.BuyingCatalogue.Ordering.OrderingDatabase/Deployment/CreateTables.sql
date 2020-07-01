@@ -1,5 +1,10 @@
 ﻿:r ../Tables/OrderStatus.sql
 :r ../Tables/Contact.sql
 :r ../Tables/Address.sql
+:r ../Tables/CatalogueItemType.sql
+:r ../Tables/CataloguePriceType.sql
+:r ../Tables/ProvisioningType.sql
+:r ../Tables/TimeUnit.sql
 :r ../Tables/Order.sql
 :r ../Tables/ServiceRecipient.sql
+:r ../Tables/OrderItem.sql

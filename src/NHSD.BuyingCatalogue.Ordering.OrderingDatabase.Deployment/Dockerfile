@@ -6,7 +6,7 @@ RUN rm -rf Deployment \
     && dotnet build "NHSD.BuyingCatalogue.Ordering.OrderingDatabase.Deployment.csproj" -c Release -o build
 
 FROM mcr.microsoft.com/mssql-tools:latest AS dacfx
-RUN apt-get update && apt-get install libunwind8 libicu-dev wget unzip -y
+RUN apt-get -o Acquire::https::No-Cache=True -o Acquire::http::No-Cache=True update && apt-get install libunwind8 libicu-dev wget unzip -y
 WORKDIR ~
 RUN wget https://go.microsoft.com/fwlink/?linkid=2128144 -O sqlpackage.zip \
     && mkdir sqlpackage \

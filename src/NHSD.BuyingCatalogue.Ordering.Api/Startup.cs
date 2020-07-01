@@ -12,8 +12,12 @@ using Microsoft.IdentityModel.Tokens;
 using NHSD.BuyingCatalogue.Ordering.Api.ActionFilters;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Logging;
+using NHSD.BuyingCatalogue.Ordering.Api.Services;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
+using NHSD.BuyingCatalogue.Ordering.Application.Services;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
@@ -49,10 +53,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             
             IdentityModelEventSource.ShowPII = _environment.IsDevelopment();
 
+            services.AddHttpContextAccessor();
             services.AddTransient<IServiceRecipientRepository, ServiceRecipientRepository>();
             services.AddTransient<IOrderRepository, OrderRepository>();
-            services.AddTransient<ICreateOrderService, CreateOrderService>();
+
+            services
+                .AddTransient<IIdentityService, IdentityService>()
+                .AddTransient<ICreateOrderService, CreateOrderService>()
+                .AddTransient<ICreateOrderItemService, CreateOrderItemService>()
+                .AddTransient<IUpdateOrderItemService, UpdateOrderItemService>();
+
             services.RegisterHealthChecks(connectionString);
+
+            services.AddSwaggerDocumentation();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
@@ -110,16 +123,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 opts.GetLevel = SerilogRequestLoggingOptions.GetLevel;
             });
 
-            if (_environment.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
             var pathBase = _configuration.GetValue<string>("PathBase");
             if (!string.IsNullOrWhiteSpace(pathBase))
             {
                 Log.Logger.Information($"USING PATH BASE {pathBase}");
                 app.UsePathBase(pathBase);
+            }
+
+            if (_environment.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+                app.UseSwaggerDocumentation(pathBase);
             }
 
             app.UseRouting();

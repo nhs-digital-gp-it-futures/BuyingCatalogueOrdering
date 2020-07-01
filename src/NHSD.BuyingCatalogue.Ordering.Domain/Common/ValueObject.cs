@@ -25,6 +25,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Common
             {
                 return false;
             }
+
             if (!(obj is ValueObject item))
             {
                 return false;
@@ -61,6 +62,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Common
             {
                 return true;
             }
+
             if (ReferenceEquals(a, null) || ReferenceEquals(b, null))
             {
                 return false;
