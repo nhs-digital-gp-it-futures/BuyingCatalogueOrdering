@@ -232,6 +232,50 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [TestCase]
+        public async Task GetOrderSummaryAsync_ServiceCatalogueSolutionCount_ReturnsCountOfTwo()
+        {
+            var order = OrderBuilder.Create()
+                .WithOrderItem(OrderItemBuilder.Create()
+                    .WithCatalogueItemType(CatalogueItemType.Solution)
+                    .Build())
+                .WithOrderItem(OrderItemBuilder.Create()
+                    .WithCatalogueItemType(CatalogueItemType.Solution)
+                    .Build()
+                ).Build();
+
+            var context = OrdersControllerTestContext.Setup(order.OrganisationId);
+            context.Order = order;
+            
+            var controller = context.OrdersController;
+
+            string expectedOrderId = context.Order.OrderId;
+
+            var response = (await controller.GetOrderSummaryAsync(expectedOrderId)).Result as OkObjectResult;
+            Assert.IsNotNull(response);
+
+            var actual = response.Value.As<OrderSummaryModel>();
+
+            var expected = OrderSummaryModelBuilder
+                .Create()
+                .WithOrderId(expectedOrderId)
+                .WithOrganisationId(order.OrganisationId)
+                .WithSections(SectionModelListBuilder
+                    .Create()
+                    .WithServiceRecipients(
+                        SectionModel
+                            .ServiceRecipients
+                            .WithStatus("incomplete")
+                            .WithCount(context.ServiceRecipientListCount))
+                    .WithCatalogueSolutions(SectionModel.CatalogueSolutions
+                        .WithStatus("incomplete")
+                        .WithCount(2))
+                    .Build())
+                .Build();
+
+            actual.Should().BeEquivalentTo(expected);
+        }
+
+        [TestCase]
         public async Task GetOrderSummaryAsync_ServiceRecipientRepository_CalledOnce()
         {
             var order = OrderBuilder.Create().Build();
@@ -628,7 +672,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                             .Create()
                             .WithOrganisationId(organisationId)
                             .WithSections(SectionModelListBuilder.Create()
-                                .WithCatalogueSolutions(SectionModel.CatalogueSolutions.WithStatus("complete"))
+                                .WithCatalogueSolutions(SectionModel.CatalogueSolutions
+                                    .WithStatus("complete")
+                                    .WithCount(0))
                                 .Build())
                             .Build());
 
@@ -642,12 +688,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                             .Create()
                             .WithOrganisationId(organisationId)
                             .WithSections(SectionModelListBuilder.Create()
-                                .WithCatalogueSolutions(SectionModel.CatalogueSolutions.WithStatus("incomplete"))
+                                .WithCatalogueSolutions(SectionModel.CatalogueSolutions
+                                    .WithStatus("incomplete")
+                                    .WithCount(0))
+                                .Build())
+                            .Build());
+
+                    yield return new TestCaseData(
+                        OrderBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithCatalogueSolutionsViewed(true)
+                            .WithOrderItem(OrderItemBuilder.Create()
+                                .WithCatalogueItemType(CatalogueItemType.Solution)
+                                .Build())
+                            .Build(),
+                        OrderSummaryModelBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithSections(SectionModelListBuilder.Create()
+                                .WithCatalogueSolutions(SectionModel.CatalogueSolutions
+                                    .WithStatus("complete")
+                                    .WithCount(1))
                                 .Build())
                             .Build());
                 }
             }
-
         }
     }
 }

@@ -23,7 +23,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _commencementDate = SectionModel.CommencementDate;
             _associatedServices = SectionModel.AssociatedServices;
             _serviceRecipients = SectionModel.ServiceRecipients.WithCount(0);
-            _catalogueSolutions = SectionModel.CatalogueSolutions;
+            _catalogueSolutions = SectionModel.CatalogueSolutions.WithCount(0);
             _additionalServices = SectionModel.AdditionalServices;
             _fundingSource = SectionModel.FundingSource;
         }
