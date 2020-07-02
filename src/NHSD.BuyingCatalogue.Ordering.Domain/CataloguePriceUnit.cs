@@ -6,7 +6,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class CataloguePriceUnit : ValueObject
     {
-        public string TierName { get; }
+        public string Name { get; }
 
         public string Description { get; }
 
@@ -15,18 +15,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         }
 
         private CataloguePriceUnit(
-            string tierName, 
+            string name, 
             string description) : this()
         {
-            TierName = tierName;
+            Name = name;
             Description = description;
         }
 
-        public static CataloguePriceUnit Create(string tierName, string description)
+        public static CataloguePriceUnit Create(string name, string description)
         {
-            if (string.IsNullOrWhiteSpace(tierName))
+            if (string.IsNullOrWhiteSpace(name))
             {
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(tierName));
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
             }
 
             if (string.IsNullOrWhiteSpace(description))
@@ -34,12 +34,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(description));
             }
 
-            return new CataloguePriceUnit(tierName, description);
+            return new CataloguePriceUnit(name, description);
         }
 
         protected override IEnumerable<object> GetEqualityComponents()
         {
-            yield return TierName;
+            yield return Name;
             yield return Description;
         }
     }

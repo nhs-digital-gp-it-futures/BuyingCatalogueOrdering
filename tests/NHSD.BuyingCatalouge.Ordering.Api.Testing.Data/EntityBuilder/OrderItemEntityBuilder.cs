@@ -20,6 +20,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
         private string _currencyCode;
         private TimeUnit? _timeUnit;
         private string _pricingUnitTierName;
+        private string _pricingUnitName;
         private string _pricingUnitDescription;
         private decimal? _price;
         private readonly DateTime _created;
@@ -39,6 +40,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             string currencyCode,
             TimeUnit? timeUnit,
             string pricingUnitTierName,
+            string pricingUnitName,
             string pricingUnitDescription,
             decimal? price,
             DateTime created,
@@ -57,6 +59,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             _currencyCode = currencyCode;
             _timeUnit = timeUnit;
             _pricingUnitTierName = pricingUnitTierName;
+            _pricingUnitName = pricingUnitName;
             _pricingUnitDescription = pricingUnitDescription;
             _price = price;
             _created = created;
@@ -77,6 +80,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             "GBP",
             null,
             "Tier",
+            "Price Name",
             "per consultation",
             1.5m,
             DateTime.UtcNow,
@@ -105,6 +109,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
                 orderItemEntity.CataloguePriceType,
                 orderItemEntity.CurrencyCode,
                 orderItemEntity.TimeUnit,
+                orderItemEntity.PricingUnitTierName,
                 orderItemEntity.PricingUnitTierName,
                 orderItemEntity.PricingUnitDescription,
                 orderItemEntity.Price,
@@ -196,6 +201,12 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             return this;
         }
 
+        public OrderItemEntityBuilder WithPricingUnitName(string pricingUnitName)
+        {
+            _pricingUnitName = pricingUnitName;
+            return this;
+        }
+
         public OrderItemEntityBuilder WithPricingUnitDescription(string pricingUnitDescription)
         {
             _pricingUnitDescription = pricingUnitDescription;
@@ -226,6 +237,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
                 CurrencyCode = _currencyCode,
                 TimeUnit = _timeUnit,
                 PricingUnitTierName = _pricingUnitTierName,
+                PricingUnitName = _pricingUnitName,
                 PricingUnitDescription = _pricingUnitDescription,
                 Price = _price,
                 Created = _created,

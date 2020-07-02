@@ -71,6 +71,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 .Excluding(orderItemEntity => orderItemEntity.OrderItemId)
                 .Excluding(orderItemEntity => orderItemEntity.DeliveryDate)
                 .Excluding(orderItemEntity => orderItemEntity.EstimationPeriod)
+                .Excluding(orderItemEntity => orderItemEntity.PricingUnitName)
+                .Excluding(orderItemEntity => orderItemEntity.PricingUnitTierName)
                 .Excluding(orderItemEntity => orderItemEntity.Created)
                 .Excluding(orderItemEntity => orderItemEntity.LastUpdated));
 

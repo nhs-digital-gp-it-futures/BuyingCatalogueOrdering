@@ -18,10 +18,10 @@ Background:
         | C000014-01 | eu      | EU Test |
         | C000014-01 | au      | UA Test |
     Given Order items exist
-        | OrderId    | CatalogueItemId | CatalogueItemName | CatalogueItemType | OdsCode | CataloguePriceUnitName | CataloguePriceUnitDescription | Price   | ProvisioningType | Quantity |
-        | C000014-01 | Cat Item 1      | Sol1              | Solution          | eu      | Tier                   | Desc                          | 461.34  | OnDemand         | 5        |
-        | C000014-01 | Cat Item 2      | Sol2              | AssociatedService | au      | Tier                   | Desc                          | 721.34  | Declarative      | 2        |
-        | C000014-01 | Cat Item 3      | Sol3              | AdditionalService | eu      | Tier                   | Desc                          | 3532.12 | Patient          | 1        |
+        | OrderId    | CatalogueItemId | CatalogueItemName | CatalogueItemType | OdsCode | CataloguePriceUnitDescription | Price   | ProvisioningType | Quantity |
+        | C000014-01 | Cat Item 1      | Sol1              | Solution          | eu      | Desc                          | 461.34  | OnDemand         | 5        |
+        | C000014-01 | Cat Item 2      | Sol2              | AssociatedService | au      | Desc                          | 721.34  | Declarative      | 2        |
+        | C000014-01 | Cat Item 3      | Sol3              | AdditionalService | eu      | Desc                          | 3532.12 | Patient          | 1        |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @8122
