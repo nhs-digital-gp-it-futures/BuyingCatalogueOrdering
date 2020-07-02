@@ -48,17 +48,4 @@
     <ProjectReference Include="..\..\src\NHSD.BuyingCatalogue.Ordering.Api\NHSD.BuyingCatalogue.Ordering.Api.csproj" />
     <ProjectReference Include="..\NHSD.BuyingCatalouge.Ordering.Api.Testing.Data\NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="Features\Order Get.feature.cs">
-      <DependentUpon>Order Get.feature</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <SpecFlowFeatureFiles Update="Features\Order Get.feature">
-      <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </SpecFlowFeatureFiles>
-  </ItemGroup>
 </Project>
