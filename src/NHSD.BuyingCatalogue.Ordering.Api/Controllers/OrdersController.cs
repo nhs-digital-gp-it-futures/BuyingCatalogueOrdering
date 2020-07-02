@@ -92,84 +92,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 {
                     new ServiceRecipientModel
                     {
-                        Name = "NHS Test CCG",
-                        OdsCode = "08E"
-                    },
-                    new ServiceRecipientModel
-                    {
                         Name = "Blue Mountain Medical Practice",
                         OdsCode = "A10001"
-                    },
-                    new ServiceRecipientModel
-                    {
-                        Name = "Lighthouse surgery",
-                        OdsCode = "Y06616"
-                    },
-                    new ServiceRecipientModel
-                    {
-                        Name = "Lincoln Test Practice",
-                        OdsCode = "Y04336"
-                    }, 
-                    new ServiceRecipientModel
-                    {
-                        Name = "Mckenzie Group Practice",
-                        OdsCode = "A81070"
-                    }, 
-                    new ServiceRecipientModel
-                    {
-                        Name = "Medical Princes Centre",
-                        OdsCode = "B81052"
-                    }, 
-                    new ServiceRecipientModel
-                    {
-                        Name = "NHS Test CCG",
-                        OdsCode = "08E"
-                    }, 
-                    new ServiceRecipientModel
-                    {
-                        Name = "The Lynton Practice",
-                        OdsCode = "B81055"
-                    }, 
-                    new ServiceRecipientModel
-                    {
-                        Name = "The Ridings Medical Group",
-                        OdsCode = "B81061"
-                    }, 
-                    new ServiceRecipientModel
-                    {
-                        Name = "Trent View Medical Practice",
-                        OdsCode = "B81065"
                     }
                 },
                 OrderItems = new[]
                 {
-                    // Order Items - One off cost
-                    new OrderItemModel
-                    {
-                        ItemId = "C000001-01-08E-23",
-                        ServiceRecipientsOdsCode = "08E",
-                        CataloguePriceType = "Flat",
-                        CatalogueItemType = "Associated Service",
-                        CatalogueItemName = "Core Training",
-                        ProvisioningType = "Declarative",
-                        ItemUnitDescription = "per Day",
-                        Price = 585.00m,
-                        Quantity = 70,
-                        CostPerYear = 40850.00m
-                    },
-                    new OrderItemModel
-                    {
-                        ItemId = "C000001-01-08E-37",
-                        ServiceRecipientsOdsCode = "08E",
-                        CataloguePriceType = "Tiered",
-                        CatalogueItemType = "Associated Service",
-                        CatalogueItemName = "George Digitisation",
-                        ProvisioningType = "Declarative",
-                        ItemUnitDescription = "per Record",
-                        Quantity = 250,
-                        CostPerYear = 887.50m
-                    },
-                    // Order items - recurring cost
                     new OrderItemModel
                     {
                         ItemId = "C000001-01-A10001-1",
@@ -185,93 +113,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                         Quantity = 3415,
                         DeliveryDate = new DateTime(2021, 7, 6),
                         CostPerYear = 4302.90m
-                    },
-                    new OrderItemModel
-                    {
-                        ItemId = "C000001-01-A10001-3",
-                        ServiceRecipientsOdsCode = "A10001",
-                        CataloguePriceType = "Tiered",
-                        CatalogueItemType = "AdditionalService",
-                        CatalogueItemName = "Additional Service 1 of Catalogue Solution name 1",
-                        ProvisioningType = "Patient",
-                        ItemUnitDescription = "per patient",
-                        TimeUnitDescription = "per year",
-                        QuantityPeriodDescription = "per month",
-                        Quantity = 420,
-                        CostPerYear = 3000.00m
-                    },
-                    new OrderItemModel
-                    {
-                        ItemId = "C000001-01-Y06616-7",
-                        ServiceRecipientsOdsCode = "Y06617",
-                        CataloguePriceType = "Flat",
-                        CatalogueItemType = "Additional Service",
-                        CatalogueItemName = "Additional Service 2 of Catalogue Solution name 1",
-                        ProvisioningType = "Declarative",
-                        ItemUnitDescription = "per license",
-                        TimeUnitDescription = "per month",
-                        QuantityPeriodDescription = "per year",
-                        Price = 25.05m,
-                        Quantity = 4,
-                        CostPerYear = 25200m
-                    },
-                    new OrderItemModel
-                    {
-                        ItemId = "C000001-01-Y04336-8",
-                        ServiceRecipientsOdsCode = "Y04336",
-                        CataloguePriceType = "Tiered",
-                        CatalogueItemType = "Solution",
-                        CatalogueItemName = "Catalogue Solution name 2",
-                        ProvisioningType = "Declarative",
-                        ItemUnitDescription = "per user",
-                        TimeUnitDescription = "per month",
-                        QuantityPeriodDescription = "per year",
-                        DeliveryDate = new DateTime(2021, 4, 24),
-                        Quantity = 10,
-                        CostPerYear = 3320m
-                    },
-                    new OrderItemModel
-                    {
-                        ItemId = "C000001-01-A81070-11",
-                        ServiceRecipientsOdsCode = "A81070",
-                        CataloguePriceType = "Flat",
-                        CatalogueItemType = "Solution",
-                        CatalogueItemName = "Catalogue Solution name 1",
-                        ProvisioningType = "OnDemand",
-                        ItemUnitDescription = "per consultation",
-                        QuantityPeriodDescription = "per month",
-                        DeliveryDate = new DateTime(2021, 4, 24),
-                        Price = 0.7m,
-                        Quantity = 250,
-                        CostPerYear = 175
-                    }, 
-                    new OrderItemModel
-                    {
-                        ItemId = "C000001-01-B81052-13",
-                        ServiceRecipientsOdsCode = "B81052",
-                        CataloguePriceType = "Tiered",
-                        CatalogueItemType = "Additional Service",
-                        CatalogueItemName = "Additional Service 1 of Catalogue Solution name 2",
-                        ProvisioningType = "OnDemand",
-                        ItemUnitDescription = "per consultation",
-                        QuantityPeriodDescription = "per year",
-                        Quantity = 330,
-                        CostPerYear = 3782.20m
-                    }, 
-                    new OrderItemModel
-                    {
-                        ItemId = "C000001-01-08E-15",
-                        ServiceRecipientsOdsCode = "08E",
-                        CataloguePriceType = "Flat",
-                        CatalogueItemType = "Associated Service",
-                        CatalogueItemName = "Associated Service name 3",
-                        ProvisioningType = "OnDemand",
-                        ItemUnitDescription = "per fragment",
-                        QuantityPeriodDescription = "per month",
-                        Price = 0.7m,
-                        Quantity = 600,
-                        CostPerYear = 5040m
-                    } 
+                    }
                 }
             };
         }
