@@ -170,7 +170,6 @@ Scenario: 7. Get the order summary after the user has viewed the Catalogue Solut
         | additional-services | incomplete |       |
         | funding-source      | incomplete |       |
 
-
 @5123
 Scenario: 8. Get the order summary that includes a list of Catalogue Solutions
     Given Orders exist
