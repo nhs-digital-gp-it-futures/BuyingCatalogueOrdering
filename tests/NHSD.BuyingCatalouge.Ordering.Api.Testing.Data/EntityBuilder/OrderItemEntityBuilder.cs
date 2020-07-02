@@ -76,7 +76,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             CataloguePriceType.Flat,
             "GBP",
             null,
-            "consultation",
+            "Tier",
             "per consultation",
             1.5m,
             DateTime.UtcNow,

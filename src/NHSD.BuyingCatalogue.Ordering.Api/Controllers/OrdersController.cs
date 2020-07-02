@@ -27,7 +27,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         private readonly IServiceRecipientRepository _serviceRecipientRepository;
 
         public OrdersController(
-            IOrderRepository orderRepository, 
+            IOrderRepository orderRepository,
             ICreateOrderService createOrderService,
             IServiceRecipientRepository serviceRecipientRepository)
         {
@@ -37,84 +37,62 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpGet]
-        [Route("/api/v1/orders/{orderId}")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Static endpoints make the endpoint unreachable")]
-        public OrderModel Get()
+        [Route("{orderId}")]
+        public async Task<ActionResult<OrderModel>> GetAsync(string orderId)
         {
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            if (order is null)
+            {
+                return NotFound();
+            }
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
             return new OrderModel
             {
-                Description = "Hello",
+                Description = order.Description.Value,
                 OrderParty = new OrderingPartyModel
                 {
-                    Name = "NHS Test CCG",
-                    OdsCode = "08E",
-                    Address = new AddressModel
-                    {
-                        Line1 = "1 Cool Street",
-                        Town = "Yoloville",
-                        County = "Brillshire",
-                        Country = "Megaland",
-                        Postcode = "YE37 1ME"
-                    },
-                    PrimaryContact = new PrimaryContactModel
-                    {
-                        EmailAddress = "bob@bob.com",
-                        FirstName = "Bob",
-                        LastName = "Bobbington",
-                        TelephoneNumber = "1337 331331"
-                    }
+                    Name = order.OrganisationName,
+                    OdsCode = order.OrganisationOdsCode,
+                    Address = order.OrganisationAddress.ToModel(),
+                    PrimaryContact = order.OrganisationContact.ToModel()
                 },
-                CommencementDate = DateTime.Today + TimeSpan.FromDays(1),
+                CommencementDate = order.CommencementDate,
                 Supplier = new SupplierModel
                 {
-                    Address = new AddressModel
-                    {
-                        Line1 = "1 Supplier Lane",
-                        Town = "Supplierville",
-                        County = "Suppliershire",
-                        Country = "Supplierland",
-                        Postcode = "SUPP 1ER"
-                    },
-                    Name = "Cool Supplier",
-                    PrimaryContact = new PrimaryContactModel
-                    {
-                        EmailAddress = "alice@alice.com",
-                        FirstName = "Alice",
-                        LastName = "Alicington",
-                        TelephoneNumber = "12345 678910"
-                    }
+                    Name = order.SupplierName,
+                    Address = order.SupplierAddress.ToModel(),
+                    PrimaryContact = order.SupplierContact.ToModel()
                 },
-                TotalOneOffCost = 100m,
-                TotalRecurringCostPerMonth = 100m,
-                TotalRecurringCostPerYear = 1200m,
-                TotalOwnershipCost = 3700m,
-                ServiceRecipients = new []
-                {
+                TotalOneOffCost = 0m,
+                TotalRecurringCostPerMonth = 0m,
+                TotalRecurringCostPerYear = 0m,
+                TotalOwnershipCost = 0m,
+                ServiceRecipients = order.ServiceRecipients.Select(serviceRecipient =>
                     new ServiceRecipientModel
                     {
-                        Name = "Blue Mountain Medical Practice",
-                        OdsCode = "A10001"
-                    }
-                },
-                OrderItems = new[]
-                {
+                        Name = serviceRecipient.Name,
+                        OdsCode = serviceRecipient.OdsCode
+                    }),
+                OrderItems = order.OrderItems.Select(orderItem =>
                     new OrderItemModel
                     {
-                        ItemId = "C000001-01-A10001-1",
-                        ServiceRecipientsOdsCode = "A10001",
-                        CataloguePriceType = "Flat",
-                        CatalogueItemType = "Solution",
-                        CatalogueItemName = "Catalogue Solution name 1",
-                        ProvisioningType = "Patient",
-                        ItemUnitDescription = "per patient",
-                        TimeUnitDescription = "per year",
-                        QuantityPeriodDescription = "per month",
-                        Price = 1.26m,
-                        Quantity = 3415,
-                        DeliveryDate = new DateTime(2021, 7, 6),
-                        CostPerYear = 4302.90m
-                    }
-                }
+                        ItemId = $"{order.OrderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
+                        ServiceRecipientsOdsCode = orderItem.OdsCode,
+                        CataloguePriceType = orderItem.CataloguePriceType.Name,
+                        CatalogueItemType = orderItem.CatalogueItemType.Name,
+                        CatalogueItemName = orderItem.CatalogueItemName,
+                        ProvisioningType = orderItem.ProvisioningType.Name,
+                        ItemUnitDescription = orderItem.CataloguePriceUnit.Description,
+                        Price = orderItem.Price,
+                        Quantity = orderItem.Quantity,
+                        CostPerYear = 0m
+                    }),
             };
         }
 
@@ -127,10 +105,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             {
                 return Forbid();
             }
-            
+
             var orders = await _orderRepository.ListOrdersByOrganisationIdAsync(organisationId);
             var orderModelResult = orders.Select(order => new OrderListItemModel
-                {
+            {
                 OrderId = order.OrderId,
                 Description = order.Description.Value,
                 LastUpdatedBy = order.LastUpdatedByName,

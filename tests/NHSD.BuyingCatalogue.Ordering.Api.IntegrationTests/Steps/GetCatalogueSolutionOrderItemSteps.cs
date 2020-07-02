@@ -15,15 +15,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     {
         private readonly Request _request;
         private readonly Response _response;
-        private readonly OrderItemReferenceList _orderItemReferenceList;
+        private readonly OrderContext _orderContext;
 
         private readonly string _orderCatalogueSolutionsUrl;
 
-        public GetCatalogueSolutionOrderItemSteps(Request request, Response response, OrderItemReferenceList orderItemReferenceList, Settings settings)
+        public GetCatalogueSolutionOrderItemSteps(Request request, Response response, OrderContext orderContext, Settings settings)
         {
             _request = request;
             _response = response;
-            _orderItemReferenceList = orderItemReferenceList;
+            _orderContext = orderContext;
+
             _orderCatalogueSolutionsUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/catalogue-solutions";
         }
         
@@ -31,7 +32,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public async Task WhenAGetRequestIsMadeForASingleOrdersCatalogueSolutionWithOrderIdAndOrderItemId(string orderId, string name)
         {
             var url = string.Format(_orderCatalogueSolutionsUrl, orderId);
-            var orderItemId = _orderItemReferenceList.GetByCatalogueSolutionItemName(name).OrderItemId;
+            var orderItemId = _orderContext.OrderItemReferenceList.GetByCatalogueSolutionItemName(name).OrderItemId;
 
             await _request.GetAsync($"{url}/{orderItemId}");
         }
