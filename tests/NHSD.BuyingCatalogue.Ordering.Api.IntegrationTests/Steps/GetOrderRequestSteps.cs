@@ -46,8 +46,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public async Task ThenTheGetOrderResponseDisplaysTheExpectedOrder()
         {
             var order = _orderContext.OrderReferenceList.GetByOrderId(_getOrderRequest.OrderId);
+            var orderItems = _orderContext.OrderItemReferenceList.FindByOrderId(_getOrderRequest.OrderId);
+            var serviceRecipients = _orderContext.ServiceRecipientReferenceList.FindByOrderId(_getOrderRequest.OrderId);
 
-            await _getOrderResponse.AssertAsync(order);
+            await _getOrderResponse.AssertAsync(order, orderItems, serviceRecipients);
         }
     }
 }

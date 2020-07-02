@@ -69,10 +69,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     Address = order.SupplierAddress.ToModel(),
                     PrimaryContact = order.SupplierContact.ToModel()
                 },
-                TotalOneOffCost = 100m,
-                TotalRecurringCostPerMonth = 100m,
-                TotalRecurringCostPerYear = 1200m,
-                TotalOwnershipCost = 3700m,
+                TotalOneOffCost = 0m,
+                TotalRecurringCostPerMonth = 0m,
+                TotalRecurringCostPerYear = 0m,
+                TotalOwnershipCost = 0m,
                 ServiceRecipients = order.ServiceRecipients.Select(serviceRecipient =>
                     new ServiceRecipientModel
                     {
@@ -91,7 +91,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                         ItemUnitDescription = orderItem.CataloguePriceUnit.Description,
                         Price = orderItem.Price,
                         Quantity = orderItem.Quantity,
-                        CostPerYear = 40850.00m
+                        CostPerYear = 0m
                     }),
             };
         }

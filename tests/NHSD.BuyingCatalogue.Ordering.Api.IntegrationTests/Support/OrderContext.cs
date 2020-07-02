@@ -6,10 +6,13 @@
         {
             OrderReferenceList = new OrderReferenceList();
             OrderItemReferenceList = new OrderItemReferenceList();
+            ServiceRecipientReferenceList = new ServiceRecipientReferenceList();
         }
 
         public OrderReferenceList OrderReferenceList { get; }
 
         public OrderItemReferenceList OrderItemReferenceList { get; }
+
+        public ServiceRecipientReferenceList ServiceRecipientReferenceList { get; }
     }
 }

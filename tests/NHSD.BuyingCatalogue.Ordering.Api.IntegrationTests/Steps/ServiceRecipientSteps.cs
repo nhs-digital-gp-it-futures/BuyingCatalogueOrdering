@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
@@ -18,14 +19,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private readonly Response _response;
         private readonly Request _request;
         private readonly Settings _settings;
+        private readonly OrderContext _orderContext;
 
         private readonly string _serviceRecipientUrl;
 
-        public ServiceRecipientSteps(Response response, Request request, Settings settings)
+        public ServiceRecipientSteps(Response response, Request request, Settings settings, OrderContext orderContext)
         {
             _response = response;
             _request = request;
             _settings = settings;
+            _orderContext = orderContext;
 
             _serviceRecipientUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/service-recipients";
         }
@@ -43,6 +46,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .Build();
 
                 await serviceRecipient.InsertAsync(_settings.ConnectionString);
+
+                _orderContext.ServiceRecipientReferenceList.Add(serviceRecipient);
             }
         }
 

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 
@@ -23,5 +25,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
             _cache.ContainsKey(catalogueSolutionItemName).Should().BeFalse();
             _cache.Add(catalogueSolutionItemName, entity);
         }
+
+        public IEnumerable<OrderItemEntity> FindByOrderId(string orderId) => _cache.Values.Where(x =>
+            string.Equals(x.OrderId, orderId, StringComparison.OrdinalIgnoreCase));
     }
 }

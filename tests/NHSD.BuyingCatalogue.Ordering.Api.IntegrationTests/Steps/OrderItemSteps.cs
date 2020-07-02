@@ -13,14 +13,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     internal sealed class OrderItemSteps
     {
         private readonly Settings _settings;
-        private readonly OrderItemReferenceList _orderItemReferenceList;
+        private readonly OrderContext _orderContext;
 
         public OrderItemSteps(
             Settings settings,
-            OrderItemReferenceList orderItemReferenceList)
+            OrderContext orderContext)
         {
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-            _orderItemReferenceList = orderItemReferenceList ?? throw new ArgumentNullException(nameof(orderItemReferenceList));
+            _orderContext = orderContext;
         }
 
         [Given(@"Order items exist")]
@@ -48,7 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 var orderItemId = await orderItemEntity.InsertAsync<int>(_settings.ConnectionString);
                 orderItemEntity.OrderItemId = orderItemId;
 
-                _orderItemReferenceList.Add(orderItemEntity.CatalogueItemName, orderItemEntity);
+                _orderContext.OrderItemReferenceList.Add(orderItemEntity.CatalogueItemName, orderItemEntity);
             }
         }
 

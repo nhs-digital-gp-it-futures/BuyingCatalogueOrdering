@@ -12,23 +12,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     {
         private readonly Request _request;
         private readonly Settings _settings;
-        private readonly OrderItemReferenceList _orderItemReferenceList;
+        private readonly OrderContext _orderContext;
+
         private UpdateCatalogueSolutionOrderItemRequest _updateCatalogueSolutionOrderItemRequest;
 
         public UpdateCatalogueSolutionOrderItemSteps(
             Request request,
             Settings settings,
-            OrderItemReferenceList orderItemReferenceList)
+            OrderContext orderContext)
         {
             _request = request;
             _settings = settings;
-            _orderItemReferenceList = orderItemReferenceList;
+            _orderContext = orderContext;
         }
 
         [Given(@"the user creates a request to change the catalogue solution order item \('(.*)'\) for the order with ID '(.*)'")]
         public void GivenTheUserCreatesARequestToChangeTheCatalogueSolutionOrderItemForTheOrderWithId(string name, string orderId)
         {
-            var orderItemId = _orderItemReferenceList.GetByCatalogueSolutionItemName(name).OrderItemId;
+            var orderItemId = _orderContext.OrderItemReferenceList.GetByCatalogueSolutionItemName(name).OrderItemId;
 
             _updateCatalogueSolutionOrderItemRequest = new UpdateCatalogueSolutionOrderItemRequest(
                 _request, 
