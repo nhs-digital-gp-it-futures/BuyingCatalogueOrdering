@@ -319,7 +319,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             int serviceRecipientsCount = await _serviceRecipientRepository.GetCountByOrderIdAsync(orderId);
-            int catalogueSolutionCount = order.OrderItems.Count(y => y.CatalogueItemType.Equals(CatalogueItemType.Solution));
+            int catalogueSolutionsCount = order.OrderItems.Count(y => y.CatalogueItemType.Equals(CatalogueItemType.Solution));
 
             OrderSummaryModel orderSummaryModel = new OrderSummaryModel
             {
@@ -339,7 +339,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                         .WithCount(serviceRecipientsCount),
                     SectionModel.CatalogueSolutions
                         .WithStatus(order.IsCatalogueSolutionsSectionComplete() ? "complete" : "incomplete")
-                        .WithCount(catalogueSolutionCount),
+                        .WithCount(catalogueSolutionsCount),
                     SectionModel.AdditionalServices,
                     SectionModel.FundingSource
                 }

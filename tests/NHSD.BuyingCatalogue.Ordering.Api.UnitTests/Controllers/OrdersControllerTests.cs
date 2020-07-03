@@ -232,7 +232,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [TestCase]
-        public async Task GetOrderSummaryAsync_ServiceCatalogueSolutionCount_ReturnsCountOfTwo()
+        public async Task GetOrderSummaryAsync_CatalogueSolutionCount_ReturnsCountOfTwo()
         {
             var order = OrderBuilder.Create()
                 .WithOrderItem(OrderItemBuilder.Create()
@@ -245,12 +245,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var context = OrdersControllerTestContext.Setup(order.OrganisationId);
             context.Order = order;
-            
-            var controller = context.OrdersController;
 
             string expectedOrderId = context.Order.OrderId;
 
-            var response = (await controller.GetOrderSummaryAsync(expectedOrderId)).Result as OkObjectResult;
+            var response = (await context.OrdersController.GetOrderSummaryAsync(expectedOrderId)).Result as OkObjectResult;
             Assert.IsNotNull(response);
 
             var actual = response.Value.As<OrderSummaryModel>();
