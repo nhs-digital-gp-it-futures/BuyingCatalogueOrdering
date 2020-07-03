@@ -53,7 +53,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             static async Task Test()
             {
                 var sut = UpdateOrderItemServiceBuilder.Create().Build();
-                await sut.UpdateAsync(null);
+                await sut.UpdateAsync(null, CatalogueItemType.Solution, ProvisioningType.OnDemand);
             }
 
             Assert.ThrowsAsync<ArgumentNullException>(Test);
@@ -68,7 +68,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 .Create()
                 .Build();
 
-            var actual = await context.UpdateOrderItemService.UpdateAsync(updateOrderItemRequest);
+            var actual = await context.UpdateOrderItemService.UpdateAsync(updateOrderItemRequest, CatalogueItemType.Solution, ProvisioningType.OnDemand);
 
             actual.Should().Be(Result.Success());
         }
@@ -84,7 +84,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 .WithOrderItemId(context.OrderItem.OrderItemId)
                 .Build();
 
-            await context.UpdateOrderItemService.UpdateAsync(updateOrderItemRequest);
+            await context.UpdateOrderItemService.UpdateAsync(updateOrderItemRequest, CatalogueItemType.Solution, ProvisioningType.OnDemand);
 
             context.OrderItem.Should().BeEquivalentTo(new
             {
@@ -105,7 +105,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 .Create()
                 .Build();
 
-            await context.UpdateOrderItemService.UpdateAsync(updateOrderItemRequest);
+            await context.UpdateOrderItemService.UpdateAsync(updateOrderItemRequest, CatalogueItemType.Solution, ProvisioningType.OnDemand);
 
             context.OrderRepositoryMock.Verify(orderRepository => 
                 orderRepository.UpdateOrderAsync(updateOrderItemRequest.Order), Times.Once);
@@ -120,7 +120,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 .Create()
                 .Build();
 
-            await context.UpdateOrderItemService.UpdateAsync(updateOrderItemRequest);
+            await context.UpdateOrderItemService.UpdateAsync(updateOrderItemRequest, CatalogueItemType.Solution, ProvisioningType.OnDemand);
 
             context.IdentityServiceMock.Verify(identityService => 
                 identityService.GetUserName(), Times.Once);

@@ -3,6 +3,7 @@
     public enum TimeUnit
     {
         Month = 1,
-        Year = 2
+        Year = 2,
+        Invalid = 3
     }
 }

@@ -1,10 +1,14 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
     public sealed class ServiceRecipientModel : IEquatable<ServiceRecipientModel>
     {
         public string Name { get; set; }
+
+        [Required(ErrorMessage = "OdsCodeRequired")]
+        [MaxLength(8, ErrorMessage = "OdsCodeTooLong")]
         public string OdsCode { get; set; }
 
         public bool Equals(ServiceRecipientModel other)

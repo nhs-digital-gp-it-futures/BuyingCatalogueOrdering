@@ -9,7 +9,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         private readonly string _catalogueSolutionId;
         private readonly string _catalogueSolutionName;
         private readonly DateTime? _deliveryDate;
-        private readonly int _quantity;
+        private int? _quantity;
         private readonly string _estimationPeriod;
         private readonly string _provisioningType;
         private readonly string _type;
@@ -39,10 +39,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _price = 25.1m;
         }
 
+        public CreateOrderItemModelBuilder WithQuantity(int? quantity)
+        {
+            _quantity = quantity;
+            return this;
+        }
+
         public static CreateOrderItemModelBuilder Create() => new CreateOrderItemModelBuilder();
 
-        public CreateOrderItemModel Build() =>
-            new CreateOrderItemModel
+        public CreateOrderItemSolutionModel Build() =>
+            new CreateOrderItemSolutionModel
             {
                 ServiceRecipient = _serviceRecipient,
                 CatalogueSolutionId = _catalogueSolutionId,
@@ -53,7 +59,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
                 ProvisioningType = _provisioningType,
                 Type = _type,
                 CurrencyCode = _currencyCode,
-                ItemUnitModel = _itemUnitModel,
+                ItemUnit = _itemUnitModel,
                 Price = _price,
             };
     }

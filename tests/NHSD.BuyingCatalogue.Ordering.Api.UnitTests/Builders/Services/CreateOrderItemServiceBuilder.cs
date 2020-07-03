@@ -9,11 +9,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
     {
         private IOrderRepository _orderRepository;
         private IIdentityService _identityService;
+        private ICreateOrderItemValidator CreateOrderItemValidator;
 
         private CreateOrderItemServiceBuilder()
         {
             _orderRepository = Mock.Of<IOrderRepository>();
             _identityService = Mock.Of<IIdentityService>();
+            CreateOrderItemValidator = Mock.Of<ICreateOrderItemValidator>();
         }
 
         public static CreateOrderItemServiceBuilder Create() => new CreateOrderItemServiceBuilder();
@@ -30,11 +32,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
             return this;
         }
 
+        public CreateOrderItemServiceBuilder WithValidator(ICreateOrderItemValidator createOrderItemValidator)
+        {
+            CreateOrderItemValidator = createOrderItemValidator;
+            return this;
+        }
+
         public CreateOrderItemService Build()
         {
             return new CreateOrderItemService(
                 _orderRepository, 
-                _identityService);
+                _identityService,
+                CreateOrderItemValidator);
         }
     }
 }

@@ -11,13 +11,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem
             Order order,
             int orderItemId,
             decimal? price,
-            int quantity)
+            int? quantity)
         {
             DeliveryDate = deliveryDate;
             EstimationPeriodName = estimationPeriodName;
             Order = order ?? throw new ArgumentNullException(nameof(order));
             OrderItemId = orderItemId;
-            Quantity = quantity;
+            Quantity = quantity.GetValueOrDefault();
             Price = price;
         }
 

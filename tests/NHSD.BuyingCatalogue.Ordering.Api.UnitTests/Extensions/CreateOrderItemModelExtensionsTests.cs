@@ -34,6 +34,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
+        public void ToRequest_NullQuantity_ThrowsArgumentException()
+        {
+            static void Test()
+            {
+                CreateOrderItemModelBuilder.Create().WithQuantity(null).Build()
+                    .ToRequest(OrderBuilder.Create().Build(), CatalogueItemType.Solution);
+            }
+
+            Assert.Throws<ArgumentException>(Test);
+        }
+
+        [Test]
         public void ToRequest_Order_CatalogueSolutionType_ReturnsCreateOrderItemRequest()
         {
             var model = CreateOrderItemModelBuilder
@@ -57,11 +69,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
                 .WithCatalogueItemName(model.CatalogueSolutionName)
                 .WithProvisioningTypeName(model.ProvisioningType)
                 .WithCataloguePriceTypeName(model.Type)
-                .WithCataloguePriceUnitTierName(model.ItemUnitModel?.Name)
-                .WithCataloguePriceUnitDescription(model.ItemUnitModel?.Description)
+                .WithCataloguePriceUnitTierName(model.ItemUnit?.Name)
+                .WithCataloguePriceUnitDescription(model.ItemUnit?.Description)
                 .WithPriceTimeUnitName(null)
                 .WithCurrencyCode(model.CurrencyCode)
-                .WithQuantity(model.Quantity)
+                .WithQuantity(model.Quantity.Value)
                 .WithEstimationPeriodName(model.EstimationPeriod)
                 .WithDeliveryDate(model.DeliveryDate)
                 .WithPrice(model.Price)

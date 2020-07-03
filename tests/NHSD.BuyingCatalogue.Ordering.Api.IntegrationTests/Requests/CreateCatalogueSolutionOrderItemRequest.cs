@@ -21,9 +21,31 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
         private static readonly IDictionary<string, Func<CreateCatalogueSolutionOrderItemRequestPayload>> PayloadFactory =
             new Dictionary<string, Func<CreateCatalogueSolutionOrderItemRequestPayload>>()
             {
-                {
-                    "complete", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().Build()
-                }
+                {"complete", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().Build()},
+                {"missing-service-recipient", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithHasServiceRecipient(false).Build()},
+                {"missing-ods-code", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithOdsCode(null).Build()},
+                {"missing-catalogue-solution-id", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithCatalogueSolutionId(null).Build()},
+                {"missing-catalogue-solution-name", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithCatalogueSolutionName(null).Build()},
+                {"missing-item-unit", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithHasItemUnit(false).Build()},
+                {"missing-item-unit-name", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithItemUnitName(null).Build()},
+                {"missing-item-unit-description", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithItemUnitNameDescription(null).Build()},
+                {"missing-provisioning-type", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithProvisioningType(null).Build()},
+                {"missing-type", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithCataloguePriceType(null).Build()},
+                {"missing-currency-code", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithCurrencyCode(null).Build()},
+                {"missing-delivery-date", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithDeliveryDate(null).Build()},
+                {"missing-quantity", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithQuantity(null).Build()},
+                {"missing-estimation-period", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithEstimationPeriod(null).Build()},
+                {"missing-price", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithPrice(null).Build()},
+                {"invalid-value-currency-code", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithCurrencyCode("YOLO").Build()},
+                {"invalid-value-provisioning-type", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithProvisioningType(ProvisioningType.Invalid).Build()},
+                {"invalid-value-type", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithCataloguePriceType(CataloguePriceType.Invalid).Build()},
+                {"invalid-value-estimation-period", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithEstimationPeriod(TimeUnit.Invalid).Build()},
+                {"too-long-ods-code", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithOdsCode(new string('1', 9)).Build()},
+                {"too-long-catalogue-solution-id", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithCatalogueSolutionId(new string('1', 15)).Build()},
+                {"too-long-catalogue-solution-name", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithCatalogueSolutionName(new string('1', 256)).Build()},
+                {"above-delivery-window", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithDeliveryDate(new DateTime(2021,1,1).AddDays(1282)).Build()},
+                {"below-delivery-window", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithDeliveryDate(new DateTime(2021,1,1).AddDays(-1)).Build()},
+                {"greater-than-zero-quantity", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithQuantity(0).Build()}
             };
 
         public CreateCatalogueSolutionOrderItemRequest(
@@ -45,11 +67,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
         public async Task<CreateCatalogueSolutionOrderItemResponse> ExecuteAsync()
         {
             object payload = null;
+
             if (Payload != null)
             {
                 payload = new
                 {
-                    ServiceRecipient = new {Payload.OdsCode},
+                    ServiceRecipient = Payload.HasServiceRecipient ? new { Payload.OdsCode } : null,
                     Payload.CatalogueSolutionId,
                     Payload.CatalogueSolutionName,
                     Payload.DeliveryDate,
@@ -58,12 +81,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                     ProvisioningType = Payload.ProvisioningType?.ToString(),
                     Type = Payload.CataloguePriceType?.ToString(),
                     Payload.CurrencyCode,
-                    ItemUnitModel =
+                    ItemUnit = Payload.HasItemUnit ?
                         new
                         {
                             Name = Payload.ItemUnitName, 
                             Description = Payload.ItemUnitNameDescription
-                        },
+                        } : null,
                     Payload.Price
                 };
             }

@@ -1,7 +1,7 @@
 ﻿using System.Data;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils

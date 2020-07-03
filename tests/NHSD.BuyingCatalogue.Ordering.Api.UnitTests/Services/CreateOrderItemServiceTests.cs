@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -27,6 +28,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                     .Create()
                     .WithOrderRepository(null)
                     .WithIdentityService(Mock.Of<IIdentityService>())
+                    .WithValidator(Mock.Of<ICreateOrderItemValidator>())
                     .Build();
             }
 
@@ -42,6 +44,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                     .Create()
                     .WithOrderRepository(Mock.Of<IOrderRepository>())
                     .WithIdentityService(null)
+                    .WithValidator(Mock.Of<ICreateOrderItemValidator>())
+                    .Build();
+            }
+
+            Assert.Throws<ArgumentNullException>(Test);
+        }
+
+        [Test]
+        public void Constructor_NullValidator_ThrowsArgumentNullException()
+        {
+            static void Test()
+            {
+                CreateOrderItemServiceBuilder
+                    .Create()
+                    .WithOrderRepository(Mock.Of<IOrderRepository>())
+                    .WithIdentityService(Mock.Of<IIdentityService>())
+                    .WithValidator(null)
                     .Build();
             }
 
@@ -58,6 +77,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             }
 
             Assert.ThrowsAsync<ArgumentNullException>(Test);
+        }
+
+        [Test]
+        public async Task CreateAsync_ValidatorReturnsErrors_ReturnsFailure()
+        {
+            var context = CreateOrderItemServiceTestContext.Setup();
+            var expectedErrors = new List<ErrorDetails>
+                {
+                    new ErrorDetails("Error1", "ErrorField"), new ErrorDetails("Error2", "ErrorField")
+                };
+
+            var createOrderItemRequest = CreateOrderItemRequestBuilder
+                .Create()
+                .Build();
+
+            context.OrderItemValidatorMock.Setup(x => x.Validate(createOrderItemRequest)).Returns(
+                expectedErrors);
+
+            var actual = await context.CreateOrderItemService.CreateAsync(createOrderItemRequest);
+            actual.Should().Be(Result.Failure<int>(expectedErrors));
         }
 
         [Test]
@@ -122,6 +161,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
+        public async Task CreateAsync_OrderItemValidator_CalledOnce()
+        {
+            var context = CreateOrderItemServiceTestContext.Setup();
+
+            var createOrderItemRequest = CreateOrderItemRequestBuilder
+                .Create()
+                .Build();
+
+            await context.CreateOrderItemService.CreateAsync(createOrderItemRequest);
+
+            context.OrderItemValidatorMock.Verify(validator =>
+                validator.Validate(createOrderItemRequest), Times.Once);
+        }
+
+        [Test]
         public async Task CreateAsync_IdentityService_CalledTwice()
         {
             var context = CreateOrderItemServiceTestContext.Setup();
@@ -153,10 +207,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 IdentityServiceMock.Setup(identityService => identityService.GetUserIdentity()).Returns(() => UserId);
                 IdentityServiceMock.Setup(identityService => identityService.GetUserName()).Returns(() => UserName);
 
+                OrderItemValidatorMock = new Mock<ICreateOrderItemValidator>();
+
                 CreateOrderItemService = CreateOrderItemServiceBuilder
                     .Create()
                     .WithOrderRepository(OrderRepositoryMock.Object)
                     .WithIdentityService(IdentityServiceMock.Object)
+                    .WithValidator(OrderItemValidatorMock.Object)
                     .Build();
             }
 
@@ -166,6 +223,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
 
             internal Mock<IIdentityService> IdentityServiceMock { get; }
+
+            internal Mock<ICreateOrderItemValidator> OrderItemValidatorMock { get; }
 
             internal Order Order { get; private set; }
 
