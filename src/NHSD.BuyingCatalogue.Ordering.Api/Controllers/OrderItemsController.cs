@@ -17,7 +17,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [HttpGet]
         [Route("order-items")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Swagger does not allow static files")]
-        public ActionResult<List<GetOrderItemTypeModel>> Get(string orderId, [FromQuery] string catalogueItemType)
+        public ActionResult<List<GetOrderItemModel>> Get(string orderId, [FromQuery] string catalogueItemType)
         {
             if (orderId is null)
                 return NotFound();
@@ -25,7 +25,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (catalogueItemType is null)
                 throw new ArgumentNullException(nameof(catalogueItemType));
 
-            return new List<GetOrderItemTypeModel>();
+            return new List<GetOrderItemModel>();
         }
 
         [HttpPut]
