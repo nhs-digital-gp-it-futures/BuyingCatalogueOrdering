@@ -246,16 +246,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = OrdersControllerTestContext.Setup(order.OrganisationId);
             context.Order = order;
 
-            string expectedOrderId = context.Order.OrderId;
-
-            var response = (await context.OrdersController.GetOrderSummaryAsync(expectedOrderId)).Result as OkObjectResult;
+            var response = (await context.OrdersController.GetOrderSummaryAsync(order.OrderId)).Result as OkObjectResult;
             Assert.IsNotNull(response);
 
             var actual = response.Value.As<OrderSummaryModel>();
 
             var expected = OrderSummaryModelBuilder
                 .Create()
-                .WithOrderId(expectedOrderId)
+                .WithOrderId(order.OrderId)
                 .WithOrganisationId(order.OrganisationId)
                 .WithSections(SectionModelListBuilder
                     .Create()
