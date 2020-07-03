@@ -38,7 +38,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithCurrencyCode(orderItemTableItem.CurrencyCode)
                     .WithDeliveryDate(orderItemTableItem.DeliveryDate != DateTime.MinValue ? orderItemTableItem.DeliveryDate : DateTime.UtcNow)
                     .WithEstimationPeriod(orderItemTableItem.EstimationPeriod)
-                    .WithPricingUnitTierName(orderItemTableItem.CataloguePriceUnitName)
+                    .WithPricingUnitName(orderItemTableItem.CataloguePriceUnitName)
                     .WithPricingUnitDescription(orderItemTableItem.CataloguePriceUnitDescription)
                     .WithPrice(orderItemTableItem.Price)
                     .WithProvisioningType(orderItemTableItem.ProvisioningType)
