@@ -26,6 +26,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public string PricingUnitTierName { get; set; }
 
+        public string PricingUnitName { get; set; }
+
         public string PricingUnitDescription { get; set; }
 
         public TimeUnit? TimeUnit { get; set; }
@@ -55,6 +57,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 ProvisioningTypeId,
                 CataloguePriceTypeId,
                 PricingUnitTierName,
+                PricingUnitName,
                 PricingUnitDescription,
                 TimeUnitId,
                 CurrencyCode,
@@ -75,6 +78,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 @ProvisioningType,
                 @CataloguePriceType,
                 @PricingUnitTierName,
+                @PricingUnitName,
                 @PricingUnitDescription,
                 @TimeUnit,
                 @CurrencyCode,
@@ -99,6 +103,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                         ProvisioningTypeId AS ProvisioningType,
                         CataloguePriceTypeId AS CataloguePriceType,
                         PricingUnitTierName,
+                        PricingUnitName,
                         PricingUnitDescription,
                         TimeUnitId AS TimeUnit,
                         CurrencyCode,

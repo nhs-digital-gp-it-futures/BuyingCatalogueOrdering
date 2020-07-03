@@ -50,8 +50,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 
             builder.OwnsOne(orderItem => orderItem.CataloguePriceUnit, navigationBuilder =>
             {
-                navigationBuilder.Property(cataloguePriceUnit => cataloguePriceUnit.TierName)
-                    .HasColumnName("PricingUnitTierName");
+                navigationBuilder.Property(cataloguePriceUnit => cataloguePriceUnit.Name)
+                    .HasColumnName("PricingUnitName");
 
                 navigationBuilder.Property(cataloguePriceUnit => cataloguePriceUnit.Description)
                     .HasColumnName("PricingUnitDescription");
