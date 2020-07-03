@@ -110,7 +110,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
                 orderItemEntity.CurrencyCode,
                 orderItemEntity.TimeUnit,
                 orderItemEntity.PricingUnitTierName,
-                orderItemEntity.PricingUnitTierName,
+                orderItemEntity.PricingUnitName,
                 orderItemEntity.PricingUnitDescription,
                 orderItemEntity.Price,
                 orderItemEntity.Created,
