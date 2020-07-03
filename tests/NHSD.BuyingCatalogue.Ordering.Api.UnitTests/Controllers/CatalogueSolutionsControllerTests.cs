@@ -578,9 +578,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             context.Order.AddOrderItem(orderItem, Guid.Empty, string.Empty);
 
             var result = await context.Controller.GetOrderItemAsync("myOrder", orderItem.OrderItemId);
-            result.Value.Should().BeOfType<GetOrderItemModel>();
+            result.Value.Should().BeOfType<GetCatalogueSolutionOrderItemModel>();
 
-            var expected = new GetOrderItemModel
+            var expected = new GetCatalogueSolutionOrderItemModel
             {
                 ServiceRecipient = new ServiceRecipientModel
                 {
