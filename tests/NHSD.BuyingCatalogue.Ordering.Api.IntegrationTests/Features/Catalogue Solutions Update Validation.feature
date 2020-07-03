@@ -1,4 +1,4 @@
-﻿Feature: Create Catalogue Solution Order Item Validation
+﻿Feature: Update Catalogue Solution Order Item Validation
     As a Buyer
     I want to only create a solution order item if the validation requirements are correct
     So that I can make sure correct information is stored
