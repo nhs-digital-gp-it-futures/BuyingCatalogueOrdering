@@ -99,7 +99,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                 .WithProvisioningType(Payload.ProvisioningType.GetValueOrDefault())
                 .WithCataloguePriceType(Payload.CataloguePriceType.GetValueOrDefault())
                 .WithCurrencyCode(Payload.CurrencyCode)
-                .WithPricingUnitTierName(Payload.ItemUnitName)
+                .WithPricingUnitName(Payload.ItemUnitName)
                 .WithPricingUnitDescription(Payload.ItemUnitNameDescription)
                 .WithPrice(Payload.Price)
                 .Build();
@@ -108,6 +108,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                 config => 
                     config
                         .Excluding(entity => entity.OrderItemId)
+                        .Excluding(entity => entity.PricingUnitTierName)
                         .Excluding(entity => entity.Created)
                         .Excluding(entity => entity.LastUpdated));
         }
