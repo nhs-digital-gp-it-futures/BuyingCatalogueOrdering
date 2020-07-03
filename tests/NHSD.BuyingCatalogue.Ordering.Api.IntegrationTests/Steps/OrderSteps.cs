@@ -5,6 +5,7 @@ using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
@@ -20,6 +21,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private readonly Request _request;
         private readonly Response _response;
         private readonly Settings _settings;
+        private readonly OrderContext _orderContext;
 
         private readonly string _orderOrganisationsUrl;
 
@@ -27,12 +29,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             ScenarioContext context,
             Request request, 
             Response response, 
-            Settings settings)
+            Settings settings,
+            OrderContext orderContext)
         {
             _context = context;
             _request = request;
             _response = response;
             _settings = settings;
+            _orderContext = orderContext;
 
             _orderOrganisationsUrl = _settings.OrderingApiBaseUrl + "/api/v1/organisations/{0}/orders";
         }
@@ -68,9 +72,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     commencementDate = ordersTableItem.CommencementDate;
                 }
 
+                var orderId = ordersTableItem.OrderId;
+
                 var order = OrderEntityBuilder
                     .Create()
-                    .WithOrderId(ordersTableItem.OrderId)
+                    .WithOrderId(orderId)
                     .WithDescription(ordersTableItem.Description)
                     .WithOrganisationId(ordersTableItem.OrganisationId)
                     .WithOrganisationName(ordersTableItem.OrganisationName)
@@ -93,6 +99,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .Build();
 
                 await order.InsertAsync(_settings.ConnectionString);
+
+                _orderContext.OrderReferenceList.Add(orderId, order);
             }
         }
 
