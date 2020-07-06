@@ -24,7 +24,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         private DateTime? _commencementDate;
         private bool _serviceRecipientsViewed;
         private bool _catalogueSolutionsViewed;
-        private readonly OrderStatus _orderStatus = new OrderStatus { OrderStatusId = 1, Name = "Submitted" };
         private readonly IList<OrderItem> _orderItems = new List<OrderItem>();
 
         private OrderBuilder()
@@ -137,29 +136,22 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 
         internal Order Build()
         {
-            var order = new Order
-            {
-                OrderId = _orderId,
-                OrganisationId = _organisationId,
-                OrganisationName = _organisationName,
-                OrganisationOdsCode = _organisationOdsCode,
-                OrganisationAddress = _organisationAddress,
-                OrganisationContact = _organisationContact,
-                SupplierId = _supplierId,
-                SupplierName = _supplierName,
-                SupplierAddress = _supplierAddress,
-                SupplierContact = _supplierContact,
-                CommencementDate = _commencementDate,
-                ServiceRecipientsViewed = _serviceRecipientsViewed,
-                CatalogueSolutionsViewed = _catalogueSolutionsViewed,
-                Created = _created,
-                LastUpdated = _lastUpdated,
-                LastUpdatedBy = _lastUpdatedBy,
-                LastUpdatedByName = _lastUpdatedByName,
-                OrderStatus = _orderStatus
-            };
+            var order = Order.Create(OrderDescription.Create(_orderDescription).Value, _organisationId, _lastUpdatedBy, _lastUpdatedByName);
 
-            order.SetDescription(OrderDescription.Create(_orderDescription).Value);
+            order.OrderId = _orderId;
+            order.OrganisationName = _organisationName;
+            order.OrganisationOdsCode = _organisationOdsCode;
+            order.OrganisationAddress = _organisationAddress;
+            order.OrganisationContact = _organisationContact;
+            order.SupplierId = _supplierId;
+            order.SupplierName = _supplierName;
+            order.SupplierAddress = _supplierAddress;
+            order.SupplierContact = _supplierContact;
+            order.CommencementDate = _commencementDate;
+            order.ServiceRecipientsViewed = _serviceRecipientsViewed;
+            order.CatalogueSolutionsViewed = _catalogueSolutionsViewed;
+            order.Created = _created;
+            order.LastUpdated = _lastUpdated;
 
             foreach (var orderItem in _orderItems)
             {
