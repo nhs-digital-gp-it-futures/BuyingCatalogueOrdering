@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Attributes
 {
     [TestFixture]
-    public class LimitAttributeTests
+    public sealed class LimitAttributeTests
     {
         [TestCase(1, LimitType.Maximum, 2, false)]
         [TestCase(1, LimitType.Maximum, 1, true)]
