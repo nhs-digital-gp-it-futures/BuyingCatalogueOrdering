@@ -36,5 +36,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
             }
             return order.CatalogueSolutionsViewed;
         }
+
+        public static bool IsAdditionalServicesSectionComplete(this Order order)
+        {
+            if (order == null)
+            {
+                return false;
+            }
+            return order.AdditionalServicesViewed;
+        }
     }
 }

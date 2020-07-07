@@ -35,7 +35,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [When(@"the user makes a request to update the order catalogue solutions section with the ID (.*)")]
         public async Task WhenAPutRequestIsMadeForAnOrdersCatalogueSolutionsWithOrderId(string orderId)
         {
-            await _request.PutJsonAsync(string.Format(_orderCatalogueSolutionsUrl, orderId), null);
+            await _request.PutJsonAsync(string.Format(_orderCatalogueSolutionsUrl, orderId), new { Status = "complete" });
         }
 
         [Then(@"the catalogue solutions response contains the order description (.*)")]

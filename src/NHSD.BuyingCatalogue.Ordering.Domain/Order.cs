@@ -53,6 +53,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public DateTime? CommencementDate { get; set; }
 
+        public bool AdditionalServicesViewed { get; set; }
+
         public IReadOnlyList<OrderItem> OrderItems =>
             _orderItems.AsReadOnly();
 

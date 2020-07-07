@@ -91,6 +91,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithLastUpdated(ordersTableItem.LastUpdated != DateTime.MinValue ? ordersTableItem.LastUpdated : DateTime.UtcNow)
                     .WithServiceRecipientsViewed(ordersTableItem.ServiceRecipientsViewed)
                     .WithCatalogueSolutionsViewed(ordersTableItem.CatalogueSolutionsViewed)
+                    .WithAdditionalServicesViewed(ordersTableItem.AdditionalServicesViewed)
                     .WithSupplierId(ordersTableItem.SupplierId)
                     .WithSupplierName(ordersTableItem.SupplierName)
                     .WithSupplierAddressId(supplierAddressId)
@@ -243,6 +244,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public bool ServiceRecipientsViewed { get; set; }
 
             public bool CatalogueSolutionsViewed { get; set; }
+
+            public bool AdditionalServicesViewed { get; set; }
         }
     }
 }

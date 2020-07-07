@@ -1,0 +1,79 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Mime;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
+using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
+using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
+using NHSD.BuyingCatalogue.Ordering.Common.Constants;
+using NHSD.BuyingCatalogue.Ordering.Domain;
+
+namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
+{
+    [Route("api/v1/[controller]")]
+    [ApiController]
+    [Produces(MediaTypeNames.Application.Json)]
+    [Authorize(Policy = PolicyName.CanAccessOrders)]
+    public sealed class SectionStatusController : ControllerBase
+    {
+        private readonly IOrderRepository _orderRepository;
+
+        private static readonly Dictionary<string, Action<Order>> completeSectionActionsDictionary = new Dictionary<string, Action<Order>>
+        {
+            { SectionModel.CatalogueSolutions.Id, o => o.CatalogueSolutionsViewed = true },
+            { SectionModel.AdditionalServices.Id, o => o.AdditionalServicesViewed = true }
+        };
+
+        public SectionStatusController(
+            IOrderRepository orderRepository)
+        {
+            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+        }
+
+        [HttpPut]
+        [Route("/api/v1/orders/{orderId}/sections/{sectionId}")]
+        [Authorize(Policy = PolicyName.CanManageOrders)]
+        public async Task<ActionResult> UpdateStatusAsync(string orderId, string sectionId, SectionStatusRequestModel sectionStatus )
+        {
+            if (sectionStatus == null)
+            {
+                throw new ArgumentNullException(nameof(sectionStatus));
+            }
+
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+
+            if (order is null)
+            {
+                return NotFound();
+            }
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
+            if (completeSectionActionsDictionary.ContainsKey(sectionId))
+            {
+                if (sectionStatus.Status == "complete")
+                {
+                    completeSectionActionsDictionary[sectionId](order);
+                }
+            }
+            else
+            {
+                return Forbid();
+            }
+            
+            order.SetLastUpdatedBy(User.GetUserId(), User.GetUserName());
+
+            await _orderRepository.UpdateOrderAsync(order);
+
+            return NoContent();
+        }
+    }
+}
