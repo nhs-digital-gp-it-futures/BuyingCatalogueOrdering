@@ -22,7 +22,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Attributes
 
             if (!(validationContext.ObjectInstance is CreateOrderItemBaseModel orderItem))
             {
-                throw new ArgumentException("The RequiredWhenProvisioningTypeInAttribute attribute should only be applied to CreateOrderItemModels");
+                throw new ArgumentException($"The {nameof(RequiredWhenProvisioningTypeInAttribute)} attribute should only be applied to CreateOrderItemModels");
             }
 
             if (!_provisioningTypes.Any(s => s.Equals(orderItem.ProvisioningType, StringComparison.OrdinalIgnoreCase)))
