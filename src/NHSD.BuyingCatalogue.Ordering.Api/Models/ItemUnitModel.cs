@@ -1,8 +1,15 @@
-﻿namespace NHSD.BuyingCatalogue.Ordering.Api.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
-    public class ItemUnitModel
+    public sealed class ItemUnitModel
     {
+        [Required(ErrorMessage = "ItemUnitNameRequired")]
+        [MaxLength(20, ErrorMessage = "ItemUnitNameTooLong")]
         public string Name { get; set; }
+
+        [Required(ErrorMessage = "ItemUnitDescriptionRequired")]
+        [MaxLength(35, ErrorMessage = "ItemUnitDescriptionTooLong")]
         public string Description { get; set; }
     }
 }

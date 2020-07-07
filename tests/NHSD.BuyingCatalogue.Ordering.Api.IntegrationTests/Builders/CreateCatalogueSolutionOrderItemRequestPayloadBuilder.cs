@@ -6,14 +6,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
 {
     internal sealed class CreateCatalogueSolutionOrderItemRequestPayloadBuilder
     {
+        private bool _hasServiceRecipient;
+        private bool _hasItemUnit;
         private string _odsCode;
         private string _catalogueSolutionId;
         private string _catalogueSolutionName;
         private DateTime? _deliveryDate;
-        private int _quantity;
+        private int? _quantity;
         private TimeUnit? _estimationPeriod;
-        private ProvisioningType _provisioningType;
-        private CataloguePriceType _cataloguePriceType;
+        private ProvisioningType? _provisioningType;
+        private CataloguePriceType? _cataloguePriceType;
         private string _currencyCode;
         private string _itemUnitName;
         private string _itemUnitNameDescription;
@@ -21,10 +23,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
 
         private CreateCatalogueSolutionOrderItemRequestPayloadBuilder()
         {
+            _hasServiceRecipient = true;
+            _hasItemUnit = true;
             _odsCode = "ODS1";
             _catalogueSolutionId = "100001-001";
             _catalogueSolutionName = Guid.NewGuid().ToString();
-            _deliveryDate = DateTime.UtcNow.Date;
+            _deliveryDate = new DateTime(2021, 1, 1);
             _quantity = 5;
             _estimationPeriod = TimeUnit.Month;
             _provisioningType = ProvisioningType.OnDemand;
@@ -37,6 +41,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
 
         public static CreateCatalogueSolutionOrderItemRequestPayloadBuilder Create() => 
             new CreateCatalogueSolutionOrderItemRequestPayloadBuilder();
+
+        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithHasServiceRecipient(bool hasServiceRecipient)
+        {
+            _hasServiceRecipient = hasServiceRecipient;
+            return this;
+        }
+
+        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithHasItemUnit(bool hasItemUnit)
+        {
+            _hasItemUnit = hasItemUnit;
+            return this;
+        }
 
         public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithOdsCode(string odsCode)
         {
@@ -62,7 +78,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
             return this;
         }
 
-        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithQuantity(int quantity)
+        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithQuantity(int? quantity)
         {
             _quantity = quantity;
             return this;
@@ -74,13 +90,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
             return this;
         }
 
-        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithProvisioningType(ProvisioningType provisioningType)
+        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithProvisioningType(ProvisioningType? provisioningType)
         {
             _provisioningType = provisioningType;
             return this;
         }
 
-        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithCataloguePriceType(CataloguePriceType cataloguePriceType)
+        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithCataloguePriceType(CataloguePriceType? cataloguePriceType)
         {
             _cataloguePriceType = cataloguePriceType;
             return this;
@@ -114,6 +130,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
         {
             return new CreateCatalogueSolutionOrderItemRequestPayload
             {
+                HasServiceRecipient = _hasServiceRecipient,
+                HasItemUnit = _hasItemUnit,
                 OdsCode = _odsCode,
                 CatalogueSolutionId = _catalogueSolutionId,
                 CatalogueSolutionName = _catalogueSolutionName,

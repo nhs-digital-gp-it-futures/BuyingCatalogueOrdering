@@ -4,6 +4,7 @@
     {
         Patient = 1,
         Declarative = 2,
-        OnDemand = 3
+        OnDemand = 3,
+        Invalid = 4
     }
 }

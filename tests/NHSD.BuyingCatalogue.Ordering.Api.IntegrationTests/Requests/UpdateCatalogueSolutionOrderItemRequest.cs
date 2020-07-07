@@ -12,6 +12,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 {
     internal sealed class UpdateCatalogueSolutionOrderItemRequest
     {
+        private const int MaximumDeliveryDateOffsetDays = 1282;
+
         private readonly Request _request;
         private readonly string _createCatalogueSolutionOrderItemUrl;
 
@@ -28,19 +30,87 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                     "high-boundary", () =>
                     UpdateCatalogueSolutionOrderItemRequestPayloadBuilder
                         .Create()
-                        .WithDeliveryDate(DateTime.MaxValue)
                         .WithPrice(999999999999999.999m)
-                        .WithQuantity(int.MaxValue)
+                        .WithQuantity(int.MaxValue - 1)
                         .Build()
                 },
                 {
                     "low-boundary", () =>
                     UpdateCatalogueSolutionOrderItemRequestPayloadBuilder
                         .Create()
-                        .WithDeliveryDate(DateTime.MinValue)
                         .WithPrice(0)
-                        .WithQuantity(0)
+                        .WithQuantity(1)
                         .Build()
+                },
+                {
+                    "missing-delivery-date", () =>
+                        UpdateCatalogueSolutionOrderItemRequestPayloadBuilder
+                            .Create()
+                            .WithDeliveryDate(null)
+                            .Build()
+                },
+                {
+                    "missing-quantity", () =>
+                        UpdateCatalogueSolutionOrderItemRequestPayloadBuilder
+                            .Create()
+                            .WithQuantity(null)
+                            .Build()
+                },
+                {
+                    "missing-estimation-period", () =>
+                        UpdateCatalogueSolutionOrderItemRequestPayloadBuilder
+                            .Create()
+                            .WithEstimationPeriod(null)
+                            .Build()
+                },
+                {
+                    "missing-price", () =>
+                        UpdateCatalogueSolutionOrderItemRequestPayloadBuilder
+                            .Create()
+                            .WithPrice(null)
+                            .Build()
+                },
+                {
+                    "outside-delivery-window", () =>
+                        UpdateCatalogueSolutionOrderItemRequestPayloadBuilder
+                            .Create()
+                            .WithDeliveryDate(new DateTime(2021, 1, 1).AddDays(MaximumDeliveryDateOffsetDays))
+                            .Build()
+                },
+                {
+                    "less-than-min-quantity", () => 
+                        UpdateCatalogueSolutionOrderItemRequestPayloadBuilder
+                            .Create()
+                            .WithQuantity(0)
+                            .Build()
+                },
+                {
+                    "greater-than-max-quantity", () => 
+                        UpdateCatalogueSolutionOrderItemRequestPayloadBuilder
+                            .Create()
+                            .WithQuantity(int.MaxValue)
+                            .Build()
+                },
+                {
+                    "less-than-min-price", () => 
+                        UpdateCatalogueSolutionOrderItemRequestPayloadBuilder
+                            .Create()
+                            .WithPrice(-1)
+                            .Build()
+                },
+                {
+                    "greater-than-max-price", () => 
+                        UpdateCatalogueSolutionOrderItemRequestPayloadBuilder
+                            .Create()
+                            .WithPrice(1000000000000000m)
+                            .Build()
+                },
+                {
+                    "invalid-value-estimation-period", () =>
+                        UpdateCatalogueSolutionOrderItemRequestPayloadBuilder
+                            .Create()
+                            .WithEstimationPeriod(TimeUnit.Invalid)
+                            .Build()
                 }
             };
 
@@ -73,7 +143,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             {
                 Payload.DeliveryDate,
                 Payload.Quantity,
-                EstimationPeriod = Payload.EstimationPeriod.ToString(),
+                EstimationPeriod = Payload.EstimationPeriod?.ToString(),
                 Payload.Price
             });
         }
@@ -108,9 +178,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
     {
         public DateTime? DeliveryDate { get; set; }
 
-        public int Quantity { get; set; }
+        public int? Quantity { get; set; }
 
-        public TimeUnit EstimationPeriod { get; set; }
+        public TimeUnit? EstimationPeriod { get; set; }
 
         public decimal? Price { get; set; }
     }

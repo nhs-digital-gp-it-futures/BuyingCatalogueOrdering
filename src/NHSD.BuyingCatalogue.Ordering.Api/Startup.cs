@@ -16,6 +16,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Services;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
+using NHSD.BuyingCatalogue.Ordering.Api.Settings;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Application.Services;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
@@ -46,6 +47,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             var allowInvalidCertificate = _configuration.GetValue<bool>("AllowInvalidCertificate");
             var bypassIdentity = _configuration.GetValue<bool>("BypassIdentity");
 
+            var validationSettings = new ValidationSettings
+            {
+                MaxDeliveryDateWeekOffset = _configuration.GetValue<int>("MaxDeliveryDateWeekOffset")
+            };
+
             Log.Logger.Information("Authority on ORDAPI is: {@authority}", authority);
             Log.Logger.Information("ORDAPI Require Https: {@requiredHttps}", requireHttps);
             Log.Logger.Information($"ORDAPI Allow Invalid Certificates: {@allowInvalidCertificate}", allowInvalidCertificate);
@@ -56,12 +62,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             services.AddHttpContextAccessor();
             services.AddTransient<IServiceRecipientRepository, ServiceRecipientRepository>();
             services.AddTransient<IOrderRepository, OrderRepository>();
+            services.AddSingleton(validationSettings);
 
             services
                 .AddTransient<IIdentityService, IdentityService>()
                 .AddTransient<ICreateOrderService, CreateOrderService>()
                 .AddTransient<ICreateOrderItemService, CreateOrderItemService>()
-                .AddTransient<IUpdateOrderItemService, UpdateOrderItemService>();
+                .AddTransient<IUpdateOrderItemService, UpdateOrderItemService>()
+                .AddTransient<ICreateOrderItemValidator, OrderItemValidator>()
+                .AddTransient<IUpdateOrderItemValidator, OrderItemValidator>();
 
             services.RegisterHealthChecks(connectionString);
 
