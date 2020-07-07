@@ -1,9 +1,8 @@
 ﻿namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
-    public sealed class OrderStatus
+    public enum OrderStatus
     {
-        public int OrderStatusId { get; set; }
-
-        public string Name { get; set; }
+        Submitted = 1,
+        Unsubmitted = 2
     }
 }

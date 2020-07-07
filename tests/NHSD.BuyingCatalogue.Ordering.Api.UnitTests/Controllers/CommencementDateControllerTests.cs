@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
@@ -46,7 +47,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task Update_UserHasDifferentPrimaryOrganisationId_ReturnsForbidden()
         {
             var context = CommencementDateControllerTestContext.Setup();
-            context.Order.OrganisationId = Guid.NewGuid();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(Guid.NewGuid())
+                .Build();
+
             var model = new CommencementDateModel { CommencementDate = DateTime.Now };
             var result = await context.Controller.Update("myOrder", model);
             result.Should().BeOfType<ForbidResult>();
@@ -90,7 +95,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task GetAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
         {
             var context = CommencementDateControllerTestContext.Setup();
-            context.Order.OrganisationId = Guid.NewGuid();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(Guid.NewGuid())
+                .Build();
+
             context.Order.CommencementDate = DateTime.Now;
             var result = await context.Controller.GetAsync("myOrder");
             result.Should().BeOfType<ForbidResult>();
@@ -107,7 +116,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             private CommencementDateControllerTestContext()
             {
                 PrimaryOrganisationId = Guid.NewGuid();
-                Order = new Order {OrganisationId = PrimaryOrganisationId};
+                Order = OrderBuilder
+                    .Create()
+                    .WithOrganisationId(PrimaryOrganisationId)
+                    .Build();
+                
                 OrderRepositoryMock = new Mock<IOrderRepository>();
                 OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]

@@ -427,7 +427,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 {
                     OrderId = repositoryOrder.OrderId,
                     Description = repositoryOrder.Description.Value,
-                    Status = repositoryOrder.OrderStatus.Name,
+                    Status = repositoryOrder.OrderStatus.ToString(),
                     DateCreated = repositoryOrder.Created,
                     LastUpdated = repositoryOrder.LastUpdated,
                     LastUpdatedBy = repositoryOrder.LastUpdatedByName

@@ -12,7 +12,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
 {
     public sealed class OrderRepository : IOrderRepository
     {
-        public const string DefaultOrderId = "C000000-01";
+        private const string DefaultOrderId = "C000000-01";
         private readonly ApplicationDbContext _context;
 
         public OrderRepository(ApplicationDbContext context)
@@ -23,7 +23,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
         public async Task<IEnumerable<Order>> ListOrdersByOrganisationIdAsync(Guid organisationId)
         {
             return await _context.Order
-                .Include(x => x.OrderStatus)
                 .Include(x => x.OrganisationAddress)
                 .Include(x => x.OrganisationContact)
                 .Include(x => x.SupplierAddress)
@@ -40,7 +39,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
             var order = await _context.Order.FindAsync(orderId);
             if (order != null)
             {
-                await _context.Entry(order).Reference(x => x.OrderStatus).LoadAsync();
                 await _context.Entry(order).Reference(x => x.OrganisationAddress).LoadAsync();
                 await _context.Entry(order).Reference(x => x.OrganisationContact).LoadAsync();
                 await _context.Entry(order).Reference(x => x.SupplierAddress).LoadAsync();
@@ -63,12 +61,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<string> GetLatestOrderIdByCreationDate()
-        {
-            var latestOrder = await _context.Order.OrderByDescending(o => o.Created).FirstOrDefaultAsync();
-            return latestOrder?.OrderId;
-        }
-
         public async Task<string> CreateOrderAsync(Order order)
         {
             if (order is null)
@@ -83,8 +75,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
                     order.OrderId = await GetIncrementedOrderId();
                 }
 
-                order.OrderStatus = await _context.OrderStatus.FindAsync(order.OrderStatus.OrderStatusId) ?? order.OrderStatus;
-
                 _context.Order.Add(order);
                 await _context.SaveChangesAsync();
                 await dbContextTransaction.CommitAsync();
@@ -96,7 +86,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
         private async Task<string> GetIncrementedOrderId()
         {
             var resultOrderId = DefaultOrderId;
-            var latestOrderId = await GetLatestOrderIdByCreationDate();
+            var latestOrderId = await GetLatestOrderIdByCreationDateAsync();
             if (!string.IsNullOrEmpty(latestOrderId))
             {
                 var numberSection = latestOrderId.Substring(1, 6);
@@ -104,6 +94,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
                 resultOrderId = $"C{orderNumber + 1:D6}-01";
             }
             return resultOrderId;
+        }
+
+        private async Task<string> GetLatestOrderIdByCreationDateAsync()
+        {
+            var latestOrder = await _context.Order.OrderByDescending(o => o.Created).FirstOrDefaultAsync();
+            return latestOrder?.OrderId;
         }
     }
 }

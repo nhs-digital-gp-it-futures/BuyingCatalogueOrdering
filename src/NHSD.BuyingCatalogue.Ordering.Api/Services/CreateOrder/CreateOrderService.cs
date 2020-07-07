@@ -32,15 +32,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
                 return Result.Failure<string>(allErrors);
             }
 
-            var order = new Order {
-                OrderStatus = new OrderStatus() { OrderStatusId = 2, Name = "Unsubmitted" },
-                OrganisationId = isOrganisationValid.Value,
-                LastUpdatedByName = createOrderRequest.LastUpdatedByName,
-                LastUpdatedBy = createOrderRequest.LastUpdatedById,
-                Created = DateTime.UtcNow,
-                LastUpdated = DateTime.UtcNow
-            };
-            order.SetDescription(isDescriptionValid.Value);
+            var order = Order.Create(
+                isDescriptionValid.Value,
+                isOrganisationValid.Value,
+                createOrderRequest.LastUpdatedById,
+                createOrderRequest.LastUpdatedByName);
 
             var orderId = await _orderRepository.CreateOrderAsync(order);
             return Result.Success(orderId);
