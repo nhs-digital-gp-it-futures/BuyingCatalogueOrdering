@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Settings;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 {
-    public class OrderItemValidator : ICreateOrderItemValidator, IUpdateOrderItemValidator
+    public sealed class OrderItemValidator : ICreateOrderItemValidator, IUpdateOrderItemValidator
     {
-        public static readonly IEnumerable<string> ValidEstimationPeriodNames = new List<string> {"MONTH", "YEAR"};
-
         private readonly ValidationSettings _validationSettings;
 
         public OrderItemValidator(ValidationSettings validationSettings)
@@ -27,47 +25,51 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             if (request.Order.CommencementDate == null)
                 throw new ArgumentException("Request Order Commencement Date should not be null");
 
-            var errors = new List<ErrorDetails>();
-            
             if (request.CatalogueItemType == null)
             {
-                errors.Add(new ErrorDetails("TypeValidValue", "Type"));
+                yield return new ErrorDetails("CatalogueItemTypeValidValue", "CatalogueItemType");
             }
             else
             {
-                errors.AddRange(ValidateDeliveryDate(request.DeliveryDate, request.Order.CommencementDate.Value, request.CatalogueItemType));
+                var errors = ValidateDeliveryDate(request.DeliveryDate, request.Order.CommencementDate.Value, request.CatalogueItemType);
+                foreach (var error in errors)
+                {
+                    yield return error;
+                }
             }
 
             var provisioningType = ProvisioningType.FromName(request.ProvisioningTypeName);
             if (provisioningType == null)
             {
-                errors.Add(new ErrorDetails("ProvisioningTypeValidValue", "ProvisioningType"));
+                yield return new ErrorDetails("ProvisioningTypeValidValue", nameof(CreateOrderItemSolutionModel.ProvisioningType));
             }
             else
             {
-                errors.AddRange(ValidateEstimationPeriod(request.EstimationPeriodName, provisioningType));
+                var errors = ValidateEstimationPeriod(request.EstimationPeriodName, provisioningType);
+                foreach (var error in errors)
+                {
+                    yield return error;
+                }
             }
 
             var cataloguePriceType = CataloguePriceType.FromName(request.CataloguePriceTypeName);
 
             if (cataloguePriceType == null)
             {
-                errors.Add(new ErrorDetails("TypeValidValue", "Type"));
+                yield return new ErrorDetails("TypeValidValue", nameof(CreateOrderItemSolutionModel.Type));
             }
             else if (cataloguePriceType.Equals(CataloguePriceType.Flat))
             {
                 if (request.Price == null)
                 {
-                    errors.Add(new ErrorDetails("PriceRequired", "Price"));
+                    yield return new ErrorDetails("PriceRequired", nameof(CreateOrderItemSolutionModel.Price));
                 }
             }
 
             if (request.CurrencyCode != "GBP")
             {
-                errors.Add(new ErrorDetails("CurrencyCodeValidValue", "CurrencyCode"));
+                yield return new ErrorDetails("CurrencyCodeValidValue", nameof(CreateOrderItemSolutionModel.CurrencyCode));
             }
-
-            return errors;
         }
 
         public IEnumerable<ErrorDetails> Validate(UpdateOrderItemRequest request, CatalogueItemType itemType, ProvisioningType provisioningType)
@@ -92,39 +94,37 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 
         private IEnumerable<ErrorDetails> ValidateDeliveryDate(DateTime? deliveryDate, DateTime commencementDate, CatalogueItemType itemType)
         {
-            var errors = new List<ErrorDetails>();
-
             if (itemType.Equals(CatalogueItemType.Solution))
             {
                 if (deliveryDate == null)
                 {
-                    errors.Add(new ErrorDetails("DeliveryDateRequired", "DeliveryDate"));
+                    yield return new ErrorDetails("DeliveryDateRequired", nameof(CreateOrderItemSolutionModel.DeliveryDate));
                 }
-                else if (deliveryDate.Value > commencementDate.AddDays(_validationSettings.MaxDeliveryDateMonthOffset * 7) 
+                else if (deliveryDate.Value > commencementDate.AddDays(_validationSettings.MaxDeliveryDateWeekOffset * 7) 
                       || deliveryDate.Value < commencementDate)
                 {
-                    errors.Add(new ErrorDetails("DeliveryDateOutsideDeliveryWindow", "DeliveryDate"));
+                    yield return new ErrorDetails("DeliveryDateOutsideDeliveryWindow", nameof(CreateOrderItemSolutionModel.DeliveryDate));
                 }
             }
-
-            return errors;
         }
 
         private static IEnumerable<ErrorDetails> ValidateEstimationPeriod(string estimationPeriodName, ProvisioningType provisioningType)
         {
-            var errors = new List<ErrorDetails>();
             if (provisioningType.Equals(ProvisioningType.OnDemand))
             {
                 if (estimationPeriodName == null)
                 {
-                    errors.Add(new ErrorDetails("EstimationPeriodRequiredIfVariableOnDemand", "EstimationPeriod"));
+                    yield return new ErrorDetails("EstimationPeriodRequiredIfVariableOnDemand", nameof(CreateOrderItemSolutionModel.EstimationPeriod));
                 }
-                else if (!ValidEstimationPeriodNames.Contains(estimationPeriodName.ToUpperInvariant()))
+                else
                 {
-                    errors.Add(new ErrorDetails("EstimationPeriodValidValue", "EstimationPeriod"));
+                    var estimationPeriod = TimeUnit.FromName(estimationPeriodName);
+                    if (estimationPeriod == null)
+                    {
+                        yield return new ErrorDetails("EstimationPeriodValidValue", nameof(CreateOrderItemSolutionModel.EstimationPeriod));
+                    }
                 }
             }
-            return errors;
         }
     }
 }

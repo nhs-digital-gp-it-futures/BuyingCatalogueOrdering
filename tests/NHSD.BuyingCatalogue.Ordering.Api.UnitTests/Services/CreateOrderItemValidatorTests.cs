@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Settings;
@@ -35,16 +33,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         public void Validate_Create_NullRequest_ThrowsException()
         {
             var context = new OrderItemValidatorTestContext();
-            Assert.Throws<ArgumentNullException>(() => context.Validator.Validate(null));
+            Assert.Throws<ArgumentNullException>(() => context.Validator.Validate(null).ToList());
         }
 
         [Test]
         public void Validate_Create_NullCommencementDateOnOrder_ThrowsException()
         {
             var context = new OrderItemValidatorTestContext();
-            Assert.Throws<ArgumentException>(() =>
-            context.Validator.Validate(context.CreateRequestBuilder.WithOrder(
-                context.OrderBuilder.WithCommencementDate(null).Build()).Build()));
+            var order = context.OrderBuilder.WithCommencementDate(null).Build();
+            var request = context.CreateRequestBuilder.WithOrder(order).Build();
+            
+            Assert.Throws<ArgumentException>(() => context.Validator.Validate(request).ToList());
         }
 
         [Test]
@@ -164,7 +163,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             var expected = new ErrorDetails("DeliveryDateOutsideDeliveryWindow", "DeliveryDate");
             
             var commencementDate = DateTime.Now;
-            var deliveryDate = commencementDate.AddDays((context.Settings.MaxDeliveryDateMonthOffset * 7) + 1);
+            var deliveryDate = commencementDate.AddDays((context.Settings.MaxDeliveryDateWeekOffset * 7) + 1);
 
             var result = context.Validator.Validate(
                 context.CreateRequestBuilder.WithOrder(
@@ -236,7 +235,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             var expected = new ErrorDetails("DeliveryDateOutsideDeliveryWindow", "DeliveryDate");
 
             var commencementDate = DateTime.Now;
-            var deliveryDate = commencementDate.AddDays((context.Settings.MaxDeliveryDateMonthOffset * 7) + 1);
+            var deliveryDate = commencementDate.AddDays((context.Settings.MaxDeliveryDateWeekOffset * 7) + 1);
 
             var result = context.Validator.Validate(
                 context.UpdateRequestBuilder.WithDeliveryDate(deliveryDate).Build(),
@@ -309,7 +308,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             public OrderItemValidatorTestContext()
             {
-                Settings = new ValidationSettings {MaxDeliveryDateMonthOffset = 1};
+                Settings = new ValidationSettings {MaxDeliveryDateWeekOffset = 1};
                 Validator = new OrderItemValidator(Settings);
                 OrderBuilder = OrderBuilder.Create().WithCommencementDate(DateTime.UtcNow);
                 CreateRequestBuilder = CreateOrderItemRequestBuilder.Create()

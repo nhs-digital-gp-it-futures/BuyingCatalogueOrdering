@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using NHSD.BuyingCatalogue.Ordering.Api.Attributes;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
@@ -20,13 +21,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
         public ItemUnitModel ItemUnit { get; set; }
 
         [Required(ErrorMessage = "QuantityRequired")]
-        [Range(1, int.MaxValue, ErrorMessage = "QuantityGreaterThanZero")]
+        [Limit(1, LimitType.Minimum, ErrorMessage = "QuantityGreaterThanZero")]
+        [Limit(int.MaxValue - 1, LimitType.Maximum, ErrorMessage = "QuantityLessThanMax")]
         public int? Quantity { get; set; }
 
         public string EstimationPeriod { get; set; }
 
         [Required(ErrorMessage = "PriceRequired")]
-        [Range(0, double.MaxValue, ErrorMessage = "QuantityGreaterThanZero")]
+        [Limit(0d, LimitType.Minimum, ErrorMessage = "PriceGreaterThanOrEqualToZero")]
+        [Limit(typeof(decimal), "999999999999999.999", LimitType.Maximum, ErrorMessage = "PriceLessThanMax")]
         public decimal? Price { get; set; }
     }
 }

@@ -49,7 +49,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
 
             var validationSettings = new ValidationSettings
             {
-                MaxDeliveryDateMonthOffset = _configuration.GetValue<int>("MaxDeliveryDateMonthOffset")
+                MaxDeliveryDateWeekOffset = _configuration.GetValue<int>("MaxDeliveryDateWeekOffset")
             };
 
             Log.Logger.Information("Authority on ORDAPI is: {@authority}", authority);

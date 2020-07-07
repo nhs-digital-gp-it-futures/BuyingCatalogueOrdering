@@ -29,7 +29,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                     UpdateCatalogueSolutionOrderItemRequestPayloadBuilder
                         .Create()
                         .WithPrice(999999999999999.999m)
-                        .WithQuantity(int.MaxValue)
+                        .WithQuantity(int.MaxValue - 1)
                         .Build()
                 },
                 {
@@ -76,10 +76,31 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                             .Build()
                 },
                 {
-                    "greater-than-zero-quantity", () =>
+                    "less-than-min-quantity", () => 
                         UpdateCatalogueSolutionOrderItemRequestPayloadBuilder
                             .Create()
                             .WithQuantity(0)
+                            .Build()
+                },
+                {
+                    "greater-than-max-quantity", () => 
+                        UpdateCatalogueSolutionOrderItemRequestPayloadBuilder
+                            .Create()
+                            .WithQuantity(int.MaxValue)
+                            .Build()
+                },
+                {
+                    "less-than-min-price", () => 
+                        UpdateCatalogueSolutionOrderItemRequestPayloadBuilder
+                            .Create()
+                            .WithPrice(-1)
+                            .Build()
+                },
+                {
+                    "greater-than-max-price", () => 
+                        UpdateCatalogueSolutionOrderItemRequestPayloadBuilder
+                            .Create()
+                            .WithPrice(1000000000000000m)
                             .Build()
                 },
                 {

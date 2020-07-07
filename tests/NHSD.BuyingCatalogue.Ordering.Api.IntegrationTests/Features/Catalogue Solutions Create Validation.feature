@@ -83,7 +83,10 @@ Scenario: 4. Create catalogue solution order item with out of range values
         | <error-id> | <error-field> |
 
     Examples: Request payloads
-        | payload-type               | error-id                          | error-field  |
-        | above-delivery-window      | DeliveryDateOutsideDeliveryWindow | DeliveryDate |
-        | below-delivery-window      | DeliveryDateOutsideDeliveryWindow | DeliveryDate |
-        | greater-than-zero-quantity | QuantityGreaterThanZero           | Quantity     |
+        | payload-type              | error-id                          | error-field  |
+        | above-delivery-window     | DeliveryDateOutsideDeliveryWindow | DeliveryDate |
+        | below-delivery-window     | DeliveryDateOutsideDeliveryWindow | DeliveryDate |
+        | less-than-min-quantity    | QuantityGreaterThanZero           | Quantity     |
+        | greater-than-max-quantity | QuantityLessThanMax               | Quantity     |
+        | less-than-min-price       | PriceGreaterThanOrEqualToZero     | Price        |
+        | greater-than-max-price    | PriceLessThanMax                  | Price        |

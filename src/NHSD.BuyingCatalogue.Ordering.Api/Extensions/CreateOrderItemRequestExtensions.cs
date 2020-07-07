@@ -18,7 +18,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
             if (order is null)
                 throw new ArgumentNullException(nameof(order));
             if(model.Quantity == null)
-                throw new ArgumentException("Model Quantity should never be null at this point", nameof(model));
+                throw new ArgumentException($"Model {nameof(model.Quantity)} should never be null at this point", nameof(model));
 
             return new CreateOrderItemRequest(
                 order,

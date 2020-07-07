@@ -1,7 +1,7 @@
 ﻿namespace NHSD.BuyingCatalogue.Ordering.Api.Settings
 {
-    public class ValidationSettings
+    public sealed class ValidationSettings
     {
-        public int MaxDeliveryDateMonthOffset { get; set; }
+        public int MaxDeliveryDateWeekOffset { get; set; }
     }
 }

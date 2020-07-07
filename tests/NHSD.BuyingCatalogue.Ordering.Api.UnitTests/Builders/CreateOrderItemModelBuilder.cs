@@ -47,7 +47,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 
         public static CreateOrderItemModelBuilder Create() => new CreateOrderItemModelBuilder();
 
-        public CreateOrderItemSolutionModel Build() =>
+        public CreateOrderItemSolutionModel BuildSolution() =>
             new CreateOrderItemSolutionModel
             {
                 ServiceRecipient = _serviceRecipient,

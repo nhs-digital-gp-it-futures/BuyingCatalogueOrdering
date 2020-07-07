@@ -4,7 +4,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Attributes;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
-    public class CreateOrderItemSolutionModel : CreateOrderItemBaseModel
+    public sealed class CreateOrderItemSolutionModel : CreateOrderItemBaseModel
     {
         [Required(ErrorMessage = "CatalogueSolutionIdRequired")]
         [MaxLength(14, ErrorMessage = "CatalogueSolutionIdTooLong")]
@@ -17,7 +17,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
         [Required(ErrorMessage = "DeliveryDateRequired")]
         public DateTime? DeliveryDate { get; set; }
 
-        [OrderItemRequired("Declarative", "Patient", ErrorMessage = "TimeUnitRequired")]
+        [RequiredWhenProvisioningTypeIn("Declarative", "Patient", ErrorMessage = "TimeUnitRequired")]
         public string TimeUnit { get; set; }
     }
 }

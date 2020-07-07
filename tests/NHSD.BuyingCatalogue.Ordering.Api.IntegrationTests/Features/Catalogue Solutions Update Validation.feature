@@ -26,37 +26,14 @@ Scenario: 1. Update a catalogue solution order item with missing values
         | <error-id> | <error-field> |
 
     Examples: Request payloads
-        | payload-type                    | error-id                                   | error-field           |
-        | missing-delivery-date           | DeliveryDateRequired                       | DeliveryDate          |
-        | missing-quantity                | QuantityRequired                           | Quantity              |
-        | missing-estimation-period       | EstimationPeriodRequiredIfVariableOnDemand | EstimationPeriod      |
-        | missing-price                   | PriceRequired                              | Price                 |
-
-@7840
-Scenario: 2. Create catalogue solution order item with out of range values
-    Given the user creates a request to change the catalogue solution order item ('Order Item 1') for the order with ID 'C000014-01'
-    And the user enters the '<payload-type>' update catalogue solution order item request payload
-    When the user sends the update catalogue solution order item request
-    Then a response with status code 400 is returned
-    And the response contains the following errors
-        | id         | field         |
-        | <error-id> | <error-field> |
-
-    Examples: Request payloads
-        | payload-type               | error-id                          | error-field  |
-        | outside-delivery-window    | DeliveryDateOutsideDeliveryWindow | DeliveryDate |
-        | greater-than-zero-quantity | QuantityGreaterThanZero           | Quantity     |
-
-@7840
-Scenario: 3. Create catalogue solution order item with invalid values
-    Given the user creates a request to change the catalogue solution order item ('Order Item 1') for the order with ID 'C000014-01'
-    And the user enters the '<payload-type>' update catalogue solution order item request payload
-    When the user sends the update catalogue solution order item request
-    Then a response with status code 400 is returned
-    And the response contains the following errors
-        | id         | field         |
-        | <error-id> | <error-field> |
-
-    Examples: Request payloads
-        | payload-type                    | error-id                   | error-field      |
-        | invalid-value-estimation-period | EstimationPeriodValidValue | EstimationPeriod |
+        | payload-type                    | error-id                                   | error-field      |
+        | missing-delivery-date           | DeliveryDateRequired                       | DeliveryDate     |
+        | missing-quantity                | QuantityRequired                           | Quantity         |
+        | missing-estimation-period       | EstimationPeriodRequiredIfVariableOnDemand | EstimationPeriod |
+        | missing-price                   | PriceRequired                              | Price            |
+        | outside-delivery-window         | DeliveryDateOutsideDeliveryWindow          | DeliveryDate     |
+        | less-than-min-quantity          | QuantityGreaterThanZero                    | Quantity         |
+        | greater-than-max-quantity       | QuantityLessThanMax                        | Quantity         |
+        | less-than-min-price             | PriceGreaterThanOrEqualToZero              | Price            |
+        | greater-than-max-price          | PriceLessThanMax                           | Price            |
+        | invalid-value-estimation-period | EstimationPeriodValidValue                 | EstimationPeriod |

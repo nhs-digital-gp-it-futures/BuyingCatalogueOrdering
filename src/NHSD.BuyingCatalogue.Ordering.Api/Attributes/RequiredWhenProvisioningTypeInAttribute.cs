@@ -7,13 +7,13 @@ using NHSD.BuyingCatalogue.Ordering.Api.Models;
 namespace NHSD.BuyingCatalogue.Ordering.Api.Attributes
 {
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
-    public class OrderItemRequiredAttribute : ValidationAttribute
+    public sealed class RequiredWhenProvisioningTypeInAttribute : ValidationAttribute
     {
         private readonly IEnumerable<string> _provisioningTypes;
 
-        public OrderItemRequiredAttribute(params string[] provisioningProvisioningTypes)
+        public RequiredWhenProvisioningTypeInAttribute(params string[] provisioningTypes)
         {
-            _provisioningTypes = provisioningProvisioningTypes ?? throw new ArgumentNullException(nameof(provisioningProvisioningTypes));
+            _provisioningTypes = provisioningTypes ?? throw new ArgumentNullException(nameof(provisioningTypes));
         }
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
@@ -25,7 +25,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Attributes
                 throw new ArgumentException("The OrderItemRequired attribute should only be applied to CreateOrderItemModels");
             }
 
-            if (!_provisioningTypes.Contains(orderItem.ProvisioningType))
+            if (!_provisioningTypes.Any(s => s.Equals(orderItem.ProvisioningType, StringComparison.OrdinalIgnoreCase)))
             {
                 return ValidationResult.Success;
             }

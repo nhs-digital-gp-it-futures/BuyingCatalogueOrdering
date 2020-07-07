@@ -4,6 +4,6 @@
     {
         Flat = 1,
         Tiered = 2,
-        Invalid
+        Invalid = 3
     }
 }

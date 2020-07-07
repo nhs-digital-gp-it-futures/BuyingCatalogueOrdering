@@ -45,7 +45,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                 {"too-long-catalogue-solution-name", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithCatalogueSolutionName(new string('1', 256)).Build()},
                 {"above-delivery-window", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithDeliveryDate(new DateTime(2021,1,1).AddDays(1282)).Build()},
                 {"below-delivery-window", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithDeliveryDate(new DateTime(2021,1,1).AddDays(-1)).Build()},
-                {"greater-than-zero-quantity", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithQuantity(0).Build()}
+                {"less-than-min-quantity", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithQuantity(0).Build()},
+                {"greater-than-max-quantity", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithQuantity(int.MaxValue).Build()},
+                {"less-than-min-price", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithPrice(-1).Build()}, 
+                {"greater-than-max-price", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithPrice(1000000000000000m).Build()} 
             };
 
         public CreateCatalogueSolutionOrderItemRequest(
