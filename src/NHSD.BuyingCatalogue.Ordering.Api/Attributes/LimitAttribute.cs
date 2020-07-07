@@ -143,7 +143,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Attributes
                     Type type = this.OperandType;
                     if (type == null)
                     {
-                        throw new InvalidOperationException("Range attribute must set Operand type for string inputs");
+                        throw new InvalidOperationException("Limit attribute must set Operand type for string inputs");
                     }
                     Type comparableType = typeof(IComparable);
                     if (!comparableType.IsAssignableFrom(type))
