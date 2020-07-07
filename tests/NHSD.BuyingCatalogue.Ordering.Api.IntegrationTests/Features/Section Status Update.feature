@@ -9,9 +9,8 @@ Background:
         | C000014-01 | Some Description    | 1             | False                    | False                    | 11/05/2020 | 11/05/2020  | 335392e4-4bb1-413b-9de5-36a85c9c0422 | 4af62b99-638c-4247-875e-965239cd0c48 |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
-
 @5124
-Scenario Outline: 1. Set the additional services order section to completed
+Scenario: 1. Set the additional services order section to completed
     When the user makes a request to complete order section with order Id C000014-01 section Id additional-services
     Then a response with status code 204 is returned
     And the order with ID C000014-01 has additional services viewed set to true
@@ -22,7 +21,7 @@ Scenario Outline: 1. Set the additional services order section to completed
     And the order with orderId C000014-01 has LastUpdated time present and it is the current time
 
 @5124
-Scenario: 2. Set the catalog solutions order section to completed
+Scenario: 2. Set the catalogue solutions order section to completed
     When the user makes a request to complete order section with order Id C000014-01 section Id catalogue-solutions
     Then a response with status code 204 is returned
     And the order with ID C000014-01 has additional services viewed set to false

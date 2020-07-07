@@ -37,9 +37,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [HttpPut]
         [Route("/api/v1/orders/{orderId}/sections/{sectionId}")]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult> UpdateStatusAsync(string orderId, string sectionId, SectionStatusRequestModel sectionStatus )
+        public async Task<ActionResult> UpdateStatusAsync(string orderId, string sectionId, UpdateOrderSectionModel sectionStatus )
         {
-            if (sectionStatus == null)
+            if (sectionStatus is null)
             {
                 throw new ArgumentNullException(nameof(sectionStatus));
             }

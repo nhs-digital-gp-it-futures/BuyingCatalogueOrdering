@@ -39,10 +39,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 
         public static bool IsAdditionalServicesSectionComplete(this Order order)
         {
-            if (order == null)
+            if (order is null)
             {
                 return false;
             }
+
             return order.AdditionalServicesViewed;
         }
     }

@@ -200,7 +200,7 @@ Scenario: 8. Get the order summary that includes a list of Catalogue Solutions
         | additional-services | incomplete |       |
         | funding-source      | incomplete |       |
 
-@7412
+@5124
 Scenario: 9. Get the order summary after the user has viewed the Additional Services section 
     Given Orders exist
         | OrderId    | Description   | OrganisationId                       | AdditionalServicesViewed |
@@ -221,7 +221,6 @@ Scenario: 9. Get the order summary after the user has viewed the Additional Serv
         | catalogue-solutions | incomplete | 0     |
         | additional-services | complete   |       |
         | funding-source      | incomplete |       |
-
 
 @5321
 Scenario: 10. If the order ID does not exist, return not found

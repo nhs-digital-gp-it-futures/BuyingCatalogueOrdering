@@ -40,7 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = SectionStatusControllerTestContext.Setup();
 
             var response =
-                await context.SectionStatusController.UpdateStatusAsync("INVALID", SectionModel.AdditionalServices.Id,new SectionStatusRequestModel{Status = "complete"});
+                await context.SectionStatusController.UpdateStatusAsync("INVALID", SectionModel.AdditionalServices.Id, new UpdateOrderSectionModel { Status = "complete"});
             response.Should().BeOfType<NotFoundResult>();
         }
 
@@ -52,7 +52,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             const string orderId = "C0000014-01";
             context.Order = CreateGetTestData(orderId, Guid.NewGuid(), "ods");
 
-            var response = await context.SectionStatusController.UpdateStatusAsync(orderId, SectionModel.AdditionalServices.Id, new SectionStatusRequestModel { Status = "complete" }); 
+            var response = await context.SectionStatusController.UpdateStatusAsync(orderId, SectionModel.AdditionalServices.Id, new UpdateOrderSectionModel { Status = "complete" }); 
             response.Should().BeOfType<ForbidResult>();
         }
 
@@ -64,7 +64,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             const string orderId = "C0000014-01";
             context.Order = CreateGetTestData(orderId, context.PrimaryOrganisationId, "ods");
 
-            var response = await context.SectionStatusController.UpdateStatusAsync(orderId, "unknown-section", new SectionStatusRequestModel { Status = "complete" });
+            var response = await context.SectionStatusController.UpdateStatusAsync(orderId, "unknown-section", new UpdateOrderSectionModel { Status = "complete" });
             response.Should().BeOfType<ForbidResult>();
         }
 
@@ -77,7 +77,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             const string orderId = "C0000014-01";
             context.Order = CreateGetTestData(orderId, context.PrimaryOrganisationId, "ods");
 
-            var response = await context.SectionStatusController.UpdateStatusAsync(orderId, sectionName, new SectionStatusRequestModel { Status = "complete" });
+            var response = await context.SectionStatusController.UpdateStatusAsync(orderId, sectionName, new UpdateOrderSectionModel { Status = "complete" });
             response.Should().BeOfType<NoContentResult>();
         }
 
@@ -89,9 +89,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             const string orderId = "C0000014-01";
             context.Order = CreateGetTestData(orderId, context.PrimaryOrganisationId, "ods");
 
-            var response = await context.SectionStatusController.UpdateStatusAsync(orderId, "additional-services", new SectionStatusRequestModel { Status = "complete" });
+            var response = await context.SectionStatusController.UpdateStatusAsync(orderId, "additional-services", new UpdateOrderSectionModel { Status = "complete" });
             response.Should().BeOfType<NoContentResult>();
-            context.OrderRepositoryMock.Verify(u=>u.UpdateOrderAsync(It.Is<Order>(o=>o.AdditionalServicesViewed==true)));
+            context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o=>o.AdditionalServicesViewed == true)));
             context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o => o.CatalogueSolutionsViewed == false)));
             context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o => o.ServiceRecipientsViewed == false)));
         }
@@ -104,7 +104,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             const string orderId = "C0000014-01";
             context.Order = CreateGetTestData(orderId, context.PrimaryOrganisationId, "ods");
 
-            var response = await context.SectionStatusController.UpdateStatusAsync(orderId, "catalogue-solutions", new SectionStatusRequestModel { Status = "complete" });
+            var response = await context.SectionStatusController.UpdateStatusAsync(orderId, "catalogue-solutions", new UpdateOrderSectionModel { Status = "complete" });
             response.Should().BeOfType<NoContentResult>();
             context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o => o.AdditionalServicesViewed == false)));
             context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o => o.CatalogueSolutionsViewed == true)));
@@ -132,8 +132,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             return repositoryOrder;
         }
-
-
 
         internal sealed class SectionStatusControllerTestContext
         {
