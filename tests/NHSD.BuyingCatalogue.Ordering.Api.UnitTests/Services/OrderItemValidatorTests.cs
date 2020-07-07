@@ -298,7 +298,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             result.First().Should().Be(expected);
         }
 
-        private class OrderItemValidatorTestContext
+        private sealed class OrderItemValidatorTestContext
         {
             public OrderItemValidator Validator { get; }
             public ValidationSettings Settings { get; }
