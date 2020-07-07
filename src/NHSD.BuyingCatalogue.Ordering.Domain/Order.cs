@@ -8,14 +8,36 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
     public sealed class Order
     {
         private readonly List<OrderItem> _orderItems = new List<OrderItem>();
-
         private readonly List<ServiceRecipient> _serviceRecipients = new List<ServiceRecipient>();
+
+        private Order()
+        {
+        }
+
+        private Order(OrderDescription orderDescription, Guid organisationId) : this()
+        {
+            Description = orderDescription ?? throw new ArgumentNullException(nameof(orderDescription));
+            OrganisationId = organisationId;
+            OrderStatus = OrderStatus.Unsubmitted;
+            Created = DateTime.UtcNow;
+        }
+
+        public static Order Create(
+            OrderDescription orderDescription,
+            Guid organisationId,
+            Guid lastUpdatedBy,
+            string lastUpdatedByName)
+        {
+            var order = new Order(orderDescription, organisationId);
+            order.SetLastUpdatedBy(lastUpdatedBy, lastUpdatedByName);
+            return order;
+        }
 
         public string OrderId { get; set; }
 
         public OrderDescription Description { get; private set; }
 
-        public Guid OrganisationId { get; set; }
+        public Guid OrganisationId { get; }
 
         public string OrganisationName { get; set; }
 
@@ -35,7 +57,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public string LastUpdatedByName { get; set; }
 
-        public OrderStatus OrderStatus { get; set; }
+        public OrderStatus OrderStatus { get; }
 
         public bool ServiceRecipientsViewed { get; set; }
 
