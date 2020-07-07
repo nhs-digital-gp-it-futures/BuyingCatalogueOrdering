@@ -28,8 +28,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             { SectionModel.AdditionalServices.Id, o => o.AdditionalServicesViewed = true }
         };
 
-        public SectionStatusController(
-            IOrderRepository orderRepository)
+        public SectionStatusController(IOrderRepository orderRepository)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
         }
