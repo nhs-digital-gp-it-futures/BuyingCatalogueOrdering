@@ -24,7 +24,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         private DateTime? _commencementDate;
         private bool _serviceRecipientsViewed;
         private bool _catalogueSolutionsViewed;
-        private bool _additionalServicesViewed;        private readonly IList<OrderItem> _orderItems = new List<OrderItem>();
+        private bool _additionalServicesViewed;        
+        private readonly IList<OrderItem> _orderItems = new List<OrderItem>();
 
         private OrderBuilder()
         {
