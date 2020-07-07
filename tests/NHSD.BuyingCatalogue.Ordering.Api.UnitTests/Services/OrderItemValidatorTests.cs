@@ -10,7 +10,7 @@ using NUnit.Framework;
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 {
     [TestFixture]
-    public class OrderItemValidatorTests
+    public sealed class OrderItemValidatorTests
     {
         [Test]
         public void Validate_NullSettings_ThrowsException()

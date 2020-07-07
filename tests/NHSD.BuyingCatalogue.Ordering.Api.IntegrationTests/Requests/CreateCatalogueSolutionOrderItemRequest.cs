@@ -15,6 +15,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 {
     internal sealed class CreateCatalogueSolutionOrderItemRequest
     {
+        private const int MaximumDeliveryDateOffsetDays = 1282;
+
         private readonly Request _request;
         private readonly string _createCatalogueSolutionOrderItemUrl;
 
@@ -43,7 +45,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                 {"too-long-ods-code", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithOdsCode(new string('1', 9)).Build()},
                 {"too-long-catalogue-solution-id", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithCatalogueSolutionId(new string('1', 15)).Build()},
                 {"too-long-catalogue-solution-name", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithCatalogueSolutionName(new string('1', 256)).Build()},
-                {"above-delivery-window", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithDeliveryDate(new DateTime(2021,1,1).AddDays(1282)).Build()},
+                {"above-delivery-window", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithDeliveryDate(new DateTime(2021,1,1).AddDays(MaximumDeliveryDateOffsetDays)).Build()},
                 {"below-delivery-window", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithDeliveryDate(new DateTime(2021,1,1).AddDays(-1)).Build()},
                 {"less-than-min-quantity", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithQuantity(0).Build()},
                 {"greater-than-max-quantity", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithQuantity(int.MaxValue).Build()},

@@ -12,6 +12,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 {
     internal sealed class UpdateCatalogueSolutionOrderItemRequest
     {
+        private const int MaximumDeliveryDateOffsetDays = 1282;
+
         private readonly Request _request;
         private readonly string _createCatalogueSolutionOrderItemUrl;
 
@@ -72,7 +74,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                     "outside-delivery-window", () =>
                         UpdateCatalogueSolutionOrderItemRequestPayloadBuilder
                             .Create()
-                            .WithDeliveryDate(new DateTime(2021, 1, 1).AddDays(2182))
+                            .WithDeliveryDate(new DateTime(2021, 1, 1).AddDays(MaximumDeliveryDateOffsetDays))
                             .Build()
                 },
                 {
