@@ -136,7 +136,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult<CreateOrderItemResponseModel>> CreateOrderItemAsync(
             string orderId,
-            CreateOrderItemModel model)
+            CreateOrderItemSolutionModel model)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
@@ -169,7 +169,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         public async Task<ActionResult<UpdateOrderItemResponseModel>> UpdateOrderItemAsync(
             string orderId, 
             int orderItemId, 
-            UpdateOrderItemModel model)
+            UpdateOrderItemSolutionModel model)
         {
             if (model is null)
                 throw new ArgumentNullException(nameof(model));
@@ -196,7 +196,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     order,
                     orderItemId,
                     model.Price,
-                    model.Quantity));
+                    model.Quantity),
+                orderItem.CatalogueItemType,
+                orderItem.ProvisioningType);
 
             if (result.IsSuccess)
                 return NoContent();

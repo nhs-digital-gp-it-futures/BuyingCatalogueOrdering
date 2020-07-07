@@ -163,40 +163,35 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public void Ctor_NullRepository_ThrowsException()
         {
-            static void Test()
-            {
-                CatalogueSolutionsControllerBuilder
-                    .Create()
-                    .WithOrderRepository(null)
-                    .WithCreateOrderItemService(Mock.Of<ICreateOrderItemService>())
-                    .Build();
-            }
+            var builder = CatalogueSolutionsControllerBuilder
+                .Create()
+                .WithOrderRepository(null)
+                .WithCreateOrderItemService(Mock.Of<ICreateOrderItemService>());
 
-            Assert.Throws<ArgumentNullException>(Test);
+            Assert.Throws<ArgumentNullException>(() => builder.Build());
         }
 
         [Test]
         public void Ctor_NullService_ThrowsException()
         {
-            static void Test()
-            {
+            var builder =
                 CatalogueSolutionsControllerBuilder
                     .Create()
                     .WithOrderRepository(Mock.Of<IOrderRepository>())
-                    .WithCreateOrderItemService(null)
-                    .Build();
-            }
+                    .WithCreateOrderItemService(null);
 
-            Assert.Throws<ArgumentNullException>(Test);
+            Assert.Throws<ArgumentNullException>(() => builder.Build());
         }
 
         [Test]
         public async Task CreateOrderItemAsync_OrderIdDoesNotExist_ReturnsNotFound()
         {
+            var createModel = CreateOrderItemModelBuilder.Create().BuildSolution();
+
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order = null;
 
-            var result = await context.Controller.CreateOrderItemAsync("unknown", null);
+            var result = await context.Controller.CreateOrderItemAsync("unknown", createModel);
 
             result.Result.Should().BeOfType<NotFoundResult>();
         }
@@ -204,13 +199,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task CreateOrderItemAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
         {
+            var createModel = CreateOrderItemModelBuilder.Create().BuildSolution();
+
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order = OrderBuilder
                 .Create()
                 .WithOrganisationId(Guid.NewGuid())
                 .Build();
 
-            var result = await context.Controller.CreateOrderItemAsync("myOrder", null);
+            var result = await context.Controller.CreateOrderItemAsync("myOrder", createModel);
 
             result.Result.Should().BeOfType<ForbidResult>();
         }
@@ -219,6 +216,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task CreateOrderItemAsync_OrderExists_ReturnsCreatedAtActionResult()
         {
             const string orderId = "C10000-01";
+            var createModel = CreateOrderItemModelBuilder.Create().BuildSolution();
             const int newOrderItemId = 456;
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
@@ -229,7 +227,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithOrganisationId(context.PrimaryOrganisationId)
                 .Build();
 
-            var result = await context.Controller.CreateOrderItemAsync(orderId, new CreateOrderItemModel());
+            var result = await context.Controller.CreateOrderItemAsync(orderId, createModel);
 
             result.Result.As<CreatedAtActionResult>().Should().BeEquivalentTo(new
             {
@@ -247,6 +245,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task CreateOrderItemAsync_OrderExists_ReturnsNewOrderItemId()
         {
             const string orderId = "C10000-01";
+            var createModel = CreateOrderItemModelBuilder.Create().BuildSolution();
             const int newOrderItemId = 456;
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
@@ -257,7 +256,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithOrganisationId(context.PrimaryOrganisationId)
                 .Build();
 
-            var result = await context.Controller.CreateOrderItemAsync(orderId, new CreateOrderItemModel());
+            var result = await context.Controller.CreateOrderItemAsync(orderId, createModel);
 
             var expected = new CreateOrderItemResponseModel
             {
@@ -271,6 +270,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task CreateOrderItemAsync_Error_ReturnsBadRequest()
         {
             const string orderId = "C10000-01";
+            var createModel = CreateOrderItemModelBuilder.Create().BuildSolution();
             var error = new ErrorDetails("TestError", "TestField");
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
@@ -281,7 +281,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithOrganisationId(context.PrimaryOrganisationId)
                 .Build();
 
-            var result = await context.Controller.CreateOrderItemAsync(orderId, new CreateOrderItemModel());
+            var result = await context.Controller.CreateOrderItemAsync(orderId, createModel);
 
             result.Result.Should().BeOfType<BadRequestObjectResult>();
         }
@@ -290,6 +290,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task CreateOrderItemAsync_Error_ReturnsErrors()
         {
             const string orderId = "C10000-01";
+            var createModel = CreateOrderItemModelBuilder.Create().BuildSolution();
+
             var error = new ErrorDetails("TestError", "TestField");
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
@@ -300,7 +302,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithOrganisationId(context.PrimaryOrganisationId)
                 .Build();
 
-            var result = await context.Controller.CreateOrderItemAsync(orderId, new CreateOrderItemModel());
+            var result = await context.Controller.CreateOrderItemAsync(orderId, createModel);
 
             var expected = new CreateOrderItemResponseModel
             {
@@ -317,6 +319,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task CreateOrderItemAsync_OrderRepository_CalledOnce()
         {
             const string orderId = "C10000-01";
+            var createModel = CreateOrderItemModelBuilder.Create().BuildSolution();
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order = OrderBuilder
@@ -325,7 +328,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithOrganisationId(context.PrimaryOrganisationId)
                 .Build();
 
-            await context.Controller.CreateOrderItemAsync(orderId, new CreateOrderItemModel());
+            await context.Controller.CreateOrderItemAsync(orderId, createModel);
 
             context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(orderId), Times.Once);
         }
@@ -334,10 +337,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task CreateOrderItemAsync_CreateOrderItemService_CalledOnce()
         {
             const string orderId = "C10000-01";
+            var createModel = CreateOrderItemModelBuilder.Create().BuildSolution();
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
 
-            await context.Controller.CreateOrderItemAsync(orderId, new CreateOrderItemModel());
+            await context.Controller.CreateOrderItemAsync(orderId, createModel);
 
             context.CreateOrderItemService.Verify(x =>
                     x.CreateAsync(It.IsNotNull<CreateOrderItemRequest>()), Times.Once);
@@ -346,18 +350,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public void UpdateOrderItemAsync_NullModel_ThrowsArgumentNullException()
         {
-            static async Task TestAsync()
-            {
-                const string orderId = "C10000-01";
-                const int orderItemId = 1;
+            const string orderId = "C10000-01";
+            const int orderItemId = 1;
 
-                var context = CatalogueSolutionsControllerTestContext.Setup();
-                context.Order = null;
+            var context = CatalogueSolutionsControllerTestContext.Setup();
+            context.Order = null;
 
-                await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, null);
-            }
-
-            Assert.ThrowsAsync<ArgumentNullException>(TestAsync);
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, null));
         }
 
         [Test]
@@ -365,11 +364,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             const string orderId = "C10000-01";
             const int orderItemId = 1;
+            var updateModel = UpdateOrderItemModelBuilder.Create().BuildSolution();
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order = null;
 
-            var result = await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, new UpdateOrderItemModel());
+            var result = await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
 
             result.Result.Should().BeOfType<NotFoundResult>();
         }
@@ -379,6 +379,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             const string orderId = "C10000-01";
             const int orderItemId = 1;
+            var updateModel = UpdateOrderItemModelBuilder.Create().BuildSolution();
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order = OrderBuilder
@@ -392,7 +393,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     .Build())
                 .Build();
 
-            await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, new UpdateOrderItemModel());
+            await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
 
             context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(orderId), Times.Once);
         }
@@ -402,6 +403,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             const string orderId = "C10000-01";
             const int orderItemId = 1;
+            var updateModel = UpdateOrderItemModelBuilder.Create().BuildSolution();
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order = OrderBuilder
@@ -409,7 +411,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithOrganisationId(Guid.NewGuid())
                 .Build();
 
-            var result = await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, new UpdateOrderItemModel());
+            var result = await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
 
             result.Result.Should().BeOfType<ForbidResult>();
         }
@@ -419,10 +421,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             const string orderId = "C10000-01";
             const int orderItemId = 1;
+            var updateModel = UpdateOrderItemModelBuilder.Create().BuildSolution();
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
 
-            var result = await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, new UpdateOrderItemModel());
+            var result = await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
 
             result.Result.Should().BeOfType<NotFoundResult>();
         }
@@ -432,6 +435,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             const string orderId = "C10000-01";
             const int orderItemId = 1;
+            var updateModel = UpdateOrderItemModelBuilder.Create().BuildSolution();
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order = OrderBuilder
@@ -445,7 +449,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     .Build())
                 .Build();
 
-            var result = await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, new UpdateOrderItemModel());
+            var result = await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
 
             result.Result.Should().BeOfType<NotFoundResult>();
         }
@@ -455,6 +459,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             const string orderId = "C10000-01";
             const int orderItemId = 1;
+            var updateModel = UpdateOrderItemModelBuilder.Create().BuildSolution();
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order = OrderBuilder
@@ -468,7 +473,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     .Build())
                 .Build();
 
-            var result = await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, new UpdateOrderItemModel());
+            var result = await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
 
             result.Result.Should().BeOfType<NoContentResult>();
         }
@@ -478,6 +483,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             const string orderId = "C10000-01";
             const int orderItemId = 1;
+            var updateModel = UpdateOrderItemModelBuilder.Create().BuildSolution();
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
             context.Order = OrderBuilder
@@ -491,12 +497,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     .Build())
                 .Build();
 
-            await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, new UpdateOrderItemModel());
+            await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
 
             context.UpdateOrderItemService.Verify(x => 
                 x.UpdateAsync(It.Is<UpdateOrderItemRequest>(r => 
                     orderId.Equals(r.Order.OrderId) 
-                    && orderItemId.Equals(r.OrderItemId))), Times.Once);
+                    && orderItemId.Equals(r.OrderItemId)), 
+                    It.IsAny<CatalogueItemType>(),
+                    It.IsAny<ProvisioningType>()), Times.Once);
         }
 
         [Test]
@@ -504,6 +512,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             const string orderId = "C10000-01";
             const int orderItemId = 1;
+            var updateModel = UpdateOrderItemModelBuilder.Create().BuildSolution();
             var error = new ErrorDetails("TestError", "TestField");
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
@@ -519,7 +528,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     .Build())
                 .Build();
 
-            var result = await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, new UpdateOrderItemModel());
+            var result = await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
 
             result.Result.Should().BeOfType<BadRequestObjectResult>();
         }
@@ -529,6 +538,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             const string orderId = "C10000-01";
             const int orderItemId = 1;
+            var updateModel = UpdateOrderItemModelBuilder.Create().BuildSolution();
             var error = new ErrorDetails("TestError", "TestField");
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
@@ -544,7 +554,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     .Build())
                 .Build();
 
-            var result = await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, new UpdateOrderItemModel());
+            var result = await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
 
             var expected = new UpdateOrderItemResponseModel
             {
@@ -652,7 +662,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 UpdateOrderItemResult = Result.Success();
 
                 UpdateOrderItemService = new Mock<IUpdateOrderItemService>();
-                UpdateOrderItemService.Setup(x => x.UpdateAsync(It.IsNotNull<UpdateOrderItemRequest>()))
+                UpdateOrderItemService.Setup(x => x.UpdateAsync(It.IsNotNull<UpdateOrderItemRequest>(), It.IsAny<CatalogueItemType>(), It.IsAny<ProvisioningType>()))
                     .ReturnsAsync(() => UpdateOrderItemResult);
 
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]

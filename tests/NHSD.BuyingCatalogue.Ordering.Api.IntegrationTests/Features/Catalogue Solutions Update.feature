@@ -5,8 +5,8 @@
 
 Background:
     Given Orders exist
-        | OrderId    | Description      | LastUpdatedBy                        | LastUpdatedByName | OrganisationId                       |
-        | C000014-01 | Some Description | 335392e4-4bb1-413b-9de5-36a85c9c0422 | Tom Smith         | 4af62b99-638c-4247-875e-965239cd0c48 |
+        | OrderId    | Description      | LastUpdatedBy                        | LastUpdatedByName | OrganisationId                       | CommencementDate |
+        | C000014-01 | Some Description | 335392e4-4bb1-413b-9de5-36a85c9c0422 | Tom Smith         | 4af62b99-638c-4247-875e-965239cd0c48 | 01/01/2021       |
     And Service Recipients exist
         | OdsCode | Name                | OrderId    |
         | ODS1    | Service Recipient   | C000014-01 |

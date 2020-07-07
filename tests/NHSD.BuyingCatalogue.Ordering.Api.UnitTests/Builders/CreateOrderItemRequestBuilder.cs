@@ -34,7 +34,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _cataloguePriceUnitTierName = "sms";
             _cataloguePriceUnitDescription = "per sms";
             _priceTimeUnitName = "month";
-            _currencyCode = "EUR";
+            _currencyCode = "GBP";
             _quantity = 10;
             _estimationPeriodName = "year";
             _deliveryDate = DateTime.UtcNow;
