@@ -28,7 +28,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
         public string EstimationPeriod { get; set; }
 
         [Required(ErrorMessage = "PriceRequired")]
-        [Limit(0d, LimitType.Minimum, ErrorMessage = "PriceGreaterThanOrEqualToZero")]
+        [Limit(typeof(decimal), "0", LimitType.Minimum, ErrorMessage = "PriceGreaterThanOrEqualToZero")]
         [Limit(typeof(decimal), "999999999999999.999", LimitType.Maximum, ErrorMessage = "PriceLessThanMax")]
         public decimal? Price { get; set; }
     }
