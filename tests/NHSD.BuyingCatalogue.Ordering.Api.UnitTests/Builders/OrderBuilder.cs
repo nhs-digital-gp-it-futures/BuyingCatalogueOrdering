@@ -24,6 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         private DateTime? _commencementDate;
         private bool _serviceRecipientsViewed;
         private bool _catalogueSolutionsViewed;
+        private bool _additionalServicesViewed;        
         private readonly IList<OrderItem> _orderItems = new List<OrderItem>();
 
         private OrderBuilder()
@@ -46,6 +47,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _commencementDate = null;
             _serviceRecipientsViewed = false;
             _catalogueSolutionsViewed = false;
+            _additionalServicesViewed = false;
         }
 
         internal static OrderBuilder Create() => new OrderBuilder();
@@ -116,6 +118,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
+        internal OrderBuilder WithAdditionalServicesViewed(bool additionalServicesViewed)
+        {
+            _additionalServicesViewed = additionalServicesViewed;
+            return this;
+        }
+
         internal OrderBuilder WithLastUpdatedBy(Guid lastUpdatedBy)
         {
             _lastUpdatedBy = lastUpdatedBy;
@@ -150,6 +158,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             order.CommencementDate = _commencementDate;
             order.ServiceRecipientsViewed = _serviceRecipientsViewed;
             order.CatalogueSolutionsViewed = _catalogueSolutionsViewed;
+            order.AdditionalServicesViewed = _additionalServicesViewed;
             order.Created = _created;
             order.LastUpdated = _lastUpdated;
 

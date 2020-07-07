@@ -45,6 +45,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public bool CatalogueSolutionsViewed { get; set; }
 
+        public bool AdditionalServicesViewed { get; set; }
+
         protected override string InsertSql => @"
             INSERT INTO dbo.[Order]
             (
@@ -67,7 +69,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 SupplierAddressId,
                 SupplierContactId,
                 ServiceRecipientsViewed,
-                CatalogueSolutionsViewed
+                CatalogueSolutionsViewed,
+                AdditionalServicesViewed
             )
             VALUES
             (
@@ -90,7 +93,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 @SupplierAddressId,
                 @SupplierContactId,
                 @ServiceRecipientsViewed,
-                @CatalogueSolutionsViewed
+                @CatalogueSolutionsViewed,
+                @AdditionalServicesViewed
             );";
 
         public static async Task<OrderEntity> FetchOrderByOrderId(string connectionString, string orderId)
@@ -116,7 +120,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                           SupplierId,
                           SupplierName,
                           ServiceRecipientsViewed,
-                          CatalogueSolutionsViewed
+                          CatalogueSolutionsViewed,
+                          AdditionalServicesViewed
                          FROM dbo.[Order]
                          WHERE OrderId = @orderId;", new { orderId }));
         }

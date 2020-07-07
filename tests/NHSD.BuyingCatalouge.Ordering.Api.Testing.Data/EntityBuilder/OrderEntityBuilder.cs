@@ -25,7 +25,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
                 SupplierName = null,
                 CommencementDate = null,
                 ServiceRecipientsViewed = false,
-                CatalogueSolutionsViewed = false
+                CatalogueSolutionsViewed = false,
+                AdditionalServicesViewed = false
             };
         }
 
@@ -150,6 +151,12 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
         public OrderEntityBuilder WithCatalogueSolutionsViewed(bool catalogueSolutionsViewed)
         {
             _orderEntity.CatalogueSolutionsViewed = catalogueSolutionsViewed;
+            return this;
+        }
+
+        public OrderEntityBuilder WithAdditionalServicesViewed(bool AdditionalServicesViewed)
+        {
+            _orderEntity.AdditionalServicesViewed = AdditionalServicesViewed;
             return this;
         }
 

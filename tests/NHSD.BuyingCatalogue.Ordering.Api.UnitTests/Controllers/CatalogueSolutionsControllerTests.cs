@@ -24,37 +24,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
     public sealed class CatalogueSolutionsControllerTests
     {
         [Test]
-        public async Task UpdateAsync_OrderNotFound_ReturnsNotFound()
-        {
-            var context = CatalogueSolutionsControllerTestContext.Setup();
-            context.Order = null;
-            var result = await context.Controller.UpdateAsync("myOrder");
-            result.Should().BeOfType<NotFoundResult>();
-        }
-
-        [Test]
-        public async Task UpdateAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
-        {
-            var context = CatalogueSolutionsControllerTestContext.Setup();
-            context.Order = OrderBuilder
-                .Create()
-                .WithOrganisationId(Guid.NewGuid())
-                .Build();
-
-            var result = await context.Controller.UpdateAsync("myOrder");
-            result.Should().BeOfType<ForbidResult>();
-        }
-
-        [Test]
-        public async Task UpdateAsync_ForExistingOrder_UpdatesCatalogueSolutionsViewed()
-        {
-            var context = CatalogueSolutionsControllerTestContext.Setup();
-            var result = await context.Controller.UpdateAsync("myOrder");
-            result.Should().BeOfType<NoContentResult>();
-            context.Order.CatalogueSolutionsViewed.Should().BeTrue();
-        }
-
-        [Test]
         public async Task GetAllAsync_WithDescriptionAndNoSolution_ReturnsOkResult()
         {
             const string expectedDescription = "A description";

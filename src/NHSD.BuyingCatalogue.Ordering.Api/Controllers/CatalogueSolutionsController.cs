@@ -67,31 +67,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             return new CatalogueSolutionsModel { OrderDescription = order.Description.Value, CatalogueSolutions = catalogueSolutionModel };
         }
 
-        [HttpPut]
-        [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult> UpdateAsync(string orderId)
-        {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
-
-            if (order is null)
-            {
-                return NotFound();
-            }
-
-            var primaryOrganisationId = User.GetPrimaryOrganisationId();
-            if (primaryOrganisationId != order.OrganisationId)
-            {
-                return Forbid();
-            }
-
-            order.CatalogueSolutionsViewed = true;
-            order.SetLastUpdatedBy(User.GetUserId(), User.GetUserName());
-
-            await _orderRepository.UpdateOrderAsync(order);
-
-            return NoContent();
-        }
-
         [HttpGet]
         [Route("{orderItemId}")]
         public async Task<ActionResult<GetCatalogueSolutionOrderItemModel>> GetOrderItemAsync(string orderId, int orderItemId)

@@ -27,21 +27,5 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             return new List<GetOrderItemModel>();
         }
-
-        [HttpPut]
-        [Route("sections/{sectionId}")]
-        public ActionResult UpdateOrderSection(string orderId, string sectionId, UpdateOrderSectionModel model)
-        {
-            if (model is null)
-                throw new ArgumentNullException(nameof(model));
-
-            if (orderId is null)
-                return NotFound();
-
-            if (sectionId is null)
-                return NotFound();
-
-            return NoContent();
-        }
     }
 }
