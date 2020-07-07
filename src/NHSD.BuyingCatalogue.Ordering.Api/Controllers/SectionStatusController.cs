@@ -14,7 +14,7 @@ using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
-    [Route("api/v1/[controller]")]
+    [Route("/api/v1/orders")]
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
@@ -35,7 +35,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpPut]
-        [Route("/api/v1/orders/{orderId}/sections/{sectionId}")]
+        [Route("{orderId}/sections/{sectionId}")]
         [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult> UpdateStatusAsync(string orderId, string sectionId, UpdateOrderSectionModel sectionStatus )
         {
