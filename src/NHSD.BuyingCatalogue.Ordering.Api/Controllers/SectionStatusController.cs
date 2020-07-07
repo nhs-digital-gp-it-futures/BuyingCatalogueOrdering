@@ -14,7 +14,7 @@ using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
-    [Route("/api/v1/orders")]
+    [Route("api/v1/orders")]
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
