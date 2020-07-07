@@ -8,9 +8,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
     public sealed class ApplicationDbContext : DbContext
     {
         private readonly ILoggerFactory _loggerFactory;
-        public DbSet<Order> Order { get; set; }
 
-        public DbSet<OrderStatus> OrderStatus { get; set; }
+        public DbSet<Order> Order { get; set; }
 
         public DbSet<ServiceRecipient> ServiceRecipient { get; set; }
 
@@ -38,7 +37,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.ApplyConfiguration(new OrderConfiguration());
+            modelBuilder.ApplyConfiguration(new OrderEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new OrderItemEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new ServiceRecipientConfiguration());
         }

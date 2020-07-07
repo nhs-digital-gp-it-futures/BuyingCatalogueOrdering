@@ -115,7 +115,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 LastUpdatedBy = order.LastUpdatedByName,
                 LastUpdated = order.LastUpdated,
                 DateCreated = order.Created,
-                Status = order.OrderStatus.Name
+                Status = order.OrderStatus.ToString()
             })
                 .ToList();
 

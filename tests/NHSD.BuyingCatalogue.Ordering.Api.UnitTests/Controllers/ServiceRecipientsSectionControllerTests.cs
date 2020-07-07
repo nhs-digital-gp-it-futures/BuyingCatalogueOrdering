@@ -55,7 +55,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task GetAllAsync_OrganisationIdDoesNotMatch_ReturnsForbidden()
         {
             var context = ServiceRecipientsTestContext.Setup();
-            context.Order.OrganisationId = Guid.NewGuid();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(Guid.NewGuid())
+                .Build();
 
             var response = await context.Controller.GetAllAsync("myOrder");
             response.Should().BeEquivalentTo(new ActionResult<ServiceRecipientsModel>(new ForbidResult()));
@@ -154,7 +157,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task UpdateAsync_OrganisationIdDoesNotMatch_ReturnsForbidden()
         {
             var context = ServiceRecipientsTestContext.Setup();
-            context.Order.OrganisationId = Guid.NewGuid();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(Guid.NewGuid())
+                .Build();
 
             var response = await context.Controller.UpdateAsync("myOrder", DefaultServiceRecipientsModel);
             response.Should().BeEquivalentTo(new ForbidResult());
@@ -300,8 +306,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 PrimaryOrganisationId = Guid.NewGuid();
                 UserId = Guid.NewGuid();
                 Username = "Test User";
-
-                Order = new Order { OrganisationId = PrimaryOrganisationId };
+                Order = OrderBuilder
+                    .Create()
+                    .WithOrganisationId(PrimaryOrganisationId)
+                    .Build();
 
                 OrderRepositoryMock = new Mock<IOrderRepository>();
                 OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);

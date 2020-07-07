@@ -119,7 +119,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task GetAllAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
         {
             var context = CatalogueSolutionsControllerTestContext.Setup();
-            context.Order.OrganisationId = Guid.NewGuid();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(Guid.NewGuid())
+                .Build();
+
             var result = await context.Controller.GetAllAsync("myOrder");
 
             result.Result.Should().BeOfType<ForbidResult>();
@@ -170,7 +174,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task CreateOrderItemAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
         {
             var context = CatalogueSolutionsControllerTestContext.Setup();
-            context.Order.OrganisationId = Guid.NewGuid();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(Guid.NewGuid())
+                .Build();
 
             var result = await context.Controller.CreateOrderItemAsync("myOrder", null);
 
@@ -366,7 +373,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             const int orderItemId = 1;
 
             var context = CatalogueSolutionsControllerTestContext.Setup();
-            context.Order.OrganisationId = Guid.NewGuid();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(Guid.NewGuid())
+                .Build();
 
             var result = await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, new UpdateOrderItemModel());
 
@@ -578,7 +588,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task GetOrderItemAsync_DoesNotHavePrimaryOrganisationId_ReturnsForbid()
         {
             var context = CatalogueSolutionsControllerTestContext.Setup();
-            context.Order.OrganisationId = Guid.NewGuid();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(Guid.NewGuid())
+                .Build();
+
             var result = await context.Controller.GetOrderItemAsync("myOrder", -1);
 
             result.Result.Should().BeOfType<ForbidResult>();
