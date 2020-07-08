@@ -88,14 +88,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (orderItem is null)
                 return NotFound();
 
+            var serviceRecipients = order.ServiceRecipients;
+
             return new GetCatalogueSolutionOrderItemModel
             {
                 ServiceRecipient = new ServiceRecipientModel
                 {
-                    OdsCode = orderItem.OdsCode
+                    OdsCode = orderItem.OdsCode,
+                    Name = serviceRecipients.FirstOrDefault(serviceRecipient => string.Equals(orderItem.OdsCode,
+                        serviceRecipient.OdsCode, StringComparison.Ordinal))?.Name
                 },
                 CatalogueSolutionId = orderItem.CatalogueItemId,
-                CatalogueSolutionName = orderItem.CatalogueItemName,
+                CatalogueItemName = orderItem.CatalogueItemName,
                 CurrencyCode = orderItem.CurrencyCode,
                 DeliveryDate = orderItem.DeliveryDate,
                 EstimationPeriod = orderItem.EstimationPeriod.Name,
