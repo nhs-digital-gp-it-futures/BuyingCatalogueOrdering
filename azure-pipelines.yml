@@ -84,10 +84,6 @@ jobs:
   - script: docker-compose up --build -d
     displayName: 'Docker up'
 
-  - bash: |
-      sleep 300
-      docker-compose logs
-
   - task: DotNetCoreCLI@2
     displayName: 'Run unit tests'
     inputs:
