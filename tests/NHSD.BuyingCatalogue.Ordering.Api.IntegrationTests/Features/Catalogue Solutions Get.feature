@@ -5,8 +5,8 @@
 
 Background:
     Given Orders exist
-        | OrderId    | Description         | OrderStatusId | LastUpdatedBy                        | OrganisationId                       |
-        | C000014-01 | Some Description    | 1             | 335392e4-4bb1-413b-9de5-36a85c9c0422 | 4af62b99-638c-4247-875e-965239cd0c48 |
+        | OrderId    | Description      | OrderStatusId | LastUpdatedBy                        | OrganisationId                       |
+        | C000014-01 | Some Description | 1             | 335392e4-4bb1-413b-9de5-36a85c9c0422 | 4af62b99-638c-4247-875e-965239cd0c48 |
     Given Service Recipients exist
         | OrderId    | OdsCode | Name    |
         | C000014-01 | eu      | EU Test |
@@ -22,8 +22,8 @@ Scenario: 1. Get a order item
     When the user makes a request to retrieve an order catalogue solution With orderID C000014-01 and CatalogueItemName Sol1
     Then a response with status code 200 is returned
     And the catalogue solutions response contains a single solution
-        | ServiceRecipientOdsCode | CatalogueSolutionId | CatalogueSolutionName | CurrencyCode | DeliveryDate | EstimationPeriod | ItemUnitName | ItemUnitDescription | Price  | ProvisioningType | Quantity | Type |
-        | eu                      | Cat Item 1          | Sol1                  | GBP          | 01/01/2021   | month            | Tier         | Desc                | 461.34 | Declarative      | 5        | Flat |
+        | ServiceRecipientOdsCode | ServiceRecipientName | CatalogueSolutionId | CatalogueItemName | CurrencyCode | DeliveryDate | EstimationPeriod | ItemUnitName | ItemUnitDescription | Price  | ProvisioningType | Quantity | Type |
+        | eu                      | EU Test              | Cat Item 1          | Sol1              | GBP          | 01/01/2021   | month            | Tier         | Desc                | 461.34 | Declarative      | 5        | Flat |
 
 @7840
 Scenario: 2. A order item type that isn't solution, returns not found

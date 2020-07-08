@@ -52,11 +52,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             var response = await _response.ReadBodyAsJsonAsync();
 
+            const string serviceRecipientToken = "serviceRecipient";
+
             var actual = new GetOrderItemModel
             {
-                ServiceRecipientOdsCode = response.SelectToken("serviceRecipient").Value<string>("odsCode"),
+                ServiceRecipientOdsCode = response.SelectToken(serviceRecipientToken).Value<string>("odsCode"),
+                ServiceRecipientName = response.SelectToken(serviceRecipientToken).Value<string>("name"),
                 CatalogueSolutionId = response.Value<string>("catalogueSolutionId"),
-                CatalogueSolutionName = response.Value<string>("catalogueSolutionName"),
+                CatalogueItemName = response.Value<string>("catalogueItemName"),
                 CurrencyCode = response.Value<string>("currencyCode"),
                 DeliveryDate = response.Value<DateTime?>("deliveryDate"),
                 EstimationPeriod = response.Value<string>("estimationPeriod"),
@@ -74,8 +77,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private sealed class GetOrderItemModel
         {
             public string ServiceRecipientOdsCode { get; set; }
+            public string ServiceRecipientName { get; set; }
             public string CatalogueSolutionId { get; set; }
-            public string CatalogueSolutionName { get; set; }
+            public string CatalogueItemName { get; set; }
             public string CurrencyCode { get; set; }
             public DateTime? DeliveryDate { get; set; }
             public string EstimationPeriod { get; set; }
