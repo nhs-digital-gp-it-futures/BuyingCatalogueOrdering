@@ -30,7 +30,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
                 model.Type,
                 model.ItemUnit?.Name,
                 model.ItemUnit?.Description,
-                model.TimeUnit,
+                model.TimeUnit?.Name,
                 model.CurrencyCode,
                 model.Quantity.Value,
                 model.EstimationPeriod,

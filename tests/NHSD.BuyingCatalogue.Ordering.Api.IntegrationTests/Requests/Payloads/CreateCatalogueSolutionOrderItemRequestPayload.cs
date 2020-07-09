@@ -9,6 +9,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests.Payloads
 
         public bool HasItemUnit { get; set; }
 
+        public bool HasTimeUnit { get; set; }
+
         public string OdsCode { get; set; }
 
         public string CatalogueSolutionId { get; set; }
@@ -30,6 +32,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests.Payloads
         public string ItemUnitName { get; set; }
 
         public string ItemUnitNameDescription { get; set; }
+
+        public string TimeUnitName { get; set; }
+
+        public string TimeUnitDescription { get; set; }
 
         public decimal? Price { get; set; } 
     }
