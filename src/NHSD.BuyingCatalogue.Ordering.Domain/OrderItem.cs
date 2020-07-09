@@ -95,6 +95,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             Price = price;
         }
 
+        public decimal CalculateTotalCostPerYear()
+        {
+            return Price.GetValueOrDefault() * Quantity * (PriceTimeUnit?.AmountInYear ?? EstimationPeriod?.AmountInYear ?? throw new InvalidOperationException("An Order Item must have a Price Time Unit or an Estimation Period"));
+        }
+
         internal void ChangePrice(
             DateTime? deliveryDate, 
             int quantity, 
