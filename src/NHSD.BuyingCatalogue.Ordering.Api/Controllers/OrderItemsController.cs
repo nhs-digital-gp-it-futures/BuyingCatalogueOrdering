@@ -1,31 +1,76 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Mime;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
-    [Route("api/v1/orders/{orderId}")]
+    [Route("api/v1/orders/{orderId}/order-items")]
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class OrderItemsController : ControllerBase
     {
-        [HttpGet]
-        [Route("order-items")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Swagger does not allow static files")]
-        public ActionResult<List<GetOrderItemModel>> Get(string orderId, [FromQuery] string catalogueItemType)
+        private readonly IOrderRepository _orderRepository;
+
+        public OrderItemsController(IOrderRepository orderRepository)
         {
-            if (orderId is null)
+            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<GetOrderItemModel>>> GetAllAsync(string orderId, [FromQuery] string catalogueItemType)
+        {
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            if (order is null)
+            {
                 return NotFound();
+            }
 
-            if (catalogueItemType is null)
-                throw new ArgumentNullException(nameof(catalogueItemType));
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
 
-            return new List<GetOrderItemModel>();
+            IEnumerable<OrderItem> orderItems = order.OrderItems;
+
+            if (!string.IsNullOrWhiteSpace(catalogueItemType))
+            {
+                var catalogueItemTypeFromName = CatalogueItemType.FromName(catalogueItemType);
+                if (catalogueItemTypeFromName is null)
+                {
+                    return new List<GetOrderItemModel>();
+                }
+
+                orderItems = orderItems.Where(y => y.CatalogueItemType.Equals(catalogueItemTypeFromName));
+            }
+
+            var serviceRecipients = order.ServiceRecipients;
+
+            return orderItems
+                .Select(orderItem => new GetOrderItemModel
+                {
+                    ItemId = $"{orderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
+                    ServiceRecipient = new ServiceRecipientModel
+                    {
+                        Name = serviceRecipients.FirstOrDefault(serviceRecipient => string.Equals(orderItem.OdsCode,
+                            serviceRecipient.OdsCode, StringComparison.OrdinalIgnoreCase))?.Name,
+                        OdsCode = orderItem.OdsCode
+                    },
+                    CataloguePriceType = orderItem.CataloguePriceType.Name,
+                    CatalogueItemType = orderItem.CatalogueItemType.Name,
+                    CatalogueItemName = orderItem.CatalogueItemName,
+                    CatalogueItemId = orderItem.CatalogueItemId,
+                }).ToList();
         }
     }
 }

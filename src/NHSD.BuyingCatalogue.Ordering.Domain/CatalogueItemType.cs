@@ -29,6 +29,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 catalogueItemType => catalogueItemType.Id.Equals(id));
         }
 
+        public static CatalogueItemType FromName(string name)
+        {
+            if (name is null)
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            return List().SingleOrDefault(catalogueItemType =>
+                name.Equals(catalogueItemType.Name, StringComparison.OrdinalIgnoreCase));
+        }
+
         public bool Equals(CatalogueItemType other)
         {
             if (other is null)
