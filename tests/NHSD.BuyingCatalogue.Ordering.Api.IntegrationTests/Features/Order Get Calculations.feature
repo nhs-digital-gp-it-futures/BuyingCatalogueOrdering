@@ -18,7 +18,7 @@ Background:
         | C000014-01 | eu      | EU Test |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
         
-Scenario: 1. Blah
+Scenario: 1. Verify the price calculations for Catalogue Solution order types
     Given Order items exist
         | OrderId    | CatalogueItemId | CatalogueItemName | CatalogueItemType | OdsCode | CataloguePriceUnitDescription | Price   | ProvisioningType   | Quantity   | EstimationPeriod   | PriceTimeUnit |
         | C000014-01 | Cat Item 1      | Sol1              | Solution          | eu      | Desc                          | <Price> | <ProvisioningType> | <Quantity> | <EstimationPeriod> | <TimeUnit>    |
