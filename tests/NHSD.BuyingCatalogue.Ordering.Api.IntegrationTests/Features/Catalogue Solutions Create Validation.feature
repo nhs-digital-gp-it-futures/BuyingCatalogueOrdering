@@ -31,6 +31,9 @@ Scenario: 1. Create catalogue solution order item with missing required field
         | missing-item-unit               | ItemUnitRequired                           | ItemUnit              |
         | missing-item-unit-name          | ItemUnitNameRequired                       | Name                  |
         | missing-item-unit-description   | ItemUnitDescriptionRequired                | Description           |
+        | missing-time-unit               | TimeUnitRequired                           | TimeUnit              |
+        | missing-time-unit-name          | TimeUnitNameRequired                       | Name                  |
+        | missing-time-unit-description   | TimeUnitDescriptionRequired                | Description           |
         | missing-provisioning-type       | ProvisioningTypeRequired                   | ProvisioningType      |
         | missing-type                    | TypeRequired                               | Type                  |
         | missing-currency-code           | CurrencyCodeRequired                       | CurrencyCode          |

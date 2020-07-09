@@ -8,6 +8,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
     {
         private bool _hasServiceRecipient;
         private bool _hasItemUnit;
+        private bool _hasTimeUnit;
+
         private string _odsCode;
         private string _catalogueSolutionId;
         private string _catalogueSolutionName;
@@ -19,12 +21,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
         private string _currencyCode;
         private string _itemUnitName;
         private string _itemUnitNameDescription;
+        private string _timeUnitName;
+        private string _timeUnitDescription;
         private decimal? _price;
 
         private CreateCatalogueSolutionOrderItemRequestPayloadBuilder()
         {
             _hasServiceRecipient = true;
             _hasItemUnit = true;
+            _hasTimeUnit = true;
+
             _odsCode = "ODS1";
             _catalogueSolutionId = "100001-001";
             _catalogueSolutionName = Guid.NewGuid().ToString();
@@ -36,6 +42,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
             _currencyCode = "GBP";
             _itemUnitName = "consultation";
             _itemUnitNameDescription = "per consultation";
+            _timeUnitName = "month";
+            _timeUnitDescription = "per month";
             _price = 1.5m;
         }
 
@@ -51,6 +59,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
         public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithHasItemUnit(bool hasItemUnit)
         {
             _hasItemUnit = hasItemUnit;
+            return this;
+        }
+
+        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithHasTimeUnit(bool hasTimeUnit)
+        {
+            _hasTimeUnit = hasTimeUnit;
             return this;
         }
 
@@ -120,6 +134,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
             return this;
         }
 
+        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithTimeUnitName(string timeUnitName)
+        {
+            _timeUnitName = timeUnitName;
+            return this;
+        }
+
+        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithTimeUnitDescription(string timeUnitDescription)
+        {
+            _timeUnitDescription = timeUnitDescription;
+            return this;
+        }
+
         public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithPrice(decimal? price)
         {
             _price = price;
@@ -132,6 +158,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
             {
                 HasServiceRecipient = _hasServiceRecipient,
                 HasItemUnit = _hasItemUnit,
+                HasTimeUnit = _hasTimeUnit,
                 OdsCode = _odsCode,
                 CatalogueSolutionId = _catalogueSolutionId,
                 CatalogueSolutionName = _catalogueSolutionName,
@@ -143,6 +170,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
                 CurrencyCode = _currencyCode,
                 ItemUnitName = _itemUnitName,
                 ItemUnitNameDescription = _itemUnitNameDescription,
+                TimeUnitName = _timeUnitName,
+                TimeUnitDescription = _timeUnitDescription,
                 Price = _price
             };
         }

@@ -18,6 +18,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
         public DateTime? DeliveryDate { get; set; }
 
         [RequiredWhenProvisioningTypeIn("Declarative", "Patient", ErrorMessage = "TimeUnitRequired")]
-        public string TimeUnit { get; set; }
+        public TimeUnitModel TimeUnit { get; set; }
     }
 }
