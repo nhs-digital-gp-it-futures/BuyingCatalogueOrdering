@@ -577,10 +577,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             {
                 ServiceRecipient = new ServiceRecipientModel
                 {
-                    OdsCode = orderItem.OdsCode
+                    OdsCode = orderItem.OdsCode,
+                    Name = serviceRecipients[0].Name
                 },
                 CatalogueSolutionId = orderItem.CatalogueItemId,
-                CatalogueSolutionName = orderItem.CatalogueItemName,
+                CatalogueItemName = orderItem.CatalogueItemName,
                 CurrencyCode = orderItem.CurrencyCode,
                 DeliveryDate = orderItem.DeliveryDate,
                 EstimationPeriod = orderItem.EstimationPeriod.Name,

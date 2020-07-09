@@ -8,7 +8,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 
         public string CatalogueSolutionId { get; set; }
 
-        public string CatalogueSolutionName { get; set; }
+        public string CatalogueItemName { get; set; }
 
         public DateTime? DeliveryDate { get; set; }
 
