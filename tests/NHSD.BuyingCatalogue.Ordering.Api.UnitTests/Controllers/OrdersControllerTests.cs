@@ -521,7 +521,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         ProvisioningType = orderItem.ProvisioningType.Name,
                         ItemUnitDescription = orderItem.CataloguePriceUnit.Description,
                         Price = orderItem.Price,
-                        Quantity = orderItem.Quantity
+                        Quantity = orderItem.Quantity,
+                        CostPerYear = orderItem.CalculateTotalCostPerYear()
                     }),
             });
         }

@@ -6,17 +6,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class TimeUnit : IEquatable<TimeUnit>
     {
-        public static readonly TimeUnit PerMonth = new TimeUnit(1, "month", "per month");
-        public static readonly TimeUnit PerYear = new TimeUnit(2, "year", "per year");
+        public static readonly TimeUnit PerMonth = new TimeUnit(1, "month", "per month", 12);
+        public static readonly TimeUnit PerYear = new TimeUnit(2, "year", "per year", 1);
 
         private TimeUnit(
-            int id, 
-            string name, 
-            string description)
+            int id,
+            string name,
+            string description,
+            int amountInYear)
         {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
             Description = description ?? throw new ArgumentNullException(nameof(description));
+            AmountInYear = amountInYear;
         }
 
         public int Id { get; }
@@ -24,6 +26,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         public string Name { get; }
 
         public string Description { get; }
+
+        public int AmountInYear { get; }
 
         internal static IEnumerable<TimeUnit> List() => 
             new[] { PerMonth, PerYear };

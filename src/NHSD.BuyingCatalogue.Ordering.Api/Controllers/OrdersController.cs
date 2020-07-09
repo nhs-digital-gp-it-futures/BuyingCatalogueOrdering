@@ -92,7 +92,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                         ItemUnitDescription = orderItem.CataloguePriceUnit.Description,
                         Price = orderItem.Price,
                         Quantity = orderItem.Quantity,
-                        CostPerYear = 0m
+                        CostPerYear = orderItem.CalculateTotalCostPerYear()
                     }),
             };
         }
