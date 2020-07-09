@@ -36,7 +36,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 
             var expectedResult = expectedOrderItems.Select(expectedItems => new
             {
-                ItemId = $"{expectedItems.OrderId}{expectedItems.OdsCode}{expectedItems.OrderItemId}",
+                ItemId = $"{expectedItems.OrderId}-{expectedItems.OdsCode}-{expectedItems.OrderItemId}",
                 ServiceRecipientName = expectedServiceRecipients.FirstOrDefault(serviceRecipient => string.Equals(expectedItems.OdsCode,
                     serviceRecipient.OdsCode, StringComparison.InvariantCulture))?.Name,
                 ServiceRecipientOdsCode = expectedItems.OdsCode,

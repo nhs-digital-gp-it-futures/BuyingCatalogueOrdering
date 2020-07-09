@@ -122,19 +122,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             string catalogueItemTypeFilter,
             IReadOnlyList<ServiceRecipient> serviceRecipients)
         {
-            var items = orderItems.Select(x => new GetOrderItemModel
+            var items = orderItems.Select(orderItem => new GetOrderItemModel
             {
-                ItemId = $"{orderId}{x.OdsCode}{x.OrderItemId}",
+                ItemId = $"{orderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
                 ServiceRecipient = new ServiceRecipientModel
                 {
-                    Name = serviceRecipients.FirstOrDefault(serviceRecipient => string.Equals(x.OdsCode,
+                    Name = serviceRecipients.FirstOrDefault(serviceRecipient => string.Equals(orderItem.OdsCode,
                            serviceRecipient.OdsCode, StringComparison.InvariantCulture))?.Name,
-                    OdsCode = x.OdsCode
+                    OdsCode = orderItem.OdsCode
                 },
-                CataloguePriceType = x.CataloguePriceType.Name,
-                CatalogueItemType = x.CatalogueItemType.Name,
-                CatalogueItemName = x.CatalogueItemName,
-                CatalogueItemId = x.CatalogueItemId,
+                CataloguePriceType = orderItem.CataloguePriceType.Name,
+                CatalogueItemType = orderItem.CatalogueItemType.Name,
+                CatalogueItemName = orderItem.CatalogueItemName,
+                CatalogueItemId = orderItem.CatalogueItemId,
             });
 
             if (catalogueItemTypeFilter != null)

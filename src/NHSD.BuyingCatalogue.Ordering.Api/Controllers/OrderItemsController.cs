@@ -59,7 +59,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             return orderItems
                 .Select(orderItem => new GetOrderItemModel
                 {
-                    ItemId = $"{orderId}{orderItem.OdsCode}{orderItem.OrderItemId}",
+                    ItemId = $"{orderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
                     ServiceRecipient = new ServiceRecipientModel
                     {
                         Name = serviceRecipients.FirstOrDefault(serviceRecipient => string.Equals(orderItem.OdsCode,
