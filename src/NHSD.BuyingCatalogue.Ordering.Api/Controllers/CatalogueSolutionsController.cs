@@ -60,7 +60,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     {
                         OdsCode = x.OdsCode,
                         Name = serviceRecipients.FirstOrDefault(serviceRecipient => string.Equals(x.OdsCode,
-                            serviceRecipient.OdsCode, StringComparison.Ordinal))?.Name
+                            serviceRecipient.OdsCode, StringComparison.InvariantCulture))?.Name
                     }
                 });
 
@@ -96,7 +96,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 {
                     OdsCode = orderItem.OdsCode,
                     Name = serviceRecipients.FirstOrDefault(serviceRecipient => string.Equals(orderItem.OdsCode,
-                        serviceRecipient.OdsCode, StringComparison.Ordinal))?.Name
+                        serviceRecipient.OdsCode, StringComparison.InvariantCulture))?.Name
                 },
                 CatalogueSolutionId = orderItem.CatalogueItemId,
                 CatalogueItemName = orderItem.CatalogueItemName,

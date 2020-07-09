@@ -1,5 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
@@ -12,13 +17,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     [Binding]
     internal sealed class OrderItemSteps
     {
+        private readonly Request _request;
+        private readonly Response _response;
         private readonly Settings _settings;
         private readonly OrderContext _orderContext;
+        private GetOrderItemRequest _getOrderItemRequest;
+        private GetOrderItemResponse _getOrderItemResponse;
 
         public OrderItemSteps(
+            Request request,
+            Response response,
             Settings settings,
             OrderContext orderContext)
         {
+            _request = request;
+            _response = response;
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
             _orderContext = orderContext;
         }
@@ -52,6 +65,38 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             }
         }
 
+        [When(@"the user makes a request to retrieve an order item with orderID (.*) and catalogueItemType (.*)")]
+        public void WhenTheUserMakesARequestToRetrieveAnOrderItemWithOrderIDAndCatalogueItemType(string orderId, string catalogueItemType)
+        {
+            _getOrderItemRequest = new GetOrderItemRequest(
+                _request,
+                _settings.OrderingApiBaseUrl,
+                orderId,
+                catalogueItemType);
+        }
+
+        [When(@"the user sends the order item request")]
+        public async Task WhenTheUserSendsTheOrderItemRequest()
+        {
+            _getOrderItemResponse = await _getOrderItemRequest.ExecuteAsync();
+        }
+
+        [Then(@"the order item response displays the expected order item")]
+        public async Task ThenTheOrderItemResponseDisplaysTheExpectedOrderItem()
+        {
+            var orderItems = _orderContext.OrderItemReferenceList.FindByOrderId(_getOrderItemRequest.OrderId);
+            var serviceRecipients = _orderContext.ServiceRecipientReferenceList.FindByOrderId(_getOrderItemRequest.OrderId);
+
+            await _getOrderItemResponse.AssertAsync(orderItems, serviceRecipients, _getOrderItemRequest.CatalogueItemType);
+        }
+
+        [Then(@"an empty catalougeItem list is returned")]
+        public async Task ThenAnEmptyCatalougeItemListIsReturned()
+        {
+            var orderItems = (await _response.ReadBodyAsJsonAsync());
+            orderItems.Count().Should().Be(0);
+        }
+        
         private sealed class OrderItemTable
         {
             public string OrderId { get; set; }
