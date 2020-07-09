@@ -8,11 +8,11 @@ using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 {
-    internal sealed class GetOrderItemResponse
+    internal sealed class GetOrderItemsResponse
     {
         private readonly Response _response;
 
-        public GetOrderItemResponse(Response response)
+        public GetOrderItemsResponse(Response response)
         {
             _response = response ?? throw new ArgumentNullException(nameof(response));
         }
@@ -34,11 +34,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 CatalogueItemId = orderItem.Value<string>("catalogueItemId")
             });
 
-            var expectedResult = expectedOrderItems.Select(expectedItems => new
+            var expectedItems = expectedOrderItems.Select(expectedItems => new
             {
                 ItemId = $"{expectedItems.OrderId}-{expectedItems.OdsCode}-{expectedItems.OrderItemId}",
                 ServiceRecipientName = expectedServiceRecipients.FirstOrDefault(serviceRecipient => string.Equals(expectedItems.OdsCode,
-                    serviceRecipient.OdsCode, StringComparison.InvariantCulture))?.Name,
+                    serviceRecipient.OdsCode, StringComparison.OrdinalIgnoreCase))?.Name,
                 ServiceRecipientOdsCode = expectedItems.OdsCode,
                 CataloguePriceType = expectedItems.CataloguePriceType.ToString(),
                 CatalogueItemType = expectedItems.CatalogueItemType.ToString(),
@@ -48,10 +48,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 
             if (catalogueItemType != null)
             {
-                expectedResult = expectedResult.Where(x => x.CatalogueItemType == catalogueItemType);
+                expectedItems = expectedItems.Where(x => x.CatalogueItemType.Equals(
+                    catalogueItemType, StringComparison.OrdinalIgnoreCase));
             }
 
-            orderItems.Should().BeEquivalentTo(expectedResult);
+            orderItems.Should().BeEquivalentTo(expectedItems);
         }
     }
 }

@@ -66,6 +66,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [TestCase("Solution")]
         [TestCase("AdditionalService")]
         [TestCase("AssociatedService")]
+        [TestCase("SOLutiON")]
+        [TestCase("ADDitIONalServiCE")]
+        [TestCase("associatedSERVICe")]
         public async Task GetAllAsync_OrderExistsWithFilter_ReturnsListOfOrderItems(string catalogueItemTypeFilter)
         {
             var context = OrderItemsControllerTestContext.Setup();
@@ -93,7 +96,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             result.Value.Should().BeOfType<List<GetOrderItemModel>>();
 
             var expectedOrderItems =
-                CreateOrderItemModel(
+                CreateOrderItemModels(
                     new List<OrderItem>
                     {
                         solutionOrderItem1,
@@ -116,7 +119,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .Build();
         }
 
-        private static IEnumerable<GetOrderItemModel> CreateOrderItemModel(
+        private static IEnumerable<GetOrderItemModel> CreateOrderItemModels(
             IEnumerable<OrderItem> orderItems,
             string orderId,
             string catalogueItemTypeFilter,
@@ -128,7 +131,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 ServiceRecipient = new ServiceRecipientModel
                 {
                     Name = serviceRecipients.FirstOrDefault(serviceRecipient => string.Equals(orderItem.OdsCode,
-                           serviceRecipient.OdsCode, StringComparison.InvariantCulture))?.Name,
+                           serviceRecipient.OdsCode, StringComparison.OrdinalIgnoreCase))?.Name,
                     OdsCode = orderItem.OdsCode
                 },
                 CataloguePriceType = orderItem.CataloguePriceType.Name,
@@ -139,7 +142,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             if (catalogueItemTypeFilter != null)
             {
-                items = items.Where(x => x.CatalogueItemType == catalogueItemTypeFilter);
+                items = items.Where(x =>
+                    x.CatalogueItemType.Equals(catalogueItemTypeFilter, StringComparison.OrdinalIgnoreCase));
             }
 
             return items;

@@ -63,7 +63,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     ServiceRecipient = new ServiceRecipientModel
                     {
                         Name = serviceRecipients.FirstOrDefault(serviceRecipient => string.Equals(orderItem.OdsCode,
-                            serviceRecipient.OdsCode, StringComparison.InvariantCulture))?.Name,
+                            serviceRecipient.OdsCode, StringComparison.OrdinalIgnoreCase))?.Name,
                         OdsCode = orderItem.OdsCode
                     },
                     CataloguePriceType = orderItem.CataloguePriceType.Name,

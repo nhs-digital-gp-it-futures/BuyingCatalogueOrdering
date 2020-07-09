@@ -6,6 +6,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
     public sealed class StepArgumentTransformation
     {
         [StepArgumentTransformation]
-        internal static string ParseStringToNull(string nullString) => nullString is "NULL" ? null : nullString;
+        internal static string ParseStringToNull(string nullString) => string.Equals(nullString, "NULL") ? null : nullString;
     }
 }

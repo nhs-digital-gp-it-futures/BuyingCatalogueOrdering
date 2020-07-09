@@ -7,9 +7,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
     {
         private IOrderRepository _orderRepository;
 
-        public OrderItemsControllerBuilder()
+        private OrderItemsControllerBuilder()
         {
-            
         }
 
         internal static OrderItemsControllerBuilder Create()

@@ -21,8 +21,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private readonly Response _response;
         private readonly Settings _settings;
         private readonly OrderContext _orderContext;
-        private GetOrderItemRequest _getOrderItemRequest;
-        private GetOrderItemResponse _getOrderItemResponse;
+        private GetOrderItemsRequest _getOrderItemsRequest;
+        private GetOrderItemsResponse _getOrderItemsResponse;
 
         public OrderItemSteps(
             Request request,
@@ -69,32 +69,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             }
         }
 
-        [When(@"the user makes a request to retrieve an order item with orderID (.*) and catalogueItemType (.*)")]
+        [When(@"the user makes a request to retrieve a list of order items with orderID (.*) and catalogueItemType (.*)")]
         public void WhenTheUserMakesARequestToRetrieveAnOrderItemWithOrderIDAndCatalogueItemType(string orderId, string catalogueItemType)
         {
-            _getOrderItemRequest = new GetOrderItemRequest(
+            _getOrderItemsRequest = new GetOrderItemsRequest(
                 _request,
                 _settings.OrderingApiBaseUrl,
                 orderId,
                 catalogueItemType);
         }
 
-        [When(@"the user sends the order item request")]
+        [When(@"the user sends the retrieve a list of order items request")]
         public async Task WhenTheUserSendsTheOrderItemRequest()
         {
-            _getOrderItemResponse = await _getOrderItemRequest.ExecuteAsync();
+            _getOrderItemsResponse = await _getOrderItemsRequest.ExecuteAsync();
         }
 
-        [Then(@"the order item response displays the expected order item")]
+        [Then(@"the order item response displays the expected order items")]
         public async Task ThenTheOrderItemResponseDisplaysTheExpectedOrderItem()
         {
-            var orderItems = _orderContext.OrderItemReferenceList.FindByOrderId(_getOrderItemRequest.OrderId);
-            var serviceRecipients = _orderContext.ServiceRecipientReferenceList.FindByOrderId(_getOrderItemRequest.OrderId);
+            var orderItems = _orderContext.OrderItemReferenceList.FindByOrderId(_getOrderItemsRequest.OrderId);
+            var serviceRecipients = _orderContext.ServiceRecipientReferenceList.FindByOrderId(_getOrderItemsRequest.OrderId);
 
-            await _getOrderItemResponse.AssertAsync(orderItems, serviceRecipients, _getOrderItemRequest.CatalogueItemType);
+            await _getOrderItemsResponse.AssertAsync(orderItems, serviceRecipients, _getOrderItemsRequest.CatalogueItemType);
         }
 
-        [Then(@"an empty catalogueItem list is returned")]
+        [Then(@"the list order items response contains no entries")]
         public async Task ThenAnEmptyCatalougeItemListIsReturned()
         {
             var orderItems = (await _response.ReadBodyAsJsonAsync());
