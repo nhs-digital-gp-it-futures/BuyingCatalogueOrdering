@@ -54,6 +54,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithPricingUnitName(orderItemTableItem.CataloguePriceUnitName)
                     .WithPricingUnitDescription(orderItemTableItem.CataloguePriceUnitDescription)
                     .WithPrice(orderItemTableItem.Price)
+                    .WithTimeUnit(orderItemTableItem.PriceTimeUnit)
                     .WithProvisioningType(orderItemTableItem.ProvisioningType)
                     .WithQuantity(orderItemTableItem.Quantity)
                     .Build();
@@ -61,6 +62,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 var orderItemId = await orderItemEntity.InsertAsync<int>(_settings.ConnectionString);
                 orderItemEntity.OrderItemId = orderItemId;
 
+                // temporarily removing these from the reference list as they are not returned by the GET
+                orderItemEntity.TimeUnit = null;
+                orderItemEntity.EstimationPeriod = null;
                 _orderContext.OrderItemReferenceList.Add(orderItemEntity.CatalogueItemName, orderItemEntity);
             }
         }
@@ -115,7 +119,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             public string CataloguePriceUnitDescription { get; set; } = "per patient";
 
-            public TimeUnit PriceTimeUnit { get; set; }
+            public TimeUnit? PriceTimeUnit { get; set; } = null;
 
             public string CurrencyCode { get; set; } = "GBP";
 

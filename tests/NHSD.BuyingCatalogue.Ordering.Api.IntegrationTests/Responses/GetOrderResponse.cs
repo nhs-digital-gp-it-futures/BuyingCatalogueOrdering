@@ -19,6 +19,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
             _response = response ?? throw new ArgumentNullException(nameof(response));
         }
 
+        public async Task AssertOrderItemCost(string orderItemId, decimal orderItemCost)
+        {
+            var responseContent = await _response.ReadBodyAsJsonAsync();
+            var orderItems = responseContent.SelectToken("orderItems");
+            var item = orderItems.FirstOrDefault(x => x.SelectToken("catalogueItemName") != null);
+            item.Should().NotBeNull();
+            item.Value<decimal>("costPerYear").Should().Be(orderItemCost);
+        }
+
         public async Task AssertAsync(OrderEntity expectedOrder, IEnumerable<OrderItemEntity> expectedOrderItems, IEnumerable<ServiceRecipientEntity> expectedServiceRecipients)
         {
             var responseContent = await _response.ReadBodyAsJsonAsync();

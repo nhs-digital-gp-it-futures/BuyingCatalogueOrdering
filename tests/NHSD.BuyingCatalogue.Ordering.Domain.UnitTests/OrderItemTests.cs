@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders;
 using NUnit.Framework;
@@ -253,6 +252,70 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             var expected = orderItemComparison.GetHashCode();
 
             actual.Should().NotBe(expected);
+        }
+
+        [Test]
+        public void CalculateCost_WithPriceTypePerMonth_CalculatesCostCorrectly()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithPrice(1m)
+                .WithQuantity(10)
+                .WithPriceTimeUnit(TimeUnit.PerMonth)
+                .Build();
+            orderItem.CalculateTotalCostPerYear().Should().Be(120);
+        }
+
+        [Test]
+        public void CalculateCost_WithPriceTypePerYear_CalculatesCostCorrectly()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithPrice(1m)
+                .WithQuantity(10)
+                .WithPriceTimeUnit(TimeUnit.PerYear)
+                .Build();
+            orderItem.CalculateTotalCostPerYear().Should().Be(10);
+        }
+
+        [Test]
+        public void CalculateTotalCostPerYear_WithEstimationPeriodPerMonth_CalculatesCorrectly()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithPrice(0.1m)
+                .WithQuantity(10)
+                .WithPriceTimeUnit(null)
+                .WithEstimationPeriod(TimeUnit.PerMonth)
+                .Build();
+            orderItem.CalculateTotalCostPerYear().Should().Be(12);
+        }
+
+        [Test]
+        public void CalculateTotalCostPerYear_WithEstimationPeriodPerYear_CalculatesCorrectly()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithPrice(0.1m)
+                .WithQuantity(10)
+                .WithPriceTimeUnit(null)
+                .WithEstimationPeriod(TimeUnit.PerYear)
+                .Build();
+            orderItem.CalculateTotalCostPerYear().Should().Be(1);
+        }
+
+        [Test]
+        public void CalculateCost_WithNoPriceTypeOrEstimationPeriod_ThrowsException()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithPrice(1m)
+                .WithQuantity(10)
+                .WithPriceTimeUnit(null)
+                .WithEstimationPeriod(null)
+                .Build();
+
+            Assert.Throws<InvalidOperationException>(() => orderItem.CalculateTotalCostPerYear());
         }
     }
 }
