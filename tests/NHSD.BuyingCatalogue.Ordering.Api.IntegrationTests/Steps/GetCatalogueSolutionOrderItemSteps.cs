@@ -58,7 +58,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             {
                 ServiceRecipientOdsCode = response.SelectToken(serviceRecipientToken).Value<string>("odsCode"),
                 ServiceRecipientName = response.SelectToken(serviceRecipientToken).Value<string>("name"),
-                CatalogueSolutionId = response.Value<string>("catalogueSolutionId"),
+                CatalogueItemId = response.Value<string>("catalogueItemId"),
                 CatalogueItemName = response.Value<string>("catalogueItemName"),
                 CurrencyCode = response.Value<string>("currencyCode"),
                 DeliveryDate = response.Value<DateTime?>("deliveryDate"),
@@ -78,7 +78,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             public string ServiceRecipientOdsCode { get; set; }
             public string ServiceRecipientName { get; set; }
-            public string CatalogueSolutionId { get; set; }
+            public string CatalogueItemId { get; set; }
             public string CatalogueItemName { get; set; }
             public string CurrencyCode { get; set; }
             public DateTime? DeliveryDate { get; set; }

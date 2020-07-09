@@ -22,8 +22,8 @@ Scenario: 1. Get a order item
     When the user makes a request to retrieve an order catalogue solution With orderID C000014-01 and CatalogueItemName Sol1
     Then a response with status code 200 is returned
     And the catalogue solutions response contains a single solution
-        | ServiceRecipientOdsCode | ServiceRecipientName | CatalogueSolutionId | CatalogueItemName | CurrencyCode | DeliveryDate | EstimationPeriod | ItemUnitName | ItemUnitDescription | Price  | ProvisioningType | Quantity | Type |
-        | eu                      | EU Test              | Cat Item 1          | Sol1              | GBP          | 01/01/2021   | month            | Tier         | Desc                | 461.34 | Declarative      | 5        | Flat |
+        | ServiceRecipientOdsCode | ServiceRecipientName | CatalogueItemId | CatalogueItemName | CurrencyCode | DeliveryDate | EstimationPeriod | ItemUnitName | ItemUnitDescription | Price  | ProvisioningType | Quantity | Type |
+        | eu                      | EU Test              | Cat Item 1      | Sol1              | GBP          | 01/01/2021   | month            | Tier         | Desc                | 461.34 | Declarative      | 5        | Flat |
 
 @7840
 Scenario: 2. A order item type that isn't solution, returns not found
