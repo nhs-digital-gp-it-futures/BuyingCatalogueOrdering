@@ -90,7 +90,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _getOrderItemResponse.AssertAsync(orderItems, serviceRecipients, _getOrderItemRequest.CatalogueItemType);
         }
 
-        [Then(@"an empty catalougeItem list is returned")]
+        [Then(@"an empty catalogueItem list is returned")]
         public async Task ThenAnEmptyCatalougeItemListIsReturned()
         {
             var orderItems = (await _response.ReadBodyAsJsonAsync());

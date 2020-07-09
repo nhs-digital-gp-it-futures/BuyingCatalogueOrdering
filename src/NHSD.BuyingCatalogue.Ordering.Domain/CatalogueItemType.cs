@@ -37,7 +37,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             }
 
             return List().SingleOrDefault(catalogueItemType =>
-                name.Equals(catalogueItemType.Name, StringComparison.CurrentCultureIgnoreCase));
+                name.Equals(catalogueItemType.Name, StringComparison.OrdinalIgnoreCase));
         }
 
         public bool Equals(CatalogueItemType other)

@@ -53,7 +53,7 @@ Scenario: 4. Passing through an invalid catalogue item type, returns an empty li
     When the user makes a request to retrieve an order item with orderID C000014-01 and catalogueItemType INVALID
     When the user sends the order item request
     Then a response with status code 200 is returned
-    And an empty catalougeItem list is returned
+    And an empty catalogueItem list is returned
 
 @5124
 Scenario: 5. If a user is not authorised then they cannot access the order items
