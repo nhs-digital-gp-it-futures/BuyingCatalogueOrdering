@@ -34,16 +34,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 CatalogueItemId = orderItem.Value<string>("catalogueItemId")
             });
 
-            var expectedItems = expectedOrderItems.Select(expectedItems => new
+            var expectedItems = expectedOrderItems.Select(expectedItem => new
             {
-                ItemId = $"{expectedItems.OrderId}-{expectedItems.OdsCode}-{expectedItems.OrderItemId}",
-                ServiceRecipientName = expectedServiceRecipients.FirstOrDefault(serviceRecipient => string.Equals(expectedItems.OdsCode,
+                ItemId = $"{expectedItem.OrderId}-{expectedItem.OdsCode}-{expectedItem.OrderItemId}",
+                ServiceRecipientName = expectedServiceRecipients.FirstOrDefault(serviceRecipient => string.Equals(expectedItem.OdsCode,
                     serviceRecipient.OdsCode, StringComparison.OrdinalIgnoreCase))?.Name,
-                ServiceRecipientOdsCode = expectedItems.OdsCode,
-                CataloguePriceType = expectedItems.CataloguePriceType.ToString(),
-                CatalogueItemType = expectedItems.CatalogueItemType.ToString(),
-                expectedItems.CatalogueItemName,
-                expectedItems.CatalogueItemId
+                ServiceRecipientOdsCode = expectedItem.OdsCode,
+                CataloguePriceType = expectedItem.CataloguePriceType.ToString(),
+                CatalogueItemType = expectedItem.CatalogueItemType.ToString(),
+                expectedItem.CatalogueItemName,
+                expectedItem.CatalogueItemId
             });
 
             if (catalogueItemType != null)
