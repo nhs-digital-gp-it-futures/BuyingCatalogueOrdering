@@ -6,6 +6,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
     {
 #pragma warning disable 649
         private int _orderItemId;
+        private DateTime _created;
 #pragma warning restore 649
 
         /// <summary>
@@ -52,6 +53,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public decimal? Price { get; private set; }
 
+        public DateTime Created 
+        {
+            get
+            {
+                return _created;
+            }
+        }
+
         private OrderItem()
         {
         }
@@ -93,6 +102,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             EstimationPeriod = estimationPeriod;
             DeliveryDate = deliveryDate;
             Price = price;
+            _created = DateTime.UtcNow;
         }
 
         public decimal CalculateTotalCostPerYear()
