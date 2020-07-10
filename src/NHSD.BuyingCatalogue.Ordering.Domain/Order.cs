@@ -107,7 +107,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 return;
 
             _orderItems.Add(orderItem);
-            CatalogueSolutionsViewed = true;
+            orderItem.MarkOrderSectionAsViewed(this);
+
             SetLastUpdatedBy(userId, name);
         }
 
