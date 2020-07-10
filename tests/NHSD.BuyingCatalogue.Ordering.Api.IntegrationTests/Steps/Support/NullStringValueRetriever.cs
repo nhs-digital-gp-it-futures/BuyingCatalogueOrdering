@@ -9,7 +9,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
         private const string NullString = "NULL";
 
         public bool CanRetrieve(KeyValuePair<string, string> keyValuePair, Type targetType, Type propertyType)
-            => propertyType == typeof(string) && IsNullValueMatch(keyValuePair.Value);
+            => IsNullValueMatch(keyValuePair.Value);
 
         public object Retrieve(KeyValuePair<string, string> keyValuePair, Type targetType, Type propertyType)
             => null;

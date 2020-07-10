@@ -31,6 +31,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                 {"missing-item-unit", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithHasItemUnit(false).Build()},
                 {"missing-item-unit-name", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithItemUnitName(null).Build()},
                 {"missing-item-unit-description", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithItemUnitNameDescription(null).Build()},
+                {"missing-time-unit", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithProvisioningType(ProvisioningType.Patient).WithHasTimeUnit(false).Build()},
+                {"missing-time-unit-name", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithProvisioningType(ProvisioningType.Patient).WithTimeUnitName(null).Build()},
+                {"missing-time-unit-description", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithProvisioningType(ProvisioningType.Patient).WithTimeUnitDescription(null).Build()},
                 {"missing-provisioning-type", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithProvisioningType(null).Build()},
                 {"missing-type", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithCataloguePriceType(null).Build()},
                 {"missing-currency-code", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithCurrencyCode(null).Build()},
@@ -92,7 +95,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                             Name = Payload.ItemUnitName, 
                             Description = Payload.ItemUnitNameDescription
                         } : null,
-                    Payload.Price
+                    Payload.Price,
+                    TimeUnit = Payload.HasTimeUnit ? 
+                        new
+                        {
+                            Name = Payload.TimeUnitName,
+                            Description = Payload.TimeUnitDescription
+                        } : null
                 };
             }
 
@@ -130,6 +139,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                 .WithPricingUnitName(Payload.ItemUnitName)
                 .WithPricingUnitDescription(Payload.ItemUnitNameDescription)
                 .WithPrice(Payload.Price)
+                .WithTimeUnit((TimeUnit?)Enum.Parse(typeof(TimeUnit), Payload.TimeUnitName, true))
                 .Build();
 
             actual.Should().BeEquivalentTo(expected, 

@@ -51,5 +51,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             await _getOrderResponse.AssertAsync(order, orderItems, serviceRecipients);
         }
+
+        [Then(@"the get order response contains a yearly value of (.*) for order item with name '(.*)'")]
+        public async Task ThenTheGetOrderResponseContainsYearlyValue(decimal amount, string orderItemName)
+        {
+            await _getOrderResponse.AssertOrderItemCost(orderItemName, amount);
+        }
     }
 }
