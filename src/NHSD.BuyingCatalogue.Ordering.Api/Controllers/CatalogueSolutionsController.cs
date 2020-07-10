@@ -54,6 +54,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             var catalogueSolutionModel = order.OrderItems.Where(y => y.CatalogueItemType.Equals(CatalogueItemType.Solution))
                 .Select(x => new CatalogueSolutionModel
                 {
+                    CatalogueItemId = x.CatalogueItemId,
                     OrderItemId = x.OrderItemId,
                     SolutionName = x.CatalogueItemName,
                     ServiceRecipient = new GetServiceRecipientModel
@@ -98,7 +99,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     Name = serviceRecipients.FirstOrDefault(serviceRecipient => string.Equals(orderItem.OdsCode,
                         serviceRecipient.OdsCode, StringComparison.OrdinalIgnoreCase))?.Name
                 },
-                CatalogueSolutionId = orderItem.CatalogueItemId,
+                CatalogueItemId = orderItem.CatalogueItemId,
                 CatalogueItemName = orderItem.CatalogueItemName,
                 CurrencyCode = orderItem.CurrencyCode,
                 DeliveryDate = orderItem.DeliveryDate,

@@ -580,7 +580,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     OdsCode = orderItem.OdsCode,
                     Name = serviceRecipients[0].Name
                 },
-                CatalogueSolutionId = orderItem.CatalogueItemId,
+                CatalogueItemId = orderItem.CatalogueItemId,
                 CatalogueItemName = orderItem.CatalogueItemName,
                 CurrencyCode = orderItem.CurrencyCode,
                 DeliveryDate = orderItem.DeliveryDate,
@@ -683,6 +683,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             return new CatalogueSolutionModel
             {
+                CatalogueItemId = orderItem.CatalogueItemId,
                 OrderItemId = orderItem.OrderItemId,
                 SolutionName = orderItem.CatalogueItemName,
                 ServiceRecipient = new GetServiceRecipientModel

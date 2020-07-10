@@ -6,7 +6,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
     {
         public ServiceRecipientModel ServiceRecipient { get; set; }
 
-        public string CatalogueSolutionId { get; set; }
+        public string CatalogueItemId { get; set; }
 
         public string CatalogueItemName { get; set; }
 
