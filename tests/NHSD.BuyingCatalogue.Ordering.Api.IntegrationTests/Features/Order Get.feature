@@ -21,7 +21,7 @@ Background:
         | OrderId    | CatalogueItemId | CatalogueItemName | CatalogueItemType | OdsCode | CataloguePriceUnitDescription | Price   | ProvisioningType | Quantity | PriceTimeUnit | EstimationPeriod |
         | C000014-01 | Cat Item 1      | Sol1              | Solution          | eu      | Desc                          | 461.34  | OnDemand         | 5        | Null          | Month            |
         | C000014-01 | Cat Item 2      | Sol2              | AssociatedService | au      | Desc                          | 721.34  | Declarative      | 2        | Month         | Null             |
-        | C000014-01 | Cat Item 3      | Sol3              | AdditionalService | eu      | Desc                          | 3532.12 | Patient          | 1        | Year          | Null             |
+        | C000014-01 | Cat Item 3      | Sol3              | AdditionalService | eu      | Desc                          | 3532.12 | Patient          | 1        | Year          | Year             |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @8122

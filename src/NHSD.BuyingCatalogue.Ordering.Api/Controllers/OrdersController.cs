@@ -90,6 +90,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                         CatalogueItemName = orderItem.CatalogueItemName,
                         ProvisioningType = orderItem.ProvisioningType.Name,
                         ItemUnitDescription = orderItem.CataloguePriceUnit.Description,
+                        TimeUnitDescription = orderItem.PriceTimeUnit?.Description,
+                        QuantityPeriodDescription = orderItem.EstimationPeriod?.Description,
                         Price = orderItem.Price,
                         Quantity = orderItem.Quantity,
                         CostPerYear = orderItem.CalculateTotalCostPerYear()
