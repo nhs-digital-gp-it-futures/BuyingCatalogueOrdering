@@ -62,9 +62,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 var orderItemId = await orderItemEntity.InsertAsync<int>(_settings.ConnectionString);
                 orderItemEntity.OrderItemId = orderItemId;
 
-                // temporarily removing these from the reference list as they are not returned by the GET
-                orderItemEntity.TimeUnit = null;
-                orderItemEntity.EstimationPeriod = null;
                 _orderContext.OrderItemReferenceList.Add(orderItemEntity.CatalogueItemName, orderItemEntity);
             }
         }

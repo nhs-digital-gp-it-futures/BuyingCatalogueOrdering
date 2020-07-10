@@ -30,7 +30,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _provisioningType = ProvisioningType.Patient; 
             _cataloguePriceType = CataloguePriceType.Flat;
             _cataloguePriceUnit = CataloguePriceUnit.Create("patients", "per patient");
-            _priceTimeUnit = null;
+            _priceTimeUnit = TimeUnit.PerMonth;
             _currencyCode = "GBP"; 
             _quantity = 10;
             _estimationPeriod = TimeUnit.PerYear;
