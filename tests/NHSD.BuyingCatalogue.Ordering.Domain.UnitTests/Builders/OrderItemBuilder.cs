@@ -147,14 +147,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders
                 _quantity,
                 _estimationPeriod,
                 _deliveryDate,
-                _price,
-                _created);
+                _price);
 
             if (_orderItemId.HasValue)
             {
                 var fieldInfo = orderItem.GetType().GetField("_orderItemId", BindingFlags.Instance|BindingFlags.NonPublic);
                 fieldInfo?.SetValue(orderItem, _orderItemId.Value);
             }
+
+            var createdFieldInfo = orderItem.GetType().GetField("_created", BindingFlags.Instance | BindingFlags.NonPublic);
+            createdFieldInfo?.SetValue(orderItem, _created);
 
             return orderItem;
         }

@@ -54,8 +54,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
                 request.Quantity,
                 estimationPeriod,
                 request.DeliveryDate,
-                request.Price,
-                DateTime.UtcNow);
+                request.Price);
 
             Order order = request.Order;
             order.AddOrderItem(orderItem,
