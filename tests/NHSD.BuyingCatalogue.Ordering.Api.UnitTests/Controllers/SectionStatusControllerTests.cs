@@ -1,22 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
-using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Domain;
-using NHSD.BuyingCatalogue.Ordering.Domain.Results;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
@@ -28,10 +23,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public void Constructor_NullParameter_ThrowsArgumentNullException()
         {
-            var sectonControllerBuilder = SectionStatusControllerBuilder
+            var sectionControllerBuilder = SectionStatusControllerBuilder
                 .Create()
                 .WithOrderRepository(null);
-            Assert.Throws<ArgumentNullException>(() => sectonControllerBuilder.Build());
+
+            Assert.Throws<ArgumentNullException>(() => sectionControllerBuilder.Build());
         }
 
         [Test]
@@ -40,7 +36,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = SectionStatusControllerTestContext.Setup();
 
             var response =
-                await context.SectionStatusController.UpdateStatusAsync("INVALID", SectionModel.AdditionalServices.Id, new UpdateOrderSectionModel { Status = "complete"});
+                await context.SectionStatusController.UpdateStatusAsync("INVALID", SectionModel.AdditionalServices.Id, new UpdateOrderSectionModel { Status = "complete" });
             response.Should().BeOfType<NotFoundResult>();
         }
 
@@ -52,7 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             const string orderId = "C0000014-01";
             context.Order = CreateGetTestData(orderId, Guid.NewGuid(), "ods");
 
-            var response = await context.SectionStatusController.UpdateStatusAsync(orderId, SectionModel.AdditionalServices.Id, new UpdateOrderSectionModel { Status = "complete" }); 
+            var response = await context.SectionStatusController.UpdateStatusAsync(orderId, SectionModel.AdditionalServices.Id, new UpdateOrderSectionModel { Status = "complete" });
             response.Should().BeOfType<ForbidResult>();
         }
 
@@ -89,9 +85,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             const string orderId = "C0000014-01";
             context.Order = CreateGetTestData(orderId, context.PrimaryOrganisationId, "ods");
 
-            var response = await context.SectionStatusController.UpdateStatusAsync(orderId, "additional-services", new UpdateOrderSectionModel { Status = "complete" });
-            response.Should().BeOfType<NoContentResult>();
-            context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o=>o.AdditionalServicesViewed == true)));
+            await context.SectionStatusController.UpdateStatusAsync(orderId, "additional-services", new UpdateOrderSectionModel { Status = "complete" });
+
+            context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o => o.AdditionalServicesViewed == true)));
             context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o => o.CatalogueSolutionsViewed == false)));
             context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o => o.ServiceRecipientsViewed == false)));
         }
@@ -113,22 +109,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         private static Order CreateGetTestData(string orderId, Guid organisationId, string odsCode)
         {
-            var repositoryOrder = OrderBuilder.Create()
-                .WithOrderId(orderId)
-                .WithOrganisationId(organisationId)
-                .Build();
-
             var repositoryOrderItem = OrderItemBuilder.Create()
                 .WithOdsCode(odsCode)
                 .Build();
 
-            var serviceRecipients = new List<(string Ods, string Name)>
-            {
-                (odsCode, "EU test")
-            };
-
-            repositoryOrder.AddOrderItem(repositoryOrderItem, Guid.Empty, string.Empty);
-            repositoryOrder.SetServiceRecipient(serviceRecipients, Guid.Empty, string.Empty);
+            var repositoryOrder = OrderBuilder.Create()
+                .WithOrderId(orderId)
+                .WithOrganisationId(organisationId)
+                .WithOrderItem(repositoryOrderItem)
+                .WithServiceRecipient((odsCode, "EU test"))
+                .Build();
 
             return repositoryOrder;
         }

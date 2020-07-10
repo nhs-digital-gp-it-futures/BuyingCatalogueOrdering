@@ -58,5 +58,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var orderItem = await OrderItemEntity.FetchByCatalogueItemName(_settings.ConnectionString, _createCatalogueSolutionOrderItemRequest.Payload.CatalogueSolutionName);
             (await _createCatalogueSolutionOrderItemResponse.GetOrderItemIdAsync()).Should().Be(orderItem.OrderItemId);
         }
+
+        [Then(@"the catalogue solution order section is marked as complete")]
+        public async Task WhenTheCatalogueSolutionOrderSectionIsMarkedAsComplete()
+        {
+            var orderEntity = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, _createCatalogueSolutionOrderItemRequest.OrderId);
+            orderEntity.CatalogueSolutionsViewed.Should().BeTrue();
+        }
     }
 }

@@ -5,8 +5,8 @@
 
 Background:
     Given Orders exist
-        | OrderId    | Description      | OrganisationId                       | LastUpdatedByName | LastUpdatedBy                        | CommencementDate |
-        | C000014-01 | Some Description | 4af62b99-638c-4247-875e-965239cd0c48 | Tom Smith         | 335392e4-4bb1-413b-9de5-36a85c9c0422 | 01/01/2021       |
+        | OrderId    | Description      | OrganisationId                       | LastUpdatedByName | LastUpdatedBy                        | CommencementDate | CatalogueSolutionsViewed |
+        | C000014-01 | Some Description | 4af62b99-638c-4247-875e-965239cd0c48 | Tom Smith         | 335392e4-4bb1-413b-9de5-36a85c9c0422 | 01/01/2021       | false                    |
     And Service Recipients exist
         | OdsCode | Name              | OrderId    |
         | ODS1    | Service Recipient | C000014-01 |
@@ -78,3 +78,10 @@ Scenario: 8. Service Failure
     And the user enters the 'complete' create catalogue solution order item request payload
     When the user sends the create catalogue solution order item request
     Then a response with status code 500 is returned
+
+@7840
+Scenario: 9. Create catalogue solution order item and the catalogue solution order section should be marked as complete
+    Given the user creates a request to add a new catalogue solution order item to the order with ID 'C000014-01'
+    And the user enters the 'complete' create catalogue solution order item request payload
+    When the user sends the create catalogue solution order item request
+    Then the catalogue solution order section is marked as complete

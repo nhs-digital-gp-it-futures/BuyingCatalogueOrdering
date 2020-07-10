@@ -38,6 +38,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
+        public void AddOrderItem_OrderItem_CatalogueSolutionsViewedReturnsTrue()
+        {
+            var order = OrderBuilder
+                .Create()
+                .WithCatalogueSolutionsViewed(false)
+                .Build();
+
+            var orderItem = OrderItemBuilder
+                .Create()
+                .Build();
+
+            order.AddOrderItem(orderItem, Guid.Empty, String.Empty);
+
+            order.CatalogueSolutionsViewed.Should().BeTrue();
+        }
+
+        [Test]
         public void AddOrderItem_AddSameOrderItem_ReturnsOneOrderItem()
         {
             var order = OrderBuilder.Create().Build();
