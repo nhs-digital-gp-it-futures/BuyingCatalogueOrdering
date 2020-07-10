@@ -34,11 +34,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 CatalogueItemId = orderItem.Value<string>("catalogueItemId")
             });
 
-            var expectedItems = expectedOrderItems.Select(expectedItem => new
+            var expectedItems = expectedOrderItems
+                .OrderBy(expectedItem => expectedItem.Created)
+                .Select(expectedItem => new
             {
                 ItemId = $"{expectedItem.OrderId}-{expectedItem.OdsCode}-{expectedItem.OrderItemId}",
-                ServiceRecipientName = expectedServiceRecipients.FirstOrDefault(serviceRecipient => string.Equals(expectedItem.OdsCode,
-                    serviceRecipient.OdsCode, StringComparison.OrdinalIgnoreCase))?.Name,
+                ServiceRecipientName = expectedServiceRecipients.FirstOrDefault(serviceRecipient =>
+                    string.Equals(expectedItem.OdsCode,
+                        serviceRecipient.OdsCode, StringComparison.OrdinalIgnoreCase))?.Name,
                 ServiceRecipientOdsCode = expectedItem.OdsCode,
                 CataloguePriceType = expectedItem.CataloguePriceType.ToString(),
                 CatalogueItemType = expectedItem.CatalogueItemType.ToString(),
@@ -52,7 +55,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                     catalogueItemType, StringComparison.OrdinalIgnoreCase));
             }
 
-            orderItems.Should().BeEquivalentTo(expectedItems);
+            orderItems.Should().BeEquivalentTo(expectedItems, options => options.WithStrictOrdering());
         }
     }
 }

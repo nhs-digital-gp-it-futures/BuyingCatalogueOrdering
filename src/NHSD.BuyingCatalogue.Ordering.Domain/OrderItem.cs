@@ -52,6 +52,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public decimal? Price { get; private set; }
 
+        public DateTime Created { get; set; }
+
         private OrderItem()
         {
         }
@@ -69,7 +71,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             int quantity,
             TimeUnit estimationPeriod,
             DateTime? deliveryDate,
-            decimal? price) : this()
+            decimal? price,
+            DateTime created) : this()
         {
             if (string.IsNullOrWhiteSpace(catalogueItemId))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(catalogueItemId));
@@ -93,6 +96,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             EstimationPeriod = estimationPeriod;
             DeliveryDate = deliveryDate;
             Price = price;
+            Created = created;
         }
 
         public decimal CalculateTotalCostPerYear()

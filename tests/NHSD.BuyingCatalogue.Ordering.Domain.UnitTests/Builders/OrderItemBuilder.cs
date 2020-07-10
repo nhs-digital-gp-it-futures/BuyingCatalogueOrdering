@@ -19,6 +19,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders
         private TimeUnit _estimationPeriod;
         private DateTime? _deliveryDate;
         private decimal? _price;
+        private DateTime _created;
 
         private OrderItemBuilder()
         {
@@ -35,6 +36,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders
             _estimationPeriod = TimeUnit.PerYear;
             _deliveryDate = DateTime.UtcNow;
             _price = 2.000m;
+            _created = DateTime.UtcNow;
         }
 
         public static OrderItemBuilder Create() => 
@@ -124,6 +126,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders
             return this;
         }
 
+        public OrderItemBuilder WithCreated(DateTime created)
+        {
+            _created = created;
+            return this;
+        }
+
         public OrderItem Build()
         {
             var orderItem = new OrderItem(
@@ -139,7 +147,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders
                 _quantity,
                 _estimationPeriod,
                 _deliveryDate,
-                _price);
+                _price,
+                _created);
 
             if (_orderItemId.HasValue)
             {

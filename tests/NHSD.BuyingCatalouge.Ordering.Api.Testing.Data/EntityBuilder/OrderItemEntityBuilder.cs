@@ -23,7 +23,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
         private string _pricingUnitName;
         private string _pricingUnitDescription;
         private decimal? _price;
-        private readonly DateTime _created;
+        private DateTime _created;
         private readonly DateTime _lastUpdated;
 
         private OrderItemEntityBuilder(
@@ -216,6 +216,12 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
         public OrderItemEntityBuilder WithPrice(decimal? price)
         {
             _price = price;
+            return this;
+        }
+
+        public OrderItemEntityBuilder WithCreated(DateTime created)
+        {
+            _created = created;
             return this;
         }
 

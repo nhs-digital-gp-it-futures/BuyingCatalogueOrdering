@@ -57,6 +57,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithTimeUnit(orderItemTableItem.PriceTimeUnit)
                     .WithProvisioningType(orderItemTableItem.ProvisioningType)
                     .WithQuantity(orderItemTableItem.Quantity)
+                    .WithCreated(orderItemTableItem.Created ?? DateTime.UtcNow)
                     .Build();
 
                 var orderItemId = await orderItemEntity.InsertAsync<int>(_settings.ConnectionString);
@@ -130,6 +131,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public DateTime? DeliveryDate { get; set; }
 
             public decimal? Price { get; set; }
+
+            public DateTime? Created { get; set; }
         }
     }
 }
