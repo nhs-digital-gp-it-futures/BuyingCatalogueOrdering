@@ -524,7 +524,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         QuantityPeriodDescription = orderItem.EstimationPeriod?.Description,
                         Price = orderItem.Price,
                         Quantity = orderItem.Quantity,
-                        CostPerYear = orderItem.CalculateTotalCostPerYear()
+                        CostPerYear = orderItem.CalculateTotalCostPerYear(),
+                        DeliveryDate = orderItem.DeliveryDate
                     }),
             });
         }

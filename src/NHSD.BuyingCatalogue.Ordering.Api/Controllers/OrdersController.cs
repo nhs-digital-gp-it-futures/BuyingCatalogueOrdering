@@ -92,6 +92,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                         ItemUnitDescription = orderItem.CataloguePriceUnit.Description,
                         TimeUnitDescription = orderItem.PriceTimeUnit?.Description,
                         QuantityPeriodDescription = orderItem.EstimationPeriod?.Description,
+                        DeliveryDate = orderItem.DeliveryDate,
                         Price = orderItem.Price,
                         Quantity = orderItem.Quantity,
                         CostPerYear = orderItem.CalculateTotalCostPerYear()
