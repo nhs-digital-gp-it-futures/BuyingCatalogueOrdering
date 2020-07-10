@@ -54,7 +54,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 TimeUnitDescription = orderItem.Value<string>("timeUnitDescription"),
                 QuantityPeriodDescription = orderItem.Value<string>("quantityPeriodDescription"),
                 Price = orderItem.Value<decimal?>("price"),
-                Quantity = orderItem.Value<int>("quantity")
+                Quantity = orderItem.Value<int>("quantity"),
+                DeliveryDate = orderItem.Value<DateTime?>("deliveryDate")
             });
 
             var serviceRecipients = responseContent.SelectToken("serviceRecipients")
@@ -88,7 +89,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 TimeUnitDescription = orderItem.TimeUnit?.ToDescription(),
                 QuantityPeriodDescription = orderItem.EstimationPeriod?.ToDescription(),
                 orderItem.Price,
-                orderItem.Quantity
+                orderItem.Quantity,
+                orderItem.DeliveryDate
             });
 
             orderItems.Should().BeEquivalentTo(convertedExpectedOrderItems);
