@@ -4,7 +4,7 @@ using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
-        internal sealed class OrderBuilder
+    internal sealed class OrderBuilder
     {
         private string _orderId;
         private string _orderDescription;
@@ -176,8 +176,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             }
 
             order.SetServiceRecipient(
-                _serviceRecipients, 
-                _lastUpdatedBy, 
+                _serviceRecipients,
+                _lastUpdatedBy,
                 _lastUpdatedByName);
 
             order.AdditionalServicesViewed = _additionalServicesViewed;
