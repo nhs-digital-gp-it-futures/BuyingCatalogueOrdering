@@ -37,6 +37,50 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             order.OrderItems.Should().BeEquivalentTo(expected);
         }
 
+        [TestCase("Solution", true)]
+        [TestCase("AdditionalService", false)]
+        [TestCase("AssociatedService", false)]
+        public void AddOrderItem_OrderItem_CatalogueItemType_CatalogueSolutionsViewedMatchExpectedValue(
+            string catalogueItemTypeNameInput,
+            bool expectedInput)
+        {
+            var order = OrderBuilder
+                .Create()
+                .WithCatalogueSolutionsViewed(false)
+                .Build();
+
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithCatalogueItemType(CatalogueItemType.FromName(catalogueItemTypeNameInput))
+                .Build();
+
+            order.AddOrderItem(orderItem, Guid.Empty, String.Empty);
+
+            order.CatalogueSolutionsViewed.Should().Be(expectedInput);
+        }
+
+        [TestCase("Solution", false)]
+        [TestCase("AdditionalService", true)]
+        [TestCase("AssociatedService", false)]
+        public void AddOrderItem_OrderItem_CatalogueItemType_AdditionalServicesViewedMatchExpectedValue(
+            string catalogueItemTypeNameInput,
+            bool expectedInput)
+        {
+            var order = OrderBuilder
+                .Create()
+                .WithAdditionalServicesViewed(false)
+                .Build();
+
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithCatalogueItemType(CatalogueItemType.FromName(catalogueItemTypeNameInput))
+                .Build();
+
+            order.AddOrderItem(orderItem, Guid.Empty, String.Empty);
+
+            order.AdditionalServicesViewed.Should().Be(expectedInput);
+        }
+
         [Test]
         public void AddOrderItem_AddSameOrderItem_ReturnsOneOrderItem()
         {

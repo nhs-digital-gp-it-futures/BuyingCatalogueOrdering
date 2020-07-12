@@ -6,18 +6,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class CatalogueItemType : IEquatable<CatalogueItemType>
     {
-        public static readonly CatalogueItemType Solution = new CatalogueItemType(1, nameof(Solution));
-        public static readonly CatalogueItemType AdditionalService = new CatalogueItemType(2, nameof(AdditionalService));
-        public static readonly CatalogueItemType AssociatedService = new CatalogueItemType(3, nameof(AssociatedService));
+        public static readonly CatalogueItemType Solution = new CatalogueItemType(1, nameof(Solution), order => order.CatalogueSolutionsViewed = true);
+        public static readonly CatalogueItemType AdditionalService = new CatalogueItemType(2, nameof(AdditionalService), order => order.AdditionalServicesViewed = true);
+        public static readonly CatalogueItemType AssociatedService = new CatalogueItemType(3, nameof(AssociatedService), order => {});
 
         public int Id { get; }
 
         public string Name { get; }
 
-        private CatalogueItemType(int id, string name)
+        internal Action<Order> MarkOrderSectionAsViewed { get; }
+
+        private CatalogueItemType(int id, string name, Action<Order> markOrderSectionAsViewed)
         {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
+            MarkOrderSectionAsViewed = markOrderSectionAsViewed ?? throw new ArgumentNullException(nameof(markOrderSectionAsViewed));
         }
 
         internal static IEnumerable<CatalogueItemType> List() => 

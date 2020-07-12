@@ -23,7 +23,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders
         private DateTime? _commencementDate;
         private bool _serviceRecipientsViewed;
         private bool _catalogueSolutionsViewed;
+        private bool _additionalServicesViewed;
         private readonly IList<OrderItem> _orderItems = new List<OrderItem>();
+        private readonly IList<(string Ods, string Name)> _serviceRecipients = new List<(string Ods, string Name)>();
 
         private OrderBuilder()
         {
@@ -45,6 +47,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders
             _commencementDate = null;
             _serviceRecipientsViewed = false;
             _catalogueSolutionsViewed = false;
+            _additionalServicesViewed = false;
         }
 
         internal static OrderBuilder Create() => new OrderBuilder();
@@ -115,6 +118,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders
             return this;
         }
 
+        internal OrderBuilder WithAdditionalServicesViewed(bool additionalServicesViewed)
+        {
+            _additionalServicesViewed = additionalServicesViewed;
+            return this;
+        }
+
         internal OrderBuilder WithLastUpdatedBy(Guid lastUpdatedBy)
         {
             _lastUpdatedBy = lastUpdatedBy;
@@ -139,6 +148,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders
             return this;
         }
 
+        public OrderBuilder WithServiceRecipient((string Ods, string Name) serviceRecipient)
+        {
+            _serviceRecipients.Add(serviceRecipient);
+            return this;
+        }
+
         internal Order Build()
         {
             var order = Order.Create(OrderDescription.Create(_orderDescription).Value, _organisationId, _lastUpdatedBy, _lastUpdatedByName);
@@ -153,15 +168,22 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders
             order.SupplierAddress = _supplierAddress;
             order.SupplierContact = _supplierContact;
             order.CommencementDate = _commencementDate;
-            order.ServiceRecipientsViewed = _serviceRecipientsViewed;
-            order.CatalogueSolutionsViewed = _catalogueSolutionsViewed;
-            order.Created = _created;
-            order.LastUpdated = _lastUpdated;
 
             foreach (var orderItem in _orderItems)
             {
                 order.AddOrderItem(orderItem, _lastUpdatedBy, _lastUpdatedByName);
             }
+
+            order.SetServiceRecipient(
+                _serviceRecipients, 
+                _lastUpdatedBy, 
+                _lastUpdatedByName);
+
+            order.AdditionalServicesViewed = _additionalServicesViewed;
+            order.ServiceRecipientsViewed = _serviceRecipientsViewed;
+            order.CatalogueSolutionsViewed = _catalogueSolutionsViewed;
+            order.Created = _created;
+            order.LastUpdated = _lastUpdated;
 
             return order;
         }
