@@ -6,16 +6,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class ProvisioningType : IEquatable<ProvisioningType>
     {
-        public static readonly ProvisioningType Patient = new ProvisioningType(1, nameof(Patient));
-        public static readonly ProvisioningType Declarative = new ProvisioningType(2, nameof(Declarative));
-        public static readonly ProvisioningType OnDemand = new ProvisioningType(3, nameof(OnDemand));
+        public static readonly ProvisioningType Patient = new ProvisioningType(1, nameof(Patient), (_) => TimeUnit.PerMonth);
+        public static readonly ProvisioningType Declarative = new ProvisioningType(2, nameof(Declarative), (_) => TimeUnit.PerYear);
+        public static readonly ProvisioningType OnDemand = new ProvisioningType(3, nameof(OnDemand), (estimationPeriod) => estimationPeriod);
+
+        private readonly Func<TimeUnit, TimeUnit> _inferEstimationPeriodFunction;
 
         private ProvisioningType(
             int id, 
-            string name)
+            string name,
+            Func<TimeUnit, TimeUnit> inferEstimationPeriodFunction)
         {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
+
+            _inferEstimationPeriodFunction = inferEstimationPeriodFunction ?? throw new ArgumentNullException(nameof(inferEstimationPeriodFunction));
         }
 
         public int Id { get; }
@@ -37,6 +42,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public static ProvisioningType FromId(int id) => 
             List().SingleOrDefault(item => id == item.Id);
+
+        public TimeUnit InferEstimationPeriod(TimeUnit estimationPeriod)
+        {
+            return _inferEstimationPeriodFunction.Invoke(estimationPeriod);
+        }
 
         public bool Equals(ProvisioningType other)
         {
