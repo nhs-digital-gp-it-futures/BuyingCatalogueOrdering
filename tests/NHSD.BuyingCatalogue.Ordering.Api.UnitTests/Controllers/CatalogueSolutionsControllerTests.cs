@@ -468,10 +468,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
 
-            context.UpdateOrderItemService.Verify(x => 
-                x.UpdateAsync(It.Is<UpdateOrderItemRequest>(r => 
-                    orderId.Equals(r.Order.OrderId) 
-                    && orderItemId.Equals(r.OrderItemId)), 
+            context.UpdateOrderItemService.Verify(x =>
+                x.UpdateAsync(It.Is<UpdateOrderItemRequest>(r =>
+                    orderId.Equals(r.Order.OrderId)
+                    && orderItemId.Equals(r.OrderItemId)),
                     It.IsAny<CatalogueItemType>(),
                     It.IsAny<ProvisioningType>()), Times.Once);
         }
@@ -529,7 +529,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             {
                 Errors = new []
                 {
-                    new ErrorModel(error.Id, error.Field) 
+                    new ErrorModel(error.Id, error.Field)
                 }
             };
 

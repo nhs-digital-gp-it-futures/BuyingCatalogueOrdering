@@ -29,7 +29,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Given(@"the user creates a request to change the catalogue solution order item \('(.*)'\) for the order with ID '(.*)'")]
         public void GivenTheUserCreatesARequestToChangeTheCatalogueSolutionOrderItemForTheOrderWithId(string name, string orderId)
         {
-            var orderItemId = _orderContext.OrderItemReferenceList.GetByCatalogueSolutionItemName(name).OrderItemId;
+            var orderItemId = _orderContext.OrderItemReferenceList.GetByOrderItemName(name).OrderItemId;
 
             _updateCatalogueSolutionOrderItemRequest = new UpdateCatalogueSolutionOrderItemRequest(
                 _request, 

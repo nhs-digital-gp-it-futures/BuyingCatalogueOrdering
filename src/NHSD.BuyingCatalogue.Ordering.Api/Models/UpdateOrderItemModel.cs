@@ -1,10 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using NHSD.BuyingCatalogue.Ordering.Api.Attributes;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
-    public abstract class UpdateOrderItemBaseModel
+    public sealed class UpdateOrderItemModel
     {
+        public DateTime? DeliveryDate { get; set; }
+
         [Required(ErrorMessage = "QuantityRequired")]
         [Limit(1, LimitType.Minimum, ErrorMessage = "QuantityGreaterThanZero")]
         [Limit(int.MaxValue - 1, LimitType.Maximum, ErrorMessage = "QuantityLessThanMax")]

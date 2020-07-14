@@ -147,9 +147,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [Route("{orderItemId}")]
         [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult<UpdateOrderItemResponseModel>> UpdateOrderItemAsync(
-            string orderId, 
-            int orderItemId, 
-            UpdateOrderItemSolutionModel model)
+            string orderId,
+            int orderItemId,
+            UpdateOrderItemModel model)
         {
             if (model is null)
                 throw new ArgumentNullException(nameof(model));
@@ -163,7 +163,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
 
             var orderItem = order.OrderItems.FirstOrDefault(
-                item => orderItemId.Equals(item.OrderItemId) 
+                item => orderItemId.Equals(item.OrderItemId)
                         && CatalogueItemType.Solution.Equals(item.CatalogueItemType));
 
             if (orderItem is null)
