@@ -1,35 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using NHSD.BuyingCatalogue.Ordering.Api.Attributes;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
+    [JsonConverter(typeof(CreateOrderItemBaseModelConverter))]
     public abstract class CreateOrderItemBaseModel
     {
-        [Required(ErrorMessage = "ServiceRecipientRequired")]
-        public ServiceRecipientModel ServiceRecipient { get; set; }
+        [Required(ErrorMessage = "CatalogueItemTypeRequired")]
+        [RegularExpression("Solution|AdditionalService|AssociatedService", ErrorMessage = "CatalogueItemTypeValidValue")]
+        public string CatalogueItemType { get; set; }
 
-        [Required(ErrorMessage = "ProvisioningTypeRequired")]
-        public string ProvisioningType { get; set; }
-
-        [Required(ErrorMessage = "TypeRequired")]
-        public string Type { get; set; }
-
-        [Required(ErrorMessage = "CurrencyCodeRequired")]
-        public string CurrencyCode { get; set; }
-
-        [Required(ErrorMessage = "ItemUnitRequired")]
-        public ItemUnitModel ItemUnit { get; set; }
-
-        [Required(ErrorMessage = "QuantityRequired")]
-        [Limit(1, LimitType.Minimum, ErrorMessage = "QuantityGreaterThanZero")]
-        [Limit(int.MaxValue - 1, LimitType.Maximum, ErrorMessage = "QuantityLessThanMax")]
-        public int? Quantity { get; set; }
-
-        public string EstimationPeriod { get; set; }
-
-        [Required(ErrorMessage = "PriceRequired")]
-        [Limit(typeof(decimal), "0", LimitType.Minimum, ErrorMessage = "PriceGreaterThanOrEqualToZero")]
-        [Limit(typeof(decimal), "999999999999999.999", LimitType.Maximum, ErrorMessage = "PriceLessThanMax")]
-        public decimal? Price { get; set; }
+        public abstract CreateOrderItemRequest ToRequest(Order order);
     }
 }

@@ -5,6 +5,7 @@
     CatalogueItemId nvarchar(14) NOT NULL,
     CatalogueItemTypeId int NOT NULL,
     CatalogueItemName nvarchar(255) NOT NULL,
+    ParentCatalogueItemId nvarchar(14) NULL,
     OdsCode nvarchar(8) NULL,
     ProvisioningTypeId int NOT NULL,
     CataloguePriceTypeId int NOT NULL,

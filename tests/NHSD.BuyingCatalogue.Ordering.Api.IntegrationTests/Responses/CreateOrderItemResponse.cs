@@ -3,11 +3,11 @@ using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 {
-    internal sealed class CreateCatalogueSolutionOrderItemResponse
+    internal sealed class CreateOrderItemResponse
     {
         private readonly Response _response;
 
-        public CreateCatalogueSolutionOrderItemResponse(
+        public CreateOrderItemResponse(
             Response response)
         {
             _response = response;
