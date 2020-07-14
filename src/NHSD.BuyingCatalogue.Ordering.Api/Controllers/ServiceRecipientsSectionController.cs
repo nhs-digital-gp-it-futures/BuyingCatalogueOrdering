@@ -54,7 +54,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 {
                     OdsCode = recipient.OdsCode,
                     Name = recipient.Name
-                }).OrderBy(serviceRecipientModel => serviceRecipientModel.Name)
+                })
+                .OrderBy(serviceRecipientModel => serviceRecipientModel.Name)
                 .ToList();
 
             var model = new ServiceRecipientsModel
