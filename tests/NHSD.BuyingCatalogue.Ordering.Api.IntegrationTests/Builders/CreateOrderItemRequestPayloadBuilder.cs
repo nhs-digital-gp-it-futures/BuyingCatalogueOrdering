@@ -4,18 +4,20 @@ using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
 {
-    internal sealed class CreateCatalogueSolutionOrderItemRequestPayloadBuilder
+    internal sealed class CreateOrderItemRequestPayloadBuilder
     {
         private bool _hasServiceRecipient;
         private bool _hasItemUnit;
         private bool _hasTimeUnit;
 
         private string _odsCode;
+        private string _catalogueItemId;
+        private string _catalogueItemName;
         private string _catalogueSolutionId;
-        private string _catalogueSolutionName;
         private DateTime? _deliveryDate;
         private int? _quantity;
         private TimeUnit? _estimationPeriod;
+        private CatalogueItemType? _catalogueItemType;
         private ProvisioningType? _provisioningType;
         private CataloguePriceType? _cataloguePriceType;
         private string _currencyCode;
@@ -25,15 +27,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
         private string _timeUnitDescription;
         private decimal? _price;
 
-        private CreateCatalogueSolutionOrderItemRequestPayloadBuilder()
+        private CreateOrderItemRequestPayloadBuilder()
         {
             _hasServiceRecipient = true;
             _hasItemUnit = true;
             _hasTimeUnit = true;
 
             _odsCode = "ODS1";
-            _catalogueSolutionId = "100001-001";
-            _catalogueSolutionName = Guid.NewGuid().ToString();
+            _catalogueItemId = "100001-001";
+            _catalogueItemName = Guid.NewGuid().ToString();
+            _catalogueItemType = CatalogueItemType.Solution;
+            _catalogueSolutionId = null;
             _deliveryDate = new DateTime(2021, 1, 1);
             _quantity = 5;
             _estimationPeriod = TimeUnit.Month;
@@ -47,121 +51,143 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
             _price = 1.5m;
         }
 
-        public static CreateCatalogueSolutionOrderItemRequestPayloadBuilder Create() => 
-            new CreateCatalogueSolutionOrderItemRequestPayloadBuilder();
+        public static CreateOrderItemRequestPayloadBuilder CreateSolution() => 
+            new CreateOrderItemRequestPayloadBuilder()
+                .WithCatalogueItemType(CatalogueItemType.Solution)
+                .WithCatalogueSolutionId(null);
 
-        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithHasServiceRecipient(bool hasServiceRecipient)
+        public static CreateOrderItemRequestPayloadBuilder CreateAdditionalService() =>
+            new CreateOrderItemRequestPayloadBuilder()
+                .WithCatalogueItemType(CatalogueItemType.AdditionalService)
+                .WithCatalogueSolutionId("123")
+                .WithDeliveryDate(null);
+
+        public CreateOrderItemRequestPayloadBuilder WithHasServiceRecipient(bool hasServiceRecipient)
         {
             _hasServiceRecipient = hasServiceRecipient;
             return this;
         }
 
-        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithHasItemUnit(bool hasItemUnit)
+        public CreateOrderItemRequestPayloadBuilder WithHasItemUnit(bool hasItemUnit)
         {
             _hasItemUnit = hasItemUnit;
             return this;
         }
 
-        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithHasTimeUnit(bool hasTimeUnit)
+        public CreateOrderItemRequestPayloadBuilder WithHasTimeUnit(bool hasTimeUnit)
         {
             _hasTimeUnit = hasTimeUnit;
             return this;
         }
 
-        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithOdsCode(string odsCode)
+        public CreateOrderItemRequestPayloadBuilder WithOdsCode(string odsCode)
         {
             _odsCode = odsCode;
             return this;
         }
 
-        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithCatalogueSolutionId(string catalogueSolutionId)
+        public CreateOrderItemRequestPayloadBuilder WithCatalogueItemId(string catalogueItemId)
+        {
+            _catalogueItemId = catalogueItemId;
+            return this;
+        }
+
+        public CreateOrderItemRequestPayloadBuilder WithCatalogueItemName(string catalogueItemName)
+        {
+            _catalogueItemName = catalogueItemName;
+            return this;
+        }
+
+        public CreateOrderItemRequestPayloadBuilder WithCatalogueSolutionId(string catalogueSolutionId)
         {
             _catalogueSolutionId = catalogueSolutionId;
             return this;
         }
 
-        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithCatalogueSolutionName(string catalogueSolutionName)
+        public CreateOrderItemRequestPayloadBuilder WithCatalogueItemType(CatalogueItemType? catalogueItemType)
         {
-            _catalogueSolutionName = catalogueSolutionName;
+            _catalogueItemType = catalogueItemType;
             return this;
         }
 
-        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithDeliveryDate(DateTime? deliveryDate)
+        public CreateOrderItemRequestPayloadBuilder WithDeliveryDate(DateTime? deliveryDate)
         {
             _deliveryDate = deliveryDate?.Date;
             return this;
         }
 
-        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithQuantity(int? quantity)
+        public CreateOrderItemRequestPayloadBuilder WithQuantity(int? quantity)
         {
             _quantity = quantity;
             return this;
         }
 
-        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithEstimationPeriod(TimeUnit? estimationPeriod)
+        public CreateOrderItemRequestPayloadBuilder WithEstimationPeriod(TimeUnit? estimationPeriod)
         {
             _estimationPeriod = estimationPeriod;
             return this;
         }
 
-        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithProvisioningType(ProvisioningType? provisioningType)
+        public CreateOrderItemRequestPayloadBuilder WithProvisioningType(ProvisioningType? provisioningType)
         {
             _provisioningType = provisioningType;
             return this;
         }
 
-        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithCataloguePriceType(CataloguePriceType? cataloguePriceType)
+        public CreateOrderItemRequestPayloadBuilder WithCataloguePriceType(CataloguePriceType? cataloguePriceType)
         {
             _cataloguePriceType = cataloguePriceType;
             return this;
         }
 
-        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithCurrencyCode(string currencyCode)
+        public CreateOrderItemRequestPayloadBuilder WithCurrencyCode(string currencyCode)
         {
             _currencyCode = currencyCode;
             return this;
         }
 
-        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithItemUnitName(string itemUnitName)
+        public CreateOrderItemRequestPayloadBuilder WithItemUnitName(string itemUnitName)
         {
             _itemUnitName = itemUnitName;
             return this;
         }
 
-        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithItemUnitNameDescription(string itemUnitNameDescription)
+        public CreateOrderItemRequestPayloadBuilder WithItemUnitNameDescription(string itemUnitNameDescription)
         {
             _itemUnitNameDescription = itemUnitNameDescription;
             return this;
         }
 
-        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithTimeUnitName(string timeUnitName)
+        public CreateOrderItemRequestPayloadBuilder WithTimeUnitName(string timeUnitName)
         {
             _timeUnitName = timeUnitName;
             return this;
         }
 
-        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithTimeUnitDescription(string timeUnitDescription)
+        public CreateOrderItemRequestPayloadBuilder WithTimeUnitDescription(string timeUnitDescription)
         {
             _timeUnitDescription = timeUnitDescription;
             return this;
         }
 
-        public CreateCatalogueSolutionOrderItemRequestPayloadBuilder WithPrice(decimal? price)
+        public CreateOrderItemRequestPayloadBuilder WithPrice(decimal? price)
         {
             _price = price;
             return this;
         }
 
-        public CreateCatalogueSolutionOrderItemRequestPayload Build()
+        public CreateOrderItemRequestPayload Build()
         {
-            return new CreateCatalogueSolutionOrderItemRequestPayload
+            return new CreateOrderItemRequestPayload
             {
                 HasServiceRecipient = _hasServiceRecipient,
+                CatalogueItemType = _catalogueItemType,
                 HasItemUnit = _hasItemUnit,
                 HasTimeUnit = _hasTimeUnit,
                 OdsCode = _odsCode,
+                CatalogueItemId = _catalogueItemId,
+                CatalogueItemName = _catalogueItemName,
                 CatalogueSolutionId = _catalogueSolutionId,
-                CatalogueSolutionName = _catalogueSolutionName,
                 DeliveryDate = _deliveryDate,
                 Quantity = _quantity,
                 EstimationPeriod = _estimationPeriod,

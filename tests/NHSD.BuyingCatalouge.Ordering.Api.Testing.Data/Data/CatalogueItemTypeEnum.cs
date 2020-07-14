@@ -4,6 +4,7 @@
     {
         Solution = 1,
         AdditionalService = 2,
-        AssociatedService = 3
+        AssociatedService = 3,
+        Invalid = 4
     }
 }

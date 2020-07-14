@@ -1,6 +1,6 @@
-﻿Feature: Create Catalogue Solution Order Item Validation
+﻿Feature: Create Additional Service Order Item Validation
     As a Buyer
-    I want to only create a catalogue solution order item if the validation requirements are correct
+    I want to only create an additional service order item if the validation requirements are correct
     So that I can make sure correct information is stored
 
 Background:
@@ -13,8 +13,8 @@ Background:
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @7840
-Scenario: 1. Create catalogue solution order item with missing required field
-    Given the user creates a request to add a new catalogue solution order item to the order with ID 'C000014-01'
+Scenario: 1. Create additional service order item with missing required field
+    Given the user creates a request to add a new additional service order item to the order with ID 'C000014-01'
     And the user enters the '<payload-type>' create order item request payload
     When the user sends the create order item request
     Then a response with status code 400 is returned
@@ -23,29 +23,29 @@ Scenario: 1. Create catalogue solution order item with missing required field
         | <error-id> | <error-field> |
 
     Examples: Request payloads
-        | payload-type                    | error-id                                   | error-field       |
-        | missing-catalogue-item-type     | CatalogueItemTypeRequired                  | CatalogueItemType |
-        | missing-service-recipient       | ServiceRecipientRequired                   | ServiceRecipient  |
-        | missing-ods-code                | OdsCodeRequired                            | OdsCode           |
-        | missing-catalogue-solution-id   | CatalogueItemIdRequired                    | CatalogueItemId   |
-        | missing-catalogue-solution-name | CatalogueItemNameRequired                  | CatalogueItemName |
-        | missing-item-unit               | ItemUnitRequired                           | ItemUnit          |
-        | missing-item-unit-name          | ItemUnitNameRequired                       | Name              |
-        | missing-item-unit-description   | ItemUnitDescriptionRequired                | Description       |
-        | missing-time-unit               | TimeUnitRequired                           | TimeUnit          |
-        | missing-time-unit-name          | TimeUnitNameRequired                       | Name              |
-        | missing-time-unit-description   | TimeUnitDescriptionRequired                | Description       |
-        | missing-provisioning-type       | ProvisioningTypeRequired                   | ProvisioningType  |
-        | missing-type                    | TypeRequired                               | Type              |
-        | missing-currency-code           | CurrencyCodeRequired                       | CurrencyCode      |
-        | missing-delivery-date           | DeliveryDateRequired                       | DeliveryDate      |
-        | missing-quantity                | QuantityRequired                           | Quantity          |
-        | missing-estimation-period       | EstimationPeriodRequiredIfVariableOnDemand | EstimationPeriod  |
-        | missing-price                   | PriceRequired                              | Price             |
+        | payload-type                  | error-id                                   | error-field         |
+        | missing-catalogue-item-type   | CatalogueItemTypeRequired                  | CatalogueItemType   |
+        | missing-service-recipient     | ServiceRecipientRequired                   | ServiceRecipient    |
+        | missing-ods-code              | OdsCodeRequired                            | OdsCode             |
+        | missing-catalogue-item-id     | CatalogueItemIdRequired                    | CatalogueItemId     |
+        | missing-catalogue-item-name   | CatalogueItemNameRequired                  | CatalogueItemName   |
+        | missing-catalogue-solution-id | CatalogueSolutionIdRequired                | CatalogueSolutionId |
+        | missing-item-unit             | ItemUnitRequired                           | ItemUnit            |
+        | missing-item-unit-name        | ItemUnitNameRequired                       | Name                |
+        | missing-item-unit-description | ItemUnitDescriptionRequired                | Description         |
+        | missing-time-unit             | TimeUnitRequired                           | TimeUnit            |
+        | missing-time-unit-name        | TimeUnitNameRequired                       | Name                |
+        | missing-time-unit-description | TimeUnitDescriptionRequired                | Description         |
+        | missing-provisioning-type     | ProvisioningTypeRequired                   | ProvisioningType    |
+        | missing-type                  | TypeRequired                               | Type                |
+        | missing-currency-code         | CurrencyCodeRequired                       | CurrencyCode        |
+        | missing-quantity              | QuantityRequired                           | Quantity            |
+        | missing-estimation-period     | EstimationPeriodRequiredIfVariableOnDemand | EstimationPeriod    |
+        | missing-price                 | PriceRequired                              | Price               |
 
 @7840
 Scenario: 2. Create catalogue solution order item with invalid values
-    Given the user creates a request to add a new catalogue solution order item to the order with ID 'C000014-01'
+    Given the user creates a request to add a new additional service order item to the order with ID 'C000014-01'
     And the user enters the '<payload-type>' create order item request payload
     When the user sends the create order item request
     Then a response with status code 400 is returned
@@ -63,7 +63,7 @@ Scenario: 2. Create catalogue solution order item with invalid values
         
 @7840
 Scenario: 3. Create catalogue solution order item with too long values
-    Given the user creates a request to add a new catalogue solution order item to the order with ID 'C000014-01'
+    Given the user creates a request to add a new additional service order item to the order with ID 'C000014-01'
     And the user enters the '<payload-type>' create order item request payload
     When the user sends the create order item request
     Then a response with status code 400 is returned
@@ -72,14 +72,15 @@ Scenario: 3. Create catalogue solution order item with too long values
         | <error-id> | <error-field> |
 
     Examples: Request payloads
-        | payload-type                     | error-id                 | error-field       |
-        | too-long-ods-code                | OdsCodeTooLong           | OdsCode           |
-        | too-long-catalogue-solution-id   | CatalogueItemIdTooLong   | CatalogueItemId   |
-        | too-long-catalogue-solution-name | CatalogueItemNameTooLong | CatalogueItemName |
+        | payload-type                   | error-id                   | error-field         |
+        | too-long-ods-code              | OdsCodeTooLong             | OdsCode             |
+        | too-long-catalogue-item-id     | CatalogueItemIdTooLong     | CatalogueItemId     |
+        | too-long-catalogue-solution-id | CatalogueSolutionIdTooLong | CatalogueSolutionId |
+        | too-long-catalogue-item-name   | CatalogueItemNameTooLong   | CatalogueItemName   |
         
 @7840
 Scenario: 4. Create catalogue solution order item with out of range values
-    Given the user creates a request to add a new catalogue solution order item to the order with ID 'C000014-01'
+    Given the user creates a request to add a new additional service order item to the order with ID 'C000014-01'
     And the user enters the '<payload-type>' create order item request payload
     When the user sends the create order item request
     Then a response with status code 400 is returned
@@ -89,8 +90,6 @@ Scenario: 4. Create catalogue solution order item with out of range values
 
     Examples: Request payloads
         | payload-type              | error-id                          | error-field  |
-        | above-delivery-window     | DeliveryDateOutsideDeliveryWindow | DeliveryDate |
-        | below-delivery-window     | DeliveryDateOutsideDeliveryWindow | DeliveryDate |
         | less-than-min-quantity    | QuantityGreaterThanZero           | Quantity     |
         | greater-than-max-quantity | QuantityLessThanMax               | Quantity     |
         | less-than-min-price       | PriceGreaterThanOrEqualToZero     | Price        |

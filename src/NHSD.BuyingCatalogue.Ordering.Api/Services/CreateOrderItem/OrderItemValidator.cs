@@ -29,7 +29,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             {
                 yield return new ErrorDetails("CatalogueItemTypeValidValue", "CatalogueItemType");
             }
-            else
+            else if(request.CatalogueItemType.Equals(CatalogueItemType.Solution))
             {
                 var errors = ValidateDeliveryDate(request.DeliveryDate, request.Order.CommencementDate.Value, request.CatalogueItemType);
                 foreach (var error in errors)

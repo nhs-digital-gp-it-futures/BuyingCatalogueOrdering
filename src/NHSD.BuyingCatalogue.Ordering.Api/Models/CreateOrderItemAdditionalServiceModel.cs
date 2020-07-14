@@ -6,13 +6,14 @@ using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
-    public sealed class CreateOrderItemSolutionModel : CreateOrderItemModel
+    public sealed class CreateOrderItemAdditionalServiceModel : CreateOrderItemModel
     {
-        [Required(ErrorMessage = "DeliveryDateRequired")]
-        public DateTime? DeliveryDate { get; set; }
-
         [RequiredWhenProvisioningTypeIn("Declarative", "Patient", ErrorMessage = "TimeUnitRequired")]
         public TimeUnitModel TimeUnit { get; set; }
+
+        [Required(ErrorMessage = "CatalogueSolutionIdRequired")]
+        [MaxLength(14, ErrorMessage = "CatalogueSolutionIdTooLong")]
+        public string CatalogueSolutionId { get; set; }
 
         public override CreateOrderItemRequest ToRequest(Order order)
         {
@@ -25,9 +26,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
                 order,
                 ServiceRecipient?.OdsCode,
                 CatalogueItemId,
-                Domain.CatalogueItemType.Solution, 
+                Domain.CatalogueItemType.AdditionalService,
                 CatalogueItemName,
-                null,
+                CatalogueSolutionId,
                 ProvisioningType,
                 Type,
                 ItemUnit?.Name,
@@ -36,7 +37,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
                 CurrencyCode,
                 Quantity.Value,
                 EstimationPeriod,
-                DeliveryDate,
+                null,
                 Price);
         }
     }

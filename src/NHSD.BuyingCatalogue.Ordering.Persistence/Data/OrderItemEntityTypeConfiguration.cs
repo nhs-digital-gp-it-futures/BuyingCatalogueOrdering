@@ -35,6 +35,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
                 .HasColumnName(nameof(OrderItem.CatalogueItemName))
                 .IsRequired();
 
+            builder.Property(orderItem => orderItem.ParentCatalogueItemId)
+                .HasColumnName(nameof(OrderItem.ParentCatalogueItemId));
+
             builder.Property(orderItem => orderItem.OdsCode)
                 .HasColumnName(nameof(OrderItem.OdsCode));
 

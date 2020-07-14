@@ -130,9 +130,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
+            if (model is null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
             var createOrderItemResponse = new CreateOrderItemResponseModel();
 
-            var result = await _createOrderItemService.CreateAsync(model.ToRequest(order, CatalogueItemType.Solution));
+            var result = await _createOrderItemService.CreateAsync(model.ToRequest(order));
             if (result.IsSuccess)
             {
                 createOrderItemResponse.OrderItemId = result.Value;

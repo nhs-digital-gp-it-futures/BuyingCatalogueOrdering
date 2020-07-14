@@ -34,6 +34,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public string CatalogueItemName { get; }
 
+        public string ParentCatalogueItemId { get; }
+
         public ProvisioningType ProvisioningType { get; }
 
         public CataloguePriceType CataloguePriceType { get; }
@@ -61,6 +63,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             string catalogueItemId,
             CatalogueItemType catalogueItemType,
             string catalogueItemName,
+            string parentCatalogueItemId,
             ProvisioningType provisioningType,
             CataloguePriceType cataloguePriceType,
             CataloguePriceUnit cataloguePriceUnit,
@@ -84,6 +87,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             CatalogueItemId = catalogueItemId;
             CatalogueItemType = catalogueItemType ?? throw new ArgumentNullException(nameof(catalogueItemType));
             CatalogueItemName = catalogueItemName;
+            ParentCatalogueItemId = parentCatalogueItemId;
             ProvisioningType = provisioningType ?? throw new ArgumentNullException(nameof(provisioningType));
             CataloguePriceType = cataloguePriceType ?? throw new ArgumentNullException(nameof(cataloguePriceType));
             CataloguePriceUnit = cataloguePriceUnit ?? throw new ArgumentNullException(nameof(cataloguePriceUnit));

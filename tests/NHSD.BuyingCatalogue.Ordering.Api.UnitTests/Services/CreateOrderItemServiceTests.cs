@@ -131,6 +131,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 createOrderItemRequest.OdsCode,
                 createOrderItemRequest.CatalogueItemId,
                 createOrderItemRequest.CatalogueItemName,
+                ParentCatalogueItemId = createOrderItemRequest.CatalogueSolutionId,
                 ProvisioningType = ProvisioningType.FromName(createOrderItemRequest.ProvisioningTypeName),
                 CataloguePriceType = CataloguePriceType.FromName(createOrderItemRequest.CataloguePriceTypeName),
                 CataloguePriceUnit = CataloguePriceUnit.Create(

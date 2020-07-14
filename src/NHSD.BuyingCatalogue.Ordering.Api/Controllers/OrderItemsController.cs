@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
+using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
@@ -20,10 +22,47 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     public sealed class OrderItemsController : ControllerBase
     {
         private readonly IOrderRepository _orderRepository;
+        private readonly ICreateOrderItemService _createOrderItemService;
 
-        public OrderItemsController(IOrderRepository orderRepository)
+        public OrderItemsController(IOrderRepository orderRepository, ICreateOrderItemService createOrderItemService)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            _createOrderItemService = createOrderItemService ?? throw new ArgumentNullException(nameof(createOrderItemService));
+        }
+
+        [HttpPost]
+        [Authorize(Policy = PolicyName.CanManageOrders)]
+        public async Task<ActionResult<CreateOrderItemResponseModel>> CreateOrderItemAsync(
+            string orderId,
+            CreateOrderItemBaseModel model)
+        {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            if (order is null)
+            {
+                return NotFound();
+            }
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
+            var createOrderItemResponse = new CreateOrderItemResponseModel();
+
+            var result = await _createOrderItemService.CreateAsync(model.ToRequest(order));
+
+            if (result.IsSuccess)
+            {
+                createOrderItemResponse.OrderItemId = result.Value;
+                return CreatedAtAction(nameof(CatalogueSolutionsController.GetOrderItemAsync).TrimAsync(), "CatalogueSolutions", new { orderId, orderItemId = createOrderItemResponse.OrderItemId }, createOrderItemResponse);
+            }
+
+            createOrderItemResponse.Errors = result.Errors.Select(x => new ErrorModel(x.Id, x.Field));
+            return BadRequest(createOrderItemResponse);
         }
 
         [HttpGet]
