@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
+using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
@@ -43,6 +44,41 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             }
 
             Assert.Throws<ArgumentNullException>(Test);
+        }
+
+        [Test]
+        public async Task GetAsync_OrderDoesNotExist_ReturnsNotFound()
+        {
+            var context = OrdersControllerTestContext.Setup();
+
+            var response = await context.OrdersController.GetAsync("INVALID");
+            response.Result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        public async Task GetAsync_WrongOrganisationId_ReturnsForbidden()
+        {
+            var context = OrdersControllerTestContext.Setup();
+
+            const string orderId = "C0000014-01";
+            context.Order = CreateGetTestData(orderId, Guid.NewGuid(), "ods").order;
+
+            var response = await context.OrdersController.GetAsync(orderId);
+            response.Result.Should().BeOfType<ForbidResult>();
+        }
+
+        [Test]
+        public async Task GetAsync_OrderExists_ReturnsResult()
+        {
+            var context = OrdersControllerTestContext.Setup();
+            const string orderId = "C0000014-01";
+
+            (Order order, OrderModel expectedOrder) = CreateGetTestData(orderId, context.PrimaryOrganisationId, "ods");
+
+            context.Order = order;
+
+            var response = await context.OrdersController.GetAsync(orderId);
+            response.Value.Should().BeEquivalentTo(expectedOrder);
         }
 
         [Test]
@@ -232,6 +268,46 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [TestCase]
+        public async Task GetOrderSummaryAsync_CatalogueSolutionCount_ReturnsCountOfTwo()
+        {
+            var order = OrderBuilder.Create()
+                .WithOrderItem(OrderItemBuilder.Create()
+                    .WithCatalogueItemType(CatalogueItemType.Solution)
+                    .Build())
+                .WithOrderItem(OrderItemBuilder.Create()
+                    .WithCatalogueItemType(CatalogueItemType.Solution)
+                    .Build()
+                ).Build();
+
+            var context = OrdersControllerTestContext.Setup(order.OrganisationId);
+            context.Order = order;
+
+            var response = (await context.OrdersController.GetOrderSummaryAsync(order.OrderId)).Result as OkObjectResult;
+            Assert.IsNotNull(response);
+
+            var actual = response.Value.As<OrderSummaryModel>();
+
+            var expected = OrderSummaryModelBuilder
+                .Create()
+                .WithOrderId(order.OrderId)
+                .WithOrganisationId(order.OrganisationId)
+                .WithSections(SectionModelListBuilder
+                    .Create()
+                    .WithServiceRecipients(
+                        SectionModel
+                            .ServiceRecipients
+                            .WithStatus("incomplete")
+                            .WithCount(context.ServiceRecipientListCount))
+                    .WithCatalogueSolutions(SectionModel.CatalogueSolutions
+                        .WithStatus("incomplete")
+                        .WithCount(2))
+                    .Build())
+                .Build();
+
+            actual.Should().BeEquivalentTo(expected);
+        }
+
+        [TestCase]
         public async Task GetOrderSummaryAsync_ServiceRecipientRepository_CalledOnce()
         {
             var order = OrderBuilder.Create().Build();
@@ -351,7 +427,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 {
                     OrderId = repositoryOrder.OrderId,
                     Description = repositoryOrder.Description.Value,
-                    Status = repositoryOrder.OrderStatus.Name,
+                    Status = repositoryOrder.OrderStatus.ToString(),
                     DateCreated = repositoryOrder.Created,
                     LastUpdated = repositoryOrder.LastUpdated,
                     LastUpdatedBy = repositoryOrder.LastUpdatedByName
@@ -390,6 +466,68 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         SectionModel.FundingSource
                     }
                 });
+        }
+
+        private static (Order order, OrderModel expectedOrder) CreateGetTestData(string orderId, Guid organisationId, string odsCode)
+        {
+            var repositoryOrder = OrderBuilder.Create()
+                .WithOrderId(orderId)
+                .WithOrganisationId(organisationId)
+                .Build();
+
+            var repositoryOrderItem = OrderItemBuilder.Create()
+                .WithOdsCode(odsCode)
+                .Build();
+
+            var serviceRecipients = new List<(string Ods, string Name)>
+            {
+                (odsCode, "EU test")
+            };
+
+            repositoryOrder.AddOrderItem(repositoryOrderItem, Guid.Empty, string.Empty);
+            repositoryOrder.SetServiceRecipient(serviceRecipients, Guid.Empty, string.Empty);
+
+            return (order: repositoryOrder, expectedOrder: new OrderModel
+            {
+                Description = repositoryOrder.Description.Value,
+                OrderParty = new OrderingPartyModel
+                {
+                    Name = repositoryOrder.OrganisationName,
+                    OdsCode = repositoryOrder.OrganisationOdsCode,
+                    Address = repositoryOrder.OrganisationAddress.ToModel(),
+                    PrimaryContact = repositoryOrder.OrganisationContact.ToModel()
+                },
+                CommencementDate = repositoryOrder.CommencementDate,
+                Supplier = new SupplierModel
+                {
+                    Name = repositoryOrder.SupplierName,
+                    Address = repositoryOrder.SupplierAddress.ToModel(),
+                    PrimaryContact = repositoryOrder.SupplierContact.ToModel()
+                },
+                ServiceRecipients = repositoryOrder.ServiceRecipients.Select(serviceRecipient =>
+                    new ServiceRecipientModel
+                    {
+                        Name = serviceRecipient.Name,
+                        OdsCode = serviceRecipient.OdsCode
+                    }),
+                OrderItems = repositoryOrder.OrderItems.Select(orderItem =>
+                    new OrderItemModel
+                    {
+                        ItemId = $"{repositoryOrder.OrderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
+                        ServiceRecipientsOdsCode = orderItem.OdsCode,
+                        CataloguePriceType = orderItem.CataloguePriceType.Name,
+                        CatalogueItemType = orderItem.CatalogueItemType.Name,
+                        CatalogueItemName = orderItem.CatalogueItemName,
+                        ProvisioningType = orderItem.ProvisioningType.Name,
+                        ItemUnitDescription = orderItem.CataloguePriceUnit.Description,
+                        TimeUnitDescription = orderItem.PriceTimeUnit?.Description,
+                        QuantityPeriodDescription = orderItem.EstimationPeriod?.Description,
+                        Price = orderItem.Price,
+                        Quantity = orderItem.Quantity,
+                        CostPerYear = orderItem.CalculateTotalCostPerYear(),
+                        DeliveryDate = orderItem.DeliveryDate
+                    }),
+            });
         }
 
         internal sealed class OrdersControllerTestContext
@@ -628,7 +766,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                             .Create()
                             .WithOrganisationId(organisationId)
                             .WithSections(SectionModelListBuilder.Create()
-                                .WithCatalogueSolutions(SectionModel.CatalogueSolutions.WithStatus("complete"))
+                                .WithCatalogueSolutions(SectionModel.CatalogueSolutions
+                                    .WithStatus("complete")
+                                    .WithCount(0))
                                 .Build())
                             .Build());
 
@@ -642,12 +782,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                             .Create()
                             .WithOrganisationId(organisationId)
                             .WithSections(SectionModelListBuilder.Create()
-                                .WithCatalogueSolutions(SectionModel.CatalogueSolutions.WithStatus("incomplete"))
+                                .WithCatalogueSolutions(SectionModel.CatalogueSolutions
+                                    .WithStatus("incomplete")
+                                    .WithCount(0))
+                                .Build())
+                            .Build());
+
+                    yield return new TestCaseData(
+                        OrderBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithCatalogueSolutionsViewed(true)
+                            .WithOrderItem(OrderItemBuilder.Create()
+                                .WithCatalogueItemType(CatalogueItemType.Solution)
+                                .Build())
+                            .Build(),
+                        OrderSummaryModelBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithSections(SectionModelListBuilder.Create()
+                                .WithCatalogueSolutions(SectionModel.CatalogueSolutions
+                                    .WithStatus("complete")
+                                    .WithCount(1))
                                 .Build())
                             .Build());
                 }
             }
-
         }
     }
 }

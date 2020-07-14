@@ -7,13 +7,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
     internal sealed class UpdateCatalogueSolutionOrderItemRequestPayloadBuilder
     {
         private DateTime? _deliveryDate;
-        private TimeUnit _estimationPeriod;
+        private TimeUnit? _estimationPeriod;
         private decimal? _price;
-        private int _quantity;
+        private int? _quantity;
 
         private UpdateCatalogueSolutionOrderItemRequestPayloadBuilder()
         {
-            _deliveryDate = DateTime.UtcNow;
+            _deliveryDate = new DateTime(2021, 1, 1);
             _estimationPeriod = TimeUnit.Month;
             _price = 100.0m;
             _quantity = 100;
@@ -28,7 +28,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
             return this;
         }
 
-        public UpdateCatalogueSolutionOrderItemRequestPayloadBuilder WithEstimationPeriod(TimeUnit estimationPeriod)
+        public UpdateCatalogueSolutionOrderItemRequestPayloadBuilder WithEstimationPeriod(TimeUnit? estimationPeriod)
         {
             _estimationPeriod = estimationPeriod;
             return this;
@@ -40,7 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
             return this;
         }
 
-        public UpdateCatalogueSolutionOrderItemRequestPayloadBuilder WithQuantity(int quantity)
+        public UpdateCatalogueSolutionOrderItemRequestPayloadBuilder WithQuantity(int? quantity)
         {
             _quantity = quantity;
             return this;

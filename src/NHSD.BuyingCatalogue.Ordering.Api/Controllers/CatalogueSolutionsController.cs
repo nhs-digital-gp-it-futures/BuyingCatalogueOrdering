@@ -54,47 +54,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             var catalogueSolutionModel = order.OrderItems.Where(y => y.CatalogueItemType.Equals(CatalogueItemType.Solution))
                 .Select(x => new CatalogueSolutionModel
                 {
+                    CatalogueItemId = x.CatalogueItemId,
                     OrderItemId = x.OrderItemId,
                     SolutionName = x.CatalogueItemName,
                     ServiceRecipient = new GetServiceRecipientModel
                     {
                         OdsCode = x.OdsCode,
                         Name = serviceRecipients.FirstOrDefault(serviceRecipient => string.Equals(x.OdsCode,
-                            serviceRecipient.OdsCode, StringComparison.Ordinal))?.Name
+                            serviceRecipient.OdsCode, StringComparison.OrdinalIgnoreCase))?.Name
                     }
                 });
 
             return new CatalogueSolutionsModel { OrderDescription = order.Description.Value, CatalogueSolutions = catalogueSolutionModel };
         }
 
-        [HttpPut]
-        [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult> UpdateAsync(string orderId)
-        {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
-
-            if (order is null)
-            {
-                return NotFound();
-            }
-
-            var primaryOrganisationId = User.GetPrimaryOrganisationId();
-            if (primaryOrganisationId != order.OrganisationId)
-            {
-                return Forbid();
-            }
-
-            order.CatalogueSolutionsViewed = true;
-            order.SetLastUpdatedBy(User.GetUserId(), User.GetUserName());
-
-            await _orderRepository.UpdateOrderAsync(order);
-
-            return NoContent();
-        }
-
         [HttpGet]
         [Route("{orderItemId}")]
-        public async Task<ActionResult<GetOrderItemModel>> GetOrderItemAsync(string orderId, int orderItemId)
+        public async Task<ActionResult<GetCatalogueSolutionOrderItemModel>> GetOrderItemAsync(string orderId, int orderItemId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
@@ -113,22 +89,27 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (orderItem is null)
                 return NotFound();
 
-            return new GetOrderItemModel
+            var serviceRecipients = order.ServiceRecipients;
+
+            return new GetCatalogueSolutionOrderItemModel
             {
                 ServiceRecipient = new ServiceRecipientModel
                 {
-                    OdsCode = orderItem.OdsCode
+                    OdsCode = orderItem.OdsCode,
+                    Name = serviceRecipients.FirstOrDefault(serviceRecipient => string.Equals(orderItem.OdsCode,
+                        serviceRecipient.OdsCode, StringComparison.OrdinalIgnoreCase))?.Name
                 },
-                CatalogueSolutionId = orderItem.CatalogueItemId,
-                CatalogueSolutionName = orderItem.CatalogueItemName,
+                CatalogueItemId = orderItem.CatalogueItemId,
+                CatalogueItemName = orderItem.CatalogueItemName,
                 CurrencyCode = orderItem.CurrencyCode,
                 DeliveryDate = orderItem.DeliveryDate,
                 EstimationPeriod = orderItem.EstimationPeriod.Name,
-                ItemUnit = new ItemUnitModel { Description = orderItem.CataloguePriceUnit.Description, Name = orderItem.CataloguePriceUnit.TierName },
+                ItemUnit = new ItemUnitModel { Description = orderItem.CataloguePriceUnit.Description, Name = orderItem.CataloguePriceUnit.Name },
                 Price = orderItem.Price,
                 ProvisioningType = orderItem.ProvisioningType.Name,
                 Quantity = orderItem.Quantity,
-                Type = orderItem.CataloguePriceType.Name
+                Type = orderItem.CataloguePriceType.Name,
+                TimeUnit = orderItem.PriceTimeUnit?.ToModel()
             };
         }
 
@@ -136,7 +117,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult<CreateOrderItemResponseModel>> CreateOrderItemAsync(
             string orderId,
-            CreateOrderItemModel model)
+            CreateOrderItemSolutionModel model)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
@@ -169,7 +150,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         public async Task<ActionResult<UpdateOrderItemResponseModel>> UpdateOrderItemAsync(
             string orderId, 
             int orderItemId, 
-            UpdateOrderItemModel model)
+            UpdateOrderItemSolutionModel model)
         {
             if (model is null)
                 throw new ArgumentNullException(nameof(model));
@@ -196,7 +177,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     order,
                     orderItemId,
                     model.Price,
-                    model.Quantity));
+                    model.Quantity),
+                orderItem.CatalogueItemType,
+                orderItem.ProvisioningType);
 
             if (result.IsSuccess)
                 return NoContent();

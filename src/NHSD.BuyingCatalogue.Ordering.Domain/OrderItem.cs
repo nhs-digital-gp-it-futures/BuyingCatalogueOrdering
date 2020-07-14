@@ -6,6 +6,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
     {
 #pragma warning disable 649
         private int _orderItemId;
+        private readonly DateTime _created;
 #pragma warning restore 649
 
         /// <summary>
@@ -52,6 +53,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public decimal? Price { get; private set; }
 
+        /// <summary>
+        /// Gets the created date and time for auditing purposes.
+        /// </summary>
+        /// <remarks>
+        /// Do not need to convert this to an auto property as recommended by ReSharper.
+        /// ReSharper disable once ConvertToAutoProperty
+        /// </remarks>
+        public DateTime Created 
+        {
+            get
+            {
+                return _created;
+            }
+        }
+
         private OrderItem()
         {
         }
@@ -93,6 +109,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             EstimationPeriod = estimationPeriod;
             DeliveryDate = deliveryDate;
             Price = price;
+            _created = DateTime.UtcNow;
+        }
+
+        public decimal CalculateTotalCostPerYear()
+        {
+            return Price.GetValueOrDefault() * Quantity * (PriceTimeUnit?.AmountInYear ?? EstimationPeriod?.AmountInYear ?? throw new InvalidOperationException("An Order Item must have a Price Time Unit or an Estimation Period"));
         }
 
         internal void ChangePrice(
@@ -114,6 +136,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
             if (changed)
                 onPropertyChangedCallback?.Invoke();
+        }
+
+        internal void MarkOrderSectionAsViewed(Order order)
+        {
+            if (order is null)
+                throw new ArgumentNullException(nameof(order));
+
+            CatalogueItemType.MarkOrderSectionAsViewed(order);
         }
 
         private bool IsTransient() => OrderItemId == default;

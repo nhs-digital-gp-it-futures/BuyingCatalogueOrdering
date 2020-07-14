@@ -5,8 +5,8 @@
 
 Background:
     Given Orders exist
-        | OrderId    | Description      | OrganisationId                       | LastUpdatedByName | LastUpdatedBy                        |
-        | C000014-01 | Some Description | 4af62b99-638c-4247-875e-965239cd0c48 | Tom Smith         | 335392e4-4bb1-413b-9de5-36a85c9c0422 |
+        | OrderId    | Description      | OrganisationId                       | LastUpdatedByName | LastUpdatedBy                        | CommencementDate | CatalogueSolutionsViewed |
+        | C000014-01 | Some Description | 4af62b99-638c-4247-875e-965239cd0c48 | Tom Smith         | 335392e4-4bb1-413b-9de5-36a85c9c0422 | 01/01/2021       | false                    |
     And Service Recipients exist
         | OdsCode | Name              | OrderId    |
         | ODS1    | Service Recipient | C000014-01 |
@@ -15,13 +15,13 @@ Background:
 @7840
 Scenario: 1. Create catalogue solution order item
     Given the user creates a request to add a new catalogue solution order item to the order with ID 'C000014-01'
-    And the user enters the '<payload-type>' create catalogue solution order item request payload
+    And the user enters the '<Payload-Type>' create catalogue solution order item request payload
     When the user sends the create catalogue solution order item request
     Then a response with status code 201 is returned
     And the expected catalogue solution order item is created
 
     Examples: Request payloads
-        | payload-type |
+        | Payload-Type |
         | complete     |
 
 @7840
@@ -78,3 +78,25 @@ Scenario: 8. Service Failure
     And the user enters the 'complete' create catalogue solution order item request payload
     When the user sends the create catalogue solution order item request
     Then a response with status code 500 is returned
+
+@7840
+Scenario: 9. Create catalogue solution order item and the catalogue solution order section should be marked as complete
+    Given the user creates a request to add a new catalogue solution order item to the order with ID 'C000014-01'
+    And the user enters the 'complete' create catalogue solution order item request payload
+    When the user sends the create catalogue solution order item request
+    Then the catalogue solution order section is marked as complete
+
+@7840
+Scenario: 10. Create catalogue solution order item should set the expected estimation period
+    Given the user creates a request to add a new catalogue solution order item to the order with ID 'C000014-01'
+    And the user enters the '<Payload-Type>' create catalogue solution order item request payload
+    When the user sends the create catalogue solution order item request
+    Then a response with status code 201 is returned
+    And the catalogue solution order item estimation period is set to '<EstimationPeriod>'
+
+    Examples: Request payloads
+        | Payload-Type        | EstimationPeriod |
+        | on-demand-per-month | Month            |
+        | on-demand-per-year  | Year             |
+        | patient             | Month            |
+        | declarative         | Year             |

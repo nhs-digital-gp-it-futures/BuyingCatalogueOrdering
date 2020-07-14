@@ -4,26 +4,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
     public sealed class GetOrderItemModel
     {
+        public string ItemId { get; set; }
+
         public ServiceRecipientModel ServiceRecipient { get; set; }
 
-        public string CatalogueSolutionId { get; set; }
+        public string CataloguePriceType { get; set; }
 
-        public string CatalogueSolutionName { get; set; }
+        public string CatalogueItemType { get; set; }
 
-        public DateTime? DeliveryDate { get; set; }
+        public string CatalogueItemName { get; set; }
 
-        public int Quantity { get; set; }
-
-        public string EstimationPeriod { get; set; }
-
-        public string ProvisioningType { get; set; }
-
-        public string Type { get; set; }
-
-        public string CurrencyCode { get; set; }
-
-        public ItemUnitModel ItemUnit { get; set; }
-
-        public decimal? Price { get; set; }
+        public string CatalogueItemId { get; set; }
     }
 }

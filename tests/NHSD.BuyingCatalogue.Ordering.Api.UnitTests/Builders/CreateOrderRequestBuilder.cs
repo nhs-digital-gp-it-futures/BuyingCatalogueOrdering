@@ -12,8 +12,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _createOrderRequest = new CreateOrderRequest()
             {
                 Description = "Some Description",
-                OrganisationId = Guid.NewGuid()
-            };            
+                OrganisationId = Guid.NewGuid(),
+                LastUpdatedById = Guid.NewGuid(),
+                LastUpdatedByName = "Some user name"
+            };
         }
 
         internal static CreateOrderRequestBuilder Create() => new CreateOrderRequestBuilder();

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Newtonsoft.Json.Linq;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
@@ -15,23 +16,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     {
         private readonly Request _request;
         private readonly Response _response;
-        private readonly OrderItemReferenceList _orderItemReferenceList;
+        private readonly OrderContext _orderContext;
 
         private readonly string _orderCatalogueSolutionsUrl;
 
-        public GetCatalogueSolutionOrderItemSteps(Request request, Response response, OrderItemReferenceList orderItemReferenceList, Settings settings)
+        public GetCatalogueSolutionOrderItemSteps(Request request, Response response, OrderContext orderContext, Settings settings)
         {
             _request = request;
             _response = response;
-            _orderItemReferenceList = orderItemReferenceList;
+            _orderContext = orderContext;
+
             _orderCatalogueSolutionsUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/catalogue-solutions";
         }
-        
+
         [When(@"the user makes a request to retrieve an order catalogue solution With orderID (.*) and CatalogueItemName (.*)")]
         public async Task WhenAGetRequestIsMadeForASingleOrdersCatalogueSolutionWithOrderIdAndOrderItemId(string orderId, string name)
         {
             var url = string.Format(_orderCatalogueSolutionsUrl, orderId);
-            var orderItemId = _orderItemReferenceList.GetByCatalogueSolutionItemName(name).OrderItemId;
+            var orderItemId = _orderContext.OrderItemReferenceList.GetByCatalogueSolutionItemName(name).OrderItemId;
 
             await _request.GetAsync($"{url}/{orderItemId}");
         }
@@ -51,20 +53,27 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             var response = await _response.ReadBodyAsJsonAsync();
 
+            var serviceRecipientToken = response.SelectToken("serviceRecipient");
+            var itemUnitToken = response.SelectToken("itemUnit");
+            var timeUnitToken = response.SelectToken("timeUnit");
+
             var actual = new GetOrderItemModel
             {
-                ServiceRecipientOdsCode = response.SelectToken("serviceRecipient").Value<string>("odsCode"),
-                CatalogueSolutionId = response.Value<string>("catalogueSolutionId"),
-                CatalogueSolutionName = response.Value<string>("catalogueSolutionName"),
+                ServiceRecipientOdsCode = serviceRecipientToken?.Value<string>("odsCode"),
+                ServiceRecipientName = serviceRecipientToken?.Value<string>("name"),
+                CatalogueItemId = response.Value<string>("catalogueItemId"),
+                CatalogueItemName = response.Value<string>("catalogueItemName"),
                 CurrencyCode = response.Value<string>("currencyCode"),
                 DeliveryDate = response.Value<DateTime?>("deliveryDate"),
                 EstimationPeriod = response.Value<string>("estimationPeriod"),
-                ItemUnitDescription = response.SelectToken("itemUnit").Value<string>("description"),
-                ItemUnitName = response.SelectToken("itemUnit").Value<string>("name"),
+                ItemUnitDescription = itemUnitToken?.Value<string>("description"),
+                ItemUnitName = itemUnitToken?.Value<string>("name"),
                 Price = response.Value<decimal?>("price"),
                 ProvisioningType = response.Value<string>("provisioningType"),
                 Quantity = response.Value<int>("quantity"),
-                Type = response.Value<string>("type")
+                Type = response.Value<string>("type"),
+                TimeUnitName = timeUnitToken?.Value<string>("name"),
+                TimeUnitDescription = timeUnitToken?.Value<string>("description"),
             };
 
             actual.Should().BeEquivalentTo(expected);
@@ -73,8 +82,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private sealed class GetOrderItemModel
         {
             public string ServiceRecipientOdsCode { get; set; }
-            public string CatalogueSolutionId { get; set; }
-            public string CatalogueSolutionName { get; set; }
+            public string ServiceRecipientName { get; set; }
+            public string CatalogueItemId { get; set; }
+            public string CatalogueItemName { get; set; }
             public string CurrencyCode { get; set; }
             public DateTime? DeliveryDate { get; set; }
             public string EstimationPeriod { get; set; }
@@ -84,6 +94,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string ProvisioningType { get; set; }
             public int Quantity { get; set; }
             public string Type { get; set; }
+
+            public string TimeUnitName { get; set; }
+
+            public string TimeUnitDescription { get; set; }
         }
     }
 }

@@ -3,6 +3,7 @@ using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
+using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
 
@@ -57,6 +58,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var orderItem = await OrderItemEntity.FetchByCatalogueItemName(_settings.ConnectionString, _createCatalogueSolutionOrderItemRequest.Payload.CatalogueSolutionName);
             (await _createCatalogueSolutionOrderItemResponse.GetOrderItemIdAsync()).Should().Be(orderItem.OrderItemId);
+        }
+
+        [Then(@"the catalogue solution order section is marked as complete")]
+        public async Task WhenTheCatalogueSolutionOrderSectionIsMarkedAsComplete()
+        {
+            var orderEntity = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, _createCatalogueSolutionOrderItemRequest.OrderId);
+            orderEntity.CatalogueSolutionsViewed.Should().BeTrue();
+        }
+
+        [Then(@"the catalogue solution order item estimation period is set to '(.*)'")]
+        public async Task ThenTheCatalogueSolutionOrderItemEstimationPeriodIsSetTo(TimeUnit estimationPeriod)
+        {
+            var orderItem = await OrderItemEntity.FetchByCatalogueItemName(_settings.ConnectionString, _createCatalogueSolutionOrderItemRequest.Payload.CatalogueSolutionName);
+            orderItem.EstimationPeriod.Should().Be(estimationPeriod);
         }
     }
 }

@@ -55,7 +55,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task GetAllAsync_OrganisationIdDoesNotMatch_ReturnsForbidden()
         {
             var context = ServiceRecipientsTestContext.Setup();
-            context.Order.OrganisationId = Guid.NewGuid();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(Guid.NewGuid())
+                .Build();
 
             var response = await context.Controller.GetAllAsync("myOrder");
             response.Should().BeEquivalentTo(new ActionResult<ServiceRecipientsModel>(new ForbidResult()));
@@ -83,7 +86,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var serviceRecipients = new List<(ServiceRecipient serviceRecipient, ServiceRecipientModel expectedModel)>
             {
-                CreateServiceRecipientData("ODS1", orderId)
+                CreateServiceRecipientData("ODS1", orderId, "name")
             };
 
             context.ServiceRecipients = serviceRecipients.Select(x => x.serviceRecipient).ToList();
@@ -111,9 +114,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var serviceRecipients = new List<(ServiceRecipient serviceRecipient, ServiceRecipientModel expectedModel)>
             {
-                CreateServiceRecipientData("ODS1", orderId),
-                CreateServiceRecipientData("ODS2", orderId),
-                CreateServiceRecipientData("ODS3", orderId)
+                CreateServiceRecipientData("ODS1", orderId, "Test"),
+                CreateServiceRecipientData("ODS2", orderId, "Service recipient"),
+                CreateServiceRecipientData("ODS3", orderId, "Data")
             };
 
             context.ServiceRecipients = serviceRecipients.Select(x => x.serviceRecipient).ToList();
@@ -121,7 +124,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var expectedList = serviceRecipients.Select(x => x.expectedModel);
 
-            expected.ServiceRecipients = expectedList;
+            expected.ServiceRecipients = expectedList.OrderBy(serviceRecipient => serviceRecipient.Name);
 
             var response = await context.Controller.GetAllAsync(orderId);
             response.Should().BeEquivalentTo(new ActionResult<ServiceRecipientsModel>(expected));
@@ -154,7 +157,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task UpdateAsync_OrganisationIdDoesNotMatch_ReturnsForbidden()
         {
             var context = ServiceRecipientsTestContext.Setup();
-            context.Order.OrganisationId = Guid.NewGuid();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(Guid.NewGuid())
+                .Build();
 
             var response = await context.Controller.UpdateAsync("myOrder", DefaultServiceRecipientsModel);
             response.Should().BeEquivalentTo(new ForbidResult());
@@ -281,12 +287,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         private static (ServiceRecipient serviceRecipient, ServiceRecipientModel expectedModel)
-            CreateServiceRecipientData(string odsCode, string orderId)
+            CreateServiceRecipientData(string odsCode, string orderId, string name)
         {
             var serviceRecipient = ServiceRecipientBuilder
                 .Create()
                 .WithOdsCode(odsCode)
                 .WithOrderId(orderId)
+                .WithName(name)
                 .Build();
 
             return (serviceRecipient,
@@ -300,8 +307,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 PrimaryOrganisationId = Guid.NewGuid();
                 UserId = Guid.NewGuid();
                 Username = "Test User";
-
-                Order = new Order { OrganisationId = PrimaryOrganisationId };
+                Order = OrderBuilder
+                    .Create()
+                    .WithOrganisationId(PrimaryOrganisationId)
+                    .Build();
 
                 OrderRepositoryMock = new Mock<IOrderRepository>();
                 OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);

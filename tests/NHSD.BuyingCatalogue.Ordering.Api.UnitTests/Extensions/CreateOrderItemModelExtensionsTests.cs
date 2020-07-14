@@ -14,23 +14,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         [Test]
         public void ToRequest_NullOrder_ThrowsArgumentNullException()
         {
-            static void Test()
-            {
-                CreateOrderItemModelBuilder.Create().Build().ToRequest(null, CatalogueItemType.Solution);
-            }
-
-            Assert.Throws<ArgumentNullException>(Test);
+            var builder = CreateOrderItemModelBuilder.Create().BuildSolution();
+            
+            Assert.Throws<ArgumentNullException>(() => builder.ToRequest(null, CatalogueItemType.Solution));
         }
 
         [Test]
         public void ToRequest_NullCatalogueItemType_ThrowsArgumentNullException()
         {
-            static void Test()
-            {
-                CreateOrderItemModelBuilder.Create().Build().ToRequest(OrderBuilder.Create().Build(), null);
-            }
+            var builder = CreateOrderItemModelBuilder.Create().BuildSolution();
 
-            Assert.Throws<ArgumentNullException>(Test);
+            Assert.Throws<ArgumentNullException>(() => builder.ToRequest(OrderBuilder.Create().Build(), null));
+        }
+
+        [Test]
+        public void ToRequest_NullQuantity_ThrowsArgumentException()
+        {
+            var builder = CreateOrderItemModelBuilder.Create().WithQuantity(null).BuildSolution();
+            var order = OrderBuilder.Create().Build();
+
+            Assert.Throws<ArgumentException>(() => builder.ToRequest(order, CatalogueItemType.Solution));
         }
 
         [Test]
@@ -38,7 +41,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         {
             var model = CreateOrderItemModelBuilder
                 .Create()
-                .Build();
+                .BuildSolution();
 
             var order = OrderBuilder
                 .Create()
@@ -57,11 +60,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
                 .WithCatalogueItemName(model.CatalogueSolutionName)
                 .WithProvisioningTypeName(model.ProvisioningType)
                 .WithCataloguePriceTypeName(model.Type)
-                .WithCataloguePriceUnitTierName(model.ItemUnitModel?.Name)
-                .WithCataloguePriceUnitDescription(model.ItemUnitModel?.Description)
+                .WithCataloguePriceUnitTierName(model.ItemUnit?.Name)
+                .WithCataloguePriceUnitDescription(model.ItemUnit?.Description)
                 .WithPriceTimeUnitName(null)
                 .WithCurrencyCode(model.CurrencyCode)
-                .WithQuantity(model.Quantity)
+                .WithQuantity(model.Quantity.Value)
                 .WithEstimationPeriodName(model.EstimationPeriod)
                 .WithDeliveryDate(model.DeliveryDate)
                 .WithPrice(model.Price)

@@ -35,7 +35,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [When(@"the user makes a request to update the order catalogue solutions section with the ID (.*)")]
         public async Task WhenAPutRequestIsMadeForAnOrdersCatalogueSolutionsWithOrderId(string orderId)
         {
-            await _request.PutJsonAsync(string.Format(_orderCatalogueSolutionsUrl, orderId), null);
+            await _request.PutJsonAsync(string.Format(_orderCatalogueSolutionsUrl, orderId), new { Status = "complete" });
         }
 
         [Then(@"the catalogue solutions response contains the order description (.*)")]
@@ -55,6 +55,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var solutionToken = response.SelectToken("catalogueSolutions");
             var solutions = solutionToken.Select(x => new CatalogueSolution
             {
+                CatalogueItemId = x.Value<string>("catalogueItemId"),
                 SolutionName = x.Value<string>("solutionName"),
                 ServiceRecipientName = x.SelectToken("serviceRecipient").Value<string>("name"),
                 ServiceRecipientOdsCode = x.SelectToken("serviceRecipient").Value<string>("odsCode")
@@ -81,6 +82,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
         private sealed class CatalogueSolution
         {
+            public string CatalogueItemId { get; set; }
             public string SolutionName { get; set; }
             public string ServiceRecipientName { get; set; }
             public string ServiceRecipientOdsCode { get; set; }

@@ -50,8 +50,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 
             builder.OwnsOne(orderItem => orderItem.CataloguePriceUnit, navigationBuilder =>
             {
-                navigationBuilder.Property(cataloguePriceUnit => cataloguePriceUnit.TierName)
-                    .HasColumnName("PricingUnitTierName");
+                navigationBuilder.Property(cataloguePriceUnit => cataloguePriceUnit.Name)
+                    .HasColumnName("PricingUnitName");
 
                 navigationBuilder.Property(cataloguePriceUnit => cataloguePriceUnit.Description)
                     .HasColumnName("PricingUnitDescription");
@@ -81,6 +81,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
             builder.Property(orderItem => orderItem.Price)
                 .HasColumnName(nameof(OrderItem.Price))
                 .HasColumnType("decimal(18, 3)");
+
+            builder.Property(orderItem => orderItem.Created)
+                .HasColumnName(nameof(OrderItem.Created))
+                .IsRequired();
         }
     }
 }

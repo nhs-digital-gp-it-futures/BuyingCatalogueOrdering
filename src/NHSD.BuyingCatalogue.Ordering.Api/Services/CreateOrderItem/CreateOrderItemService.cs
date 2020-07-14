@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Application.Services;
@@ -11,12 +12,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IIdentityService _identityService;
+        private readonly ICreateOrderItemValidator _orderItemValidator;
 
         public CreateOrderItemService(IOrderRepository orderRepository,
-            IIdentityService identityService)
+            IIdentityService identityService,
+            ICreateOrderItemValidator orderItemValidator)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
             _identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
+            _orderItemValidator = orderItemValidator ?? throw new ArgumentNullException(nameof(orderItemValidator));
         }
 
         public async Task<Result<int>> CreateAsync(CreateOrderItemRequest request)
@@ -24,12 +28,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             if (request is null)
                 throw new ArgumentNullException(nameof(request));
 
+            var validationErrors = _orderItemValidator.Validate(request).ToList();
+            if (validationErrors.Any())
+            {
+                return Result.Failure<int>(validationErrors);
+            }
+
             var provisioningType = ProvisioningType.FromName(request.ProvisioningTypeName);
             var cataloguePriceType = CataloguePriceType.FromName(request.CataloguePriceTypeName);
             var cataloguePriceUnit = CataloguePriceUnit.Create(request.CataloguePriceUnitTierName, request.CataloguePriceUnitDescription);
 
             var priceTimeUnit = TimeUnit.FromName(request.PriceTimeUnitName);
+
             var estimationPeriod = TimeUnit.FromName(request.EstimationPeriodName);
+            if (provisioningType != null)
+                estimationPeriod = provisioningType.InferEstimationPeriod(estimationPeriod);
 
             var orderItem = new OrderItem(
                 request.OdsCode, 
@@ -47,8 +60,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
                 request.Price);
 
             Order order = request.Order;
-            order.AddOrderItem(orderItem, 
-                _identityService.GetUserIdentity(), 
+            order.AddOrderItem(orderItem,
+                _identityService.GetUserIdentity(),
                 _identityService.GetUserName());
 
             await _orderRepository.UpdateOrderAsync(order);

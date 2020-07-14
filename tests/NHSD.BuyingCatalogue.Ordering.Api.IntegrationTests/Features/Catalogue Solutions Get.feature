@@ -5,16 +5,16 @@
 
 Background:
     Given Orders exist
-        | OrderId    | Description         | OrderStatusId | LastUpdatedBy                        | OrganisationId                       |
-        | C000014-01 | Some Description    | 1             | 335392e4-4bb1-413b-9de5-36a85c9c0422 | 4af62b99-638c-4247-875e-965239cd0c48 |
+        | OrderId    | Description      | OrderStatusId | LastUpdatedBy                        | OrganisationId                       |
+        | C000014-01 | Some Description | 1             | 335392e4-4bb1-413b-9de5-36a85c9c0422 | 4af62b99-638c-4247-875e-965239cd0c48 |
     Given Service Recipients exist
         | OrderId    | OdsCode | Name    |
         | C000014-01 | eu      | EU Test |
         | C000014-01 | ods     | NULL    |
     Given Order items exist
-        | OrderId    | CatalogueItemId | CatalogueItemName | CatalogueItemType | OdsCode | CurrencyCode | DeliveryDate | EstimationPeriod | CataloguePriceUnitName | CataloguePriceUnitDescription | Price   | ProvisioningType | Quantity |
-        | C000014-01 | Cat Item 1      | Sol1              | Solution          | eu      | GBP          | 01/01/2021   | Month            | Tier                   | Desc                          | 461.34  | Declarative      | 5        |
-        | C000014-01 | Cat Item 2      | Sol2              | AdditionalService | ods     | USD          | 09/03/2022   | Year             | Unit                   | Another Desc                  | 3521.67 | Patient          | 3        |
+        | OrderId    | CatalogueItemId | CatalogueItemName | CatalogueItemType | OdsCode | CurrencyCode | DeliveryDate | EstimationPeriod | CataloguePriceUnitName | CataloguePriceUnitDescription | Price   | ProvisioningType | Quantity | PriceTimeUnit |
+        | C000014-01 | Cat Item 1      | Sol1              | Solution          | eu      | GBP          | 01/01/2021   | Month            | Tier                   | Desc                          | 461.34  | Declarative      | 5        | Month         |
+        | C000014-01 | Cat Item 2      | Sol2              | AdditionalService | ods     | USD          | 09/03/2022   | Year             | Unit                   | Another Desc                  | 3521.67 | Patient          | 3        | Year          |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @7840
@@ -22,8 +22,8 @@ Scenario: 1. Get a order item
     When the user makes a request to retrieve an order catalogue solution With orderID C000014-01 and CatalogueItemName Sol1
     Then a response with status code 200 is returned
     And the catalogue solutions response contains a single solution
-        | ServiceRecipientOdsCode | CatalogueSolutionId | CatalogueSolutionName | CurrencyCode | DeliveryDate | EstimationPeriod | ItemUnitName | ItemUnitDescription | Price  | ProvisioningType | Quantity | Type |
-        | eu                      | Cat Item 1          | Sol1                  | GBP          | 01/01/2021   | month            | Tier         | Desc                | 461.34 | Declarative      | 5        | Flat |
+        | ServiceRecipientOdsCode | ServiceRecipientName | CatalogueItemId | CatalogueItemName | CurrencyCode | DeliveryDate | EstimationPeriod | ItemUnitName | ItemUnitDescription | Price  | ProvisioningType | Quantity | Type | TimeUnitName | TimeUnitDescription |
+        | eu                      | EU Test              | Cat Item 1      | Sol1              | GBP          | 01/01/2021   | month            | Tier         | Desc                | 461.34 | Declarative      | 5        | Flat | month        | per month           |
 
 @7840
 Scenario: 2. A order item type that isn't solution, returns not found

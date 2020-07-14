@@ -8,7 +8,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
     internal static class CreateOrderItemModelExtensions
     {
         public static CreateOrderItemRequest ToRequest(
-            this CreateOrderItemModel model, 
+            this CreateOrderItemSolutionModel model, 
             Order order, 
             CatalogueItemType catalogueItemType)
         {
@@ -17,6 +17,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 
             if (order is null)
                 throw new ArgumentNullException(nameof(order));
+            if(model.Quantity == null)
+                throw new ArgumentException($"Model {nameof(model.Quantity)} should never be null at this point", nameof(model));
 
             return new CreateOrderItemRequest(
                 order,
@@ -26,11 +28,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
                 model.CatalogueSolutionName,
                 model.ProvisioningType,
                 model.Type,
-                model.ItemUnitModel?.Name,
-                model.ItemUnitModel?.Description,
-                null,
+                model.ItemUnit?.Name,
+                model.ItemUnit?.Description,
+                model.TimeUnit?.Name,
                 model.CurrencyCode,
-                model.Quantity,
+                model.Quantity.Value,
                 model.EstimationPeriod,
                 model.DeliveryDate,
                 model.Price);

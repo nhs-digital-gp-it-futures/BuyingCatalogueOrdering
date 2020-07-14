@@ -2,13 +2,13 @@
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
-    public class CreateOrderItemModel
+    public sealed class GetCatalogueSolutionOrderItemModel
     {
         public ServiceRecipientModel ServiceRecipient { get; set; }
-        
-        public string CatalogueSolutionId { get; set; }
 
-        public string CatalogueSolutionName { get; set; }
+        public string CatalogueItemId { get; set; }
+
+        public string CatalogueItemName { get; set; }
 
         public DateTime? DeliveryDate { get; set; }
 
@@ -22,8 +22,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 
         public string CurrencyCode { get; set; }
 
-        public ItemUnitModel ItemUnitModel { get; set; }
+        public ItemUnitModel ItemUnit { get; set; }
 
         public decimal? Price { get; set; }
+
+        public TimeUnitModel TimeUnit { get; set; }
     }
 }

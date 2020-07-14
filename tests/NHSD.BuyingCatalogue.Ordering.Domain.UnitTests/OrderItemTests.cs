@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders;
 using NUnit.Framework;
@@ -112,6 +111,53 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             }
 
             Assert.Throws<ArgumentNullException>(Test);
+        }
+
+        [Test]
+        public void MarkOrderSectionAsViewed_NullOrder_ThrowsArgumentNullException()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithCatalogueItemType(CatalogueItemType.Solution)
+                .Build();
+
+            Assert.Throws<ArgumentNullException>(() => orderItem.MarkOrderSectionAsViewed(null));
+        }
+
+        [Test]
+        public void MarkOrderSectionAsViewed_Order_CatalogueSolutionsViewedIsTrue()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithCatalogueItemType(CatalogueItemType.Solution)
+                .Build();
+
+            var order = OrderBuilder
+                .Create()
+                .WithCatalogueSolutionsViewed(false)
+                .Build();
+
+            orderItem.MarkOrderSectionAsViewed(order);
+
+            order.CatalogueSolutionsViewed.Should().BeTrue();
+        }
+
+        [Test]
+        public void MarkOrderSectionAsViewed_Order_AdditionalServicesViewedIsTrue()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithCatalogueItemType(CatalogueItemType.AdditionalService)
+                .Build();
+
+            var order = OrderBuilder
+                .Create()
+                .WithCatalogueSolutionsViewed(false)
+                .Build();
+
+            orderItem.MarkOrderSectionAsViewed(order);
+
+            order.AdditionalServicesViewed.Should().BeTrue();
         }
 
         [Test]
@@ -253,6 +299,70 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             var expected = orderItemComparison.GetHashCode();
 
             actual.Should().NotBe(expected);
+        }
+
+        [Test]
+        public void CalculateCost_WithPriceTypePerMonth_CalculatesCostCorrectly()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithPrice(1m)
+                .WithQuantity(10)
+                .WithPriceTimeUnit(TimeUnit.PerMonth)
+                .Build();
+            orderItem.CalculateTotalCostPerYear().Should().Be(120);
+        }
+
+        [Test]
+        public void CalculateCost_WithPriceTypePerYear_CalculatesCostCorrectly()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithPrice(1m)
+                .WithQuantity(10)
+                .WithPriceTimeUnit(TimeUnit.PerYear)
+                .Build();
+            orderItem.CalculateTotalCostPerYear().Should().Be(10);
+        }
+
+        [Test]
+        public void CalculateTotalCostPerYear_WithEstimationPeriodPerMonth_CalculatesCorrectly()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithPrice(0.1m)
+                .WithQuantity(10)
+                .WithPriceTimeUnit(null)
+                .WithEstimationPeriod(TimeUnit.PerMonth)
+                .Build();
+            orderItem.CalculateTotalCostPerYear().Should().Be(12);
+        }
+
+        [Test]
+        public void CalculateTotalCostPerYear_WithEstimationPeriodPerYear_CalculatesCorrectly()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithPrice(0.1m)
+                .WithQuantity(10)
+                .WithPriceTimeUnit(null)
+                .WithEstimationPeriod(TimeUnit.PerYear)
+                .Build();
+            orderItem.CalculateTotalCostPerYear().Should().Be(1);
+        }
+
+        [Test]
+        public void CalculateCost_WithNoPriceTypeOrEstimationPeriod_ThrowsException()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithPrice(1m)
+                .WithQuantity(10)
+                .WithPriceTimeUnit(null)
+                .WithEstimationPeriod(null)
+                .Build();
+
+            Assert.Throws<InvalidOperationException>(() => orderItem.CalculateTotalCostPerYear());
         }
     }
 }

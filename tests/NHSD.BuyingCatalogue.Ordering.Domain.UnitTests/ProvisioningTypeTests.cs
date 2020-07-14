@@ -68,6 +68,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [TestCase(null)]
+        [TestCase("month")]
+        [TestCase("year")]
+        public void InferEstimationPeriod_OnDemand_PerMonth_ReturnsEstimationPeriodOfPerMonth(
+            string inputEstimationPeriodName)
+        {
+            var expectedTimeUnit = TimeUnit.FromName(inputEstimationPeriodName);
+
+            var actual = ProvisioningType.OnDemand.InferEstimationPeriod(expectedTimeUnit);
+            actual.Should().Be(expectedTimeUnit);
+        }
+
+        [Test]
+        public void InferEstimationPeriod_Declarative_Null_ReturnsEstimationPeriodOfPerYear()
+        {
+            var actual = ProvisioningType.Declarative.InferEstimationPeriod(null);
+            actual.Should().Be(TimeUnit.PerYear);
+        }
+
+        [Test]
+        public void InferEstimationPeriod_Patient_Null_ReturnsEstimationPeriodOfPerMonth()
+        {
+            var actual = ProvisioningType.Patient.InferEstimationPeriod(null);
+            actual.Should().Be(TimeUnit.PerMonth);
+        }
+
+        [TestCase(null)]
         [TestCase("InvalidType")]
         public void Equals_ComparisonObject_AreNotEqual(object comparisonObject)
         {

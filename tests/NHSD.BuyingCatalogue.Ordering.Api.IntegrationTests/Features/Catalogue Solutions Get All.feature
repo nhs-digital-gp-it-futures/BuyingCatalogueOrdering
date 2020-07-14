@@ -14,12 +14,12 @@ Background:
         | C000014-01 | auz     | AUZ Test |
         | C000014-01 | ods     | NULL     |
     Given Order items exist
-        | OrderId    | CatalogueItemName | CatalogueItemType | OdsCode |
-        | C000014-01 | Sol 1             | Solution          | eu      |
-        | C000014-01 | Sol 2             | Solution          | auz     |
-        | C000014-01 | Sol 3             | Solution          | ods     |
-        | C000014-01 | Add Serv 1        | AdditionalService | eu      |
-        | C000014-01 | Ass Serv 1        | AssociatedService | auz     |
+        | OrderId    | CatalogueItemId | CatalogueItemName | CatalogueItemType | OdsCode |
+        | C000014-01 | 1001-001        | Sol 1             | Solution          | eu      |
+        | C000014-01 | 1002-001        | Sol 2             | Solution          | auz     |
+        | C000014-01 | 1003-001        | Sol 3             | Solution          | ods     |
+        | C000014-01 | 1004-001        | Add Serv 1        | AdditionalService | eu      |
+        | C000014-01 | 1005-001        | Ass Serv 1        | AssociatedService | auz     |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @4631
@@ -28,10 +28,10 @@ Scenario: 1. Get an orders catalogue solutions
     Then a response with status code 200 is returned
     And the catalogue solutions response contains the order description Some Description
     And the catalogue solutions response contains solutions
-        | SolutionName | ServiceRecipientName | ServiceRecipientOdsCode |
-        | Sol 1        | EU Test              | eu                      |
-        | Sol 2        | AUZ Test             | auz                     |
-        | Sol 3        | NULL                 | ods                     |
+        | SolutionName | CatalogueItemId | ServiceRecipientName | ServiceRecipientOdsCode |
+        | Sol 1        | 1001-001        | EU Test              | eu                      |
+        | Sol 2        | 1002-001        | AUZ Test             | auz                     |
+        | Sol 3        | 1003-001        | NULL                 | ods                     |
 
 @4621
 Scenario: 2. Get an orders catalouge solution that contains no solutions
