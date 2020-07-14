@@ -32,7 +32,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                 {"missing-quantity", () => CreateOrderItemRequestPayloadBuilder.CreateAdditionalService().WithQuantity(null).Build()},
                 {"missing-estimation-period", () => CreateOrderItemRequestPayloadBuilder.CreateAdditionalService().WithEstimationPeriod(null).Build()},
                 {"missing-price", () => CreateOrderItemRequestPayloadBuilder.CreateAdditionalService().WithPrice(null).Build()},
-                {"invalid-value-currency-code", () => CreateOrderItemRequestPayloadBuilder.CreateAdditionalService().WithCurrencyCode("YOLO").Build()},
+                {"invalid-value-currency-code", () => CreateOrderItemRequestPayloadBuilder.CreateAdditionalService().WithCurrencyCode("INV").Build()},
                 {"invalid-value-provisioning-type", () => CreateOrderItemRequestPayloadBuilder.CreateAdditionalService().WithProvisioningType(ProvisioningType.Invalid).Build()},
                 {"invalid-value-type", () => CreateOrderItemRequestPayloadBuilder.CreateAdditionalService().WithCataloguePriceType(CataloguePriceType.Invalid).Build()},
                 {"invalid-value-estimation-period", () => CreateOrderItemRequestPayloadBuilder.CreateAdditionalService().WithEstimationPeriod(TimeUnit.Invalid).Build()},

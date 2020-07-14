@@ -6,7 +6,7 @@ using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Attributes
 {
-    public sealed class CreateOrderItemModelConverter : JsonConverter<CreateOrderItemBaseModel>
+    public sealed class CreateOrderItemBaseModelConverter : JsonConverter<CreateOrderItemBaseModel>
     {
         public override CreateOrderItemBaseModel Read(
             ref Utf8JsonReader reader, 

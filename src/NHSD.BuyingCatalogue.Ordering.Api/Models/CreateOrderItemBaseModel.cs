@@ -7,7 +7,7 @@ using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
-    [JsonConverter(typeof(CreateOrderItemModelConverter))]
+    [JsonConverter(typeof(CreateOrderItemBaseModelConverter))]
     public class CreateOrderItemBaseModel
     {
         [Required(ErrorMessage = "CatalogueItemTypeRequired")]
