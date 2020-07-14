@@ -25,5 +25,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
         public ItemUnitModel ItemUnit { get; set; }
 
         public decimal? Price { get; set; }
+
+        public TimeUnitModel TimeUnit { get; set; }
     }
 }

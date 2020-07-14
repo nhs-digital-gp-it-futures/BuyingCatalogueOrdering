@@ -86,7 +86,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var serviceRecipients = new List<(ServiceRecipient serviceRecipient, ServiceRecipientModel expectedModel)>
             {
-                CreateServiceRecipientData("ODS1", orderId)
+                CreateServiceRecipientData("ODS1", orderId, "name")
             };
 
             context.ServiceRecipients = serviceRecipients.Select(x => x.serviceRecipient).ToList();
@@ -114,9 +114,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var serviceRecipients = new List<(ServiceRecipient serviceRecipient, ServiceRecipientModel expectedModel)>
             {
-                CreateServiceRecipientData("ODS1", orderId),
-                CreateServiceRecipientData("ODS2", orderId),
-                CreateServiceRecipientData("ODS3", orderId)
+                CreateServiceRecipientData("ODS1", orderId, "Test"),
+                CreateServiceRecipientData("ODS2", orderId, "Service recipient"),
+                CreateServiceRecipientData("ODS3", orderId, "Data")
             };
 
             context.ServiceRecipients = serviceRecipients.Select(x => x.serviceRecipient).ToList();
@@ -124,7 +124,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var expectedList = serviceRecipients.Select(x => x.expectedModel);
 
-            expected.ServiceRecipients = expectedList;
+            expected.ServiceRecipients = expectedList.OrderBy(serviceRecipient => serviceRecipient.Name);
 
             var response = await context.Controller.GetAllAsync(orderId);
             response.Should().BeEquivalentTo(new ActionResult<ServiceRecipientsModel>(expected));
@@ -287,12 +287,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         private static (ServiceRecipient serviceRecipient, ServiceRecipientModel expectedModel)
-            CreateServiceRecipientData(string odsCode, string orderId)
+            CreateServiceRecipientData(string odsCode, string orderId, string name)
         {
             var serviceRecipient = ServiceRecipientBuilder
                 .Create()
                 .WithOdsCode(odsCode)
                 .WithOrderId(orderId)
+                .WithName(name)
                 .Build();
 
             return (serviceRecipient,

@@ -70,11 +70,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var expected = table.CreateSet<ServiceRecipientTable>();
 
-            var payload = new ServiceRecipientsTable {ServiceRecipients = table.CreateSet<ServiceRecipientTable>() };
+            var serviceRecipients = (await _response.ReadBodyAsJsonAsync())
+                .SelectToken("serviceRecipients").Select(CreateServiceRecipients);
 
-            var serviceRecipients = (await _response.ReadBodyAsJsonAsync()).SelectToken("serviceRecipients").Select(CreateServiceRecipients);
-
-            expected.Should().BeEquivalentTo(serviceRecipients, conf => conf.Excluding(x => x.OrderId));
+            expected.Should().BeEquivalentTo(serviceRecipients, conf =>
+                conf.Excluding(x => x.OrderId).WithStrictOrdering());
         }
 
         [Then(@"the persisted service recipients are")]

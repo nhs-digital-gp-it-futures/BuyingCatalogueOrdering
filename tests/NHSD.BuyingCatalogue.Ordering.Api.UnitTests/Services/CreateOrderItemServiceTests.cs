@@ -193,6 +193,62 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 identityService.GetUserIdentity(), Times.Once);
         }
 
+        [TestCase(null)]
+        [TestCase("month")]
+        [TestCase("year")]
+        public async Task CreateAsync_ProvisioningType_OnDemand_OrderItemAddedWithExpectedEstimationPeriod(
+            string inputEstimationPeriod)
+        {
+            var context = CreateOrderItemServiceTestContext.Setup();
+
+            var createOrderItemRequest = CreateOrderItemRequestBuilder
+                .Create()
+                .WithProvisioningTypeName(ProvisioningType.OnDemand.Name)
+                .WithEstimationPeriodName(inputEstimationPeriod)
+                .Build();
+
+            await context.CreateOrderItemService.CreateAsync(createOrderItemRequest);
+
+            var orderItem = createOrderItemRequest.Order.OrderItems.First();
+
+            var expectedEstimationPeriod = TimeUnit.FromName(inputEstimationPeriod);
+            orderItem.EstimationPeriod.Should().Be(expectedEstimationPeriod);
+        }
+
+        [Test]
+        public async Task CreateAsync_ProvisioningType_Patient_OrderItemAddedWithEstimationPeriod_PerMonth()
+        {
+            var context = CreateOrderItemServiceTestContext.Setup();
+
+            var createOrderItemRequest = CreateOrderItemRequestBuilder
+                .Create()
+                .WithProvisioningTypeName(ProvisioningType.Patient.Name)
+                .WithEstimationPeriodName(null)
+                .Build();
+
+            await context.CreateOrderItemService.CreateAsync(createOrderItemRequest);
+
+            var orderItem = createOrderItemRequest.Order.OrderItems.First();
+            orderItem.EstimationPeriod.Should().Be(TimeUnit.PerMonth);
+        }
+
+        [Test]
+        public async Task CreateAsync_ProvisioningType_Declarative_OrderItemAddedWithEstimationPeriod_PerYear()
+        {
+            var context = CreateOrderItemServiceTestContext.Setup();
+
+            var createOrderItemRequest = CreateOrderItemRequestBuilder
+                .Create()
+                .WithProvisioningTypeName(ProvisioningType.Declarative.Name)
+                .WithEstimationPeriodName(null)
+                .Build();
+
+            await context.CreateOrderItemService.CreateAsync(createOrderItemRequest);
+
+            var orderItem = createOrderItemRequest.Order.OrderItems.First();
+            orderItem.EstimationPeriod.Should().Be(TimeUnit.PerYear);
+        }
+
         private sealed class CreateOrderItemServiceTestContext
         {
             private CreateOrderItemServiceTestContext()
