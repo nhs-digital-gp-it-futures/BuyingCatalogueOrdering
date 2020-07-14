@@ -15,7 +15,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
         private const int MaximumDeliveryDateOffsetDays = 1282;
 
         private readonly Request _request;
-        private readonly string _createCatalogueSolutionOrderItemUrl;
+        private readonly string _createOrderItemUrl;
 
         private static readonly IDictionary<string, Func<UpdateOrderItemRequestPayload>> PayloadFactory =
             new Dictionary<string, Func<UpdateOrderItemRequestPayload>>()
@@ -127,7 +127,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             OrderId = orderId ?? throw new ArgumentNullException(nameof(orderId));
             OrderItemId = orderItemId;
 
-            _createCatalogueSolutionOrderItemUrl =
+            _createOrderItemUrl =
                 $"{orderingApiBaseAddress}/api/v1/orders/{orderId}/order-items/{orderItemId}";
         }
 
@@ -139,7 +139,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 
         public async Task ExecuteAsync()
         {
-            await _request.PutJsonAsync(_createCatalogueSolutionOrderItemUrl, new
+            await _request.PutJsonAsync(_createOrderItemUrl, new
             {
                 Payload.DeliveryDate,
                 Payload.Quantity,
@@ -154,7 +154,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                 throw new ArgumentNullException(nameof(key));
 
             if (!PayloadFactory.TryGetValue(key, out var factory))
-                Assert.Fail("Unexpected update catalogue solution order item payload type.");
+                Assert.Fail("Unexpected update order item payload type.");
 
             Payload = factory();
         }
@@ -174,7 +174,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
         }
     }
 
-    internal class UpdateOrderItemRequestPayload
+    internal sealed class UpdateOrderItemRequestPayload
     {
         public DateTime? DeliveryDate { get; set; }
 
