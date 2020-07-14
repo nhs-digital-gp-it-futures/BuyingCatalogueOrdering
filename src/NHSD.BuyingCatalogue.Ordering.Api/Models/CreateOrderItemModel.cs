@@ -1,10 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using NHSD.BuyingCatalogue.Ordering.Api.Attributes;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
     public class CreateOrderItemModel : CreateOrderItemBaseModel
     {
+        public override CreateOrderItemRequest ToRequest(Order order)
+        {
+            throw new NotImplementedException();
+        }
+
         [Required(ErrorMessage = "CatalogueItemIdRequired")]
         [MaxLength(14, ErrorMessage = "CatalogueItemIdTooLong")]
         public string CatalogueItemId { get; set; }

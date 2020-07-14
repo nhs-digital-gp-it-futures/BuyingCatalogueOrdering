@@ -27,33 +27,34 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public void Constructor_NullOrderRepository_NullException()
         {
-            var context = OrderItemsControllerTestContext.Setup();
-            
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                var _ = new OrderItemsController(null, context.UpdateOrderItemServiceMock.Object, Mock.Of<ICreateOrderItemService>());
-            });
+            var builder = OrderItemsControllerBuilder.Create()
+                .WithOrderRepository(null)
+                .WithCreateOrderItemService(Mock.Of<ICreateOrderItemService>())
+                .WithUpdateOrderItemService(Mock.Of<IUpdateOrderItemService>());
+
+            Assert.Throws<ArgumentNullException>(() => builder.Build());
         }
 
         [Test]
         public void Constructor_UpdateOrderItemServiceNull_NullException()
         {
-            var context = OrderItemsControllerTestContext.Setup();
+            var builder = OrderItemsControllerBuilder.Create()
+                .WithOrderRepository(Mock.Of<IOrderRepository>())
+                .WithCreateOrderItemService(Mock.Of<ICreateOrderItemService>())
+                .WithUpdateOrderItemService(null);
 
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                var _ = new OrderItemsController(context.OrderRepositoryMock.Object, null, context.CreateOrderItemServiceMock.Object);
-            });
+            Assert.Throws<ArgumentNullException>(() => builder.Build());
         }
 
         [Test]
         public void Constructor_NullCreateOrderItemService_NullException()
         {
-            var context = OrderItemsControllerTestContext.Setup();
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                var _ = new OrderItemsController(context.OrderRepositoryMock.Object, context.UpdateOrderItemServiceMock.Object, null);
-            });
+            var builder = OrderItemsControllerBuilder.Create()
+                .WithOrderRepository(Mock.Of<IOrderRepository>())
+                .WithCreateOrderItemService(null)
+                .WithUpdateOrderItemService(Mock.Of<IUpdateOrderItemService>());
+
+            Assert.Throws<ArgumentNullException>(() => builder.Build());
         }
 
         [Test]

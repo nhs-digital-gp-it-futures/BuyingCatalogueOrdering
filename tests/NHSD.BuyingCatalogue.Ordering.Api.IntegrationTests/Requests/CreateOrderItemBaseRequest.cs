@@ -17,6 +17,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
         private readonly Request _request;
         private readonly string _createOrderItemUrl;
 
+        private static readonly Dictionary<string, Func<Request, string, string, CreateOrderItemBaseRequest>> CreateFunctions 
+            = new Dictionary<string, Func<Request, string, string, CreateOrderItemBaseRequest>>
+        {
+            { "catalogue solution", (request, url, orderId) => new CreateCatalogueSolutionOrderItemRequest(
+                request,
+                url,
+                orderId)
+            },
+            { "additional service", (request, url, orderId) => new CreateAdditionalServiceOrderItemRequest(
+                request,
+                url,
+                orderId)
+            }
+        };
+
         protected abstract IDictionary<string, Func<CreateOrderItemRequestPayload>> PayloadFactory { get; }
         public string OrderId { get; set; }
         public CreateOrderItemRequestPayload Payload { get; private set; }
@@ -111,6 +126,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             var response = await _request.PostJsonAsync(_createOrderItemUrl, payload);
 
             return new CreateOrderItemResponse(response);
+        }
+
+        public static CreateOrderItemBaseRequest Create(string orderItemType, Request request, string baseUrl, string orderId)
+        {
+            if (!CreateFunctions.TryGetValue(orderItemType, out var factory))
+                Assert.Fail("Unexpected create order item request type.");
+
+            return factory(request, baseUrl, orderId);
         }
     }
 }

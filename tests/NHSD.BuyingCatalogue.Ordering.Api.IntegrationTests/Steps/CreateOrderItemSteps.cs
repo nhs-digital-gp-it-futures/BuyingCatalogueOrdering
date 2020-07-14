@@ -19,20 +19,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private CreateOrderItemBaseRequest _createOrderItemRequest;
         private CreateOrderItemResponse _createOrderItemResponse;
 
-        private readonly Dictionary<string, Func<Request, string, string, CreateOrderItemBaseRequest>> _createFunctions = new Dictionary<string, Func<Request, string, string, CreateOrderItemBaseRequest>>
-        {
-            { "catalogue solution", (request, url, orderId) => new CreateCatalogueSolutionOrderItemRequest(
-                    request,
-                    url,
-                    orderId)
-            },
-            { "additional service", (request, url, orderId) => new CreateAdditionalServiceOrderItemRequest(
-                request,
-                url,
-                orderId)
-        }
-        };
-
         public CreateOrderItemSteps(
             Request request,
             Settings settings)
@@ -44,7 +30,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Given(@"the user creates a request to add a new (.*) order item to the order with ID '(.*)'")]
         public void GivenTheUserCreatesARequestToAddANewCatalogueSolutionOrderItemToTheOrderWithId(string itemType, string orderId)
         {
-            _createOrderItemRequest = _createFunctions[itemType](_request, _settings.OrderingApiBaseUrl, orderId);
+            _createOrderItemRequest = CreateOrderItemBaseRequest.Create(itemType, _request, _settings.OrderingApiBaseUrl, orderId);
         }
 
         [Given(@"the user enters the '(.*)' create order item request payload")]

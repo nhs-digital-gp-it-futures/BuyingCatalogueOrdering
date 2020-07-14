@@ -119,6 +119,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             string orderId,
             CreateOrderItemSolutionModel model)
         {
+            if (model is null)
+                throw new ArgumentNullException(nameof(model));
+
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
             {
@@ -129,11 +132,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (primaryOrganisationId != order.OrganisationId)
             {
                 return Forbid();
-            }
-
-            if (model is null)
-            {
-                throw new ArgumentNullException(nameof(model));
             }
 
             var createOrderItemResponse = new CreateOrderItemResponseModel();
