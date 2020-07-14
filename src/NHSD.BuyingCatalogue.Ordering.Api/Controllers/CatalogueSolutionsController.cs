@@ -108,7 +108,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 Price = orderItem.Price,
                 ProvisioningType = orderItem.ProvisioningType.Name,
                 Quantity = orderItem.Quantity,
-                Type = orderItem.CataloguePriceType.Name
+                Type = orderItem.CataloguePriceType.Name,
+                TimeUnit = orderItem.PriceTimeUnit?.ToModel()
             };
         }
 
