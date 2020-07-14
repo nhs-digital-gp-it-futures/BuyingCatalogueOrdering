@@ -10,8 +10,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
     {
         private readonly Dictionary<string, OrderItemEntity> _cache = new Dictionary<string, OrderItemEntity>();
 
-        public OrderItemEntity GetByOrderItemName(string ItemName) => 
-            _cache[ItemName]
+        public IEnumerable<OrderItemEntity> GetAll() => 
+            _cache.Values;
+
+        public OrderItemEntity GetByOrderCatalogueItemName(string catalogueItemName) => 
+            _cache[catalogueItemName]
                 .Should()
                 .NotBeNull()
                 .And
@@ -20,13 +23,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
                 .BeOfType<OrderItemEntity>()
                 .Which;
 
-        public void Add(string ItemName, OrderItemEntity entity)
+        public void Add(string catalogueItemName, OrderItemEntity entity)
         {
-            _cache.ContainsKey(ItemName).Should().BeFalse();
-            _cache.Add(ItemName, entity);
+            _cache.ContainsKey(catalogueItemName).Should().BeFalse();
+            _cache.Add(catalogueItemName, entity);
         }
 
         public IEnumerable<OrderItemEntity> FindByOrderId(string orderId) => _cache.Values.Where(x =>
             string.Equals(x.OrderId, orderId, StringComparison.OrdinalIgnoreCase));
+
+        public OrderItemEntity FindByOrderItemId(int? orderItemId) => 
+            _cache.Values.SingleOrDefault(x => x.OrderItemId == orderItemId.GetValueOrDefault());
     }
 }

@@ -58,6 +58,220 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
+        public async Task ListAsync_OrderDoesNotExist_ReturnsNotFound()
+        {
+            var context = OrderItemsControllerTestContext.Setup();
+            context.Order = null;
+
+            var response = await context.OrderItemsController.ListAsync("INVALID", null);
+            response.Result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        public async Task ListAsync_CatalogueItemTypeIsInvalid_ReturnsEmptyList()
+        {
+            var context = OrderItemsControllerTestContext.Setup();
+
+            var response = await context.OrderItemsController.ListAsync("myOrder", "INVALID");
+            response.Value.Should().BeEmpty();
+        }
+
+        [Test]
+        public async Task ListAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
+        {
+            var context = OrderItemsControllerTestContext.Setup();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(Guid.NewGuid())
+                .Build();
+
+            var result = await context.OrderItemsController.ListAsync("myOrder", null);
+
+            result.Result.Should().BeOfType<ForbidResult>();
+        }
+
+        [TestCase(null)]
+        [TestCase("Solution")]
+        [TestCase("AdditionalService")]
+        [TestCase("AssociatedService")]
+        [TestCase("SOLutiON")]
+        [TestCase("ADDitIONalServiCE")]
+        [TestCase("associatedSERVICe")]
+        public async Task ListAsync_OrderExistsWithFilter_ReturnsListOfOrderItems(string catalogueItemTypeFilter)
+        {
+            var context = OrderItemsControllerTestContext.Setup();
+
+            var serviceRecipients = new List<(string Ods, string Name)>
+            {
+                ("eu", "EU test"),
+                ("auz", null)
+            };
+
+            context.Order.SetServiceRecipient(serviceRecipients, Guid.Empty, String.Empty);
+
+            var solutionOrderItem1 = CreateOrderItem(CatalogueItemType.Solution, serviceRecipients[0].Ods, 1, new DateTime(2020, 04, 13));
+            var solutionOrderItem2 = CreateOrderItem(CatalogueItemType.Solution, serviceRecipients[1].Ods, 2, new DateTime(2020, 04, 12));
+            var additionalServiceOrderItem1 = CreateOrderItem(CatalogueItemType.AdditionalService, serviceRecipients[1].Ods, 3, new DateTime(2020, 05, 13));
+            var associatedServiceOrderItem1 = CreateOrderItem(CatalogueItemType.AssociatedService, serviceRecipients[0].Ods, 4, new DateTime(2020, 05, 11));
+
+            context.Order.AddOrderItem(solutionOrderItem1, Guid.Empty, string.Empty);
+            context.Order.AddOrderItem(solutionOrderItem2, Guid.Empty, string.Empty);
+            context.Order.AddOrderItem(additionalServiceOrderItem1, Guid.Empty, string.Empty);
+            context.Order.AddOrderItem(associatedServiceOrderItem1, Guid.Empty, string.Empty);
+
+            const string orderId = "myOrder";
+            var result = await context.OrderItemsController.ListAsync(orderId, catalogueItemTypeFilter);
+            result.Value.Should().BeOfType<List<GetOrderItemModel>>();
+
+            var expectedOrderItems =
+                CreateOrderItemModels(
+                    new List<OrderItem>
+                    {
+                        solutionOrderItem1,
+                        solutionOrderItem2,
+                        additionalServiceOrderItem1,
+                        associatedServiceOrderItem1
+                    }, orderId,
+                    catalogueItemTypeFilter,
+                    context.Order.ServiceRecipients);
+
+            result.Value.Should().BeEquivalentTo(expectedOrderItems, options => options.WithStrictOrdering());
+        }
+        
+        [Test]
+        public async Task GetAsync_NonExistentOrderID_OrderItemId_ReturnsNotFound()
+        {
+            var context = OrderItemsControllerTestContext.Setup();
+            context.Order = null;
+
+            var result = await context.OrderItemsController.GetAsync(string.Empty, 1);
+
+            result.Result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        public async Task GetAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
+        {
+            var context = OrderItemsControllerTestContext.Setup();
+            context.Order = OrderBuilder
+                .Create()
+                .Build();
+
+            var result = await context.OrderItemsController.GetAsync(context.Order.OrderId, 1);
+
+            result.Result.Should().BeOfType<ForbidResult>();
+        }
+
+        [Test]
+        public async Task GetAsync_OrderId_NonExistentOrderItemId_ReturnsNotFound()
+        {
+            var serviceRecipient = ServiceRecipientBuilder
+                .Create()
+                .WithOdsCode("ODS1")
+                .Build();
+
+            var orderItem = CreateOrderItem(CatalogueItemType.Solution, serviceRecipient.OdsCode, 1, DateTime.UtcNow);
+
+            var context = OrderItemsControllerTestContext.Setup();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(context.PrimaryOrganisationId)
+                .WithOrderItem(orderItem)
+                .WithServiceRecipient((serviceRecipient.OdsCode, serviceRecipient.Name))
+                .Build();
+
+            const int nonExistentOrderItemId = 2;
+            var result = await context.OrderItemsController.GetAsync(context.Order.OrderId, nonExistentOrderItemId);
+
+            result.Result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        public async Task GetAsync_EmptyOrderItems_ReturnsNotFound()
+        {
+            var context = OrderItemsControllerTestContext.Setup();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(context.PrimaryOrganisationId)
+                .Build();
+
+            const int orderItemId = 1;
+            var result = await context.OrderItemsController.GetAsync(context.Order.OrderId, orderItemId);
+
+            result.Result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        public async Task GetAsync_UnmatchedServiceRecipient_ReturnsExpected()
+        {
+            var serviceRecipient = ServiceRecipientBuilder
+                .Create()
+                .WithOdsCode("ODS2")
+                .Build();
+
+            var orderItem = CreateOrderItem(CatalogueItemType.Solution, serviceRecipient.OdsCode, 1, DateTime.UtcNow);
+
+            var context = OrderItemsControllerTestContext.Setup();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(context.PrimaryOrganisationId)
+                .WithOrderItem(orderItem)
+                .WithServiceRecipient(("UNMATCHED ODS1", serviceRecipient.Name))
+                .Build();
+
+            var result = await context.OrderItemsController.GetAsync(context.Order.OrderId, orderItem.OrderItemId);
+
+            result.Value.Should().BeEquivalentTo(new GetOrderItemModel(context.Order.OrderId, orderItem, null));
+        }
+
+        [Test]
+        public async Task GetAsync_OrderRepository_CalledOnce()
+        {
+            var serviceRecipient = ServiceRecipientBuilder
+                .Create()
+                .WithOdsCode("ODS2")
+                .Build();
+
+            var orderItem = CreateOrderItem(CatalogueItemType.Solution, serviceRecipient.OdsCode, 1, DateTime.UtcNow);
+
+            var context = OrderItemsControllerTestContext.Setup();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(context.PrimaryOrganisationId)
+                .WithOrderItem(orderItem)
+                .WithServiceRecipient((serviceRecipient.OdsCode, serviceRecipient.Name))
+                .Build();
+
+            string orderId = context.Order.OrderId;
+            await context.OrderItemsController.GetAsync(orderId, orderItem.OrderItemId);
+
+            context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(orderId), Times.Once);
+        }
+
+        [Test]
+        public async Task GetAsync_OrderId_OrderItemId_ReturnsExpected()
+        {
+            var serviceRecipient = ServiceRecipientBuilder
+                .Create()
+                .WithOdsCode("ODS1")
+                .Build();
+
+            var orderItem = CreateOrderItem(CatalogueItemType.Solution, serviceRecipient.OdsCode, 1, DateTime.UtcNow);
+
+            var context = OrderItemsControllerTestContext.Setup();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(context.PrimaryOrganisationId)
+                .WithOrderItem(orderItem)
+                .WithServiceRecipient((serviceRecipient.OdsCode, serviceRecipient.Name))
+                .Build();
+
+            var result = await context.OrderItemsController.GetAsync(context.Order.OrderId, orderItem.OrderItemId);
+
+            result.Value.Should().BeEquivalentTo(new GetOrderItemModel(context.Order.OrderId, orderItem, serviceRecipient));
+        }
+
+        [Test]
         public async Task CreateOrderItemAsync_OrderIdDoesNotExist_ReturnsNotFound()
         {
             var createModel = CreateOrderItemModelBuilder.Create().BuildSolution();
@@ -219,87 +433,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             context.CreateOrderItemServiceMock.Verify(x =>
                     x.CreateAsync(It.IsNotNull<CreateOrderItemRequest>()), Times.Once);
-        }
-
-        [Test]
-        public async Task GetAllAsync_OrderDoesNotExist_ReturnsNotFound()
-        {
-            var context = OrderItemsControllerTestContext.Setup();
-            context.Order = null;
-
-            var response = await context.OrderItemsController.GetAllAsync("INVALID", null);
-            response.Result.Should().BeOfType<NotFoundResult>();
-        }
-
-        [Test]
-        public async Task GetAllAsync_CatalogueItemTypeIsInvalid_ReturnsEmptyList()
-        {
-            var context = OrderItemsControllerTestContext.Setup();
-
-            var response = await context.OrderItemsController.GetAllAsync("myOrder", "INVALID");
-            response.Value.Should().BeEmpty();
-        }
-
-        [Test]
-        public async Task GetAllAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
-        {
-            var context = OrderItemsControllerTestContext.Setup();
-            context.Order = OrderBuilder
-                .Create()
-                .WithOrganisationId(Guid.NewGuid())
-                .Build();
-
-            var result = await context.OrderItemsController.GetAllAsync("myOrder", null);
-
-            result.Result.Should().BeOfType<ForbidResult>();
-        }
-
-        [TestCase(null)]
-        [TestCase("Solution")]
-        [TestCase("AdditionalService")]
-        [TestCase("AssociatedService")]
-        [TestCase("SOLutiON")]
-        [TestCase("ADDitIONalServiCE")]
-        [TestCase("associatedSERVICe")]
-        public async Task GetAllAsync_OrderExistsWithFilter_ReturnsListOfOrderItems(string catalogueItemTypeFilter)
-        {
-            var context = OrderItemsControllerTestContext.Setup();
-
-            var serviceRecipients = new List<(string Ods, string Name)>
-            {
-                ("eu", "EU test"),
-                ("auz", null)
-            };
-
-            context.Order.SetServiceRecipient(serviceRecipients, Guid.Empty, String.Empty);
-
-            var solutionOrderItem1 = CreateOrderItem(CatalogueItemType.Solution, serviceRecipients[0].Ods, 1, new DateTime(2020, 04, 13));
-            var solutionOrderItem2 = CreateOrderItem(CatalogueItemType.Solution, serviceRecipients[1].Ods, 2, new DateTime(2020, 04, 12));
-            var additionalServiceOrderItem1 = CreateOrderItem(CatalogueItemType.AdditionalService, serviceRecipients[1].Ods, 3, new DateTime(2020, 05, 13));
-            var associatedServiceOrderItem1 = CreateOrderItem(CatalogueItemType.AssociatedService, serviceRecipients[0].Ods, 4, new DateTime(2020, 05, 11));
-
-            context.Order.AddOrderItem(solutionOrderItem1, Guid.Empty, string.Empty);
-            context.Order.AddOrderItem(solutionOrderItem2, Guid.Empty, string.Empty);
-            context.Order.AddOrderItem(additionalServiceOrderItem1, Guid.Empty, string.Empty);
-            context.Order.AddOrderItem(associatedServiceOrderItem1, Guid.Empty, string.Empty);
-
-            const string orderId = "myOrder";
-            var result = await context.OrderItemsController.GetAllAsync(orderId, catalogueItemTypeFilter);
-            result.Value.Should().BeOfType<List<GetOrderItemModel>>();
-
-            var expectedOrderItems =
-                CreateOrderItemModels(
-                    new List<OrderItem>
-                    {
-                        solutionOrderItem1,
-                        solutionOrderItem2,
-                        additionalServiceOrderItem1,
-                        associatedServiceOrderItem1
-                    }, orderId,
-                    catalogueItemTypeFilter,
-                    context.Order.ServiceRecipients);
-
-            result.Value.Should().BeEquivalentTo(expectedOrderItems, options => options.WithStrictOrdering());
         }
 
         [Test]
@@ -498,7 +631,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             result.Result.As<ObjectResult>().Value.Should().BeEquivalentTo(expected);
         }
 
-        private OrderItem CreateOrderItem(CatalogueItemType catalogueItemType, string odsCode, int orderItemId, DateTime created)
+        private static OrderItem CreateOrderItem(
+            CatalogueItemType catalogueItemType, string odsCode, int orderItemId, DateTime created)
         {
             return OrderItemBuilder.Create()
                 .WithCatalogueItemType(catalogueItemType)
@@ -514,22 +648,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             string catalogueItemTypeFilter,
             IReadOnlyList<ServiceRecipient> serviceRecipients)
         {
+            var serviceRecipientDictionary = serviceRecipients.ToDictionary(x => x.OdsCode);
+
             var items = orderItems
                 .OrderBy(orderItem => orderItem.Created)
-                .Select(orderItem => new GetOrderItemModel
-            {
-                ItemId = $"{orderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
-                ServiceRecipient = new ServiceRecipientModel
-                {
-                    Name = serviceRecipients.FirstOrDefault(serviceRecipient => string.Equals(orderItem.OdsCode,
-                           serviceRecipient.OdsCode, StringComparison.OrdinalIgnoreCase))?.Name,
-                    OdsCode = orderItem.OdsCode
-                },
-                CataloguePriceType = orderItem.CataloguePriceType.Name,
-                CatalogueItemType = orderItem.CatalogueItemType.Name,
-                CatalogueItemName = orderItem.CatalogueItemName,
-                CatalogueItemId = orderItem.CatalogueItemId,
-            });
+                .Select(orderItem => 
+                    new GetOrderItemModel(
+                        orderId, 
+                        orderItem, 
+                        serviceRecipientDictionary[orderItem.OdsCode]));
 
             if (catalogueItemTypeFilter != null)
             {

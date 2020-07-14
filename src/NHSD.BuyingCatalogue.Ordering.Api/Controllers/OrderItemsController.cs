@@ -71,7 +71,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetOrderItemModel>>> GetAllAsync(string orderId, [FromQuery] string catalogueItemType)
+        public async Task<ActionResult<IEnumerable<GetOrderItemModel>>> ListAsync(string orderId, [FromQuery] string catalogueItemType)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
@@ -98,24 +98,39 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 orderItems = orderItems.Where(y => y.CatalogueItemType.Equals(catalogueItemTypeFromName));
             }
 
-            var serviceRecipients = order.ServiceRecipients;
+            var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(x => x.OdsCode.ToUpperInvariant());
 
             return orderItems
                 .OrderBy(x => x.Created)
-                .Select(orderItem => new GetOrderItemModel
-                {
-                    ItemId = $"{orderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
-                    ServiceRecipient = new ServiceRecipientModel
-                    {
-                        Name = serviceRecipients.FirstOrDefault(serviceRecipient => string.Equals(orderItem.OdsCode,
-                            serviceRecipient.OdsCode, StringComparison.OrdinalIgnoreCase))?.Name,
-                        OdsCode = orderItem.OdsCode
-                    },
-                    CataloguePriceType = orderItem.CataloguePriceType.Name,
-                    CatalogueItemType = orderItem.CatalogueItemType.Name,
-                    CatalogueItemName = orderItem.CatalogueItemName,
-                    CatalogueItemId = orderItem.CatalogueItemId,
-                }).ToList();
+                .Select(orderItem => new GetOrderItemModel(orderId, orderItem, serviceRecipientDictionary[orderItem.OdsCode.ToUpperInvariant()])).ToList();
+        }
+
+        [HttpGet("{orderItemId}")]
+        public async Task<ActionResult<GetOrderItemModel>> GetAsync(string orderId, int orderItemId)
+        {
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            if (order is null)
+            {
+                return NotFound();
+            }
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
+            OrderItem orderItem = order.OrderItems.FirstOrDefault(x => x.OrderItemId == orderItemId);
+            if (orderItem is null)
+                return NotFound();
+
+            var matchedServiceRecipient = order.ServiceRecipients.FirstOrDefault(serviceRecipient => 
+                string.Equals(orderItem.OdsCode, serviceRecipient.OdsCode, StringComparison.OrdinalIgnoreCase));
+
+            return new GetOrderItemModel(
+                orderId, 
+                orderItem, 
+                matchedServiceRecipient);
         }
 
         [HttpPut]
