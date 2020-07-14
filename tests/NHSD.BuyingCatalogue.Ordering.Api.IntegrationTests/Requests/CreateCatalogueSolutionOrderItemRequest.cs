@@ -46,7 +46,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                 {"less-than-min-quantity", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithQuantity(0).Build()},
                 {"greater-than-max-quantity", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithQuantity(int.MaxValue).Build()},
                 {"less-than-min-price", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithPrice(-1).Build()}, 
-                {"greater-than-max-price", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithPrice(1000000000000000m).Build()} 
+                {"greater-than-max-price", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithPrice(1000000000000000m).Build()},
+                {"on-demand-per-month", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithProvisioningType(ProvisioningType.OnDemand).WithEstimationPeriod(TimeUnit.Month).Build()},
+                {"on-demand-per-year", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithProvisioningType(ProvisioningType.OnDemand).WithEstimationPeriod(TimeUnit.Year).Build()},
+                {"patient", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithProvisioningType(ProvisioningType.Patient).WithEstimationPeriod(null).Build()},
+                {"declarative", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithProvisioningType(ProvisioningType.Declarative).WithEstimationPeriod(null).Build()}
             };
 
         public CreateCatalogueSolutionOrderItemRequest(

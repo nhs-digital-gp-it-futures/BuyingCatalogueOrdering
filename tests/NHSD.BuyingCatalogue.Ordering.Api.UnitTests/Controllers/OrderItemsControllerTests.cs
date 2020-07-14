@@ -257,10 +257,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             context.Order.SetServiceRecipient(serviceRecipients, Guid.Empty, String.Empty);
 
-            var solutionOrderItem1 = CreateOrderItem(CatalogueItemType.Solution, serviceRecipients[0].Ods, 1);
-            var solutionOrderItem2 = CreateOrderItem(CatalogueItemType.Solution, serviceRecipients[1].Ods, 2);
-            var additionalServiceOrderItem1 = CreateOrderItem(CatalogueItemType.AdditionalService, serviceRecipients[1].Ods, 3);
-            var associatedServiceOrderItem1 = CreateOrderItem(CatalogueItemType.AssociatedService, serviceRecipients[0].Ods, 4);
+            var solutionOrderItem1 = CreateOrderItem(CatalogueItemType.Solution, serviceRecipients[0].Ods, 1, new DateTime(2020, 04, 13));
+            var solutionOrderItem2 = CreateOrderItem(CatalogueItemType.Solution, serviceRecipients[1].Ods, 2, new DateTime(2020, 04, 12));
+            var additionalServiceOrderItem1 = CreateOrderItem(CatalogueItemType.AdditionalService, serviceRecipients[1].Ods, 3, new DateTime(2020, 05, 13));
+            var associatedServiceOrderItem1 = CreateOrderItem(CatalogueItemType.AssociatedService, serviceRecipients[0].Ods, 4, new DateTime(2020, 05, 11));
 
             context.Order.AddOrderItem(solutionOrderItem1, Guid.Empty, string.Empty);
             context.Order.AddOrderItem(solutionOrderItem2, Guid.Empty, string.Empty);
@@ -283,15 +283,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     catalogueItemTypeFilter,
                     context.Order.ServiceRecipients);
 
-            result.Value.Should().BeEquivalentTo(expectedOrderItems);
+            result.Value.Should().BeEquivalentTo(expectedOrderItems, options => options.WithStrictOrdering());
         }
 
-        private OrderItem CreateOrderItem(CatalogueItemType catalogueItemType, string odsCode, int orderItemId)
+        private OrderItem CreateOrderItem(CatalogueItemType catalogueItemType, string odsCode, int orderItemId, DateTime created)
         {
             return OrderItemBuilder.Create()
                 .WithCatalogueItemType(catalogueItemType)
                 .WithOrderItemId(orderItemId)
                 .WithOdsCode(odsCode)
+                .WithCreated(created)
                 .Build();
         }
 
@@ -301,7 +302,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             string catalogueItemTypeFilter,
             IReadOnlyList<ServiceRecipient> serviceRecipients)
         {
-            var items = orderItems.Select(orderItem => new GetOrderItemModel
+            var items = orderItems
+                .OrderBy(orderItem => orderItem.Created)
+                .Select(orderItem => new GetOrderItemModel
             {
                 ItemId = $"{orderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
                 ServiceRecipient = new ServiceRecipientModel

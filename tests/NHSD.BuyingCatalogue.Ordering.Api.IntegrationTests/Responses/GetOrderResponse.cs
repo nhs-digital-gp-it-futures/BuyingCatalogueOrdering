@@ -42,19 +42,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 .WithSupplierName(responseContent.SelectToken("supplier").Value<string>("name"))
                 .Build();
 
-            var orderItems = responseContent.SelectToken("orderItems")
-                .Select(orderItem => OrderItemEntityBuilder.Create()
-                    .WithOrderId(expectedOrder.OrderId)
-                    .WithOdsCode(orderItem.Value<string>("serviceRecipientsOdsCode"))
-                    .WithCataloguePriceType(Enum.Parse<CataloguePriceType>(orderItem.Value<string>("cataloguePriceType")))
-                    .WithCatalogueItemType(Enum.Parse<CatalogueItemType>(orderItem.Value<string>("catalogueItemType")))
-                    .WithCatalogueItemName(orderItem.Value<string>("catalogueItemName"))
-                    .WithProvisioningType(Enum.Parse<ProvisioningType>(orderItem.Value<string>("provisioningType")))
-                    .WithPricingUnitDescription(orderItem.Value<string>("itemUnitDescription"))
-                    .WithPrice(orderItem.Value<decimal?>("price"))
-                    .WithQuantity(orderItem.Value<int>("quantity"))
-                    .Build())
-                .ToList();
+            var orderItems = responseContent.SelectToken("orderItems").Select(orderItem => new
+            {
+                ItemId = orderItem.Value<string>("itemId"),
+                ServiceRecipientsOdsCode = orderItem.Value<string>("serviceRecipientsOdsCode"),
+                CataloguePriceType = orderItem.Value<string>("cataloguePriceType"),
+                CatalogueItemType = orderItem.Value<string>("catalogueItemType"),
+                CatalogueItemName = orderItem.Value<string>("catalogueItemName"),
+                ProvisioningType = orderItem.Value<string>("provisioningType"),
+                ItemUnitDescription = orderItem.Value<string>("itemUnitDescription"),
+                TimeUnitDescription = orderItem.Value<string>("timeUnitDescription"),
+                QuantityPeriodDescription = orderItem.Value<string>("quantityPeriodDescription"),
+                Price = orderItem.Value<decimal?>("price"),
+                Quantity = orderItem.Value<int>("quantity"),
+                DeliveryDate = orderItem.Value<DateTime?>("deliveryDate")
+            });
 
             var serviceRecipients = responseContent.SelectToken("serviceRecipients")
                 .Select(serviceRecipient => ServiceRecipientBuilder.Create()
@@ -75,15 +77,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 .Excluding(orderEntity => orderEntity.SupplierAddressId)
                 .Excluding(orderEntity => orderEntity.SupplierContactId));
 
-            orderItems.Should().BeEquivalentTo(expectedOrderItems, x =>
-                x.Excluding(orderItemEntity => orderItemEntity.CatalogueItemId)
-                .Excluding(orderItemEntity => orderItemEntity.OrderItemId)
-                .Excluding(orderItemEntity => orderItemEntity.DeliveryDate)
-                .Excluding(orderItemEntity => orderItemEntity.EstimationPeriod)
-                .Excluding(orderItemEntity => orderItemEntity.PricingUnitName)
-                .Excluding(orderItemEntity => orderItemEntity.PricingUnitTierName)
-                .Excluding(orderItemEntity => orderItemEntity.Created)
-                .Excluding(orderItemEntity => orderItemEntity.LastUpdated));
+            var convertedExpectedOrderItems = expectedOrderItems.Select(orderItem => new
+            {
+                ItemId = $"{expectedOrder.OrderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
+                ServiceRecipientsOdsCode = orderItem.OdsCode,
+                CataloguePriceType = orderItem.CataloguePriceType.ToString(),
+                CatalogueItemType = orderItem.CatalogueItemType.ToString(),
+                orderItem.CatalogueItemName,
+                ProvisioningType = orderItem.ProvisioningType.ToString(),
+                ItemUnitDescription = orderItem.PricingUnitDescription,
+                TimeUnitDescription = orderItem.TimeUnit?.ToDescription(),
+                QuantityPeriodDescription = orderItem.EstimationPeriod?.ToDescription(),
+                orderItem.Price,
+                orderItem.Quantity,
+                orderItem.DeliveryDate
+            });
+
+            orderItems.Should().BeEquivalentTo(convertedExpectedOrderItems);
 
             serviceRecipients.Should().BeEquivalentTo(expectedServiceRecipients);
         }

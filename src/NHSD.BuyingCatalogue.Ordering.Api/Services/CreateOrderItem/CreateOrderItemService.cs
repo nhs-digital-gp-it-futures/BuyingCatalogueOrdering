@@ -39,7 +39,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             var cataloguePriceUnit = CataloguePriceUnit.Create(request.CataloguePriceUnitTierName, request.CataloguePriceUnitDescription);
 
             var priceTimeUnit = TimeUnit.FromName(request.PriceTimeUnitName);
+
             var estimationPeriod = TimeUnit.FromName(request.EstimationPeriodName);
+            if (provisioningType != null)
+                estimationPeriod = provisioningType.InferEstimationPeriod(estimationPeriod);
 
             var orderItem = new OrderItem(
                 request.OdsCode, 

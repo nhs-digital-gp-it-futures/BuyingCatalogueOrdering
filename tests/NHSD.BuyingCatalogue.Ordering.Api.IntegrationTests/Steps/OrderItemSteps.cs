@@ -57,14 +57,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithTimeUnit(orderItemTableItem.PriceTimeUnit)
                     .WithProvisioningType(orderItemTableItem.ProvisioningType)
                     .WithQuantity(orderItemTableItem.Quantity)
+                    .WithCreated(orderItemTableItem.Created ?? DateTime.UtcNow)
                     .Build();
 
                 var orderItemId = await orderItemEntity.InsertAsync<int>(_settings.ConnectionString);
                 orderItemEntity.OrderItemId = orderItemId;
 
-                // temporarily removing these from the reference list as they are not returned by the GET
-                orderItemEntity.TimeUnit = null;
-                orderItemEntity.EstimationPeriod = null;
                 _orderContext.OrderItemReferenceList.Add(orderItemEntity.CatalogueItemName, orderItemEntity);
             }
         }
@@ -130,6 +128,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public DateTime? DeliveryDate { get; set; }
 
             public decimal? Price { get; set; }
+
+            public DateTime? Created { get; set; }
         }
     }
 }

@@ -13,13 +13,13 @@ Background:
         | C000014-01 | auz     | AUZ Test |
         | C000014-01 | ods     | NULL     |
     Given Order items exist
-        | OrderId    | CatalogueItemName | CatalogueItemType | OdsCode |
-        | C000014-01 | Sol 1             | Solution          | eu      |
-        | C000014-01 | Sol 2             | Solution          | auz     |
-        | C000014-01 | Sol 3             | Solution          | ods     |
-        | C000014-01 | Add Serv 1        | AdditionalService | eu      |
-        | C000014-01 | Add Serv 2        | AdditionalService | ods     |
-        | C000014-01 | Ass Serv 1        | AssociatedService | auz     |
+        | OrderId    | CatalogueItemName | CatalogueItemType | OdsCode | Created    |
+        | C000014-01 | Sol 1             | Solution          | eu      | 05/06/2020 |
+        | C000014-01 | Sol 2             | Solution          | auz     | 04/30/2020 |
+        | C000014-01 | Sol 3             | Solution          | ods     | 07/21/2020 |
+        | C000014-01 | Add Serv 1        | AdditionalService | eu      | 05/05/2020 |
+        | C000014-01 | Add Serv 2        | AdditionalService | ods     | 04/10/2020 |
+        | C000014-01 | Ass Serv 1        | AssociatedService | auz     | 12/14/2019 |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @5124

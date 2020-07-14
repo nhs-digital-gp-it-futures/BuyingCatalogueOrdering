@@ -114,6 +114,53 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
+        public void MarkOrderSectionAsViewed_NullOrder_ThrowsArgumentNullException()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithCatalogueItemType(CatalogueItemType.Solution)
+                .Build();
+
+            Assert.Throws<ArgumentNullException>(() => orderItem.MarkOrderSectionAsViewed(null));
+        }
+
+        [Test]
+        public void MarkOrderSectionAsViewed_Order_CatalogueSolutionsViewedIsTrue()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithCatalogueItemType(CatalogueItemType.Solution)
+                .Build();
+
+            var order = OrderBuilder
+                .Create()
+                .WithCatalogueSolutionsViewed(false)
+                .Build();
+
+            orderItem.MarkOrderSectionAsViewed(order);
+
+            order.CatalogueSolutionsViewed.Should().BeTrue();
+        }
+
+        [Test]
+        public void MarkOrderSectionAsViewed_Order_AdditionalServicesViewedIsTrue()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithCatalogueItemType(CatalogueItemType.AdditionalService)
+                .Build();
+
+            var order = OrderBuilder
+                .Create()
+                .WithCatalogueSolutionsViewed(false)
+                .Build();
+
+            orderItem.MarkOrderSectionAsViewed(order);
+
+            order.AdditionalServicesViewed.Should().BeTrue();
+        }
+
+        [Test]
         public void ChangePrice_ChangeValues_ExpectedPropertiesUpdated()
         {
             var orderItem = OrderItemBuilder

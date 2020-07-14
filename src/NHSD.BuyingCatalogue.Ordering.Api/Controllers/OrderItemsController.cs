@@ -96,6 +96,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             var serviceRecipients = order.ServiceRecipients;
 
             return orderItems
+                .OrderBy(x => x.Created)
                 .Select(orderItem => new GetOrderItemModel
                 {
                     ItemId = $"{orderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",

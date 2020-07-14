@@ -103,11 +103,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             if (orderItem is null)
                 throw new ArgumentNullException(nameof(orderItem));
 
-            if (!_orderItems.Contains(orderItem))
-            {
-                _orderItems.Add(orderItem);
-                SetLastUpdatedBy(userId, name);
-            }
+            if (_orderItems.Contains(orderItem))
+                return;
+
+            _orderItems.Add(orderItem);
+            orderItem.MarkOrderSectionAsViewed(this);
+
+            SetLastUpdatedBy(userId, name);
         }
 
         public void UpdateOrderItem(
@@ -129,7 +131,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 () => SetLastUpdatedBy(userId, name));
         }
 
-        public void SetServiceRecipient(List<(string Ods, string Name)> serviceRecipients, Guid userId, string lastUpdatedName)
+        public void SetServiceRecipient(IEnumerable<(string Ods, string Name)> serviceRecipients, Guid userId, string lastUpdatedName)
         {
             if (serviceRecipients is null)
                 throw new ArgumentNullException(nameof(serviceRecipients));

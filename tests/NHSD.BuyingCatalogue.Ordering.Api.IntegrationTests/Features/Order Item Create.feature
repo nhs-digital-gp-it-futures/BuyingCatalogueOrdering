@@ -1,12 +1,12 @@
-﻿Feature: Create catalogue solution order item
+﻿Feature: Create order item
     As a Buyer User
-    I want to create a catalogue solution order item for a given order
+    I want to create an order item for a given order
     So that I can complete my order
 
 Background:
     Given Orders exist
-        | OrderId    | Description      | OrganisationId                       | LastUpdatedByName | LastUpdatedBy                        | CommencementDate |
-        | C000014-01 | Some Description | 4af62b99-638c-4247-875e-965239cd0c48 | Tom Smith         | 335392e4-4bb1-413b-9de5-36a85c9c0422 | 01/01/2021       |
+        | OrderId    | Description      | OrganisationId                       | LastUpdatedByName | LastUpdatedBy                        | CommencementDate | CatalogueSolutionsViewed |
+        | C000014-01 | Some Description | 4af62b99-638c-4247-875e-965239cd0c48 | Tom Smith         | 335392e4-4bb1-413b-9de5-36a85c9c0422 | 01/01/2021       | false                    |
     And Service Recipients exist
         | OdsCode | Name              | OrderId    |
         | ODS1    | Service Recipient | C000014-01 |
@@ -19,7 +19,7 @@ Scenario: 1. Create catalogue solution order item
     When the user sends the create order item request
     Then a response with status code 201 is returned
     And the expected order item is created
-    Examples: Request payloads
+    Examples: Item Types
         | ItemType           |
         | catalogue solution |
         | additional service |
@@ -30,7 +30,7 @@ Scenario: 2. Create catalogue solution order item and the new order item ID is r
     And the user enters the 'complete' create order item request payload
     When the user sends the create order item request
     And the response contains the new order item ID
-    Examples: Request payloads
+    Examples: Item Types
         | ItemType           |
         | catalogue solution |
         | additional service |
@@ -43,7 +43,7 @@ Scenario: 3. Create catalogue solution order item and the order audit informatio
     Then the order with orderId C000014-01 is updated in the database with data
         | LastUpdatedBy                        | LastUpdatedByName |
         | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
-    Examples: Request payloads
+    Examples: Item Types
         | ItemType           |
         | catalogue solution |
         | additional service |
@@ -54,7 +54,7 @@ Scenario: 4. Create catalogue solution order item with invalid order ID
     And the user enters the 'complete' create order item request payload
     When the user sends the create order item request
     Then a response with status code 404 is returned
-    Examples: Request payloads
+    Examples: Item Types
         | ItemType           |
         | catalogue solution |
         | additional service |
@@ -66,7 +66,7 @@ Scenario: 5. If a user is not authorised then they cannot create a catalogue sol
     And the user enters the 'complete' create order item request payload
     When the user sends the create order item request
     Then a response with status code 401 is returned
-    Examples: Request payloads
+    Examples: Item Types
         | ItemType           |
         | catalogue solution |
         | additional service |
@@ -78,7 +78,7 @@ Scenario: 6. A non buyer user cannot create a catalogue solution order item
     And the user enters the 'complete' create order item request payload
     When the user sends the create order item request
     Then a response with status code 403 is returned
-    Examples: Request payloads
+    Examples: Item Types
         | ItemType           |
         | catalogue solution |
         | additional service |
@@ -90,7 +90,7 @@ Scenario: 7. A buyer user cannot create a catalogue solution order item for an o
     And the user enters the 'complete' create order item request payload
     When the user sends the create order item request
     Then a response with status code 403 is returned
-    Examples: Request payloads
+    Examples: Item Types
         | ItemType           |
         | catalogue solution |
         | additional service |
@@ -102,7 +102,33 @@ Scenario: 8. Service Failure
     And the user enters the 'complete' create order item request payload
     When the user sends the create order item request
     Then a response with status code 500 is returned
-    Examples: Request payloads
+    Examples: Item Types
         | ItemType           |
         | catalogue solution |
         | additional service |
+
+@7840
+Scenario: 9. Create catalogue solution order item and the catalogue solution order section should be marked as complete
+    And the user creates a request to add a new catalogue solution order item to the order with ID 'C000014-01'
+    And the user enters the 'complete' create order item request payload
+    When the user sends the create order item request
+    Then the catalogue solution order section is marked as complete
+
+@7840
+Scenario: 10. Create catalogue solution order item should set the expected estimation period
+    And the user creates a request to add a new <ItemType> order item to the order with ID 'C000014-01'
+    And the user enters the '<Payload-Type>' create order item request payload
+    When the user sends the create order item request
+    Then a response with status code 201 is returned
+    And the order item estimation period is set to '<EstimationPeriod>'
+
+    Examples: Request payloads
+        | ItemType           | Payload-Type        | EstimationPeriod |
+        | catalogue solution | on-demand-per-month | Month            |
+        | catalogue solution | on-demand-per-year  | Year             |
+        | catalogue solution | patient             | Month            |
+        | catalogue solution | declarative         | Year             |
+        | additional service | on-demand-per-month | Month            |
+        | additional service | on-demand-per-year  | Year             |
+        | additional service | patient             | Month            |
+        | additional service | declarative         | Year             |

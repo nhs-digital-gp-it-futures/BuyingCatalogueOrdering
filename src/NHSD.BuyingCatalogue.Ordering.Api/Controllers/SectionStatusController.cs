@@ -22,7 +22,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     {
         private readonly IOrderRepository _orderRepository;
 
-        private static readonly Dictionary<string, Action<Order>> completeSectionActionsDictionary = new Dictionary<string, Action<Order>>
+        private static readonly Dictionary<string, Action<Order>> _completeSectionActionsDictionary = new Dictionary<string, Action<Order>>
         {
             { SectionModel.CatalogueSolutions.Id, o => o.CatalogueSolutionsViewed = true },
             { SectionModel.AdditionalServices.Id, o => o.AdditionalServicesViewed = true }
@@ -56,11 +56,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            if (completeSectionActionsDictionary.ContainsKey(sectionId))
+            if (_completeSectionActionsDictionary.ContainsKey(sectionId))
             {
                 if (sectionStatus.Status == "complete")
                 {
-                    completeSectionActionsDictionary[sectionId](order);
+                    _completeSectionActionsDictionary[sectionId](order);
                 }
             }
             else
