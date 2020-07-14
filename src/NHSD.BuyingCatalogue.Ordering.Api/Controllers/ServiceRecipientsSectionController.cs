@@ -49,11 +49,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             var serviceRecipients =
                 (await _serviceRecipientRepository.ListServiceRecipientsByOrderIdAsync(orderId)).ToList();
 
-            var recipientModelList = serviceRecipients.Select(recipient => new ServiceRecipientModel
-            {
-                OdsCode = recipient.OdsCode,
-                Name = recipient.Name
-            }).ToList();
+            var recipientModelList = serviceRecipients
+                .Select(recipient => new ServiceRecipientModel
+                {
+                    OdsCode = recipient.OdsCode,
+                    Name = recipient.Name
+                })
+                .OrderBy(serviceRecipientModel => serviceRecipientModel.Name)
+                .ToList();
 
             var model = new ServiceRecipientsModel
             {
