@@ -1,4 +1,5 @@
 ﻿using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 
@@ -7,6 +8,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
     internal sealed class OrderItemsControllerBuilder
     {
         private IOrderRepository _orderRepository;
+        private IUpdateOrderItemService _updateOrderItemRepository;
         private ICreateOrderItemService _createOrderItemService;
 
         private OrderItemsControllerBuilder()
@@ -24,6 +26,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
+        internal OrderItemsControllerBuilder WithUpdateOrderItemService(IUpdateOrderItemService updateOrderItemService)
+        {
+            _updateOrderItemRepository = updateOrderItemService;
+            return this;
+        }
+
+
         internal OrderItemsControllerBuilder WithCreateOrderItemService(ICreateOrderItemService createOrderItemService)
         {
             _createOrderItemService = createOrderItemService;
@@ -31,6 +40,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         }
 
         internal OrderItemsController Build() =>
-            new OrderItemsController(_orderRepository, _createOrderItemService);
+            new OrderItemsController(_orderRepository, _updateOrderItemRepository, _createOrderItemService);
     }
 }

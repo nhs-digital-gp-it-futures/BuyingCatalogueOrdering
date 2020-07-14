@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Routing;
 using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
@@ -26,18 +27,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public void Constructor_NullOrderRepository_NullException()
         {
+            var context = OrderItemsControllerTestContext.Setup();
+            
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var _ = new OrderItemsController(null, Mock.Of<ICreateOrderItemService>());
+                var _ = new OrderItemsController(null, context.UpdateOrderItemServiceMock.Object, Mock.Of<ICreateOrderItemService>());
+            });
+        }
+
+        [Test]
+        public void Constructor_UpdateOrderItemServiceNull_NullException()
+        {
+            var context = OrderItemsControllerTestContext.Setup();
+
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                var _ = new OrderItemsController(context.OrderRepositoryMock.Object, null, context.CreateOrderItemServiceMock.Object);
             });
         }
 
         [Test]
         public void Constructor_NullCreateOrderItemService_NullException()
         {
+            var context = OrderItemsControllerTestContext.Setup();
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var _ = new OrderItemsController(Mock.Of<IOrderRepository>(), null);
+                var _ = new OrderItemsController(context.OrderRepositoryMock.Object, context.UpdateOrderItemServiceMock.Object, null);
             });
         }
 
@@ -286,6 +301,202 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             result.Value.Should().BeEquivalentTo(expectedOrderItems, options => options.WithStrictOrdering());
         }
 
+        [Test]
+        public void UpdateOrderItemAsync_NullModel_ThrowsArgumentNullException()
+        {
+            const string orderId = "C10000-01";
+            const int orderItemId = 1;
+
+            var context = OrderItemsControllerTestContext.Setup();
+            context.Order = null;
+
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await context.OrderItemsController.UpdateOrderItemAsync(orderId, orderItemId, null));
+        }
+
+        [Test]
+        public async Task UpdateOrderItemAsync_UnknownOrder_ReturnsNotFound()
+        {
+            const string orderId = "C10000-01";
+            const int orderItemId = 1;
+            var updateModel = UpdateOrderItemModelBuilder.Create().BuildSolution();
+
+            var context = OrderItemsControllerTestContext.Setup();
+            context.Order = null;
+
+            var result = await context.OrderItemsController.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
+
+            result.Result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        public async Task UpdateOrderItemAsync_OrderRepository_CalledOnce()
+        {
+            const string orderId = "C10000-01";
+            const int orderItemId = 1;
+            var updateModel = UpdateOrderItemModelBuilder.Create().BuildSolution();
+
+            var context = OrderItemsControllerTestContext.Setup();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrderId(orderId)
+                .WithOrganisationId(context.PrimaryOrganisationId)
+                .WithOrderItem(OrderItemBuilder
+                    .Create()
+                    .WithOrderItemId(orderItemId)
+                    .WithCatalogueItemType(CatalogueItemType.Solution)
+                    .Build())
+                .Build();
+
+            await context.OrderItemsController.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
+
+            context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(orderId), Times.Once);
+        }
+
+        [Test]
+        public async Task UpdateOrderItemAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
+        {
+            const string orderId = "C10000-01";
+            const int orderItemId = 1;
+            var updateModel = UpdateOrderItemModelBuilder.Create().BuildSolution();
+
+            var context = OrderItemsControllerTestContext.Setup();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(Guid.NewGuid())
+                .Build();
+
+            var result = await context.OrderItemsController.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
+
+            result.Result.Should().BeOfType<ForbidResult>();
+        }
+
+        [Test]
+        public async Task UpdateOrderItemAsync_EmptyOrderItems_ReturnsNotFound()
+        {
+            const string orderId = "C10000-01";
+            const int orderItemId = 1;
+            var updateModel = UpdateOrderItemModelBuilder.Create().BuildSolution();
+
+            var context = OrderItemsControllerTestContext.Setup();
+
+            var result = await context.OrderItemsController.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
+
+            result.Result.Should().BeOfType<NotFoundResult>();
+        }
+        
+        [Test]
+        public async Task UpdateOrderItemAsync_UpdateOrderItemModel_ReturnsNotContent()
+        {
+            const string orderId = "C10000-01";
+            const int orderItemId = 1;
+            var updateModel = UpdateOrderItemModelBuilder.Create().BuildSolution();
+
+            var context = OrderItemsControllerTestContext.Setup();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrderId(orderId)
+                .WithOrganisationId(context.PrimaryOrganisationId)
+                .WithOrderItem(OrderItemBuilder
+                    .Create()
+                    .WithOrderItemId(orderItemId)
+                    .WithCatalogueItemType(CatalogueItemType.Solution)
+                    .Build())
+                .Build();
+
+            var result = await context.OrderItemsController.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
+
+            result.Result.Should().BeOfType<NoContentResult>();
+        }
+
+        [Test]
+        public async Task UpdateOrderItemAsync_UpdateOrderItemService_CalledOnce()
+        {
+            const string orderId = "C10000-01";
+            const int orderItemId = 1;
+            var updateModel = UpdateOrderItemModelBuilder.Create().BuildSolution();
+
+            var context = OrderItemsControllerTestContext.Setup();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrderId(orderId)
+                .WithOrganisationId(context.PrimaryOrganisationId)
+                .WithOrderItem(OrderItemBuilder
+                    .Create()
+                    .WithOrderItemId(orderItemId)
+                    .WithCatalogueItemType(CatalogueItemType.Solution)
+                    .Build())
+                .Build();
+
+            await context.OrderItemsController.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
+
+            context.UpdateOrderItemServiceMock.Verify(x =>
+                x.UpdateAsync(It.Is<UpdateOrderItemRequest>(r =>
+                        orderId.Equals(r.Order.OrderId)
+                        && orderItemId.Equals(r.OrderItemId)),
+                    It.IsAny<CatalogueItemType>(),
+                    It.IsAny<ProvisioningType>()), Times.Once);
+        }
+
+        [Test]
+        public async Task UpdateOrderItemAsync_Error_ReturnsBadRequest()
+        {
+            const string orderId = "C10000-01";
+            const int orderItemId = 1;
+            var updateModel = UpdateOrderItemModelBuilder.Create().BuildSolution();
+            var error = new ErrorDetails("TestError", "TestField");
+
+            var context = OrderItemsControllerTestContext.Setup();
+            context.UpdateOrderItemResult = Result.Failure(error);
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrderId(orderId)
+                .WithOrganisationId(context.PrimaryOrganisationId)
+                .WithOrderItem(OrderItemBuilder
+                    .Create()
+                    .WithOrderItemId(orderItemId)
+                    .WithCatalogueItemType(CatalogueItemType.Solution)
+                    .Build())
+                .Build();
+
+            var result = await context.OrderItemsController.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
+
+            result.Result.Should().BeOfType<BadRequestObjectResult>();
+        }
+
+        [Test]
+        public async Task UpdateOrderItemAsync_Error_ReturnsError()
+        {
+            const string orderId = "C10000-01";
+            const int orderItemId = 1;
+            var updateModel = UpdateOrderItemModelBuilder.Create().BuildSolution();
+            var error = new ErrorDetails("TestError", "TestField");
+
+            var context = OrderItemsControllerTestContext.Setup();
+            context.UpdateOrderItemResult = Result.Failure(error);
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrderId(orderId)
+                .WithOrganisationId(context.PrimaryOrganisationId)
+                .WithOrderItem(OrderItemBuilder
+                    .Create()
+                    .WithOrderItemId(orderItemId)
+                    .WithCatalogueItemType(CatalogueItemType.Solution)
+                    .Build())
+                .Build();
+
+            var result = await context.OrderItemsController.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
+
+            var expected = new UpdateOrderItemResponseModel
+            {
+                Errors = new[]
+                {
+                    new ErrorModel(error.Id, error.Field)
+                }
+            };
+
+            result.Result.As<ObjectResult>().Value.Should().BeEquivalentTo(expected);
+        }
+
         private OrderItem CreateOrderItem(CatalogueItemType catalogueItemType, string odsCode, int orderItemId, DateTime created)
         {
             return OrderItemBuilder.Create()
@@ -342,6 +553,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             OrderRepositoryMock = new Mock<IOrderRepository>();
 
             OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
+            OrderRepositoryMock.Setup(x => x.UpdateOrderAsync(It.IsAny<Order>())).Callback<Order>(x => Order = x);
+
+            UpdateOrderItemResult = Result.Success();
+
+            UpdateOrderItemServiceMock = new Mock<IUpdateOrderItemService>();
+            UpdateOrderItemServiceMock.Setup(x => x.UpdateAsync(It.IsNotNull<UpdateOrderItemRequest>(), It.IsAny<CatalogueItemType>(), It.IsAny<ProvisioningType>()))
+                .ReturnsAsync(() => UpdateOrderItemResult);
             NewOrderItemId = Result.Success(123);
 
             CreateOrderItemServiceMock = new Mock<ICreateOrderItemService>();
@@ -359,6 +577,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             OrderItemsController = OrderItemsControllerBuilder.Create()
                 .WithOrderRepository(OrderRepositoryMock.Object)
+                .WithUpdateOrderItemService(UpdateOrderItemServiceMock.Object)
                 .WithCreateOrderItemService(CreateOrderItemServiceMock.Object)
                 .Build();
 
@@ -375,6 +594,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         internal Result<int> NewOrderItemId { get; set; }
         internal Order Order { get; set; }
         internal OrderItemsController OrderItemsController { get; set; }
+        internal Mock<IUpdateOrderItemService> UpdateOrderItemServiceMock { get; }
+        internal Result UpdateOrderItemResult { get; set; }
 
         internal static OrderItemsControllerTestContext Setup()
         {

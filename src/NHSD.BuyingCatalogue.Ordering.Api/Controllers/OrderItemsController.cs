@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
@@ -22,11 +23,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     public sealed class OrderItemsController : ControllerBase
     {
         private readonly IOrderRepository _orderRepository;
+        private readonly IUpdateOrderItemService _updateOrderItemService;
         private readonly ICreateOrderItemService _createOrderItemService;
 
-        public OrderItemsController(IOrderRepository orderRepository, ICreateOrderItemService createOrderItemService)
+        public OrderItemsController(IOrderRepository orderRepository,
+            IUpdateOrderItemService updateOrderItemService,
+            ICreateOrderItemService createOrderItemService)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            _updateOrderItemService = updateOrderItemService ?? throw new ArgumentNullException(nameof(updateOrderItemService));
             _createOrderItemService = createOrderItemService ?? throw new ArgumentNullException(nameof(createOrderItemService));
         }
 
@@ -112,5 +117,54 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     CatalogueItemId = orderItem.CatalogueItemId,
                 }).ToList();
         }
+
+        [HttpPut]
+        [Route("{orderItemId}")]
+        [Authorize(Policy = PolicyName.CanManageOrders)]
+        public async Task<ActionResult<UpdateOrderItemResponseModel>> UpdateOrderItemAsync(
+            string orderId,
+            int orderItemId,
+            UpdateOrderItemModel model)
+        {
+            if (model is null)
+                throw new ArgumentNullException(nameof(model));
+
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            if (order is null)
+                return NotFound();
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+                return Forbid();
+
+            var orderItem = order.OrderItems.FirstOrDefault(
+                item => orderItemId.Equals(item.OrderItemId));
+
+            if (orderItem is null)
+                return NotFound();
+
+            var result = await _updateOrderItemService.UpdateAsync(
+                new UpdateOrderItemRequest(
+                    model.DeliveryDate,
+                    model.EstimationPeriod,
+                    order,
+                    orderItemId,
+                    model.Price,
+                    model.Quantity),
+                orderItem.CatalogueItemType,
+                orderItem.ProvisioningType);
+
+            if (result.IsSuccess)
+                return NoContent();
+
+            var updateOrderItemResponse =
+                new UpdateOrderItemResponseModel
+                {
+                    Errors = result.Errors.Select(x => new ErrorModel(x.Id, x.Field))
+                };
+
+            return BadRequest(updateOrderItemResponse);
+        }
+
     }
 }

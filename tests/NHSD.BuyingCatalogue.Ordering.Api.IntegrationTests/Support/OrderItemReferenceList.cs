@@ -10,8 +10,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
     {
         private readonly Dictionary<string, OrderItemEntity> _cache = new Dictionary<string, OrderItemEntity>();
 
-        public OrderItemEntity GetByCatalogueSolutionItemName(string catalogueSolutionItemName) => 
-            _cache[catalogueSolutionItemName]
+        public OrderItemEntity GetByOrderItemName(string ItemName) => 
+            _cache[ItemName]
                 .Should()
                 .NotBeNull()
                 .And
@@ -20,10 +20,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
                 .BeOfType<OrderItemEntity>()
                 .Which;
 
-        public void Add(string catalogueSolutionItemName, OrderItemEntity entity)
+        public void Add(string ItemName, OrderItemEntity entity)
         {
-            _cache.ContainsKey(catalogueSolutionItemName).Should().BeFalse();
-            _cache.Add(catalogueSolutionItemName, entity);
+            _cache.ContainsKey(ItemName).Should().BeFalse();
+            _cache.Add(ItemName, entity);
         }
 
         public IEnumerable<OrderItemEntity> FindByOrderId(string orderId) => _cache.Values.Where(x =>

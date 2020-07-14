@@ -5,7 +5,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
     internal sealed class ServiceRecipientBuilder
     {
         private string _odsCode;
-        private readonly string _name;
+        private string _name;
         private string _orderId;
 
         private ServiceRecipientBuilder()
@@ -24,6 +24,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         internal ServiceRecipientBuilder WithOrderId(string orderId)
         {
             _orderId = orderId;
+            return this;
+        }
+
+        internal ServiceRecipientBuilder WithName(string name)
+        {
+            _name = name;
             return this;
         }
 

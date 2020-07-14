@@ -33,7 +33,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public async Task WhenAGetRequestIsMadeForASingleOrdersCatalogueSolutionWithOrderIdAndOrderItemId(string orderId, string name)
         {
             var url = string.Format(_orderCatalogueSolutionsUrl, orderId);
-            var orderItemId = _orderContext.OrderItemReferenceList.GetByCatalogueSolutionItemName(name).OrderItemId;
+            var orderItemId = _orderContext.OrderItemReferenceList.GetByOrderItemName(name).OrderItemId;
 
             await _request.GetAsync($"{url}/{orderItemId}");
         }
