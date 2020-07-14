@@ -52,7 +52,7 @@ indent_size = 2
 
 # Feature files
 [*.feature]
-end_of_line = lf
+end_of_line = crlf
 insert_final_newline = true
 
 # SQL files

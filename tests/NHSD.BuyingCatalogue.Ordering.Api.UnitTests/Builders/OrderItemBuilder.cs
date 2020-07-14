@@ -20,7 +20,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         private TimeUnit _estimationPeriod;
         private DateTime? _deliveryDate;
         private decimal? _price;
-        public DateTime _created;
+        private DateTime _created;
 
         private OrderItemBuilder()
         {

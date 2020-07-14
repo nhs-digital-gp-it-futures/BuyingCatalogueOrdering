@@ -15,13 +15,13 @@ Background:
 @7840
 Scenario: 1. Create catalogue solution order item
     Given the user creates a request to add a new catalogue solution order item to the order with ID 'C000014-01'
-    And the user enters the '<payload-type>' create catalogue solution order item request payload
+    And the user enters the '<Payload-Type>' create catalogue solution order item request payload
     When the user sends the create catalogue solution order item request
     Then a response with status code 201 is returned
     And the expected catalogue solution order item is created
 
     Examples: Request payloads
-        | payload-type |
+        | Payload-Type |
         | complete     |
 
 @7840
@@ -85,3 +85,18 @@ Scenario: 9. Create catalogue solution order item and the catalogue solution ord
     And the user enters the 'complete' create catalogue solution order item request payload
     When the user sends the create catalogue solution order item request
     Then the catalogue solution order section is marked as complete
+
+@7840
+Scenario: 10. Create catalogue solution order item should set the expected estimation period
+    Given the user creates a request to add a new catalogue solution order item to the order with ID 'C000014-01'
+    And the user enters the '<Payload-Type>' create catalogue solution order item request payload
+    When the user sends the create catalogue solution order item request
+    Then a response with status code 201 is returned
+    And the catalogue solution order item estimation period is set to '<EstimationPeriod>'
+
+    Examples: Request payloads
+        | Payload-Type        | EstimationPeriod |
+        | on-demand-per-month | Month            |
+        | on-demand-per-year  | Year             |
+        | patient             | Month            |
+        | declarative         | Year             |

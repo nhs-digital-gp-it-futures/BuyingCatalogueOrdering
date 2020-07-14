@@ -558,38 +558,53 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task GetOrderItemAsync_OrderItemExists_ReturnsResult()
         {
+            var serviceRecipient = ServiceRecipientBuilder
+                .Create()
+                .WithOdsCode("eu")
+                .Build();
+
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithOdsCode(serviceRecipient.OdsCode)
+                .WithPriceTimeUnit(TimeUnit.PerMonth)
+                .Build();
+
             var context = CatalogueSolutionsControllerTestContext.Setup();
-
-            var serviceRecipients = new List<(string Ods, string Name)>
-            {
-                ("eu", "EU test")
-            };
-
-            context.Order.SetServiceRecipient(serviceRecipients, Guid.Empty, string.Empty);
-
-            var orderItem = OrderItemBuilder.Create().WithOdsCode(serviceRecipients[0].Ods).Build();
-            context.Order.AddOrderItem(orderItem, Guid.Empty, string.Empty);
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(context.PrimaryOrganisationId)
+                .WithServiceRecipient((serviceRecipient.OdsCode, serviceRecipient.Name))
+                .WithOrderItem(orderItem)
+                .Build();
 
             var result = await context.Controller.GetOrderItemAsync("myOrder", orderItem.OrderItemId);
-            result.Value.Should().BeOfType<GetCatalogueSolutionOrderItemModel>();
-
+            
             var expected = new GetCatalogueSolutionOrderItemModel
             {
                 ServiceRecipient = new ServiceRecipientModel
                 {
                     OdsCode = orderItem.OdsCode,
-                    Name = serviceRecipients[0].Name
+                    Name = serviceRecipient.Name
                 },
                 CatalogueItemId = orderItem.CatalogueItemId,
                 CatalogueItemName = orderItem.CatalogueItemName,
                 CurrencyCode = orderItem.CurrencyCode,
                 DeliveryDate = orderItem.DeliveryDate,
                 EstimationPeriod = orderItem.EstimationPeriod.Name,
-                ItemUnit = new ItemUnitModel { Description = orderItem.CataloguePriceUnit.Description, Name = orderItem.CataloguePriceUnit.Name },
+                ItemUnit = new ItemUnitModel
+                {
+                    Description = orderItem.CataloguePriceUnit.Description, 
+                    Name = orderItem.CataloguePriceUnit.Name
+                },
                 Price = orderItem.Price,
                 ProvisioningType = orderItem.ProvisioningType.Name,
                 Quantity = orderItem.Quantity,
-                Type = orderItem.CataloguePriceType.Name
+                Type = orderItem.CataloguePriceType.Name,
+                TimeUnit = new TimeUnitModel
+                {
+                    Name = orderItem.PriceTimeUnit.Name,
+                    Description = orderItem.PriceTimeUnit.Description
+                }
             };
 
             result.Value.Should().BeEquivalentTo(expected);

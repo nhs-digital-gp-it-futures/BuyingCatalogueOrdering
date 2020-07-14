@@ -52,8 +52,36 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                 {"below-delivery-window", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithDeliveryDate(new DateTime(2021,1,1).AddDays(-1)).Build()},
                 {"less-than-min-quantity", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithQuantity(0).Build()},
                 {"greater-than-max-quantity", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithQuantity(int.MaxValue).Build()},
-                {"less-than-min-price", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithPrice(-1).Build()}, 
-                {"greater-than-max-price", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithPrice(1000000000000000m).Build()} 
+                {"less-than-min-price", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithPrice(-1).Build()},
+                {"greater-than-max-price", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder.Create().WithPrice(1000000000000000m).Build()} ,
+                {
+                    "on-demand-per-month", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder
+                        .Create()
+                        .WithProvisioningType(ProvisioningType.OnDemand)
+                        .WithEstimationPeriod(TimeUnit.Month)
+                        .Build()
+                },
+                {
+                    "on-demand-per-year", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder
+                        .Create()
+                        .WithProvisioningType(ProvisioningType.OnDemand)
+                        .WithEstimationPeriod(TimeUnit.Year)
+                        .Build()
+                },
+                {
+                    "patient", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder
+                        .Create()
+                        .WithProvisioningType(ProvisioningType.Patient)
+                        .WithEstimationPeriod(null)
+                        .Build()
+                },
+                {
+                    "declarative", () => CreateCatalogueSolutionOrderItemRequestPayloadBuilder
+                        .Create()
+                        .WithProvisioningType(ProvisioningType.Declarative)
+                        .WithEstimationPeriod(null)
+                        .Build()
+                }
             };
 
         public CreateCatalogueSolutionOrderItemRequest(
@@ -92,11 +120,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                     ItemUnit = Payload.HasItemUnit ?
                         new
                         {
-                            Name = Payload.ItemUnitName, 
+                            Name = Payload.ItemUnitName,
                             Description = Payload.ItemUnitNameDescription
                         } : null,
                     Payload.Price,
-                    TimeUnit = Payload.HasTimeUnit ? 
+                    TimeUnit = Payload.HasTimeUnit ?
                         new
                         {
                             Name = Payload.TimeUnitName,
@@ -106,7 +134,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             }
 
             var response = await _request.PostJsonAsync(_createCatalogueSolutionOrderItemUrl, payload);
-            
+
             return new CreateCatalogueSolutionOrderItemResponse(response);
         }
 
@@ -142,8 +170,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                 .WithTimeUnit((TimeUnit?)Enum.Parse(typeof(TimeUnit), Payload.TimeUnitName, true))
                 .Build();
 
-            actual.Should().BeEquivalentTo(expected, 
-                config => 
+            actual.Should().BeEquivalentTo(expected,
+                config =>
                     config
                         .Excluding(entity => entity.OrderItemId)
                         .Excluding(entity => entity.PricingUnitTierName)
