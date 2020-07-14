@@ -2,9 +2,9 @@
 using System.Reflection;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
-namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
+namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
 {
-    internal sealed class OrderItemBuilder
+    public sealed class OrderItemBuilder
     {
         private int? _orderItemId;
         private string _odsCode;
