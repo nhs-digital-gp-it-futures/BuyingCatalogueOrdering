@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Reflection;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 
-namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders
+namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
 {
     public sealed class OrderItemBuilder
     {
@@ -10,7 +11,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders
         private string _catalogueItemId; 
         private CatalogueItemType _catalogueItemType; 
         private string _catalogueItemName;
-        private string _parentCatalogueItemId;
         private ProvisioningType _provisioningType; 
         private CataloguePriceType _cataloguePriceType;
         private CataloguePriceUnit _cataloguePriceUnit;
@@ -28,11 +28,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders
             _catalogueItemId = "1000-001"; 
             _catalogueItemType = CatalogueItemType.Solution;
             _catalogueItemName = Guid.NewGuid().ToString();
-            _parentCatalogueItemId = null;
             _provisioningType = ProvisioningType.Patient; 
             _cataloguePriceType = CataloguePriceType.Flat;
             _cataloguePriceUnit = CataloguePriceUnit.Create("patients", "per patient");
-            _priceTimeUnit = null;
+            _priceTimeUnit = TimeUnit.PerMonth;
             _currencyCode = "GBP"; 
             _quantity = 10;
             _estimationPeriod = TimeUnit.PerYear;
@@ -71,12 +70,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders
         public OrderItemBuilder WithCatalogueItemName(string catalogueItemName)
         {
             _catalogueItemName = catalogueItemName;
-            return this;
-        }
-
-        public OrderItemBuilder WithParentCatalogueItemId(string parentCatalogueItemId)
-        {
-            _parentCatalogueItemId = parentCatalogueItemId;
             return this;
         }
 
@@ -147,7 +140,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.Builders
                 _catalogueItemId,
                 _catalogueItemType,
                 _catalogueItemName,
-                _parentCatalogueItemId,
+                null,
                 _provisioningType,
                 _cataloguePriceType,
                 _cataloguePriceUnit,
