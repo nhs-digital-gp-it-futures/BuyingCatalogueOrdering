@@ -68,7 +68,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [When(@"the user makes a request to retrieve a list of order items with orderID (.*) and catalogueItemType (.*)")]
-        public void WhenTheUserMakesARequestToRetrieveAnOrderItemWithOrderIDAndCatalogueItemType(string orderId, string catalogueItemType)
+        public void WhenTheUserMakesARequestToRetrieveAnOrderItemWithOrderIdAndCatalogueItemType(string orderId, string catalogueItemType)
         {
             _getOrderItemsRequest = new GetOrderItemsRequest(
                 _request,
@@ -93,7 +93,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Then(@"the list order items response contains no entries")]
-        public async Task ThenAnEmptyCatalougeItemListIsReturned()
+        public async Task ThenAnEmptyCatalogueItemListIsReturned()
         {
             var orderItems = (await _response.ReadBodyAsJsonAsync());
             orderItems.Count().Should().Be(0);
