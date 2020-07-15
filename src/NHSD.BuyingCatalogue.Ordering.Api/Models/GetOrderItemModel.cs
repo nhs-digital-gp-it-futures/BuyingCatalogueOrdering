@@ -6,14 +6,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
     public sealed class GetOrderItemModel
     {
-        public GetOrderItemModel(string orderId, OrderItem orderItem, ServiceRecipient serviceRecipient)
+        public GetOrderItemModel(OrderItem orderItem, ServiceRecipient serviceRecipient)
         {
             if (orderItem is null)
                 throw new ArgumentNullException(nameof(orderItem));
 
             OrderItemId = orderItem.OrderItemId;
-            ItemId = $"{orderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}";
-
             ServiceRecipient = serviceRecipient != null ? new ServiceRecipientModel
             {
                 OdsCode = serviceRecipient.OdsCode,
@@ -37,8 +35,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
         }
 
         public int OrderItemId { get; set; }
-
-        public string ItemId { get; set; }
 
         public string CatalogueItemId { get; set; }
 

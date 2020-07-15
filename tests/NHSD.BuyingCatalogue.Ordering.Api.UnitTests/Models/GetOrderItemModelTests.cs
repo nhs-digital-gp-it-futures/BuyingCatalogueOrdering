@@ -7,20 +7,19 @@ using NUnit.Framework;
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
 {
     [TestFixture]
+    [Parallelizable(ParallelScope.All)]
     internal sealed class GetOrderItemModelTests
     {
         [Test]
         public void Constructor_NullOrderItem_ThrowsArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() =>
-                _ = new GetOrderItemModel(string.Empty, null, ServiceRecipientBuilder.Create().Build()));
+                _ = new GetOrderItemModel(null, ServiceRecipientBuilder.Create().Build()));
         }
 
         [Test]
         public void Constructor_ReturnsExpected()
         {
-            const string orderId = "Some order id";
-
             var serviceRecipient = ServiceRecipientBuilder
                 .Create()
                 .WithOdsCode("ODS1")
@@ -32,7 +31,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
                 .WithOdsCode(serviceRecipient.OdsCode)
                 .Build();
 
-            var actual = new GetOrderItemModel(orderId, orderItem, serviceRecipient);
+            var actual = new GetOrderItemModel(orderItem, serviceRecipient);
 
             var expected = new
             {
@@ -75,7 +74,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
                 .WithOdsCode("Some ods code")
                 .Build();
 
-            var actual = new GetOrderItemModel("Some order id", orderItem, null);
+            var actual = new GetOrderItemModel(orderItem, null);
 
             actual.ServiceRecipient.Should().BeNull();
         }

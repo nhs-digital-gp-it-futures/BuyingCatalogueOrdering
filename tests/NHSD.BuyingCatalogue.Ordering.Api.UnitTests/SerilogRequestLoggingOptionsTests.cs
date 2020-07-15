@@ -10,6 +10,7 @@ using Serilog.Events;
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests
 {
     [TestFixture]
+    [Parallelizable(ParallelScope.All)]
     internal sealed class SerilogRequestLoggingOptionsTests
     {
         [Test]

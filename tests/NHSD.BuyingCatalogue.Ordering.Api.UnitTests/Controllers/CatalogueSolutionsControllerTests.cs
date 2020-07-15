@@ -21,6 +21,7 @@ using NUnit.Framework;
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
+    [Parallelizable(ParallelScope.All)]
     public sealed class CatalogueSolutionsControllerTests
     {
         [Test]

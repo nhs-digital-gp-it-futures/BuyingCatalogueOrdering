@@ -131,7 +131,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         solutionOrderItem2,
                         additionalServiceOrderItem1,
                         associatedServiceOrderItem1
-                    }, orderId,
+                    },
                     catalogueItemTypeFilter,
                     context.Order.ServiceRecipients);
 
@@ -221,7 +221,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var result = await context.OrderItemsController.GetAsync(context.Order.OrderId, orderItem.OrderItemId);
 
-            result.Value.Should().BeEquivalentTo(new GetOrderItemModel(context.Order.OrderId, orderItem, null));
+            result.Value.Should().BeEquivalentTo(new GetOrderItemModel(orderItem, null));
         }
 
         [Test]
@@ -268,7 +268,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var result = await context.OrderItemsController.GetAsync(context.Order.OrderId, orderItem.OrderItemId);
 
-            result.Value.Should().BeEquivalentTo(new GetOrderItemModel(context.Order.OrderId, orderItem, serviceRecipient));
+            result.Value.Should().BeEquivalentTo(new GetOrderItemModel(orderItem, serviceRecipient));
         }
 
         [Test]
@@ -644,7 +644,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         private static IEnumerable<GetOrderItemModel> CreateOrderItemModels(
             IEnumerable<OrderItem> orderItems,
-            string orderId,
             string catalogueItemTypeFilter,
             IReadOnlyList<ServiceRecipient> serviceRecipients)
         {
@@ -654,7 +653,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .OrderBy(orderItem => orderItem.Created)
                 .Select(orderItem => 
                     new GetOrderItemModel(
-                        orderId, 
                         orderItem, 
                         serviceRecipientDictionary[orderItem.OdsCode]));
 

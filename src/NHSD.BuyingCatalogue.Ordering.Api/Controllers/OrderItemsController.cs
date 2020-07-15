@@ -102,7 +102,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             return orderItems
                 .OrderBy(x => x.Created)
-                .Select(orderItem => new GetOrderItemModel(orderId, orderItem, serviceRecipientDictionary[orderItem.OdsCode.ToUpperInvariant()])).ToList();
+                .Select(orderItem => new GetOrderItemModel(orderItem, serviceRecipientDictionary[orderItem.OdsCode.ToUpperInvariant()])).ToList();
         }
 
         [HttpGet("{orderItemId}")]
@@ -127,10 +127,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             var matchedServiceRecipient = order.ServiceRecipients.FirstOrDefault(serviceRecipient => 
                 string.Equals(orderItem.OdsCode, serviceRecipient.OdsCode, StringComparison.OrdinalIgnoreCase));
 
-            return new GetOrderItemModel(
-                orderId, 
-                orderItem, 
-                matchedServiceRecipient);
+            return new GetOrderItemModel(orderItem, matchedServiceRecipient);
         }
 
         [HttpPut]
