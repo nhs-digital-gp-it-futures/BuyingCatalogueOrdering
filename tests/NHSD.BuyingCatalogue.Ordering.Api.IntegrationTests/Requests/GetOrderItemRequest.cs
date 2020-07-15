@@ -14,19 +14,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             Request request,
             string orderingApiBaseAddress,
             string orderId,
-            int? orderItemId)
+            int orderItemId)
         {
             _request = request ?? throw new ArgumentNullException(nameof(request));
 
             OrderId = orderId ?? throw new ArgumentNullException(nameof(orderId));
             OrderItemId = orderItemId;
 
-            _getOrderItemUrl = $"{orderingApiBaseAddress}/api/v1/orders/{orderId}/order-items/{orderItemId.GetValueOrDefault()}";
+            _getOrderItemUrl = $"{orderingApiBaseAddress}/api/v1/orders/{orderId}/order-items/{orderItemId}";
         }
 
         public string OrderId { get; }
 
-        public int? OrderItemId { get; }
+        public int OrderItemId { get; }
 
         public async Task<GetOrderItemResponse> ExecuteAsync()
         {

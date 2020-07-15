@@ -2,6 +2,7 @@
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
+using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models

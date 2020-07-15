@@ -105,7 +105,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 .Select(orderItem => new GetOrderItemModel(orderItem, serviceRecipientDictionary[orderItem.OdsCode.ToUpperInvariant()])).ToList();
         }
 
-        [HttpGet("{orderItemId}")]
+        [HttpGet]
+        [Route("{orderItemId}")]
         public async Task<ActionResult<GetOrderItemModel>> GetAsync(string orderId, int orderItemId)
         {
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
