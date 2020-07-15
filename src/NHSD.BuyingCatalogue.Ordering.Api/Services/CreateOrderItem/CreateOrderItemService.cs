@@ -49,6 +49,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
                 request.CatalogueItemId,
                 request.CatalogueItemType,
                 request.CatalogueItemName,
+                request.CatalogueSolutionId,
                 provisioningType,
                 cataloguePriceType,
                 cataloguePriceUnit,

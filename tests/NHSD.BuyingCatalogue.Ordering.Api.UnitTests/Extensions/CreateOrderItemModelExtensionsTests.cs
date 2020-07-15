@@ -1,6 +1,5 @@
 ﻿using System;
 using FluentAssertions;
-using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Domain;
@@ -10,31 +9,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class CreateOrderItemModelExtensionsTests
+    internal sealed class CreateOrderItemBaseModelTests
     {
         [Test]
         public void ToRequest_NullOrder_ThrowsArgumentNullException()
         {
             var builder = CreateOrderItemModelBuilder.Create().BuildSolution();
             
-            Assert.Throws<ArgumentNullException>(() => builder.ToRequest(null, CatalogueItemType.Solution));
+            Assert.Throws<ArgumentNullException>(() => builder.ToRequest(null));
         }
 
         [Test]
-        public void ToRequest_NullCatalogueItemType_ThrowsArgumentNullException()
-        {
-            var builder = CreateOrderItemModelBuilder.Create().BuildSolution();
-
-            Assert.Throws<ArgumentNullException>(() => builder.ToRequest(OrderBuilder.Create().Build(), null));
-        }
-
-        [Test]
-        public void ToRequest_NullQuantity_ThrowsArgumentException()
+        public void ToRequest_NullQuantity_ThrowsInvalidOperationException()
         {
             var builder = CreateOrderItemModelBuilder.Create().WithQuantity(null).BuildSolution();
             var order = OrderBuilder.Create().Build();
 
-            Assert.Throws<ArgumentException>(() => builder.ToRequest(order, CatalogueItemType.Solution));
+            Assert.Throws<InvalidOperationException>(() => builder.ToRequest(order));
         }
 
         [Test]
@@ -48,17 +39,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
                 .Create()
                 .Build();
 
-            var catalogueItemType = CatalogueItemType.Solution;
-
-            var actual = model.ToRequest(order, catalogueItemType);
+            var actual = model.ToRequest(order);
 
             var expected = CreateOrderItemRequestBuilder
                 .Create()
                 .WithOrder(order)
                 .WithOdsCode(model.ServiceRecipient?.OdsCode)
-                .WithCatalogueItemId(model.CatalogueSolutionId)
-                .WithCatalogueItemType(catalogueItemType)
-                .WithCatalogueItemName(model.CatalogueSolutionName)
+                .WithCatalogueItemId(model.CatalogueItemId)
+                .WithCatalogueItemType(CatalogueItemType.Solution)
+                .WithCatalogueItemName(model.CatalogueItemName)
+                .WithCatalogueSolutionId(null)
                 .WithProvisioningTypeName(model.ProvisioningType)
                 .WithCataloguePriceTypeName(model.Type)
                 .WithCataloguePriceUnitTierName(model.ItemUnit?.Name)

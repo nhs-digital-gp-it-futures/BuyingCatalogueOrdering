@@ -15,6 +15,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 
         public string CatalogueItemName { get; }
 
+        public string CatalogueSolutionId { get; }
+
         public string ProvisioningTypeName { get; }
 
         public string CataloguePriceTypeName { get; }
@@ -41,6 +43,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             string catalogueItemId,
             CatalogueItemType catalogueItemType,
             string catalogueItemName,
+            string catalogueSolutionId,
             string provisioningTypeName,
             string cataloguePriceTypeName,
             string cataloguePriceUnitTierName,
@@ -57,6 +60,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             CatalogueItemId = catalogueItemId;
             CatalogueItemType = catalogueItemType ?? throw new ArgumentNullException(nameof(catalogueItemType));
             CatalogueItemName = catalogueItemName;
+            CatalogueSolutionId = catalogueSolutionId;
             ProvisioningTypeName = provisioningTypeName;
             CataloguePriceTypeName = cataloguePriceTypeName;
             CataloguePriceUnitTierName = cataloguePriceUnitTierName;

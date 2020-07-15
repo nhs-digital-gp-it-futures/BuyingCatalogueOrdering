@@ -96,7 +96,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                         Price = orderItem.Price,
                         Quantity = orderItem.Quantity,
                         CostPerYear = orderItem.CalculateTotalCostPerYear()
-                    }),
+                    })
             };
         }
 

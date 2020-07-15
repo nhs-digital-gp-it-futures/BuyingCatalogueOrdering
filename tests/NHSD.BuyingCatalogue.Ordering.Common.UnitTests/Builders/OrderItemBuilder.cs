@@ -140,6 +140,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
                 _catalogueItemId,
                 _catalogueItemType,
                 _catalogueItemName,
+                null,
                 _provisioningType,
                 _cataloguePriceType,
                 _cataloguePriceUnit,

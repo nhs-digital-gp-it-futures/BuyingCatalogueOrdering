@@ -12,6 +12,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         private string _catalogueItemId;
         private CatalogueItemType _catalogueItemType;
         private string _catalogueItemName;
+        private string _catalogueSolutionId;
         private string _cataloguePriceTypeName;
         private string _provisioningTypeName;
         private string _cataloguePriceUnitTierName;
@@ -30,6 +31,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _catalogueItemId = "10001-001";
             _catalogueItemType = CatalogueItemType.AssociatedService;
             _catalogueItemName = "Some catalogue item name";
+            _catalogueSolutionId = "10001-002";
             _provisioningTypeName = "Declarative";
             _cataloguePriceTypeName = "Flat";
             _cataloguePriceUnitTierName = "sms";
@@ -71,6 +73,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         public CreateOrderItemRequestBuilder WithCatalogueItemName(string catalogueItemName)
         {
             _catalogueItemName = catalogueItemName;
+            return this;
+        }
+
+        public CreateOrderItemRequestBuilder WithCatalogueSolutionId(string catalogueSolutionId)
+        {
+            _catalogueSolutionId = catalogueSolutionId;
             return this;
         }
 
@@ -141,6 +149,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
                 _catalogueItemId,
                 _catalogueItemType,
                 _catalogueItemName,
+                _catalogueSolutionId,
                 _provisioningTypeName,
                 _cataloguePriceTypeName,
                 _cataloguePriceUnitTierName,
