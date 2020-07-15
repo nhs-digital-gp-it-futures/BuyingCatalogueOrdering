@@ -19,6 +19,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\NHSD.BuyingCatalogue.Ordering.Domain\NHSD.BuyingCatalogue.Ordering.Domain.csproj" />
+    <ProjectReference Include="..\NHSD.BuyingCatalogue.Ordering.Common.UnitTests\NHSD.BuyingCatalogue.Ordering.Common.UnitTests.csproj" />
   </ItemGroup>
 
 </Project>

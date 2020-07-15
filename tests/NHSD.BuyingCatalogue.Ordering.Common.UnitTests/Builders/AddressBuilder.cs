@@ -1,8 +1,8 @@
 ﻿using NHSD.BuyingCatalogue.Ordering.Domain;
 
-namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
+namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
 {
-    internal sealed class AddressBuilder
+    public sealed class AddressBuilder
     {
         private readonly int _addressId;
         private string _line1;
@@ -29,66 +29,66 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _country = "Some country";
         }
 
-        internal static AddressBuilder Create()
+        public static AddressBuilder Create()
         {
             return new AddressBuilder();
         }
 
-        internal AddressBuilder WithLine1(string line1)
+        public AddressBuilder WithLine1(string line1)
         {
             _line1 = line1;
             return this;
         }
 
-        internal AddressBuilder WithLine2(string line2)
+        public AddressBuilder WithLine2(string line2)
         {
             _line2 = line2;
             return this;
         }
 
-        internal AddressBuilder WithLine3(string line3)
+        public AddressBuilder WithLine3(string line3)
         {
             _line3 = line3;
             return this;
         }
 
-        internal AddressBuilder WithLine4(string line4)
+        public AddressBuilder WithLine4(string line4)
         {
             _line4 = line4;
             return this;
         }
 
-        internal AddressBuilder WithLine5(string line5)
+        public AddressBuilder WithLine5(string line5)
         {
             _line5 = line5;
             return this;
         }
 
-        internal AddressBuilder WithTown(string town)
+        public AddressBuilder WithTown(string town)
         {
             _town = town;
             return this;
         }
 
-        internal AddressBuilder WithCounty(string county)
+        public AddressBuilder WithCounty(string county)
         {
             _county = county;
             return this;
         }
 
-        internal AddressBuilder WithPostcode(string postcode)
+        public AddressBuilder WithPostcode(string postcode)
         {
             _postcode = postcode;
             return this;
         }
 
-        internal AddressBuilder WithCountry(string country)
+        public AddressBuilder WithCountry(string country)
         {
             _country = country;
             return this;
         }
 
-        internal Address Build()
+        public Address Build()
         {
             return new Address
             {

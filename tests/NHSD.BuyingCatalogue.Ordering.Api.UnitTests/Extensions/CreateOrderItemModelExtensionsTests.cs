@@ -1,6 +1,7 @@
 ﻿using System;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
+using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
 
