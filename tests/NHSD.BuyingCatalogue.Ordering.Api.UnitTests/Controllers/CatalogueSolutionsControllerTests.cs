@@ -14,6 +14,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
+using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Domain.Results;
 using NUnit.Framework;
@@ -21,6 +22,7 @@ using NUnit.Framework;
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
+    [Parallelizable(ParallelScope.All)]
     public sealed class CatalogueSolutionsControllerTests
     {
         [Test]
@@ -468,10 +470,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             await context.Controller.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
 
-            context.UpdateOrderItemService.Verify(x => 
-                x.UpdateAsync(It.Is<UpdateOrderItemRequest>(r => 
-                    orderId.Equals(r.Order.OrderId) 
-                    && orderItemId.Equals(r.OrderItemId)), 
+            context.UpdateOrderItemService.Verify(x =>
+                x.UpdateAsync(It.Is<UpdateOrderItemRequest>(r =>
+                    orderId.Equals(r.Order.OrderId)
+                    && orderItemId.Equals(r.OrderItemId)),
                     It.IsAny<CatalogueItemType>(),
                     It.IsAny<ProvisioningType>()), Times.Once);
         }
@@ -529,7 +531,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             {
                 Errors = new []
                 {
-                    new ErrorModel(error.Id, error.Field) 
+                    new ErrorModel(error.Id, error.Field)
                 }
             };
 

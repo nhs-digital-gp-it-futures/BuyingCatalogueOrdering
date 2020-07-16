@@ -9,12 +9,14 @@ using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
+using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
+    [Parallelizable(ParallelScope.All)]
     internal sealed class OrderingPartyControllerTests
     {
         [Test]

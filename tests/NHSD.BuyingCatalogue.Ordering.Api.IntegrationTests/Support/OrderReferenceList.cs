@@ -8,6 +8,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
     {
         private readonly Dictionary<string, OrderEntity> _cache = new Dictionary<string, OrderEntity>();
 
+        public IEnumerable<OrderEntity> GetAll() =>
+            _cache.Values;
+
         public OrderEntity GetByOrderId(string orderId) => 
             _cache[orderId]
                 .Should()

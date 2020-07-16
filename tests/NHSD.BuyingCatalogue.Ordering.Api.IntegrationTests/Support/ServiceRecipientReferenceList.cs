@@ -20,9 +20,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
         public IEnumerable<ServiceRecipientEntity> FindByOrderId(string orderId) =>
             _cache.Values.Where(x => string.Equals(x.OrderId, orderId, StringComparison.OrdinalIgnoreCase));
 
+        public ServiceRecipientEntity Get(string orderId, string odsCode)
+        {
+            string key = GenerateKey(orderId, odsCode);
+            return _cache[key];
+        }
+
         private string GenerateKey(string orderId, string odsCode)
         {
-            return $"{orderId}_{odsCode}";
+            return $"{orderId?.ToUpperInvariant()}_{odsCode?.ToUpperInvariant()}";
         }
     }
 }

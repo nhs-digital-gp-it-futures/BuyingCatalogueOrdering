@@ -20,7 +20,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Attributes
         {
             if (validationContext == null) throw new ArgumentNullException(nameof(validationContext));
 
-            if (!(validationContext.ObjectInstance is CreateOrderItemBaseModel orderItem))
+            if (!(validationContext.ObjectInstance is CreateOrderItemModel orderItem))
             {
                 throw new ArgumentException($"The {nameof(RequiredWhenProvisioningTypeInAttribute)} attribute should only be applied to CreateOrderItemModels");
             }

@@ -26,8 +26,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 
         public static UpdateOrderItemModelBuilder Create() => new UpdateOrderItemModelBuilder();
 
-        public UpdateOrderItemSolutionModel BuildSolution() =>
-            new UpdateOrderItemSolutionModel
+        public UpdateOrderItemModel BuildSolution() =>
+            new UpdateOrderItemModel
             {
                 DeliveryDate = _deliveryDate,
                 Quantity = _quantity,

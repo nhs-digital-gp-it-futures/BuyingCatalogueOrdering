@@ -119,6 +119,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             string orderId,
             CreateOrderItemSolutionModel model)
         {
+            if (model is null)
+                throw new ArgumentNullException(nameof(model));
+
             var order = await _orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
             {
@@ -133,7 +136,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             var createOrderItemResponse = new CreateOrderItemResponseModel();
 
-            var result = await _createOrderItemService.CreateAsync(model.ToRequest(order, CatalogueItemType.Solution));
+            var result = await _createOrderItemService.CreateAsync(model.ToRequest(order));
             if (result.IsSuccess)
             {
                 createOrderItemResponse.OrderItemId = result.Value;
@@ -148,9 +151,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [Route("{orderItemId}")]
         [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult<UpdateOrderItemResponseModel>> UpdateOrderItemAsync(
-            string orderId, 
-            int orderItemId, 
-            UpdateOrderItemSolutionModel model)
+            string orderId,
+            int orderItemId,
+            UpdateOrderItemModel model)
         {
             if (model is null)
                 throw new ArgumentNullException(nameof(model));
@@ -164,7 +167,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
 
             var orderItem = order.OrderItems.FirstOrDefault(
-                item => orderItemId.Equals(item.OrderItemId) 
+                item => orderItemId.Equals(item.OrderItemId)
                         && CatalogueItemType.Solution.Equals(item.CatalogueItemType));
 
             if (orderItem is null)

@@ -51,8 +51,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             new CreateOrderItemSolutionModel
             {
                 ServiceRecipient = _serviceRecipient,
-                CatalogueSolutionId = _catalogueSolutionId,
-                CatalogueSolutionName = _catalogueSolutionName,
+                CatalogueItemId = _catalogueSolutionId,
+                CatalogueItemName = _catalogueSolutionName,
                 DeliveryDate = _deliveryDate,
                 Quantity = _quantity,
                 EstimationPeriod = _estimationPeriod,
