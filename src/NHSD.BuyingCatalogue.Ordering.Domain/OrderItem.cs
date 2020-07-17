@@ -130,12 +130,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         {
             bool changed = !Equals(DeliveryDate, deliveryDate);
             changed = changed || !Equals(Quantity, quantity);
-            changed = changed || !Equals(EstimationPeriod, estimationPeriod);
+            changed = changed || Equals(ProvisioningType, ProvisioningType.OnDemand) 
+                && !Equals(EstimationPeriod, estimationPeriod);
             changed = changed || !Equals(Price, price);
 
             DeliveryDate = deliveryDate;
             Quantity = quantity;
-            EstimationPeriod = estimationPeriod;
+
+            if (ProvisioningType.Equals(ProvisioningType.OnDemand))
+            {
+                EstimationPeriod = estimationPeriod;
+            }
+
             Price = price;
 
             if (changed)

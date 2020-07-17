@@ -111,7 +111,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             public string CatalogueItemName { get; set; }
 
-            public ProvisioningType ProvisioningType { get; set; } = ProvisioningType.Declarative;
+            public ProvisioningType ProvisioningType { get; set; } = ProvisioningType.OnDemand;
 
             public string CataloguePriceUnitName { get; set; } = "patient";
 

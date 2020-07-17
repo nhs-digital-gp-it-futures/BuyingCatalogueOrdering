@@ -161,10 +161,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void ChangePrice_ChangeValues_ExpectedPropertiesUpdated()
+        public void ChangePrice_ChangeValues_OnDemand_ExpectedPropertiesUpdated()
         {
             var orderItem = OrderItemBuilder
                 .Create()
+                .WithProvisioningType(ProvisioningType.OnDemand)
                 .WithDeliveryDate(DateTime.UtcNow)
                 .WithEstimationPeriod(TimeUnit.PerYear)
                 .Build();
@@ -187,12 +188,40 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             orderItem.Should().BeEquivalentTo(expected);
         }
 
+        [Test]
+        public void ChangePrice_ChangeValues_NotOnDemand_ExpectedPropertiesUpdated()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithProvisioningType(ProvisioningType.Patient)
+                .WithDeliveryDate(DateTime.UtcNow)
+                .WithEstimationPeriod(TimeUnit.PerYear)
+                .Build();
+
+            var expected = new
+            {
+                DeliveryDate = orderItem.DeliveryDate?.AddDays(1),
+                Quantity = orderItem.Quantity + 1,
+                EstimationPeriod = TimeUnit.PerYear,
+                Price = orderItem.Price + 1m
+            };
+
+            orderItem.ChangePrice(
+                expected.DeliveryDate,
+                expected.Quantity,
+                TimeUnit.PerMonth,
+                expected.Price,
+                null);
+
+            orderItem.Should().BeEquivalentTo(expected);
+        }
+
         [TestCase(0, 0, false, 0, 0)]
         [TestCase(1, 0, false, 0, 1)]
         [TestCase(0, 1, false, 0, 1)]
         [TestCase(0, 0, true, 0, 1)]
         [TestCase(0, 0, false, 1, 1)]
-        public void ChangePrice_Callback_ReturnsExpectedCallbackCount(
+        public void ChangePrice_Callback_OnDemand_ReturnsExpectedCallbackCount(
             int deliveryDateChangeInput,
             int quantityChangeInput,
             bool estimationPeriodChangeInput,
@@ -203,6 +232,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
             var orderItem = OrderItemBuilder
                 .Create()
+                .WithProvisioningType(ProvisioningType.OnDemand)
                 .WithEstimationPeriod(TimeUnit.PerYear)
                 .Build();
 
@@ -211,6 +241,36 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
                 orderItem.Quantity + quantityChangeInput, 
                 estimationPeriodChangeInput ? TimeUnit.PerMonth : TimeUnit.PerYear, 
                 orderItem.Price + priceChangeInput, 
+                () => callbackCounter++);
+
+            callbackCounter.Should().Be(expectedCount);
+        }
+
+        [TestCase(0, 0, false, 0, 0)]
+        [TestCase(0, 0, true, 0, 0)]
+        [TestCase(1, 0, false, 0, 1)]
+        [TestCase(0, 1, false, 0, 1)]
+        [TestCase(0, 0, false, 1, 1)]
+        public void ChangePrice_Callback_NotOnDemand_ReturnsExpectedCallbackCount(
+            int deliveryDateChangeInput,
+            int quantityChangeInput,
+            bool estimationPeriodChangeInput,
+            decimal priceChangeInput,
+            int expectedCount)
+        {
+            int callbackCounter = 0;
+
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithProvisioningType(ProvisioningType.Declarative)
+                .WithEstimationPeriod(TimeUnit.PerYear)
+                .Build();
+
+            orderItem.ChangePrice(
+                orderItem.DeliveryDate?.AddDays(deliveryDateChangeInput),
+                orderItem.Quantity + quantityChangeInput,
+                estimationPeriodChangeInput ? TimeUnit.PerMonth : TimeUnit.PerYear,
+                orderItem.Price + priceChangeInput,
                 () => callbackCounter++);
 
             callbackCounter.Should().Be(expectedCount);

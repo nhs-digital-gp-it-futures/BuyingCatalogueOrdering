@@ -12,9 +12,10 @@ Background:
         | ODS1    | Service Recipient   | C000014-01 |
         | ODS2    | Service Recipient 2 | C000014-01 |
     And Order items exist
-        | OrderId    | OdsCode | CatalogueItemName | CatalogueItemType |
-        | C000014-01 | ODS1    | Order Item 1      | Solution          |
-        | C000014-01 | ODS2    | Order Item 2      | AdditionalService |
+        | OrderId    | OdsCode | CatalogueItemName | CatalogueItemType | ProvisioningType |
+        | C000014-01 | ODS1    | Order Item 1      | Solution          | OnDemand         |
+        | C000014-01 | ODS2    | Order Item 2      | AdditionalService | OnDemand         |
+        | C000014-01 | ODS2    | Order Item 3      | Solution          | Declarative      |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @7840
@@ -32,7 +33,15 @@ Scenario: 1. Update a catalogue solution order item
         | low-boundary  |
 
 @7840
-Scenario: 2. Update a catalogue solution order item and the order audit information is updated
+Scenario: 2. Update a catalogue solution order item that is not on demand does not update the estimation period
+    Given the user creates a request to change the catalogue solution order item ('Order Item 3') for the order with ID 'C000014-01'
+    And the user enters the 'missing-estimation-period' update catalogue solution order item request payload
+    When the user sends the update catalogue solution order item request
+    Then a response with status code 204 is returned
+    And the catalogue solution order item is updated
+
+@7840
+Scenario: 3. Update a catalogue solution order item and the order audit information is updated
     Given the user creates a request to change the catalogue solution order item ('Order Item 1') for the order with ID 'C000014-01'
     And the user enters the 'complete' update catalogue solution order item request payload
     When the user sends the update catalogue solution order item request
@@ -41,21 +50,21 @@ Scenario: 2. Update a catalogue solution order item and the order audit informat
         | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
 
 @7840
-Scenario: 3. Update a catalogue solution order item with invalid order ID should return not found
+Scenario: 4. Update a catalogue solution order item with invalid order ID should return not found
     Given the user creates a request to change the catalogue solution order item ('Order Item 1') for the order with ID 'INVALID'
     And the user enters the 'complete' update catalogue solution order item request payload
     When the user sends the update catalogue solution order item request
     Then a response with status code 404 is returned
 
 @7840
-Scenario: 4. Update a additional service order item should return not found
+Scenario: 5. Update an additional service order item should return not found
     Given the user creates a request to change the catalogue solution order item ('Order Item 2') for the order with ID 'C000014-01'
     And the user enters the 'complete' update catalogue solution order item request payload
     When the user sends the update catalogue solution order item request
     Then a response with status code 404 is returned
 
 @7840
-Scenario: 5. If a user is not authorised then they cannot update a catalogue solution order item
+Scenario: 6. If a user is not authorised then they cannot update a catalogue solution order item
     Given no user is logged in
     And the user creates a request to change the catalogue solution order item ('Order Item 1') for the order with ID 'C000014-01'
     And the user enters the 'complete' update catalogue solution order item request payload
@@ -63,7 +72,7 @@ Scenario: 5. If a user is not authorised then they cannot update a catalogue sol
     Then a response with status code 401 is returned
 
 @7840
-Scenario: 6. A non buyer user cannot update a catalogue solution order item
+Scenario: 7. A non buyer user cannot update a catalogue solution order item
     Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
     And the user creates a request to change the catalogue solution order item ('Order Item 1') for the order with ID 'C000014-01'
     And the user enters the 'complete' update catalogue solution order item request payload
@@ -71,7 +80,7 @@ Scenario: 6. A non buyer user cannot update a catalogue solution order item
     Then a response with status code 403 is returned
 
 @7840
-Scenario: 7. A buyer user cannot update a catalogue solution order item for an organisation they don't belong to
+Scenario: 8. A buyer user cannot update a catalogue solution order item for an organisation they don't belong to
     Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
     And the user creates a request to change the catalogue solution order item ('Order Item 1') for the order with ID 'C000014-01'
     And the user enters the 'complete' update catalogue solution order item request payload
@@ -79,7 +88,7 @@ Scenario: 7. A buyer user cannot update a catalogue solution order item for an o
     Then a response with status code 403 is returned
 
 @7840
-Scenario: 8. Service Failure
+Scenario: 9. Service Failure
     Given the call to the database will fail
     And the user creates a request to change the catalogue solution order item ('Order Item 1') for the order with ID 'C000014-01'
     And the user enters the 'complete' update catalogue solution order item request payload
