@@ -159,14 +159,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             Payload = factory();
         }
 
-        public void AssertPayload(OrderItemEntity actual)
+        public void AssertPayload(OrderItemEntity actual, OrderItemEntity original)
         {
+            var expectedEstimationPeriod = Payload.EstimationPeriod;
+
+            if (original.ProvisioningType != ProvisioningType.OnDemand)
+            {
+                expectedEstimationPeriod = original.EstimationPeriod;
+            }
+
             var expected = new
             {
                 OrderId,
                 OrderItemId,
                 DeliveryDate = Payload.DeliveryDate?.Date,
-                Payload.EstimationPeriod,
+                EstimationPeriod = expectedEstimationPeriod,
                 Payload.Price
             };
 

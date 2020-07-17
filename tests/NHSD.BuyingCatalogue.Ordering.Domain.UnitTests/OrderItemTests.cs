@@ -165,6 +165,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         {
             var orderItem = OrderItemBuilder
                 .Create()
+                .WithProvisioningType(ProvisioningType.OnDemand)
                 .WithDeliveryDate(DateTime.UtcNow)
                 .WithEstimationPeriod(TimeUnit.PerYear)
                 .Build();
@@ -187,6 +188,34 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             orderItem.Should().BeEquivalentTo(expected);
         }
 
+        [Test]
+        public void ChangePrice_ChangeValues_NullEstimationPeriod_ExpectedPropertiesUpdated()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithProvisioningType(ProvisioningType.Patient)
+                .WithDeliveryDate(DateTime.UtcNow)
+                .WithEstimationPeriod(TimeUnit.PerYear)
+                .Build();
+
+            var expected = new
+            {
+                DeliveryDate = orderItem.DeliveryDate?.AddDays(1),
+                Quantity = orderItem.Quantity + 1,
+                EstimationPeriod = TimeUnit.PerYear,
+                Price = orderItem.Price + 1m
+            };
+
+            orderItem.ChangePrice(
+                expected.DeliveryDate,
+                expected.Quantity,
+                null,
+                expected.Price,
+                null);
+
+            orderItem.Should().BeEquivalentTo(expected);
+        }
+
         [TestCase(0, 0, false, 0, 0)]
         [TestCase(1, 0, false, 0, 1)]
         [TestCase(0, 1, false, 0, 1)]
@@ -203,6 +232,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
             var orderItem = OrderItemBuilder
                 .Create()
+                .WithProvisioningType(ProvisioningType.OnDemand)
                 .WithEstimationPeriod(TimeUnit.PerYear)
                 .Build();
 

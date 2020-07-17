@@ -55,8 +55,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var orderItem = await OrderItemEntity.FetchByOrderItemId(_settings.ConnectionString,
                 _updateCatalogueSolutionOrderItemRequest.OrderItemId);
+            var original = _orderContext.OrderItemReferenceList
+                    .FindByOrderItemId(_updateCatalogueSolutionOrderItemRequest
+                    .OrderItemId);
 
-            _updateCatalogueSolutionOrderItemRequest.AssertPayload(orderItem);
+            _updateCatalogueSolutionOrderItemRequest.AssertPayload(orderItem, original);
         }
     }
 }
