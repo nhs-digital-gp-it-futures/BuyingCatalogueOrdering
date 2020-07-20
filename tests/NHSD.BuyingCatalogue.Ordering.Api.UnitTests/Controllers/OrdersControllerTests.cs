@@ -318,8 +318,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     .Build())
                 .WithOrderItem(OrderItemBuilder.Create()
                     .WithCatalogueItemType(CatalogueItemType.AssociatedService)
-                    .Build()
-                ).Build();
+                    .Build())
+                .WithOrderItem(OrderItemBuilder.Create()
+                    .WithCatalogueItemType(CatalogueItemType.Solution)
+                    .Build())
+                .Build();
 
             var context = OrdersControllerTestContext.Setup(order.OrganisationId);
             context.Order = order;
@@ -340,6 +343,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                             .ServiceRecipients
                             .WithStatus("incomplete")
                             .WithCount(context.ServiceRecipientListCount))
+                    .WithCatalogueSolutions(SectionModel.CatalogueSolutions
+                        .WithStatus("incomplete")
+                        .WithCount(1))
                     .WithAssociatedServices(SectionModel.AssociatedServices
                         .WithStatus("incomplete")
                         .WithCount(2))
