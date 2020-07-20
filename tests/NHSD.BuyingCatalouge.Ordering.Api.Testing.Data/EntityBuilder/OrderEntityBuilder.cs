@@ -154,9 +154,15 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             return this;
         }
 
-        public OrderEntityBuilder WithAdditionalServicesViewed(bool AdditionalServicesViewed)
+        public OrderEntityBuilder WithAdditionalServicesViewed(bool additionalServicesViewed)
         {
-            _orderEntity.AdditionalServicesViewed = AdditionalServicesViewed;
+            _orderEntity.AdditionalServicesViewed = additionalServicesViewed;
+            return this;
+        }
+
+        public OrderEntityBuilder WithAssociatedServicesViewed(bool associatedServicesViewed)
+        {
+            _orderEntity.AssociatedServicesViewed = associatedServicesViewed;
             return this;
         }
 

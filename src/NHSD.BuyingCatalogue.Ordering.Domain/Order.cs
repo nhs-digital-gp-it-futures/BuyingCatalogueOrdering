@@ -77,6 +77,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public bool AdditionalServicesViewed { get; set; }
 
+        public bool AssociatedServicesViewed { get; set; }
+
         public IReadOnlyList<OrderItem> OrderItems =>
             _orderItems.AsReadOnly();
 
