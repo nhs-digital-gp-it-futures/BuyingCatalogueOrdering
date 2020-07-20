@@ -11,8 +11,8 @@ Background:
         | OrderId    | OdsCode | Name    |
         | C000014-01 | eu      | EU Test |
     Given Order items exist
-        | OrderId    | CatalogueItemName | CatalogueItemType | OdsCode | PriceTimeUnit |
-        | C000014-01 | Sol 1             | Solution          | eu      | Month         |
+        | OrderId    | CatalogueItemName | CatalogueItemType | OdsCode | PriceTimeUnit | EstimationPeriod |
+        | C000014-01 | Sol 1             | Solution          | eu      | Month         | Month            |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @7580

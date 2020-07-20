@@ -123,7 +123,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             public int Quantity { get; private set; } = 1;
 
-            public TimeUnit? EstimationPeriod { get; set; } = null;
+            public TimeUnit? EstimationPeriod { get; set; } = TimeUnit.Month;
 
             public DateTime? DeliveryDate { get; set; }
 
