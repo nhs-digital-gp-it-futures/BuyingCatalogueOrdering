@@ -32,6 +32,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
             Quantity = orderItem.Quantity;
             TimeUnit = orderItem.PriceTimeUnit?.ToModel();
             Type = orderItem.CataloguePriceType.Name;
+            EstimationPeriod = orderItem.EstimationPeriod?.Name;
         }
 
         public int OrderItemId { get; set; }
@@ -61,5 +62,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
         public TimeUnitModel TimeUnit { get; set; }
 
         public string Type { get; set; }
+
+        public string EstimationPeriod { get; set; }
     }
 }

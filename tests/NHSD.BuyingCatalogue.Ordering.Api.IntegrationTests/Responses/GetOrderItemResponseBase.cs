@@ -23,7 +23,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 Quantity = responseBody.Value<int>("quantity"),
                 ServiceRecipient = ReadServiceRecipient(responseBody),
                 TimeUnit = ReadTimeUnit(responseBody),
-                Type = Enum.Parse<CataloguePriceType>(responseBody.Value<string>("type"))
+                Type = Enum.Parse<CataloguePriceType>(responseBody.Value<string>("type")),
+                EstimationPeriod = ReadEstimationPeriod(responseBody)
             };
         }
 
@@ -42,6 +43,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
             }
 
             return itemUnit;
+        }
+
+        private static object ReadEstimationPeriod(JToken responseBody)
+        {
+            object timeUnit = null;
+
+            var timeUnitToken = responseBody.Value<string>("estimationPeriod");
+            if (timeUnitToken != null)
+            {
+                return Enum.Parse<TimeUnit>(timeUnitToken, true).ToString();
+            }
+
+            return null;
         }
 
         private static object ReadTimeUnit(JToken responseBody)
@@ -90,6 +104,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 orderItemEntity.CatalogueItemName,
                 orderItemEntity.CurrencyCode,
                 orderItemEntity.DeliveryDate,
+                EstimationPeriod = orderItemEntity.EstimationPeriod?.ToString(),
                 ItemUnit = new
                 {
                     Name = orderItemEntity.PricingUnitName,
