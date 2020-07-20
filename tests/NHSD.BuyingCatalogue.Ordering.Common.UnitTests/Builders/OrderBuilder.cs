@@ -25,6 +25,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
         private bool _serviceRecipientsViewed;
         private bool _catalogueSolutionsViewed;
         private bool _additionalServicesViewed;
+        private bool _associatedServicesViewed;
         private readonly IList<OrderItem> _orderItems = new List<OrderItem>();
         private readonly IList<(string Ods, string Name)> _serviceRecipients = new List<(string Ods, string Name)>();
 
@@ -49,6 +50,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             _serviceRecipientsViewed = false;
             _catalogueSolutionsViewed = false;
             _additionalServicesViewed = false;
+            _associatedServicesViewed = false;
         }
 
         public static OrderBuilder Create() => new OrderBuilder();
@@ -125,6 +127,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             return this;
         }
 
+        public OrderBuilder WithAssociatedServicesViewed(bool associatedServicesViewed)
+        {
+            _associatedServicesViewed = associatedServicesViewed;
+            return this;
+        }
+
         public OrderBuilder WithLastUpdatedBy(Guid lastUpdatedBy)
         {
             _lastUpdatedBy = lastUpdatedBy;
@@ -183,6 +191,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             order.AdditionalServicesViewed = _additionalServicesViewed;
             order.ServiceRecipientsViewed = _serviceRecipientsViewed;
             order.CatalogueSolutionsViewed = _catalogueSolutionsViewed;
+            order.AssociatedServicesViewed = _associatedServicesViewed;
             order.Created = _created;
             order.LastUpdated = _lastUpdated;
 

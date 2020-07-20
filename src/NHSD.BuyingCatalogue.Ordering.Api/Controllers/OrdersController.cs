@@ -143,6 +143,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             int serviceRecipientsCount = await _serviceRecipientRepository.GetCountByOrderIdAsync(orderId);
             int catalogueSolutionsCount = order.OrderItems.Count(y => y.CatalogueItemType.Equals(CatalogueItemType.Solution));
+            int associatedServicesCount = order.OrderItems.Count(y => y.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
 
             OrderSummaryModel orderSummaryModel = new OrderSummaryModel
             {
@@ -155,7 +156,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     SectionModel.OrderingParty.WithStatus(order.IsOrderingPartySectionComplete() ? "complete" : "incomplete"),
                     SectionModel.Supplier.WithStatus(order.IsSupplierSectionComplete() ? "complete" : "incomplete"),
                     SectionModel.CommencementDate.WithStatus(order.IsCommencementDateSectionComplete() ? "complete" : "incomplete"),
-                    SectionModel.AssociatedServices,
+                    SectionModel.AssociatedServices
+                        .WithStatus(order.IsAssociatedServicesSectionComplete() ? "complete" : "incomplete")
+                        .WithCount(associatedServicesCount),
                     SectionModel
                         .ServiceRecipients
                         .WithStatus(order.IsServiceRecipientsSectionComplete() ? "complete" : "incomplete")
