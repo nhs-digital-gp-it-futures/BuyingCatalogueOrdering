@@ -15,6 +15,7 @@ Background:
         | OrderId    | OdsCode | CatalogueItemName | CatalogueItemType | ProvisioningType |
         | C000014-01 | ODS1    | Order Item 1      | Solution          | OnDemand         |
         | C000014-01 | ODS2    | Order Item 2      | AdditionalService | Declarative      |
+        | C000014-01 | ODS2    | Order Item 3      | AssociatedService | Patient          |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @7840
@@ -26,10 +27,16 @@ Scenario: 1. Update an order item
     And the order item is updated
 
     Examples: Request payloads
-        | payload-type  |
-        | complete      |
-        | high-boundary |
-        | low-boundary  |
+        | ItemName     | payload-type  |
+        | Order Item 1 | complete      |
+        | Order Item 1 | high-boundary |
+        | Order Item 1 | low-boundary  |
+        | Order Item 2 | complete      |
+        | Order Item 2 | high-boundary |
+        | Order Item 2 | low-boundary  |
+        | Order Item 3 | complete      |
+        | Order Item 3 | high-boundary |
+        | Order Item 3 | low-boundary  |
 
 @7840
 Scenario: 2. Update an order item that is not on demand does not update the estimation period
