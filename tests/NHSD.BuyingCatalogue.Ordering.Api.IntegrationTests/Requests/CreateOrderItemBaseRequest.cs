@@ -29,6 +29,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                 request,
                 url,
                 orderId)
+            },
+            { "associated service", (request, url, orderId) => new CreateAssociatedServiceOrderItemRequest(
+                request,
+                url,
+                orderId)
             }
         };
 
@@ -60,6 +65,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
         }
         public void AssertPayload(OrderItemEntity actual)
         {
+            var timeUnit = Payload.CatalogueItemType == CatalogueItemType.AssociatedService
+                ? null
+                : (TimeUnit?)Enum.Parse(typeof(TimeUnit), Payload.TimeUnitName, true);
+
             var expectedBuilder = OrderItemEntityBuilder
                 .Create()
                 .WithOrderId(OrderId)
@@ -76,7 +85,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                 .WithPricingUnitName(Payload.ItemUnitName)
                 .WithPricingUnitDescription(Payload.ItemUnitNameDescription)
                 .WithPrice(Payload.Price)
-                .WithTimeUnit((TimeUnit?)Enum.Parse(typeof(TimeUnit), Payload.TimeUnitName, true));
+                .WithTimeUnit(timeUnit);
             
             var expected = expectedBuilder.Build();
             actual.Should().BeEquivalentTo(expected,
