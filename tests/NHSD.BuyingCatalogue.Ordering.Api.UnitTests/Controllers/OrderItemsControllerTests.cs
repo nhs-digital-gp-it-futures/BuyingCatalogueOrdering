@@ -320,8 +320,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             result.Result.As<CreatedAtActionResult>().Should().BeEquivalentTo(new
             {
-                ActionName = "GetOrderItem",
-                ControllerName = "CatalogueSolutions",
+                ActionName = "Get",
                 RouteValues = new RouteValueDictionary
                 {
                     { "orderId", orderId },
