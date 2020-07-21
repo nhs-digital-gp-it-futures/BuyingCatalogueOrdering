@@ -30,8 +30,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _request.PutJsonAsync(string.Format(_sectionStatusUpdateUrl, orderId, sectionId), payload);
         }
 
-        [Then(@"the order with ID (.*) has additional services viewed set to (.*)")]
+        [Then(@"the order with ID (.*) has catalogue solutions viewed set to (.*)")]
         public async Task TheOrderWithIdHasCatalogueSolutionsViewedSet(string orderId, bool viewed)
+        {
+            var actual = (await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId)).CatalogueSolutionsViewed;
+            actual.Should().Be(viewed);
+        }
+
+        [Then(@"the order with ID (.*) has additional services viewed set to (.*)")]
+        public async Task TheOrderWithIdHasAdditionalServicesViewedSet(string orderId, bool viewed)
         {
             var actual = (await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId)).AdditionalServicesViewed;
             actual.Should().Be(viewed);

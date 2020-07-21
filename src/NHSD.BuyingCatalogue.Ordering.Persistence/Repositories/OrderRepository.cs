@@ -12,7 +12,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
 {
     public sealed class OrderRepository : IOrderRepository
     {
-        private const string DefaultOrderId = "C000000-01";
+        private const string DefaultOrderId = "C010000-01";
         private readonly ApplicationDbContext _context;
 
         public OrderRepository(ApplicationDbContext context)
