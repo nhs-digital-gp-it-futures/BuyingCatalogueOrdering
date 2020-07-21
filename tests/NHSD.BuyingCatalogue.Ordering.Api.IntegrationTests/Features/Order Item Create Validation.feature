@@ -58,7 +58,7 @@ Scenario: 1. Create catalogue solution order item with missing required field
         | greater-than-max-price            | PriceLessThanMax                           | Price             |
 
 @7840
-Scenario: 1. Create additional service order item with missing required field
+Scenario: 2. Create additional service order item with missing required field
     Given the user creates a request to add a new additional service order item to the order with ID 'C000014-01'
     And the user enters the '<payload-type>' create order item request payload
     When the user sends the create order item request

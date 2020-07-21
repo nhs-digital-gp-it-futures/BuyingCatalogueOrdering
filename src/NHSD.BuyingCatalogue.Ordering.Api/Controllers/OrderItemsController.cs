@@ -63,7 +63,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (result.IsSuccess)
             {
                 createOrderItemResponse.OrderItemId = result.Value;
-                return CreatedAtAction(nameof(GetAsync).TrimAsync(), null, new { orderId, orderItemId = createOrderItemResponse.OrderItemId }, createOrderItemResponse);
+                return CreatedAtAction(nameof(GetAsync).TrimAsync(), "OrderItems", new { orderId, orderItemId = createOrderItemResponse.OrderItemId }, createOrderItemResponse);
             }
 
             createOrderItemResponse.Errors = result.Errors.Select(x => new ErrorModel(x.Id, x.Field));
