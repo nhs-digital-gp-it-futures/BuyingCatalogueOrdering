@@ -2,7 +2,7 @@
 {
     public enum CostType
     {
-        Recurring,
-        OneOff
+        Recurring = 0,
+        OneOff = 1
     }
 }
