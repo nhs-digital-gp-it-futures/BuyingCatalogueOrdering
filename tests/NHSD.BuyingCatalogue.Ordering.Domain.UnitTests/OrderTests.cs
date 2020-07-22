@@ -256,7 +256,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void CalculateCostPerYearRecurring_OrderItemCostTypeRecurring_ReturnsTotalOrderItemCost()
+        public void CalculateCostPerYear_OrderItemCostTypeRecurring_ReturnsTotalOrderItemCost()
         {
             const int orderItemId1 = 1;
             const int orderItemId2 = 1;
@@ -289,7 +289,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void CalculateCostPerYearRecurring_OrderItemCostTypeOneOff_ReturnsZero()
+        public void CalculateCostPerYear_OrderItemCostTypeOneOff_ReturnsZero()
         {
             const int orderItemId = 1;
 
