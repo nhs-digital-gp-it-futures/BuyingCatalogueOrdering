@@ -254,5 +254,58 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
             order.Should().BeEquivalentTo(expected);
         }
+
+        [Test]
+        public void CalculateCostPerYear_OrderItemCostTypeRecurring_ReturnsTotalOrderItemCost()
+        {
+            const int orderItemId1 = 1;
+            const int orderItemId2 = 1;
+
+            var orderItem1 = OrderItemBuilder
+                .Create()
+                .WithOrderItemId(orderItemId1)
+                .WithCatalogueItemType(CatalogueItemType.Solution)
+                .WithProvisioningType(ProvisioningType.Declarative)
+                .WithPrice(120)
+                .WithQuantity(2)
+                .Build();
+
+            var orderItem2 = OrderItemBuilder
+                .Create()
+                .WithOrderItemId(orderItemId2)
+                .WithCatalogueItemType(CatalogueItemType.AdditionalService)
+                .WithProvisioningType(ProvisioningType.Patient)
+                .WithPrice(240)
+                .WithQuantity(2)
+                .Build();
+
+            var order = OrderBuilder
+                .Create()
+                .WithOrderItem(orderItem1)
+                .WithOrderItem(orderItem2)
+                .Build();
+
+            order.CalculateCostPerYear(CostType.Recurring).Should().Be(2880);
+        }
+
+        [Test]
+        public void CalculateCostPerYear_OrderItemCostTypeOneOff_ReturnsZero()
+        {
+            const int orderItemId = 1;
+
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithOrderItemId(orderItemId)
+                .WithCatalogueItemType(CatalogueItemType.AssociatedService)
+                .WithProvisioningType(ProvisioningType.Declarative)
+                .Build();
+
+            var order = OrderBuilder
+                .Create()
+                .WithOrderItem(orderItem)
+                .Build();
+
+            order.CalculateCostPerYear(CostType.Recurring).Should().Be(0);
+        }
     }
 }

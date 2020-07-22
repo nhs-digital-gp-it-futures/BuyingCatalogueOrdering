@@ -57,5 +57,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             await _getOrderResponse.AssertOrderItemCost(orderItemName, amount);
         }
+
+        [Then(@"the get order response contains a (.*) of (.*) for the order")]
+        public async Task ThenTheGetOrderResponseContainsARecurringCostForTheOrder(string item, decimal amount)
+        {
+            await _getOrderResponse.AssertRecurringCost(item, amount);
+        }
+
     }
 }
