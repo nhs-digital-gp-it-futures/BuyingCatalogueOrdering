@@ -89,6 +89,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         {
             Description = orderDescription ?? throw new ArgumentNullException(nameof(orderDescription));
         }
+        public decimal CalculateCostPerYear(CostType costType)
+        {
+            return _orderItems.Where(x => x.CostType == costType).Sum(y => y.CalculateTotalCostPerYear());
+        }
 
         public void SetLastUpdatedBy(Guid userId, string name)
         {
