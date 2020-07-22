@@ -398,7 +398,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         [Test]
         public void CostType_OrderItemIsOneOff_ReturnsCorrectCostType()
         {
-            var orderItem = CreateOrderItem(CatalogueItemType.AdditionalService, ProvisioningType.Declarative);
+            var orderItem = CreateOrderItem(CatalogueItemType.AssociatedService, ProvisioningType.Declarative);
             orderItem.CostType.Should().Be(CostType.OneOff);
         }
 
