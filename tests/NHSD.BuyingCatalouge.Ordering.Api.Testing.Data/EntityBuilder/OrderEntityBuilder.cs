@@ -13,6 +13,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             {
                 Description = "Some Description",
                 OrganisationId = Guid.NewGuid(),
+                OrganisationOdsCode = "test",
                 OrganisationAddressId = null,
                 OrganisationBillingAddressId = null,
                 OrganisationContactId = null,
