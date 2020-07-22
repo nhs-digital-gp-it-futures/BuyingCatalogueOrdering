@@ -65,9 +65,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
         }
         public void AssertPayload(OrderItemEntity actual)
         {
-            var timeUnit = Payload.CatalogueItemType == CatalogueItemType.AssociatedService
-                ? null
-                : (TimeUnit?)Enum.Parse(typeof(TimeUnit), Payload.TimeUnitName, true);
+            var timeUnit = Payload.HasTimeUnit
+                ? (TimeUnit?)Enum.Parse(typeof(TimeUnit), Payload.TimeUnitName, true)
+                : null;
 
             var expectedBuilder = OrderItemEntityBuilder
                 .Create()
