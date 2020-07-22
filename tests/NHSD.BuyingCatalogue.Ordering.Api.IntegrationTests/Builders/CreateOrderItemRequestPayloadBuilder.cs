@@ -62,6 +62,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
                 .WithCatalogueSolutionId("123")
                 .WithDeliveryDate(null);
 
+        public static CreateOrderItemRequestPayloadBuilder CreateAssociatedService() =>
+            new CreateOrderItemRequestPayloadBuilder()
+                .WithCatalogueItemType(CatalogueItemType.AssociatedService)
+                .WithHasServiceRecipient(false)
+                .WithHasTimeUnit(false)
+                .WithDeliveryDate(null);
+
         public CreateOrderItemRequestPayloadBuilder WithHasServiceRecipient(bool hasServiceRecipient)
         {
             _hasServiceRecipient = hasServiceRecipient;
