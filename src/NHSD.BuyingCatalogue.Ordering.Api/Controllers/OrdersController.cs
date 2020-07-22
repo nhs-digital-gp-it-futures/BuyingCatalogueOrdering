@@ -53,6 +53,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
+            var calculatedCostPerYear = order.CalculateCostPerYear(CostType.Recurring);
+            const int monthsPerYear = 12;
+
             return new OrderModel
             {
                 Description = order.Description.Value,
@@ -71,8 +74,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     PrimaryContact = order.SupplierContact.ToModel()
                 },
                 TotalOneOffCost = 0m,
-                TotalRecurringCostPerMonth = 0m,
-                TotalRecurringCostPerYear = 0m,
+                TotalRecurringCostPerMonth = calculatedCostPerYear / monthsPerYear,
+                TotalRecurringCostPerYear = calculatedCostPerYear,
                 TotalOwnershipCost = 0m,
                 ServiceRecipients = order.ServiceRecipients.Select(serviceRecipient =>
                     new ServiceRecipientModel

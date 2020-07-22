@@ -28,6 +28,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
             item.Value<decimal>("costPerYear").Should().Be(orderItemCost);
         }
 
+        public async Task AssertRecurringCost(string item, decimal recurringCost)
+        {
+            var responseContent = await _response.ReadBodyAsJsonAsync();
+
+            responseContent.Value<decimal>(item).Should().Be(recurringCost);
+        }
+
         public async Task AssertAsync(OrderEntity expectedOrder, IEnumerable<OrderItemEntity> expectedOrderItems, IEnumerable<ServiceRecipientEntity> expectedServiceRecipients)
         {
             var responseContent = await _response.ReadBodyAsJsonAsync();
