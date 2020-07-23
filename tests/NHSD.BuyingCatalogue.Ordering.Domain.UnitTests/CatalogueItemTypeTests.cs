@@ -39,7 +39,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             actual.Should().BeNull();
         }
 
-        [Test()]
+        [Test]
         public void InferEstimationPeriod_NullProvisioningType_ThrowsArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => 
