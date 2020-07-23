@@ -49,6 +49,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public bool AssociatedServicesViewed { get; set; }
 
+        public bool? FundingSourceOnlyGMS { get; set; }
+
         protected override string InsertSql => @"
             INSERT INTO dbo.[Order]
             (
@@ -73,7 +75,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 ServiceRecipientsViewed,
                 CatalogueSolutionsViewed,
                 AdditionalServicesViewed,
-                AssociatedServicesViewed
+                AssociatedServicesViewed,
+                FundingSourceOnlyGMS
             )
             VALUES
             (
@@ -98,7 +101,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 @ServiceRecipientsViewed,
                 @CatalogueSolutionsViewed,
                 @AdditionalServicesViewed,
-                @AssociatedServicesViewed
+                @AssociatedServicesViewed,
+                @FundingSourceOnlyGMS
             );";
 
         public static async Task<OrderEntity> FetchOrderByOrderId(string connectionString, string orderId)

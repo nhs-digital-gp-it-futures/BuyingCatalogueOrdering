@@ -167,6 +167,12 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             return this;
         }
 
+        public OrderEntityBuilder WithFundingSourceOnlyGMS(bool? fundingSourceOnlyGMS)
+        {
+            _orderEntity.FundingSourceOnlyGMS = fundingSourceOnlyGMS;
+            return this;
+        }
+
         public OrderEntity Build()
         {
             return _orderEntity;

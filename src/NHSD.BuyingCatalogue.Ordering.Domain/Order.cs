@@ -79,6 +79,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public bool AssociatedServicesViewed { get; set; }
 
+        public bool? FundingSourceOnlyGMS { get; set; }
+
         public IReadOnlyList<OrderItem> OrderItems =>
             _orderItems.AsReadOnly();
 

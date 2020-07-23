@@ -218,7 +218,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.CommencementDateSectionStatusCases))]
         [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.ServiceRecipientsSectionStatusCases))]
         [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.CatalogueSolutionsSectionStatusCases))]
+        [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.AdditionalServicesSectionStatusCases))]
         [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.AssociatedServicesSectionStatusCases))]
+        [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.FundingStatusCases))]
         public async Task GetOrderSummaryAsync_ChangeOrderData_ReturnsExpectedSummary(Order order,
             OrderSummaryModel expected)
         {
@@ -803,6 +805,65 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 }
             }
 
+            internal static IEnumerable<TestCaseData> AdditionalServicesSectionStatusCases
+            {
+                get
+                {
+                    var organisationId = Guid.NewGuid();
+
+                    yield return new TestCaseData(
+                        OrderBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithAdditionalServicesViewed(true)
+                            .Build(),
+                        OrderSummaryModelBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithSections(SectionModelListBuilder.Create()
+                                .WithAdditionalServices(SectionModel.AdditionalServices
+                                    .WithStatus("complete")
+                                    .WithCount(0))
+                                .Build())
+                            .Build());
+
+                    yield return new TestCaseData(
+                        OrderBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithAdditionalServicesViewed(false)
+                            .Build(),
+                        OrderSummaryModelBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithSections(SectionModelListBuilder.Create()
+                                .WithAdditionalServices(SectionModel.AdditionalServices
+                                    .WithStatus("incomplete")
+                                    .WithCount(0))
+                                .Build())
+                            .Build());
+
+                    yield return new TestCaseData(
+                        OrderBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithAdditionalServicesViewed(true)
+                            .WithOrderItem(OrderItemBuilder.Create()
+                                .WithCatalogueItemType(CatalogueItemType.AdditionalService)
+                                .Build())
+                            .Build(),
+                        OrderSummaryModelBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithSections(SectionModelListBuilder.Create()
+                                .WithAdditionalServices(SectionModel.AdditionalServices
+                                    .WithStatus("complete")
+                                    .WithCount(1))
+                                .Build())
+                            .Build());
+                }
+            }
+
             internal static IEnumerable<TestCaseData> CatalogueSolutionsSectionStatusCases
             {
                 get
@@ -916,6 +977,59 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                                 .WithAssociatedServices(SectionModel.AssociatedServices
                                     .WithStatus("complete")
                                     .WithCount(1))
+                                .Build())
+                            .Build());
+                }
+            }
+
+            internal static IEnumerable<TestCaseData> FundingStatusCases
+            {
+                get
+                {
+                    var organisationId = Guid.NewGuid();
+
+                    yield return new TestCaseData(
+                        OrderBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithFundingSourceViewed(true)
+                            .Build(),
+                        OrderSummaryModelBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithSections(SectionModelListBuilder.Create()
+                                .WithFundingSource(SectionModel.FundingSource
+                                    .WithStatus("complete"))
+                                .Build())
+                            .Build());
+
+                    yield return new TestCaseData(
+                        OrderBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithFundingSourceViewed(false)
+                            .Build(),
+                        OrderSummaryModelBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithSections(SectionModelListBuilder.Create()
+                                .WithFundingSource(SectionModel.FundingSource
+                                    .WithStatus("complete"))
+                                .Build())
+                            .Build());
+
+                    yield return new TestCaseData(
+                        OrderBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithFundingSourceViewed(null)
+                            .Build(),
+                        OrderSummaryModelBuilder
+                            .Create()
+                            .WithOrganisationId(organisationId)
+                            .WithSections(SectionModelListBuilder.Create()
+                                .WithFundingSource(SectionModel.FundingSource
+                                    .WithStatus("incomplete"))
                                 .Build())
                             .Build());
                 }

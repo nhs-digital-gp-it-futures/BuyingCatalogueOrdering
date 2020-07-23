@@ -12,8 +12,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         private SectionModel _associatedServices;
         private SectionModel _serviceRecipients;
         private SectionModel _catalogueSolutions;
-        private readonly SectionModel _additionalServices;
-        private readonly SectionModel _fundingSource;
+        private SectionModel _additionalServices;
+        private SectionModel _fundingSource;
 
         private SectionModelListBuilder()
         {
@@ -24,7 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _associatedServices = SectionModel.AssociatedServices.WithCount(0);
             _serviceRecipients = SectionModel.ServiceRecipients.WithCount(0);
             _catalogueSolutions = SectionModel.CatalogueSolutions.WithCount(0);
-            _additionalServices = SectionModel.AdditionalServices;
+            _additionalServices = SectionModel.AdditionalServices.WithCount(0);
             _fundingSource = SectionModel.FundingSource;
         }
 
@@ -63,6 +63,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
+        public SectionModelListBuilder WithAdditionalServices(SectionModel additionalServices)
+        {
+            _additionalServices = additionalServices;
+            return this;
+        }
+
         public SectionModelListBuilder WithCatalogueSolutions(SectionModel catalogueSolutions)
         {
             _catalogueSolutions = catalogueSolutions;
@@ -72,6 +78,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         public SectionModelListBuilder WithAssociatedServices(SectionModel associatedServices)
         {
             _associatedServices = associatedServices;
+            return this;
+        }
+
+        public SectionModelListBuilder WithFundingSource(SectionModel fundingSource)
+        {
+            _fundingSource = fundingSource;
             return this;
         }
 
