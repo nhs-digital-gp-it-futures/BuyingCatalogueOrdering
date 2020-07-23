@@ -127,7 +127,7 @@ Scenario: 10. Create additional service order item and the additional service or
     And the user creates a request to add a new additional service order item to the order with ID 'C000014-01'
     And the user enters the 'complete' create order item request payload
     When the user sends the create order item request
-    Then the catalogue solution order section is marked as complete
+    Then the additional service order section is marked as complete
 
 @7840
 Scenario: 11. Create associated service order item and the associated service order section should be marked as complete
@@ -156,4 +156,4 @@ Scenario: 12. Create order item should set the expected estimation period
         | additional service | declarative         | Year             |
         | associated service | on-demand-per-month | Month            |
         | associated service | on-demand-per-year  | Year             |
-        | associated service | declarative         | Year             |
+        | associated service | declarative         | NULL             |

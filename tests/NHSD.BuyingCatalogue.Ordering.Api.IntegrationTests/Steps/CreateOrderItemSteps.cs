@@ -81,10 +81,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Then(@"the order item estimation period is set to '(.*)'")]
-        public async Task ThenTheCatalogueSolutionOrderItemEstimationPeriodIsSetTo(TimeUnit estimationPeriod)
+        public async Task ThenTheCatalogueSolutionOrderItemEstimationPeriodIsSetTo(string estimationPeriodName)
         {
+            TimeUnit? expectedEstimationPeriod = null;
+            if (!string.IsNullOrWhiteSpace(estimationPeriodName))
+                expectedEstimationPeriod = Enum.Parse<TimeUnit>(estimationPeriodName, true);
+
             var orderItem = await OrderItemEntity.FetchByCatalogueItemName(_settings.ConnectionString, _createOrderItemRequest.Payload.CatalogueItemName);
-            orderItem.EstimationPeriod.Should().Be(estimationPeriod);
+            orderItem.EstimationPeriod.Should().Be(expectedEstimationPeriod);
         }
     }
 }
