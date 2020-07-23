@@ -93,6 +93,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithCatalogueSolutionsViewed(ordersTableItem.CatalogueSolutionsViewed)
                     .WithAdditionalServicesViewed(ordersTableItem.AdditionalServicesViewed)
                     .WithAssociatedServicesViewed(ordersTableItem.AssociatedServicesViewed)
+                    .WithFundingSourceOnlyGMS(ordersTableItem.FundingSourceOnlyGMS)
                     .WithSupplierId(ordersTableItem.SupplierId)
                     .WithSupplierName(ordersTableItem.SupplierName)
                     .WithSupplierAddressId(supplierAddressId)
@@ -249,6 +250,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public bool AdditionalServicesViewed { get; set; }
 
             public bool AssociatedServicesViewed { get; set; }
+
+            public bool? FundingSourceOnlyGMS { get; set; }
         }
     }
 }
