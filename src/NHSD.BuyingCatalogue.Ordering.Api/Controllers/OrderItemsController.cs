@@ -96,10 +96,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (orderItem is null)
                 return NotFound();
 
-            var matchedServiceRecipient = order.ServiceRecipients.FirstOrDefault(serviceRecipient =>
-                string.Equals(orderItem.OdsCode, serviceRecipient.OdsCode, StringComparison.OrdinalIgnoreCase));
+            var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(x => x.OdsCode.ToUpperInvariant());
 
-            return new GetOrderItemModel(orderItem, matchedServiceRecipient);
+            serviceRecipientDictionary.TryAdd(order.OrganisationOdsCode.ToUpperInvariant(),
+                new ServiceRecipient { OdsCode = order.OrganisationOdsCode, Name = order.OrganisationName });
+
+            serviceRecipientDictionary.TryGetValue(orderItem.OdsCode.ToUpperInvariant(), out var serviceRecipient);
+
+            return new GetOrderItemModel(orderItem, serviceRecipient);
         }
 
         [HttpPost]
