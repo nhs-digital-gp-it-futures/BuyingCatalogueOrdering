@@ -36,9 +36,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             order.OrderItems.Should().BeEquivalentTo(expected);
         }
 
-        [TestCase("Solution", true)]
-        [TestCase("AdditionalService", false)]
-        [TestCase("AssociatedService", false)]
+        [TestCase(nameof(CatalogueItemType.Solution), true)]
+        [TestCase(nameof(CatalogueItemType.AdditionalService), false)]
+        [TestCase(nameof(CatalogueItemType.AssociatedService), false)]
         public void AddOrderItem_OrderItem_CatalogueItemType_CatalogueSolutionsViewedMatchExpectedValue(
             string catalogueItemTypeNameInput,
             bool expectedInput)
@@ -58,10 +58,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             order.CatalogueSolutionsViewed.Should().Be(expectedInput);
         }
 
-        [TestCase("Solution", false)]
-        [TestCase("AdditionalService", true)]
-        [TestCase("AssociatedService", false)]
+        [TestCase(nameof(CatalogueItemType.Solution), false)]
+        [TestCase(nameof(CatalogueItemType.AdditionalService), true)]
+        [TestCase(nameof(CatalogueItemType.AssociatedService), false)]
         public void AddOrderItem_OrderItem_CatalogueItemType_AdditionalServicesViewedMatchExpectedValue(
+            string catalogueItemTypeNameInput,
+            bool expectedInput)
+        {
+            var order = OrderBuilder
+                .Create()
+                .WithAdditionalServicesViewed(false)
+                .Build();
+
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithCatalogueItemType(CatalogueItemType.FromName(catalogueItemTypeNameInput))
+                .Build();
+
+            order.AddOrderItem(orderItem, Guid.Empty, String.Empty);
+
+            order.AdditionalServicesViewed.Should().Be(expectedInput);
+        }
+
+        [TestCase(nameof(CatalogueItemType.Solution), false)]
+        [TestCase(nameof(CatalogueItemType.AdditionalService), true)]
+        [TestCase(nameof(CatalogueItemType.AssociatedService), false)]
+        public void AddOrderItem_OrderItem_CatalogueItemType_AssociatedServicesViewedMatchExpectedValue(
             string catalogueItemTypeNameInput,
             bool expectedInput)
         {

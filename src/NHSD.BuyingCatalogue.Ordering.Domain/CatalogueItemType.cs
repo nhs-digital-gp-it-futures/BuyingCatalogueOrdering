@@ -6,9 +6,28 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class CatalogueItemType : IEquatable<CatalogueItemType>
     {
-        public static readonly CatalogueItemType Solution = new CatalogueItemType(1, nameof(Solution), order => order.CatalogueSolutionsViewed = true);
-        public static readonly CatalogueItemType AdditionalService = new CatalogueItemType(2, nameof(AdditionalService), order => order.AdditionalServicesViewed = true);
-        public static readonly CatalogueItemType AssociatedService = new CatalogueItemType(3, nameof(AssociatedService), order => {});
+        public static readonly CatalogueItemType Solution = new CatalogueItemType(
+            1, 
+            nameof(Solution), 
+            order => order.CatalogueSolutionsViewed = true, 
+            (provisioningType, estimationPeriod) => provisioningType.InferEstimationPeriod(estimationPeriod));
+
+        public static readonly CatalogueItemType AdditionalService = new CatalogueItemType(
+            2, 
+            nameof(AdditionalService), 
+            order => order.AdditionalServicesViewed = true,
+            (provisioningType, estimationPeriod) => provisioningType.InferEstimationPeriod(estimationPeriod));
+
+        public static readonly CatalogueItemType AssociatedService = new CatalogueItemType(
+            3, 
+            nameof(AssociatedService), 
+            order => order.AssociatedServicesViewed = true,
+            (provisioningType, estimationPeriod) => 
+                provisioningType.Equals(ProvisioningType.OnDemand) 
+                    ? provisioningType.InferEstimationPeriod(estimationPeriod) 
+                    : null);
+
+        private readonly Func<ProvisioningType, TimeUnit, TimeUnit> _inferEstimationPeriodFunction;
 
         public int Id { get; }
 
@@ -16,11 +35,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         internal Action<Order> MarkOrderSectionAsViewed { get; }
 
-        private CatalogueItemType(int id, string name, Action<Order> markOrderSectionAsViewed)
+        private CatalogueItemType(
+            int id, 
+            string name, 
+            Action<Order> markOrderSectionAsViewed,
+            Func<ProvisioningType, TimeUnit, TimeUnit> inferEstimationPeriodFunction)
         {
             Id = id;
             Name = name ?? throw new ArgumentNullException(nameof(name));
             MarkOrderSectionAsViewed = markOrderSectionAsViewed ?? throw new ArgumentNullException(nameof(markOrderSectionAsViewed));
+            _inferEstimationPeriodFunction = inferEstimationPeriodFunction ?? throw new ArgumentNullException(nameof(inferEstimationPeriodFunction));
         }
 
         internal static IEnumerable<CatalogueItemType> List() => 
@@ -41,6 +65,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
             return List().SingleOrDefault(catalogueItemType =>
                 name.Equals(catalogueItemType.Name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public TimeUnit InferEstimationPeriod(ProvisioningType provisioningType, TimeUnit estimationPeriod)
+        {
+            if (provisioningType is null)
+            {
+                throw new ArgumentNullException(nameof(provisioningType));
+            }
+
+            return _inferEstimationPeriodFunction(provisioningType, estimationPeriod);
         }
 
         public bool Equals(CatalogueItemType other)

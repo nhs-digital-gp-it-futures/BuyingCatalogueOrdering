@@ -115,7 +115,21 @@ Scenario: 9. Create catalogue solution order item and the catalogue solution ord
     Then the catalogue solution order section is marked as complete
 
 @7840
-Scenario: 10. Create order item should set the expected estimation period
+Scenario: 10. Create additional service order item and the additional service order section should be marked as complete
+    And the user creates a request to add a new additional service order item to the order with ID 'C000014-01'
+    And the user enters the 'complete' create order item request payload
+    When the user sends the create order item request
+    Then the catalogue solution order section is marked as complete
+
+@7840
+Scenario: 11. Create associated service order item and the associated service order section should be marked as complete
+    And the user creates a request to add a new associated service order item to the order with ID 'C000014-01'
+    And the user enters the 'complete' create order item request payload
+    When the user sends the create order item request
+    Then the associated service order section is marked as complete
+
+@7840
+Scenario: 12. Create order item should set the expected estimation period
     And the user creates a request to add a new <ItemType> order item to the order with ID 'C000014-01'
     And the user enters the '<Payload-Type>' create order item request payload
     When the user sends the create order item request

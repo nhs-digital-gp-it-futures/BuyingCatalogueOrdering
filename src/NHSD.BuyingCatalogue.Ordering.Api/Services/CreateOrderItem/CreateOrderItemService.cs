@@ -34,20 +34,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
                 return Result.Failure<int>(validationErrors);
             }
 
+            var catalogueItemType = request.CatalogueItemType;
             var provisioningType = ProvisioningType.FromName(request.ProvisioningTypeName);
             var cataloguePriceType = CataloguePriceType.FromName(request.CataloguePriceTypeName);
             var cataloguePriceUnit = CataloguePriceUnit.Create(request.CataloguePriceUnitTierName, request.CataloguePriceUnitDescription);
 
             var priceTimeUnit = TimeUnit.FromName(request.PriceTimeUnitName);
-
-            var estimationPeriod = TimeUnit.FromName(request.EstimationPeriodName);
-            if (provisioningType != null)
-                estimationPeriod = provisioningType.InferEstimationPeriod(estimationPeriod);
+            var estimationPeriod = catalogueItemType.InferEstimationPeriod(provisioningType, TimeUnit.FromName(request.EstimationPeriodName));
 
             var orderItem = new OrderItem(
                 request.OdsCode, 
                 request.CatalogueItemId,
-                request.CatalogueItemType,
+                catalogueItemType,
                 request.CatalogueItemName,
                 request.CatalogueSolutionId,
                 provisioningType,

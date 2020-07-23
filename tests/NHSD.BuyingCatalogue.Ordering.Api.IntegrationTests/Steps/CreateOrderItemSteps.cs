@@ -66,6 +66,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             orderEntity.CatalogueSolutionsViewed.Should().BeTrue();
         }
 
+        [Then(@"the additional service order section is marked as complete")]
+        public async Task WhenTheAdditionalServiceOrderSectionIsMarkedAsComplete()
+        {
+            var orderEntity = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, _createOrderItemRequest.OrderId);
+            orderEntity.AdditionalServicesViewed.Should().BeTrue();
+        }
+
+        [Then(@"the associated service order section is marked as complete")]
+        public async Task WhenTheAssociatedServiceOrderSectionIsMarkedAsComplete()
+        {
+            var orderEntity = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, _createOrderItemRequest.OrderId);
+            orderEntity.AssociatedServicesViewed.Should().BeTrue();
+        }
+
         [Then(@"the order item estimation period is set to '(.*)'")]
         public async Task ThenTheCatalogueSolutionOrderItemEstimationPeriodIsSetTo(TimeUnit estimationPeriod)
         {
