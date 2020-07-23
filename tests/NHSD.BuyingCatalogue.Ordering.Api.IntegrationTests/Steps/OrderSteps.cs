@@ -214,7 +214,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             public string OrganisationName { get; set; }
 
-            public string OrganisationOdsCode { get; set; }
+            public string OrganisationOdsCode { get; set; } = "test";
 
             public string OrganisationAddressPostcode { get; set; }
 

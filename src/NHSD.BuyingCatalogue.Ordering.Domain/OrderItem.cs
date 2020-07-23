@@ -121,6 +121,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             return Price.GetValueOrDefault() * Quantity * (PriceTimeUnit?.AmountInYear ?? EstimationPeriod?.AmountInYear ?? throw new InvalidOperationException("An Order Item must have a Price Time Unit or an Estimation Period"));
         }
 
+        public CostType CostType =>
+            CatalogueItemType.Equals(CatalogueItemType.AssociatedService) &&
+            ProvisioningType.Equals(ProvisioningType.Declarative)
+                ? CostType.OneOff
+                : CostType.Recurring;
+
         internal void ChangePrice(
             DateTime? deliveryDate, 
             int quantity, 

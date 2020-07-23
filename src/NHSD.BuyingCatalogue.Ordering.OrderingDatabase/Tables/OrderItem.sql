@@ -26,6 +26,5 @@
     CONSTRAINT FK_OrderItem_ProvisioningType_ProvisioningTypeId FOREIGN KEY (ProvisioningTypeId) REFERENCES dbo.ProvisioningType(ProvisioningTypeId),
     CONSTRAINT FK_OrderItem_CataloguePriceType_CataloguePriceTypeId FOREIGN KEY (CataloguePriceTypeId) REFERENCES dbo.CataloguePriceType(CataloguePriceTypeId),
     CONSTRAINT FK_OrderItem_TimeUnit_TimeUnitId FOREIGN KEY (TimeUnitId) REFERENCES dbo.TimeUnit(TimeUnitId),
-    CONSTRAINT FK_OrderItem_TimeUnit_EstimationPeriodId FOREIGN KEY (EstimationPeriodId) REFERENCES dbo.TimeUnit(TimeUnitId),
-    CONSTRAINT FK_OrderItem_ServiceRecipient_OdsCode FOREIGN KEY (OrderId, OdsCode) REFERENCES dbo.ServiceRecipient(OrderId, OdsCode)
+    CONSTRAINT FK_OrderItem_TimeUnit_EstimationPeriodId FOREIGN KEY (EstimationPeriodId) REFERENCES dbo.TimeUnit(TimeUnitId)
 );

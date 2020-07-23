@@ -5,8 +5,8 @@
 
 Background:
     Given Orders exist
-        | OrderId    | Description      | OrganisationId                       | LastUpdatedByName | LastUpdatedBy                        | CommencementDate | CatalogueSolutionsViewed |
-        | C000014-01 | Some Description | 4af62b99-638c-4247-875e-965239cd0c48 | Tom Smith         | 335392e4-4bb1-413b-9de5-36a85c9c0422 | 01/01/2021       | false                    |
+        | OrderId    | OrganisationOdsCode | Description      | OrganisationId                       | LastUpdatedByName | LastUpdatedBy                        | CommencementDate | CatalogueSolutionsViewed |
+        | C000014-01 | ODS1                | Some Description | 4af62b99-638c-4247-875e-965239cd0c48 | Tom Smith         | 335392e4-4bb1-413b-9de5-36a85c9c0422 | 01/01/2021       | false                    |
     And Service Recipients exist
         | OdsCode | Name              | OrderId    |
         | ODS1    | Service Recipient | C000014-01 |
@@ -23,6 +23,7 @@ Scenario: 1. Create order item
         | ItemType           |
         | catalogue solution |
         | additional service |
+        | associated service |
 
 @7840
 Scenario: 2. Create order item and the new order item ID is returned
@@ -34,6 +35,7 @@ Scenario: 2. Create order item and the new order item ID is returned
         | ItemType           |
         | catalogue solution |
         | additional service |
+        | associated service |
 
 @7840
 Scenario: 3. Create order item and the order audit information is updated
@@ -47,6 +49,7 @@ Scenario: 3. Create order item and the order audit information is updated
         | ItemType           |
         | catalogue solution |
         | additional service |
+        | associated service |
 
 @7840
 Scenario: 4. Create order item with invalid order ID
@@ -58,6 +61,7 @@ Scenario: 4. Create order item with invalid order ID
         | ItemType           |
         | catalogue solution |
         | additional service |
+        | associated service |
 
 @7840
 Scenario: 5. If a user is not authorised then they cannot create an order item
@@ -70,6 +74,7 @@ Scenario: 5. If a user is not authorised then they cannot create an order item
         | ItemType           |
         | catalogue solution |
         | additional service |
+        | associated service |
 
 @7840
 Scenario: 6. A non buyer user cannot create an order item
@@ -82,6 +87,7 @@ Scenario: 6. A non buyer user cannot create an order item
         | ItemType           |
         | catalogue solution |
         | additional service |
+        | associated service |
 
 @7840
 Scenario: 7. A buyer user cannot create an order item for an organisation they don't belong to
@@ -94,6 +100,7 @@ Scenario: 7. A buyer user cannot create an order item for an organisation they d
         | ItemType           |
         | catalogue solution |
         | additional service |
+        | associated service |
 
 @7840
 Scenario: 8. Service Failure
@@ -106,6 +113,7 @@ Scenario: 8. Service Failure
         | ItemType           |
         | catalogue solution |
         | additional service |
+        | associated service |
 
 @7840
 Scenario: 9. Create catalogue solution order item and the catalogue solution order section should be marked as complete
@@ -146,3 +154,6 @@ Scenario: 12. Create order item should set the expected estimation period
         | additional service | on-demand-per-year  | Year             |
         | additional service | patient             | Month            |
         | additional service | declarative         | Year             |
+        | associated service | on-demand-per-month | Month            |
+        | associated service | on-demand-per-year  | Year             |
+        | associated service | declarative         | Year             |

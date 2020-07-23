@@ -66,6 +66,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(x => x.OdsCode.ToUpperInvariant());
+            serviceRecipientDictionary.TryAdd(order.OrganisationOdsCode.ToUpperInvariant(),
+                new ServiceRecipient { OdsCode = order.OrganisationOdsCode, Name = order.OrganisationName });
 
             return orderItems
                 .OrderBy(x => x.Created)
@@ -94,7 +96,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (orderItem is null)
                 return NotFound();
 
-            var matchedServiceRecipient = order.ServiceRecipients.FirstOrDefault(serviceRecipient => 
+            var matchedServiceRecipient = order.ServiceRecipients.FirstOrDefault(serviceRecipient =>
                 string.Equals(orderItem.OdsCode, serviceRecipient.OdsCode, StringComparison.OrdinalIgnoreCase));
 
             return new GetOrderItemModel(orderItem, matchedServiceRecipient);

@@ -535,6 +535,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             repositoryOrder.AddOrderItem(repositoryOrderItem, Guid.Empty, string.Empty);
             repositoryOrder.SetServiceRecipient(serviceRecipients, Guid.Empty, string.Empty);
 
+            var calculatedCostPerYear = repositoryOrder.CalculateCostPerYear(CostType.Recurring);
+            const int monthsPerYear = 12;
+
             return (order: repositoryOrder, expectedOrder: new OrderModel
             {
                 Description = repositoryOrder.Description.Value,
@@ -552,6 +555,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     Address = repositoryOrder.SupplierAddress.ToModel(),
                     PrimaryContact = repositoryOrder.SupplierContact.ToModel()
                 },
+                TotalRecurringCostPerMonth = calculatedCostPerYear / monthsPerYear,
+                TotalRecurringCostPerYear = calculatedCostPerYear,
                 ServiceRecipients = repositoryOrder.ServiceRecipients.Select(serviceRecipient =>
                     new ServiceRecipientModel
                     {

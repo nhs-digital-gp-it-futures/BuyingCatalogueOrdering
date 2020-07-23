@@ -394,5 +394,39 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
             Assert.Throws<InvalidOperationException>(() => orderItem.CalculateTotalCostPerYear());
         }
+
+        [Test]
+        public void CostType_OrderItemIsOneOff_ReturnsCorrectCostType()
+        {
+            var orderItem = CreateOrderItem(CatalogueItemType.AssociatedService, ProvisioningType.Declarative);
+            orderItem.CostType.Should().Be(CostType.OneOff);
+        }
+
+        [TestCase(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.Declarative), CostType.Recurring)]
+        [TestCase(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.OnDemand), CostType.Recurring)]
+        [TestCase(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.Patient), CostType.Recurring)]
+        [TestCase(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.Declarative), CostType.Recurring)]
+        [TestCase(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.OnDemand), CostType.Recurring)]
+        [TestCase(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.Patient), CostType.Recurring)]
+        [TestCase(nameof(CatalogueItemType.AssociatedService), nameof(ProvisioningType.OnDemand), CostType.Recurring)]
+        [TestCase(nameof(CatalogueItemType.AssociatedService), nameof(ProvisioningType.Patient), CostType.Recurring)]
+        [TestCase(nameof(CatalogueItemType.AssociatedService), nameof(ProvisioningType.Declarative), CostType.OneOff)]
+        public void CostType_DeterminesTheCostType_ReturnsCorrectCostType(string catalogueItemTypeName, string provisioningTypeName, CostType costType)
+        {
+            var catalogueItemType = CatalogueItemType.FromName(catalogueItemTypeName);
+            var provisioningType = ProvisioningType.FromName(provisioningTypeName);
+            var orderItem = CreateOrderItem(catalogueItemType, provisioningType);
+
+            orderItem.CostType.Should().Be(costType);
+        }
+
+        private OrderItem CreateOrderItem(CatalogueItemType catalogueItemType, ProvisioningType provisioningType)
+        {
+            return OrderItemBuilder
+                .Create()
+                .WithCatalogueItemType(catalogueItemType)
+                .WithProvisioningType(provisioningType)
+                .Build();
+        }
     }
 }
