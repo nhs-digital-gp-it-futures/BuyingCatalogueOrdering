@@ -7,24 +7,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
     public sealed class CatalogueItemType : IEquatable<CatalogueItemType>
     {
         public static readonly CatalogueItemType Solution = new CatalogueItemType(
-            1, 
-            nameof(Solution), 
-            order => order.CatalogueSolutionsViewed = true, 
+            1,
+            nameof(Solution),
+            order => order.CatalogueSolutionsViewed = true,
             (provisioningType, estimationPeriod) => provisioningType.InferEstimationPeriod(estimationPeriod));
 
         public static readonly CatalogueItemType AdditionalService = new CatalogueItemType(
-            2, 
-            nameof(AdditionalService), 
+            2,
+            nameof(AdditionalService),
             order => order.AdditionalServicesViewed = true,
             (provisioningType, estimationPeriod) => provisioningType.InferEstimationPeriod(estimationPeriod));
 
         public static readonly CatalogueItemType AssociatedService = new CatalogueItemType(
-            3, 
-            nameof(AssociatedService), 
+            3,
+            nameof(AssociatedService),
             order => order.AssociatedServicesViewed = true,
-            (provisioningType, estimationPeriod) => 
-                provisioningType.Equals(ProvisioningType.OnDemand) 
-                    ? provisioningType.InferEstimationPeriod(estimationPeriod) 
+            (provisioningType, estimationPeriod) =>
+                provisioningType.Equals(ProvisioningType.OnDemand)
+                    ? provisioningType.InferEstimationPeriod(estimationPeriod)
                     : null);
 
         private readonly Func<ProvisioningType, TimeUnit, TimeUnit> _inferEstimationPeriodFunction;
@@ -36,8 +36,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         internal Action<Order> MarkOrderSectionAsViewed { get; }
 
         private CatalogueItemType(
-            int id, 
-            string name, 
+            int id,
+            string name,
             Action<Order> markOrderSectionAsViewed,
             Func<ProvisioningType, TimeUnit, TimeUnit> inferEstimationPeriodFunction)
         {
@@ -47,7 +47,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             _inferEstimationPeriodFunction = inferEstimationPeriodFunction ?? throw new ArgumentNullException(nameof(inferEstimationPeriodFunction));
         }
 
-        internal static IEnumerable<CatalogueItemType> List() => 
+        internal static IEnumerable<CatalogueItemType> List() =>
             new[] { Solution, AdditionalService, AssociatedService };
 
         public static CatalogueItemType FromId(int id)
