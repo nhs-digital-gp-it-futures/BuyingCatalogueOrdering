@@ -17,7 +17,7 @@
     CatalogueSolutionsViewed BIT DEFAULT 0,
     AdditionalServicesViewed BIT DEFAULT 0,
     AssociatedServicesViewed BIT DEFAULT 0,
-    FundingSourceViewed BIT DEFAULT 0,
+    FundingSourceOnlyGMS BIT NULL,
     CommencementDate DATETIME2 NULL,
     Created DATETIME2 NOT NULL,
     LastUpdated DATETIME2 NOT NULL,
