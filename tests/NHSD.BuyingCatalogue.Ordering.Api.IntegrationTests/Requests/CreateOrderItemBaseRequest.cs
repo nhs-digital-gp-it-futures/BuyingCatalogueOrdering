@@ -63,6 +63,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 
             Payload = factory();
         }
+
         public void AssertPayload(OrderItemEntity actual)
         {
             var timeUnit = Payload.HasTimeUnit

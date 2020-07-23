@@ -47,8 +47,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 
         private static object ReadEstimationPeriod(JToken responseBody)
         {
-            object timeUnit = null;
-
             var timeUnitToken = responseBody.Value<string>("estimationPeriod");
             if (timeUnitToken != null)
             {

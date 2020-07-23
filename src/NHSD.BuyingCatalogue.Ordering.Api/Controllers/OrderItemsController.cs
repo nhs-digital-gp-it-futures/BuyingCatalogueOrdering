@@ -35,6 +35,73 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             _createOrderItemService = createOrderItemService ?? throw new ArgumentNullException(nameof(createOrderItemService));
         }
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<GetOrderItemModel>>> ListAsync(
+            string orderId, 
+            [FromQuery] string catalogueItemType)
+        {
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            if (order is null)
+            {
+                return NotFound();
+            }
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
+            IEnumerable<OrderItem> orderItems = order.OrderItems;
+
+            if (!string.IsNullOrWhiteSpace(catalogueItemType))
+            {
+                var catalogueItemTypeFromName = CatalogueItemType.FromName(catalogueItemType);
+                if (catalogueItemTypeFromName is null)
+                {
+                    return new List<GetOrderItemModel>();
+                }
+
+                orderItems = orderItems.Where(y => y.CatalogueItemType.Equals(catalogueItemTypeFromName));
+            }
+
+            var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(x => x.OdsCode.ToUpperInvariant());
+            serviceRecipientDictionary.TryAdd(order.OrganisationOdsCode.ToUpperInvariant(),
+                new ServiceRecipient { OdsCode = order.OrganisationOdsCode, Name = order.OrganisationName });
+
+            return orderItems
+                .OrderBy(x => x.Created)
+                .Select(orderItem => new GetOrderItemModel(
+                    orderItem,
+                    serviceRecipientDictionary[orderItem.OdsCode.ToUpperInvariant()])).ToList();
+        }
+
+        [HttpGet]
+        [Route("{orderItemId}")]
+        public async Task<ActionResult<GetOrderItemModel>> GetAsync(string orderId, int orderItemId)
+        {
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            if (order is null)
+            {
+                return NotFound();
+            }
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
+            OrderItem orderItem = order.OrderItems.FirstOrDefault(x => x.OrderItemId == orderItemId);
+            if (orderItem is null)
+                return NotFound();
+
+            var matchedServiceRecipient = order.ServiceRecipients.FirstOrDefault(serviceRecipient =>
+                string.Equals(orderItem.OdsCode, serviceRecipient.OdsCode, StringComparison.OrdinalIgnoreCase));
+
+            return new GetOrderItemModel(orderItem, matchedServiceRecipient);
+        }
+
         [HttpPost]
         [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult<CreateOrderItemResponseModel>> CreateOrderItemAsync(
@@ -68,69 +135,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             createOrderItemResponse.Errors = result.Errors.Select(x => new ErrorModel(x.Id, x.Field));
             return BadRequest(createOrderItemResponse);
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetOrderItemModel>>> ListAsync(string orderId, [FromQuery] string catalogueItemType)
-        {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
-            if (order is null)
-            {
-                return NotFound();
-            }
-
-            var primaryOrganisationId = User.GetPrimaryOrganisationId();
-            if (primaryOrganisationId != order.OrganisationId)
-            {
-                return Forbid();
-            }
-
-            IEnumerable<OrderItem> orderItems = order.OrderItems;
-
-            if (!string.IsNullOrWhiteSpace(catalogueItemType))
-            {
-                var catalogueItemTypeFromName = CatalogueItemType.FromName(catalogueItemType);
-                if (catalogueItemTypeFromName is null)
-                {
-                    return new List<GetOrderItemModel>();
-                }
-
-                orderItems = orderItems.Where(y => y.CatalogueItemType.Equals(catalogueItemTypeFromName));
-            }
-
-            var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(x => x.OdsCode.ToUpperInvariant());
-            serviceRecipientDictionary.TryAdd(order.OrganisationOdsCode.ToUpperInvariant(),
-                new ServiceRecipient { OdsCode = order.OrganisationOdsCode, Name = order.OrganisationName });
-
-            return orderItems
-                .OrderBy(x => x.Created)
-                .Select(orderItem => new GetOrderItemModel(orderItem, serviceRecipientDictionary[orderItem.OdsCode.ToUpperInvariant()])).ToList();
-        }
-
-        [HttpGet]
-        [Route("{orderItemId}")]
-        public async Task<ActionResult<GetOrderItemModel>> GetAsync(string orderId, int orderItemId)
-        {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
-            if (order is null)
-            {
-                return NotFound();
-            }
-
-            var primaryOrganisationId = User.GetPrimaryOrganisationId();
-            if (primaryOrganisationId != order.OrganisationId)
-            {
-                return Forbid();
-            }
-
-            OrderItem orderItem = order.OrderItems.FirstOrDefault(x => x.OrderItemId == orderItemId);
-            if (orderItem is null)
-                return NotFound();
-
-            var matchedServiceRecipient = order.ServiceRecipients.FirstOrDefault(serviceRecipient =>
-                string.Equals(orderItem.OdsCode, serviceRecipient.OdsCode, StringComparison.OrdinalIgnoreCase));
-
-            return new GetOrderItemModel(orderItem, matchedServiceRecipient);
         }
 
         [HttpPut]
@@ -180,6 +184,5 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             return BadRequest(updateOrderItemResponse);
         }
-
     }
 }
