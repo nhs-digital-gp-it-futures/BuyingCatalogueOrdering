@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
@@ -11,7 +8,7 @@ using TechTalk.SpecFlow;
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 {
     [Binding]
-    class FundingSourceSteps
+    internal class FundingSourceSteps
     {
         private readonly Request _request;
         private readonly Settings _settings;

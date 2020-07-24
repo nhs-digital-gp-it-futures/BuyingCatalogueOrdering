@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests.Payloads;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
@@ -8,7 +7,7 @@ using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 {
-    class UpdateFundingSourceRequest
+    internal class UpdateFundingSourceRequest
     {
         private readonly Request _request;
         private readonly string _updateFundingSourceUrl;
