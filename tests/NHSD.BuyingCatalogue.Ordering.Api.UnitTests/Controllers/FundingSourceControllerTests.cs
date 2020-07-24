@@ -22,8 +22,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public void Constructor_NullOrderRepository_ThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() =>
-                FundingSourceControllerBuilder.Create().WithOrderRepository(null).Build());
+            var builder = FundingSourceControllerBuilder.Create()
+                .WithOrderRepository(null);
+
+            Assert.Throws<ArgumentNullException>(() => builder.Build());
         }
 
         [Test]
@@ -31,7 +33,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             const string orderId = "DOESNOTEXIST";
             var context = FundingSourceControllerTestContext.Setup();
-            using var controller = context.FundingSourceController;
+            context.Order = null;
+
+            using var controller = context.Controller;
 
             var result = await controller.GetAsync(orderId);
 
@@ -49,7 +53,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithOrganisationId(Guid.NewGuid())
                 .Build();
 
-            using var controller = context.FundingSourceController;
+            using var controller = context.Controller;
             var actual = await controller.GetAsync(orderId);
 
             actual.Result.Should().BeOfType<ForbidResult>();
@@ -67,7 +71,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithFundingSourceOnlyGms(true)
                 .Build();
 
-            using var controller = context.FundingSourceController;
+            using var controller = context.Controller;
             var actual = await controller.GetAsync(orderId);
 
             var expected = new GetFundingSourceModel
@@ -85,18 +89,94 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var context = FundingSourceControllerTestContext.Setup();
 
-            using var controller = context.FundingSourceController;
+            using var controller = context.Controller;
 
             await controller.GetAsync(orderId);
 
             context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(orderId), Times.Once);
         }
 
+        [Test]
+        public void Put_NullModel_ThrowsException()
+        {
+            var context = FundingSourceControllerTestContext.Setup();
+            Assert.ThrowsAsync<ArgumentNullException>(() => context.Controller.PutFundingSourceAsync("123", null));
+        }
+
+        [Test]
+        public async Task Put_OtherOrganisationId_ReturnsForbidResult()
+        {
+            var organisationId = Guid.NewGuid();
+            const string orderId = "C0000014-01";
+            var context = FundingSourceControllerTestContext.Setup(organisationId);
+            var order = OrderBuilder.Create().WithOrganisationId(Guid.NewGuid()).Build();
+            context.Order = order;
+            var controller = context.Controller;
+
+            var response = await controller.PutFundingSourceAsync(orderId, new UpdateFundingSourceModel());
+            response.Should().BeEquivalentTo(new ForbidResult());
+        }
+
+        [Test]
+        public async Task Put_NullOrderReturned_ReturnsNotFound()
+        {
+            var organisationId = Guid.NewGuid();
+            const string orderId = "C0000014-01";
+            var context = FundingSourceControllerTestContext.Setup(organisationId);
+            context.Order = null;
+            var controller = context.Controller;
+
+            var response = await controller.PutFundingSourceAsync(orderId, new UpdateFundingSourceModel());
+            response.Should().BeEquivalentTo(new NotFoundResult());
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public async Task Put_AllValid_CallsUpdateOnOrderRepository(bool fundingSource)
+        {
+            var organisationId = Guid.NewGuid();
+            const string orderId = "C0000014-01";
+            var context = FundingSourceControllerTestContext.Setup(organisationId);
+            var controller = context.Controller;
+            var model = new UpdateFundingSourceModel {OnlyGMS = fundingSource};
+            var response = await controller.PutFundingSourceAsync(orderId, model);
+            response.Should().BeEquivalentTo(new NoContentResult());
+
+            context.OrderRepositoryMock.Verify(x =>
+                x.UpdateOrderAsync(It.Is<Order>(
+                    y => y.FundingSourceOnlyGMS == fundingSource)));
+        }
+        
+        [Test]
+        public async Task Put_AllValid_UpdatesLastUpdated()
+        {
+            var organisationId = Guid.NewGuid();
+            const string orderId = "C0000014-01";
+            var context = FundingSourceControllerTestContext.Setup(organisationId);
+            var controller = context.Controller;
+            var model = new UpdateFundingSourceModel { OnlyGMS = true };
+            var response = await controller.PutFundingSourceAsync(orderId, model);
+            response.Should().BeEquivalentTo(new NoContentResult());
+
+            context.OrderRepositoryMock.Verify(x =>
+                x.UpdateOrderAsync(It.Is<Order>(
+                    y => y.LastUpdatedBy == context.NameIdentity &&
+                         y.LastUpdatedByName == context.Name)));
+        }
+
         private sealed class FundingSourceControllerTestContext
         {
-            private FundingSourceControllerTestContext()
+            private FundingSourceControllerTestContext(Guid primaryOrganisationId)
             {
-                PrimaryOrganisationId = Guid.NewGuid();
+                PrimaryOrganisationId = primaryOrganisationId;
+                Name = "Test User";
+                NameIdentity = Guid.NewGuid();
+                
+				Order = OrderBuilder.Create()
+                    .WithOrganisationId(PrimaryOrganisationId)
+                    .WithLastUpdatedBy(Guid.NewGuid())
+                    .WithLastUpdatedByName("Gandalf the Gray")
+                    .Build();
 
                 OrderRepositoryMock = new Mock<IOrderRepository>();
                 OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
@@ -105,11 +185,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 {
                     new Claim("Ordering", "Manage"),
                     new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
-                    new Claim(ClaimTypes.Name, "Test User"),
-                    new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
+                    new Claim(ClaimTypes.Name, Name),
+                    new Claim(ClaimTypes.NameIdentifier, NameIdentity.ToString())
                 }, "mock"));
 
-                FundingSourceController = FundingSourceControllerBuilder
+                Controller = FundingSourceControllerBuilder
                     .Create()
                     .WithOrderRepository(OrderRepositoryMock.Object)
                     .WithControllerContext(
@@ -120,19 +200,28 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     .Build();
             }
 
+            internal string Name { get; }
+
+            internal Guid NameIdentity { get; }
+
             internal Guid PrimaryOrganisationId { get; set; }
 
             private ClaimsPrincipal ClaimsPrincipal { get; }
 
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
 
+            internal FundingSourceController Controller { get; }
+            
             internal Order Order { get; set; }
-
-            internal FundingSourceController FundingSourceController { get; }
 
             internal static FundingSourceControllerTestContext Setup()
             {
-                return new FundingSourceControllerTestContext();
+                return new FundingSourceControllerTestContext(Guid.NewGuid());
+            }
+
+            internal static FundingSourceControllerTestContext Setup(Guid primaryOrganisationId)
+            {
+                return new FundingSourceControllerTestContext(primaryOrganisationId);
             }
         }
     }

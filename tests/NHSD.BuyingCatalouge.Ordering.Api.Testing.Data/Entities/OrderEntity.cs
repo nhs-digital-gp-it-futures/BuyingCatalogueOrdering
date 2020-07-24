@@ -130,7 +130,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                           ServiceRecipientsViewed,
                           CatalogueSolutionsViewed,
                           AdditionalServicesViewed,
-                          AssociatedServicesViewed
+                          AssociatedServicesViewed,
+                          FundingSourceOnlyGMS
                          FROM dbo.[Order]
                          WHERE OrderId = @orderId;", new { orderId }));
         }

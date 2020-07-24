@@ -43,5 +43,35 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 OnlyGMS = order.FundingSourceOnlyGMS
             };
         }
+        
+        [HttpPut]
+        [Authorize(Policy = PolicyName.CanManageOrders)]
+        public async Task<ActionResult> PutFundingSourceAsync(string orderId, UpdateFundingSourceModel model)
+        {
+            if (model == null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            if (order is null)
+            {
+                return NotFound();
+            }
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
+            order.FundingSourceOnlyGMS = model.OnlyGMS;
+
+            var name = User.Identity.Name;
+            order.SetLastUpdatedBy(User.GetUserId(), name);
+
+            await _orderRepository.UpdateOrderAsync(order);
+            return NoContent();
+        }
     }
 }
