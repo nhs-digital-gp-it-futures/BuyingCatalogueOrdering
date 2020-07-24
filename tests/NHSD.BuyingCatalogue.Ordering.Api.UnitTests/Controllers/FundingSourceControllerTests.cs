@@ -33,7 +33,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public void Put_NullModel_ThrowsException()
         {
             var context = FundingSourceControllerTestContext.Setup();
-            Assert.ThrowsAsync<ArgumentNullException>(() => context.Controller.PutFundingSource("123", null));
+            Assert.ThrowsAsync<ArgumentNullException>(() => context.Controller.PutFundingSourceAsync("123", null));
         }
 
         [Test]
@@ -46,7 +46,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             context.Order = order;
             var controller = context.Controller;
 
-            var response = await controller.PutFundingSource(orderId, new UpdateFundingSourceModel());
+            var response = await controller.PutFundingSourceAsync(orderId, new UpdateFundingSourceModel());
             response.Should().BeEquivalentTo(new ForbidResult());
         }
 
@@ -59,7 +59,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             context.Order = null;
             var controller = context.Controller;
 
-            var response = await controller.PutFundingSource(orderId, new UpdateFundingSourceModel());
+            var response = await controller.PutFundingSourceAsync(orderId, new UpdateFundingSourceModel());
             response.Should().BeEquivalentTo(new NotFoundResult());
         }
 
@@ -72,7 +72,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = FundingSourceControllerTestContext.Setup(organisationId);
             var controller = context.Controller;
             var model = new UpdateFundingSourceModel {OnlyGMS = fundingSource};
-            var response = await controller.PutFundingSource(orderId, model);
+            var response = await controller.PutFundingSourceAsync(orderId, model);
             response.Should().BeEquivalentTo(new NoContentResult());
 
             context.OrderRepositoryMock.Verify(x =>
@@ -88,7 +88,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = FundingSourceControllerTestContext.Setup(organisationId);
             var controller = context.Controller;
             var model = new UpdateFundingSourceModel { OnlyGMS = true };
-            var response = await controller.PutFundingSource(orderId, model);
+            var response = await controller.PutFundingSourceAsync(orderId, model);
             response.Should().BeEquivalentTo(new NoContentResult());
 
             context.OrderRepositoryMock.Verify(x =>

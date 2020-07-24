@@ -25,7 +25,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpPut]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult> PutFundingSource(string orderId, UpdateFundingSourceModel model)
+        public async Task<ActionResult> PutFundingSourceAsync(string orderId, UpdateFundingSourceModel model)
         {
             if (model == null)
             {
