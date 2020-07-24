@@ -14,7 +14,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
-    public class FundingSourceController : Controller
+    public sealed class FundingSourceController : Controller
     {
         private readonly IOrderRepository _orderRepository;
 
@@ -24,6 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpPut]
+        [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult> PutFundingSource(string orderId, UpdateFundingSourceModel model)
         {
             if (model == null)
@@ -44,6 +45,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             order.FundingSourceOnlyGMS = model.OnlyGMS;
+
+            var name = User.Identity.Name;
+            order.SetLastUpdatedBy(User.GetUserId(), name);
+
             await _orderRepository.UpdateOrderAsync(order);
             return NoContent();
         }
