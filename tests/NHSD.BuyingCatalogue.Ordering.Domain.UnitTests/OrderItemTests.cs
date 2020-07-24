@@ -382,17 +382,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void CalculateCost_WithNoPriceTypeOrEstimationPeriod_ThrowsException()
+        public void CalculateCost_WithNoPriceTypeOrEstimationPeriod_PriceIsPriceTimesQuanitiy()
         {
+            var price = 26;
+            var quantity = 13;
             var orderItem = OrderItemBuilder
                 .Create()
-                .WithPrice(1m)
-                .WithQuantity(10)
+                .WithPrice(price)
+                .WithQuantity(quantity)
                 .WithPriceTimeUnit(null)
                 .WithEstimationPeriod(null)
                 .Build();
 
-            Assert.Throws<InvalidOperationException>(() => orderItem.CalculateTotalCostPerYear());
+            orderItem.CalculateTotalCostPerYear().Should().Be(price * quantity);
         }
 
         [Test]
