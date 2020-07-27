@@ -89,7 +89,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     Address = order.SupplierAddress.ToModel(),
                     PrimaryContact = order.SupplierContact.ToModel()
                 },
-                TotalOneOffCost = 0m,
+                TotalOneOffCost = order.CalculateCostPerYear(CostType.OneOff),
                 TotalRecurringCostPerMonth = calculatedCostPerYear / monthsPerYear,
                 TotalRecurringCostPerYear = calculatedCostPerYear,
                 TotalOwnershipCost = 0m,

@@ -529,12 +529,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithOdsCode(odsCode)
                 .Build();
 
+            var oneOffOrderItem = OrderItemBuilder.Create()
+                .WithOdsCode(odsCode)
+                .WithCatalogueItemType(CatalogueItemType.AssociatedService)
+                .WithProvisioningType(ProvisioningType.Declarative)
+                .WithEstimationPeriod(null)
+                .WithPriceTimeUnit(null)
+                .Build();
+
             var serviceRecipients = new List<(string Ods, string Name)>
             {
                 (odsCode, "EU test")
             };
 
             repositoryOrder.AddOrderItem(repositoryOrderItem, Guid.Empty, string.Empty);
+            repositoryOrder.AddOrderItem(oneOffOrderItem, Guid.Empty, string.Empty);
             repositoryOrder.SetServiceRecipient(serviceRecipients, Guid.Empty, string.Empty);
 
             var calculatedCostPerYear = repositoryOrder.CalculateCostPerYear(CostType.Recurring);
@@ -557,6 +566,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     Address = repositoryOrder.SupplierAddress.ToModel(),
                     PrimaryContact = repositoryOrder.SupplierContact.ToModel()
                 },
+                TotalOneOffCost = repositoryOrder.CalculateCostPerYear(CostType.OneOff),
                 TotalRecurringCostPerMonth = calculatedCostPerYear / monthsPerYear,
                 TotalRecurringCostPerYear = calculatedCostPerYear,
                 ServiceRecipients = repositoryOrder.ServiceRecipients.Select(serviceRecipient =>
