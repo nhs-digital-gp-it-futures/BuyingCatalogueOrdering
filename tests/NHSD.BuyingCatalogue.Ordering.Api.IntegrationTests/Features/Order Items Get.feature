@@ -23,11 +23,12 @@ Scenario: 1. Get an order item
     When the user sends the retrieve an order item request
     Then a response with status code 200 is returned
     And the response contains the expected order item
+
     Examples:
-    | ItemName |
-    | Item 1   |
-    | Item 2   |
-    | Item 3   |
+        | ItemName |
+        | Item 1   |
+        | Item 2   |
+        | Item 3   |
 
 @7580
 Scenario: 2. Get an order item for an order that does not exist
