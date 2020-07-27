@@ -1,4 +1,6 @@
-﻿using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
+﻿using Microsoft.AspNetCore.Mvc;
+using Moq;
+using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
@@ -6,20 +8,33 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
     internal sealed class FundingSourceControllerBuilder
     {
         private IOrderRepository _orderRepository;
+        private ControllerContext _controllerContext;
 
-        private FundingSourceControllerBuilder() { }
+        public FundingSourceControllerBuilder()
+        {
+            _orderRepository = Mock.Of<IOrderRepository>();
+            _controllerContext = null;
+        }
 
-        internal static FundingSourceControllerBuilder Create() { return new FundingSourceControllerBuilder();}
+        public static FundingSourceControllerBuilder Create() => 
+            new FundingSourceControllerBuilder();
 
-        internal FundingSourceControllerBuilder WithOrderRepository(IOrderRepository orderRepository)
+        public FundingSourceControllerBuilder WithOrderRepository(IOrderRepository orderRepository)
         {
             _orderRepository = orderRepository;
             return this;
         }
 
-        internal FundingSourceController Build()
+        public FundingSourceControllerBuilder WithControllerContext(ControllerContext controllerContext)
         {
-            return new FundingSourceController(_orderRepository);
+            _controllerContext = controllerContext;
+            return this;
         }
+
+        public FundingSourceController Build() => 
+            new FundingSourceController(_orderRepository)
+            {
+                ControllerContext = _controllerContext
+            };
     }
 }

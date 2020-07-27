@@ -992,7 +992,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         OrderBuilder
                             .Create()
                             .WithOrganisationId(organisationId)
-                            .WithFundingSourceViewed(true)
+                            .WithFundingSourceOnlyGms((bool?)true)
                             .Build(),
                         OrderSummaryModelBuilder
                             .Create()
@@ -1007,7 +1007,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         OrderBuilder
                             .Create()
                             .WithOrganisationId(organisationId)
-                            .WithFundingSourceViewed(false)
+                            .WithFundingSourceOnlyGms((bool?)false)
                             .Build(),
                         OrderSummaryModelBuilder
                             .Create()
@@ -1022,7 +1022,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         OrderBuilder
                             .Create()
                             .WithOrganisationId(organisationId)
-                            .WithFundingSourceViewed(null)
+                            .WithFundingSourceOnlyGms(null)
                             .Build(),
                         OrderSummaryModelBuilder
                             .Create()
