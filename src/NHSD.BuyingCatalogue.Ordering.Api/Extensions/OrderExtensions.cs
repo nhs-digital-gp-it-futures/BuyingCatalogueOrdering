@@ -56,5 +56,30 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
         {
             return !(order is null) && order.AssociatedServicesViewed;
         }
+
+        public static bool IsSectionStatusComplete(this Order order, int serviceRecipientsCount, int catalogueSolutionsCount, int associatedServicesCount)
+        {
+            var scenario1 = catalogueSolutionsCount > 0 
+                            && associatedServicesCount == 0 
+                            && IsAssociatedServicesSectionComplete(order) 
+                            && IsFundingSourceComplete(order);
+
+            var scenario2 = catalogueSolutionsCount > 0 
+                            && associatedServicesCount > 0
+                            && IsFundingSourceComplete(order);
+
+            var scenario3 =  serviceRecipientsCount == 0 
+                            && IsServiceRecipientsSectionComplete(order)
+                            && associatedServicesCount > 0
+                            && IsFundingSourceComplete(order);
+
+            var scenario4 = serviceRecipientsCount > 0
+                            && catalogueSolutionsCount == 0
+                            && IsCatalogueSolutionsSectionComplete(order)
+                            && associatedServicesCount > 0
+                            && IsFundingSourceComplete(order);
+
+            return scenario1 || scenario2 || scenario3 || scenario4 ;
+        }
     }
 }

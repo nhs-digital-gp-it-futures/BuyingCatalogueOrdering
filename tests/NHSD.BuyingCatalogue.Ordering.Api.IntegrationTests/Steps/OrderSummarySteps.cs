@@ -66,7 +66,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             actual.Sections.Should().BeEquivalentTo(expected);
         }
-        
+
+        [Then(@"the order Section Status is (.*)")]
+        public async Task ThenTheOrderSummarySectionStatusIs(string expectedStatus)
+        {
+            var response = await _response.ReadBodyAsJsonAsync();
+
+            var actualSectionStatus = response.SelectToken("sectionStatus").ToString();
+            Assert.IsNotNull(actualSectionStatus);
+
+            actualSectionStatus.Should().BeEquivalentTo(expectedStatus);
+        }
+
         private sealed class OrderSummaryTable
         {
             public string OrderId { get; set; }
