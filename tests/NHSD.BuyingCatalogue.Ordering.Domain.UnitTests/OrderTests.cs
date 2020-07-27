@@ -278,7 +278,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void CalculateCostPerYear_OrderItemCostTypeRecurring_ReturnsTotalOrderItemCost()
+        public void CalculateCostPerYear_Recurring_OrderItemCostTypeRecurring_ReturnsTotalOrderItemCost()
         {
             const int orderItemId1 = 1;
             const int orderItemId2 = 1;
@@ -311,7 +311,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void CalculateCostPerYear_OrderItemCostTypeOneOff_ReturnsZero()
+        public void CalculateCostPerYear_Recurring_OrderItemCostTypeOneOff_ReturnsZero()
         {
             const int orderItemId = 1;
 
@@ -328,6 +328,52 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
                 .Build();
 
             order.CalculateCostPerYear(CostType.Recurring).Should().Be(0);
+        }
+
+        [Test]
+        public void CalculateCostPerYear_OneOff_OrderItemCostTypeOneOff_ReturnsTotalOneOffCost()
+        {
+            const int orderItemId = 1;
+
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithOrderItemId(orderItemId)
+                .WithCatalogueItemType(CatalogueItemType.AssociatedService)
+                .WithProvisioningType(ProvisioningType.Declarative)
+                .WithPrice(5)
+                .WithQuantity(10)
+                .WithEstimationPeriod(null)
+                .WithPriceTimeUnit(null)
+                .Build();
+
+            var order = OrderBuilder
+                .Create()
+                .WithOrderItem(orderItem)
+                .Build();
+
+            order.CalculateCostPerYear(CostType.OneOff).Should().Be(50);
+        }
+
+        [Test]
+        public void CalculateCostPerYear_OneOff_OrderItemCostTypeRecurring_ReturnsZero()
+        {
+            const int orderItemId = 1;
+
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithOrderItemId(orderItemId)
+                .WithCatalogueItemType(CatalogueItemType.AssociatedService)
+                .WithProvisioningType(ProvisioningType.OnDemand)
+                .WithPrice(5)
+                .WithQuantity(10)
+                .Build();
+
+            var order = OrderBuilder
+                .Create()
+                .WithOrderItem(orderItem)
+                .Build();
+
+            order.CalculateCostPerYear(CostType.OneOff).Should().Be(0);
         }
     }
 }
