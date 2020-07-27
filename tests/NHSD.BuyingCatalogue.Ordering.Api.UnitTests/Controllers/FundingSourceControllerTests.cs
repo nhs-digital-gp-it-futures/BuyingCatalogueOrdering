@@ -35,9 +35,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = FundingSourceControllerTestContext.Setup();
             context.Order = null;
 
-            using var controller = context.Controller;
-
-            var result = await controller.GetAsync(orderId);
+            var result = await context.Controller.GetAsync(orderId);
 
             result.Result.Should().BeOfType<NotFoundResult>();
         }
@@ -53,8 +51,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithOrganisationId(Guid.NewGuid())
                 .Build();
 
-            using var controller = context.Controller;
-            var actual = await controller.GetAsync(orderId);
+            var actual = await context.Controller.GetAsync(orderId);
 
             actual.Result.Should().BeOfType<ForbidResult>();
         }
@@ -63,7 +60,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task GetAsync_OrderExists_FundingSourceDetailsReturned()
         {
             const string orderId = "C0000014-01";
-
             var context = FundingSourceControllerTestContext.Setup();
             context.Order = OrderBuilder
                 .Create()
@@ -71,8 +67,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithFundingSourceOnlyGms(true)
                 .Build();
 
-            using var controller = context.Controller;
-            var actual = await controller.GetAsync(orderId);
+            var actual = await context.Controller.GetAsync(orderId);
 
             var expected = new GetFundingSourceModel
             {
@@ -86,12 +81,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task GetAsync_GetOrderByIdAsync_CalledOnce()
         {
             const string orderId = "C0000014-01";
-
             var context = FundingSourceControllerTestContext.Setup();
 
-            using var controller = context.Controller;
-
-            await controller.GetAsync(orderId);
+            await context.Controller.GetAsync(orderId);
 
             context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(orderId), Times.Once);
         }
@@ -111,9 +103,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = FundingSourceControllerTestContext.Setup(organisationId);
             var order = OrderBuilder.Create().WithOrganisationId(Guid.NewGuid()).Build();
             context.Order = order;
-            var controller = context.Controller;
 
-            var response = await controller.PutFundingSourceAsync(orderId, new UpdateFundingSourceModel());
+            var response = await context.Controller.PutFundingSourceAsync(orderId, new UpdateFundingSourceModel());
             response.Should().BeEquivalentTo(new ForbidResult());
         }
 
@@ -124,9 +115,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             const string orderId = "C0000014-01";
             var context = FundingSourceControllerTestContext.Setup(organisationId);
             context.Order = null;
-            var controller = context.Controller;
 
-            var response = await controller.PutFundingSourceAsync(orderId, new UpdateFundingSourceModel());
+            var response = await context.Controller.PutFundingSourceAsync(orderId, new UpdateFundingSourceModel());
             response.Should().BeEquivalentTo(new NotFoundResult());
         }
 
@@ -137,9 +127,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var organisationId = Guid.NewGuid();
             const string orderId = "C0000014-01";
             var context = FundingSourceControllerTestContext.Setup(organisationId);
-            var controller = context.Controller;
             var model = new UpdateFundingSourceModel {OnlyGMS = fundingSource};
-            var response = await controller.PutFundingSourceAsync(orderId, model);
+
+            var response = await context.Controller.PutFundingSourceAsync(orderId, model);
             response.Should().BeEquivalentTo(new NoContentResult());
 
             context.OrderRepositoryMock.Verify(x =>
@@ -153,9 +143,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var organisationId = Guid.NewGuid();
             const string orderId = "C0000014-01";
             var context = FundingSourceControllerTestContext.Setup(organisationId);
-            var controller = context.Controller;
             var model = new UpdateFundingSourceModel { OnlyGMS = true };
-            var response = await controller.PutFundingSourceAsync(orderId, model);
+
+            var response = await context.Controller.PutFundingSourceAsync(orderId, model);
             response.Should().BeEquivalentTo(new NoContentResult());
 
             context.OrderRepositoryMock.Verify(x =>
