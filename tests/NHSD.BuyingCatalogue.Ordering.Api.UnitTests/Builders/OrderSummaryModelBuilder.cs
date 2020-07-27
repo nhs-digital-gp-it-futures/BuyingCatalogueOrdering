@@ -50,7 +50,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
-
         public OrderSummaryModel Build()
         {
             return new OrderSummaryModel

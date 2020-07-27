@@ -1148,7 +1148,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                                 .Build())
                             .WithSectionStatus("complete")
                             .Build());
-
                 }
             }
         }
