@@ -134,7 +134,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         [Test]
         public void IsFundingSourceComplete_OrderFundingViewed_ReturnsTrue()
         {
-            var order = OrderBuilder.Create().WithFundingSourceViewed(true).Build();
+            var order = OrderBuilder.Create().WithFundingSourceOnlyGms(true).Build();
             var actual = OrderExtensions.IsFundingSourceComplete(order);
             actual.Should().BeTrue();
         }
@@ -158,7 +158,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         {
             var order = OrderBuilder
                 .Create()
-                .WithFundingSourceViewed(null)
+                .WithFundingSourceOnlyGms(null)
                 .WithServiceRecipientsViewed(false)
                 .WithAssociatedServicesViewed(false)
                 .WithCatalogueSolutionsViewed(false)
@@ -174,7 +174,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         {
             var order = OrderBuilder
                 .Create()
-                .WithFundingSourceViewed(true)
+                .WithFundingSourceOnlyGms(true)
                 .WithServiceRecipientsViewed(true)
                 .WithAssociatedServicesViewed(true)
                 .WithCatalogueSolutionsViewed(true)
@@ -188,7 +188,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         {
             var order = OrderBuilder
                 .Create()
-                .WithFundingSourceViewed(true)
+                .WithFundingSourceOnlyGms(true)
                 .WithServiceRecipientsViewed(true)
                 .WithAssociatedServicesViewed(true)
                 .WithCatalogueSolutionsViewed(true)
@@ -202,7 +202,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         {
             var order = OrderBuilder
                 .Create()
-                .WithFundingSourceViewed(true)
+                .WithFundingSourceOnlyGms(true)
                 .WithServiceRecipientsViewed(true)
                 .WithAssociatedServicesViewed(true)
                 .WithCatalogueSolutionsViewed(true)
@@ -216,7 +216,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         {
             var order = OrderBuilder
                 .Create()
-                .WithFundingSourceViewed(true)
+                .WithFundingSourceOnlyGms(true)
                 .WithServiceRecipientsViewed(true)
                 .WithAssociatedServicesViewed(true)
                 .WithCatalogueSolutionsViewed(true)
