@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -36,6 +37,76 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         {
             var actual = CatalogueItemType.FromId(10);
             actual.Should().BeNull();
+        }
+
+        [Test]
+        public void InferEstimationPeriod_NullProvisioningType_ThrowsArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => 
+                CatalogueItemType.Solution.InferEstimationPeriod(null, TimeUnit.PerYear));
+        }
+
+        [TestCase(nameof(ProvisioningType.OnDemand), null, null)]
+        [TestCase(nameof(ProvisioningType.OnDemand), "month", "month")]
+        [TestCase(nameof(ProvisioningType.OnDemand), "year", "year")]
+        [TestCase(nameof(ProvisioningType.Patient), null, "month")]
+        [TestCase(nameof(ProvisioningType.Patient), "month", "month")]
+        [TestCase(nameof(ProvisioningType.Patient), "year", "month")]
+        [TestCase(nameof(ProvisioningType.Declarative), null, "year")]
+        [TestCase(nameof(ProvisioningType.Declarative), "month", "year")]
+        [TestCase(nameof(ProvisioningType.Declarative), "year", "year")]
+        public void InferEstimationPeriod_SolutionCatalogueItemType_ReturnsExpectedEstimationPeriod(
+            string provisioningTypeNameInput,
+            string estimationPeriodNameInput,
+            string expectedEstimationPeriodNameInput)
+        {
+            var estimationPeriod = TimeUnit.FromName(estimationPeriodNameInput);
+            var provisioningType = ProvisioningType.FromName(provisioningTypeNameInput);
+
+            var actual = CatalogueItemType.Solution.InferEstimationPeriod(provisioningType, estimationPeriod);
+
+            actual.Should().Be(TimeUnit.FromName(expectedEstimationPeriodNameInput));
+        }
+
+        [TestCase(nameof(ProvisioningType.OnDemand), null, null)]
+        [TestCase(nameof(ProvisioningType.OnDemand), "month", "month")]
+        [TestCase(nameof(ProvisioningType.OnDemand), "year", "year")]
+        [TestCase(nameof(ProvisioningType.Patient), null, "month")]
+        [TestCase(nameof(ProvisioningType.Patient), "month", "month")]
+        [TestCase(nameof(ProvisioningType.Patient), "year", "month")]
+        [TestCase(nameof(ProvisioningType.Declarative), null, "year")]
+        [TestCase(nameof(ProvisioningType.Declarative), "month", "year")]
+        [TestCase(nameof(ProvisioningType.Declarative), "year", "year")]
+        public void InferEstimationPeriod_AdditionalServiceCatalogueItemType_ReturnsExpectedEstimationPeriod(
+            string provisioningTypeNameInput,
+            string estimationPeriodNameInput,
+            string expectedEstimationPeriodNameInput)
+        {
+            var estimationPeriod = TimeUnit.FromName(estimationPeriodNameInput);
+            var provisioningType = ProvisioningType.FromName(provisioningTypeNameInput);
+
+            var actual = CatalogueItemType.AdditionalService.InferEstimationPeriod(provisioningType, estimationPeriod);
+
+            actual.Should().Be(TimeUnit.FromName(expectedEstimationPeriodNameInput));
+        }
+
+        [TestCase(nameof(ProvisioningType.OnDemand), null, null)]
+        [TestCase(nameof(ProvisioningType.OnDemand), "month", "month")]
+        [TestCase(nameof(ProvisioningType.OnDemand), "year", "year")]
+        [TestCase(nameof(ProvisioningType.Declarative), null, null)]
+        [TestCase(nameof(ProvisioningType.Declarative), "month", null)]
+        [TestCase(nameof(ProvisioningType.Declarative), "year", null)]
+        public void InferEstimationPeriod_AssociatedServiceCatalogueItemType_ReturnsExpectedEstimationPeriod(
+            string provisioningTypeNameInput,
+            string estimationPeriodNameInput,
+            string expectedEstimationPeriodNameInput)
+        {
+            var estimationPeriod = TimeUnit.FromName(estimationPeriodNameInput);
+            var provisioningType = ProvisioningType.FromName(provisioningTypeNameInput);
+
+            var actual = CatalogueItemType.AssociatedService.InferEstimationPeriod(provisioningType, estimationPeriod);
+
+            actual.Should().Be(TimeUnit.FromName(expectedEstimationPeriodNameInput));
         }
 
         [TestCase(null)]

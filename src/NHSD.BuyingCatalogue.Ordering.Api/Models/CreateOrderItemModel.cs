@@ -21,9 +21,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
         [MaxLength(255, ErrorMessage = "CatalogueItemNameTooLong")]
         public string CatalogueItemName { get; set; }
 
-        [Required(ErrorMessage = "ServiceRecipientRequired")]
-        public ServiceRecipientModel ServiceRecipient { get; set; }
-
         [Required(ErrorMessage = "ProvisioningTypeRequired")]
         public string ProvisioningType { get; set; }
 

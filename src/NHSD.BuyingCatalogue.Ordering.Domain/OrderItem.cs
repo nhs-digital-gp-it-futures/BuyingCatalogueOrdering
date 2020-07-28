@@ -118,8 +118,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public decimal CalculateTotalCostPerYear()
         {
-            return Price.GetValueOrDefault() * Quantity * (PriceTimeUnit?.AmountInYear ?? EstimationPeriod?.AmountInYear ?? throw new InvalidOperationException("An Order Item must have a Price Time Unit or an Estimation Period"));
+            return Price.GetValueOrDefault() * Quantity * (PriceTimeUnit?.AmountInYear ?? EstimationPeriod?.AmountInYear ?? 1 );
         }
+
+        public CostType CostType =>
+            CatalogueItemType.Equals(CatalogueItemType.AssociatedService) &&
+            ProvisioningType.Equals(ProvisioningType.Declarative)
+                ? CostType.OneOff
+                : CostType.Recurring;
 
         internal void ChangePrice(
             DateTime? deliveryDate, 
@@ -130,12 +136,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         {
             bool changed = !Equals(DeliveryDate, deliveryDate);
             changed = changed || !Equals(Quantity, quantity);
-            changed = changed || !Equals(EstimationPeriod, estimationPeriod);
+            changed = changed || (estimationPeriod != null 
+                                  && !Equals(EstimationPeriod, estimationPeriod));
             changed = changed || !Equals(Price, price);
 
             DeliveryDate = deliveryDate;
             Quantity = quantity;
-            EstimationPeriod = estimationPeriod;
+
+            if (estimationPeriod != null)
+            {
+                EstimationPeriod = estimationPeriod;
+            }
+
             Price = price;
 
             if (changed)

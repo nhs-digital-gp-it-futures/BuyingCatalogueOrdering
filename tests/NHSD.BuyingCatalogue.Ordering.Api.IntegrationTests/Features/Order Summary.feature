@@ -22,10 +22,10 @@ Scenario: 1. Get the order summary
         | ordering-party      | incomplete |       |
         | supplier            | incomplete |       |
         | commencement-date   | incomplete |       |
-        | associated-services | incomplete |       |
+        | associated-services | incomplete | 0     |
         | service-recipients  | incomplete | 0     |
         | catalogue-solutions | incomplete | 0     |
-        | additional-services | incomplete |       |
+        | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
 
 @4619
@@ -47,10 +47,10 @@ Scenario: 2. Get the order summary when the order has a primary ordering party c
         | ordering-party      | complete   |       |
         | supplier            | incomplete |       |
         | commencement-date   | incomplete |       |
-        | associated-services | incomplete |       |
+        | associated-services | incomplete | 0     |
         | service-recipients  | incomplete | 0     |
         | catalogue-solutions | incomplete | 0     |
-        | additional-services | incomplete |       |
+        | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
 
 @4619
@@ -72,10 +72,10 @@ Scenario: 3. Get the order summary when the order has a primary supplier contact
         | ordering-party      | incomplete |       |
         | supplier            | complete   |       |
         | commencement-date   | incomplete |       |
-        | associated-services | incomplete |       |
+        | associated-services | incomplete | 0     |
         | service-recipients  | incomplete | 0     |
         | catalogue-solutions | incomplete | 0     |
-        | additional-services | incomplete |       |
+        | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
 
 @4619
@@ -94,33 +94,41 @@ Scenario: 4. Get the order summary when the order has a commencement date
         | ordering-party      | incomplete |       |
         | supplier            | incomplete |       |
         | commencement-date   | complete   |       |
-        | associated-services | incomplete |       |
+        | associated-services | incomplete | 0     |
         | service-recipients  | incomplete | 0     |
         | catalogue-solutions | incomplete | 0     |
-        | additional-services | incomplete |       |
+        | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
 
-@7412
-Scenario: 5. Get the order summary after the user has viewed the service recipients section
+@5115
+Scenario: 5. Get the order summary after a section has been viewed
     Given Orders exist
-        | OrderId    | Description   | OrganisationId                       | ServiceRecipientsViewed |
-        | C000015-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                    |
+        | OrderId    | Description   | OrganisationId                       | ServiceRecipientsViewed     | AdditionalServicesViewed     | CatalogueSolutionsViewed     | AssociatedServicesViewed     | FundingSourceOnlyGMS      |
+        | C000015-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | <service-recipients-viewed> | <additional-services-viewed> | <catalogue-solutions-viewed> | <associated-services-viewed> | <funding-source-only-gms> |
     When the user makes a request to retrieve the order summary with the ID C000015-01
     Then a response with status code 200 is returned
     And the order summary is returned with the following values
         | OrderId    | OrganisationId                       | Description   |
         | C000015-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
     And the order Summary Sections have the following values
-        | Id                  | Status     | Count |
-        | description         | complete   |       |
-        | ordering-party      | incomplete |       |
-        | supplier            | incomplete |       |
-        | commencement-date   | incomplete |       |
-        | associated-services | incomplete |       |
-        | service-recipients  | complete   | 0     |
-        | catalogue-solutions | incomplete | 0     |
-        | additional-services | incomplete |       |
-        | funding-source      | incomplete |       |
+        | Id                  | Status                       | Count |
+        | description         | complete                     |       |
+        | ordering-party      | incomplete                   |       |
+        | supplier            | incomplete                   |       |
+        | commencement-date   | incomplete                   |       |
+        | associated-services | <associated-services-status> | 0     |
+        | service-recipients  | <service-recipients-status>  | 0     |
+        | catalogue-solutions | <catalogue-solutions-status> | 0     |
+        | additional-services | <additional-services-status> | 0     |
+        | funding-source      | <funding-source-status>      |       |
+
+    Examples: Sections
+        | service-recipients-viewed | additional-services-viewed | catalogue-solutions-viewed | associated-services-viewed | funding-source-only-gms | service-recipients-status | additional-services-status | catalogue-solutions-status | associated-services-status | funding-source-status |
+        | True                      | False                      | False                      | False                      | NULL                    | complete                  | incomplete                 | incomplete                 | incomplete                 | incomplete            |
+        | False                     | True                       | False                      | False                      | NULL                    | incomplete                | complete                   | incomplete                 | incomplete                 | incomplete            |
+        | False                     | False                      | True                       | False                      | NULL                    | incomplete                | incomplete                 | complete                   | incomplete                 | incomplete            |
+        | False                     | False                      | False                      | True                       | False                   | incomplete                | incomplete                 | incomplete                 | complete                   | complete              |
+        | False                     | False                      | False                      | False                      | True                    | incomplete                | incomplete                 | incomplete                 | incomplete                 | complete              |
 
 @4629
 Scenario: 6. Get the order summary that includes a list of service recipients
@@ -142,39 +150,17 @@ Scenario: 6. Get the order summary that includes a list of service recipients
         | ordering-party      | incomplete |       |
         | supplier            | incomplete |       |
         | commencement-date   | incomplete |       |
-        | associated-services | incomplete |       |
+        | associated-services | incomplete | 0     |
         | service-recipients  | complete   | 2     |
         | catalogue-solutions | incomplete | 0     |
-        | additional-services | incomplete |       |
-        | funding-source      | incomplete |       |
-
-@7412
-Scenario: 7. Get the order summary after the user has viewed the Catalogue Solutions section 
-    Given Orders exist
-        | OrderId    | Description   | OrganisationId                       | CatalogueSolutionsViewed |
-        | C000015-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                     |
-    When the user makes a request to retrieve the order summary with the ID C000015-01
-    Then a response with status code 200 is returned
-    And the order summary is returned with the following values
-        | OrderId    | OrganisationId                       | Description   |
-        | C000015-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
-    And the order Summary Sections have the following values
-        | Id                  | Status     | Count |
-        | description         | complete   |       |
-        | ordering-party      | incomplete |       |
-        | supplier            | incomplete |       |
-        | commencement-date   | incomplete |       |
-        | associated-services | incomplete |       |
-        | service-recipients  | incomplete | 0     |
-        | catalogue-solutions | complete   | 0     |
-        | additional-services | incomplete |       |
+        | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
 
 @5123
-Scenario: 8. Get the order summary that includes a list of Catalogue Solutions
+Scenario: 7. Get the order summary that includes a list of Catalogue Solutions
     Given Orders exist
-        | OrderId    | Description   | OrganisationId                       |  CatalogueSolutionsViewed |
-        | C000016-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 |  true                     |
+        | OrderId    | Description   | OrganisationId                       | CatalogueSolutionsViewed |
+        | C000016-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                     |
     And Service Recipients exist
         | OdsCode | Name                      | OrderId    |
         | Ods1    | Updated Service Recipient | C000016-01 |
@@ -194,32 +180,68 @@ Scenario: 8. Get the order summary that includes a list of Catalogue Solutions
         | ordering-party      | incomplete |       |
         | supplier            | incomplete |       |
         | commencement-date   | incomplete |       |
-        | associated-services | incomplete |       |
+        | associated-services | incomplete | 0     |
         | service-recipients  | incomplete | 2     |
         | catalogue-solutions | complete   | 2     |
-        | additional-services | incomplete |       |
+        | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
 
-@5124
-Scenario: 9. Get the order summary after the user has viewed the Additional Services section 
+@5115
+Scenario: 8. Get the order summary that includes a list of associated services
     Given Orders exist
-        | OrderId    | Description   | OrganisationId                       | AdditionalServicesViewed |
-        | C000015-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                     |
-    When the user makes a request to retrieve the order summary with the ID C000015-01
+        | OrderId    | Description   | OrganisationId                       | AssociatedServicesViewed |
+        | C000016-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                     |
+    And Service Recipients exist
+        | OdsCode | Name                      | OrderId    |
+        | Ods1    | Updated Service Recipient | C000016-01 |
+    And Order items exist
+        | OrderId    | OdsCode | CatalogueItemName | CatalogueItemType |
+        | C000016-01 | Ods1    | Associated Item 1 | AssociatedService |
+        | C000016-01 | Ods1    | Associated Item 2 | AssociatedService |
+    When the user makes a request to retrieve the order summary with the ID C000016-01
     Then a response with status code 200 is returned
     And the order summary is returned with the following values
         | OrderId    | OrganisationId                       | Description   |
-        | C000015-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
+        | C000016-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
     And the order Summary Sections have the following values
         | Id                  | Status     | Count |
         | description         | complete   |       |
         | ordering-party      | incomplete |       |
         | supplier            | incomplete |       |
         | commencement-date   | incomplete |       |
-        | associated-services | incomplete |       |
-        | service-recipients  | incomplete | 0     |
+        | associated-services | complete   | 2     |
+        | service-recipients  | incomplete | 1     |
         | catalogue-solutions | incomplete | 0     |
-        | additional-services | complete   |       |
+        | additional-services | incomplete | 0     |
+        | funding-source      | incomplete |       |
+
+@5115
+Scenario: 9. Get the order summary that includes a list of additional services
+    Given Orders exist
+        | OrderId    | Description   | OrganisationId                       | AdditionalServicesViewed |
+        | C000016-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                     |
+    And Service Recipients exist
+        | OdsCode | Name                      | OrderId    |
+        | Ods1    | Updated Service Recipient | C000016-01 |
+    And Order items exist
+        | OrderId    | OdsCode | CatalogueItemName | CatalogueItemType |
+        | C000016-01 | Ods1    | Additional Item 1 | AdditionalService |
+        | C000016-01 | Ods1    | Additional Item 2 | AdditionalService |
+    When the user makes a request to retrieve the order summary with the ID C000016-01
+    Then a response with status code 200 is returned
+    And the order summary is returned with the following values
+        | OrderId    | OrganisationId                       | Description   |
+        | C000016-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
+    And the order Summary Sections have the following values
+        | Id                  | Status     | Count |
+        | description         | complete   |       |
+        | ordering-party      | incomplete |       |
+        | supplier            | incomplete |       |
+        | commencement-date   | incomplete |       |
+        | associated-services | incomplete | 0     |
+        | service-recipients  | incomplete | 1     |
+        | catalogue-solutions | incomplete | 0     |
+        | additional-services | complete   | 2     |
         | funding-source      | incomplete |       |
 
 @5321

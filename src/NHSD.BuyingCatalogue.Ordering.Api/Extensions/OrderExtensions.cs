@@ -46,5 +46,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 
             return order.AdditionalServicesViewed;
         }
+
+        public static bool IsFundingSourceComplete(this Order order)
+        {
+            return order?.FundingSourceOnlyGMS != null;
+        }
+
+        public static bool IsAssociatedServicesSectionComplete(this Order order)
+        {
+            return !(order is null) && order.AssociatedServicesViewed;
+        }
     }
 }

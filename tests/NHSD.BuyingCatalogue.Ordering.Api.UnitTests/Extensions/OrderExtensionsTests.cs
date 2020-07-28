@@ -114,5 +114,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
             var actual = OrderExtensions.IsCatalogueSolutionsSectionComplete(order);
             actual.Should().BeFalse();
         }
+
+        [Test]
+        public void IsAssociatedServicesSectionComplete_NullOrder_ReturnsFalse()
+        {
+            var actual = OrderExtensions.IsAssociatedServicesSectionComplete(null);
+            actual.Should().BeFalse();
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public void IsAssociatedServicesSectionComplete_ToggleViewed_ReturnsBool(bool viewed)
+        {
+            var order = OrderBuilder.Create().WithAdditionalServicesViewed(viewed).Build();
+            var actual = order.IsAssociatedServicesSectionComplete();
+            actual.Should().BeFalse();
+        }
     }
 }

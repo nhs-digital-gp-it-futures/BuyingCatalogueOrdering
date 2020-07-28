@@ -67,6 +67,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [TestCase("additional-services")]
         [TestCase("catalogue-solutions")]
+        [TestCase("associated-services")]
         public async Task UpdateStatusAsync_CorrectSectionId_ReturnsNoContentResult(string sectionName)
         {
             var context = SectionStatusControllerTestContext.Setup();
@@ -78,33 +79,25 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             response.Should().BeOfType<NoContentResult>();
         }
 
-        [Test]
-        public async Task UpdateStatusAsync_WithAdditionalServicesSectionId_UpdatesAdditionalServicesViewedField()
+        [TestCase("additional-services", true, false, false)]
+        [TestCase("catalogue-solutions", false, true, false)]
+        [TestCase("associated-services", false, false, true)]
+        public async Task UpdateStatusAsync_WithSectionId_UpdatesTheSelectedStatus(
+            string sectionId,
+            bool additionalServicesViewed,
+            bool catalogueSolutionsViewed,
+            bool associatedServicesViewed)
         {
             var context = SectionStatusControllerTestContext.Setup();
 
             const string orderId = "C0000014-01";
             context.Order = CreateGetTestData(orderId, context.PrimaryOrganisationId, "ods");
 
-            await context.SectionStatusController.UpdateStatusAsync(orderId, "additional-services", new UpdateOrderSectionModel { Status = "complete" });
+            await context.SectionStatusController.UpdateStatusAsync(orderId, sectionId, new UpdateOrderSectionModel { Status = "complete" });
 
-            context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o => o.AdditionalServicesViewed == true)));
-            context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o => o.CatalogueSolutionsViewed == false)));
-            context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o => o.ServiceRecipientsViewed == false)));
-        }
-
-        [Test]
-        public async Task UpdateStatusAsync_WithCatalogueSolutionsSectionId_UpdatesCatalogueSolutionsViewedField()
-        {
-            var context = SectionStatusControllerTestContext.Setup();
-
-            const string orderId = "C0000014-01";
-            context.Order = CreateGetTestData(orderId, context.PrimaryOrganisationId, "ods");
-
-            var response = await context.SectionStatusController.UpdateStatusAsync(orderId, "catalogue-solutions", new UpdateOrderSectionModel { Status = "complete" });
-            response.Should().BeOfType<NoContentResult>();
-            context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o => o.AdditionalServicesViewed == false)));
-            context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o => o.CatalogueSolutionsViewed == true)));
+            context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o => o.AdditionalServicesViewed == additionalServicesViewed)));
+            context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o => o.CatalogueSolutionsViewed == catalogueSolutionsViewed)));
+            context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o => o.AssociatedServicesViewed == associatedServicesViewed)));
             context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o => o.ServiceRecipientsViewed == false)));
         }
 

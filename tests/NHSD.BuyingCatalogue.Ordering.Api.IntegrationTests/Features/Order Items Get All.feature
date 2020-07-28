@@ -37,7 +37,7 @@ Scenario: 1. Get all order items for an ID filtering by catalogue item type
         | AssociatedService |
         | SOLutiON          |
         | AssocIATEDService |
-        | ADDITIONALserivce |
+        | ADDITIONALservice |
 
 @5124
 Scenario: 2. Passing through an order ID that does not exist, returns Not Found

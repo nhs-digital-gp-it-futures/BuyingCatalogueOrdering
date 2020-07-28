@@ -15,6 +15,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
         [MaxLength(14, ErrorMessage = "CatalogueSolutionIdTooLong")]
         public string CatalogueSolutionId { get; set; }
 
+        [Required(ErrorMessage = "ServiceRecipientRequired")]
+        public ServiceRecipientModel ServiceRecipient { get; set; }
+
         public override CreateOrderItemRequest ToRequest(Order order)
         {
             if (order is null)

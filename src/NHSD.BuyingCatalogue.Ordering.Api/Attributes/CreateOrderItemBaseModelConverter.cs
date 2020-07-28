@@ -25,6 +25,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Attributes
                 return (CreateOrderItemBaseModel)JsonSerializer.Deserialize(doc.RootElement.GetRawText(), typeof(CreateOrderItemAdditionalServiceModel), options);
             }
 
+            if (model.CatalogueItemType == CatalogueItemType.AssociatedService.Name)
+            {
+                return (CreateOrderItemBaseModel)JsonSerializer.Deserialize(doc.RootElement.GetRawText(), typeof(CreateOrderItemAssociatedServiceModel), options);
+            }
             return model;
         }
 

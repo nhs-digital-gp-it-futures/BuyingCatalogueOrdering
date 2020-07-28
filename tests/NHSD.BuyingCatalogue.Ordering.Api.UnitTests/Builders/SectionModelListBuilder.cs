@@ -9,11 +9,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         private SectionModel _orderingParty;
         private SectionModel _supplier;
         private SectionModel _commencementDate;
-        private readonly SectionModel _associatedServices;
+        private SectionModel _associatedServices;
         private SectionModel _serviceRecipients;
         private SectionModel _catalogueSolutions;
-        private readonly SectionModel _additionalServices;
-        private readonly SectionModel _fundingSource;
+        private SectionModel _additionalServices;
+        private SectionModel _fundingSource;
 
         private SectionModelListBuilder()
         {
@@ -21,10 +21,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _orderingParty = SectionModel.OrderingParty;
             _supplier = SectionModel.Supplier;
             _commencementDate = SectionModel.CommencementDate;
-            _associatedServices = SectionModel.AssociatedServices;
+            _associatedServices = SectionModel.AssociatedServices.WithCount(0);
             _serviceRecipients = SectionModel.ServiceRecipients.WithCount(0);
             _catalogueSolutions = SectionModel.CatalogueSolutions.WithCount(0);
-            _additionalServices = SectionModel.AdditionalServices;
+            _additionalServices = SectionModel.AdditionalServices.WithCount(0);
             _fundingSource = SectionModel.FundingSource;
         }
 
@@ -63,9 +63,27 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
+        public SectionModelListBuilder WithAdditionalServices(SectionModel additionalServices)
+        {
+            _additionalServices = additionalServices;
+            return this;
+        }
+
         public SectionModelListBuilder WithCatalogueSolutions(SectionModel catalogueSolutions)
         {
             _catalogueSolutions = catalogueSolutions;
+            return this;
+        }
+
+        public SectionModelListBuilder WithAssociatedServices(SectionModel associatedServices)
+        {
+            _associatedServices = associatedServices;
+            return this;
+        }
+
+        public SectionModelListBuilder WithFundingSource(SectionModel fundingSource)
+        {
+            _fundingSource = fundingSource;
             return this;
         }
 

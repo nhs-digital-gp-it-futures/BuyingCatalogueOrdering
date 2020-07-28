@@ -36,9 +36,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             order.OrderItems.Should().BeEquivalentTo(expected);
         }
 
-        [TestCase("Solution", true)]
-        [TestCase("AdditionalService", false)]
-        [TestCase("AssociatedService", false)]
+        [TestCase(nameof(CatalogueItemType.Solution), true)]
+        [TestCase(nameof(CatalogueItemType.AdditionalService), false)]
+        [TestCase(nameof(CatalogueItemType.AssociatedService), false)]
         public void AddOrderItem_OrderItem_CatalogueItemType_CatalogueSolutionsViewedMatchExpectedValue(
             string catalogueItemTypeNameInput,
             bool expectedInput)
@@ -58,10 +58,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             order.CatalogueSolutionsViewed.Should().Be(expectedInput);
         }
 
-        [TestCase("Solution", false)]
-        [TestCase("AdditionalService", true)]
-        [TestCase("AssociatedService", false)]
+        [TestCase(nameof(CatalogueItemType.Solution), false)]
+        [TestCase(nameof(CatalogueItemType.AdditionalService), true)]
+        [TestCase(nameof(CatalogueItemType.AssociatedService), false)]
         public void AddOrderItem_OrderItem_CatalogueItemType_AdditionalServicesViewedMatchExpectedValue(
+            string catalogueItemTypeNameInput,
+            bool expectedInput)
+        {
+            var order = OrderBuilder
+                .Create()
+                .WithAdditionalServicesViewed(false)
+                .Build();
+
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithCatalogueItemType(CatalogueItemType.FromName(catalogueItemTypeNameInput))
+                .Build();
+
+            order.AddOrderItem(orderItem, Guid.Empty, String.Empty);
+
+            order.AdditionalServicesViewed.Should().Be(expectedInput);
+        }
+
+        [TestCase(nameof(CatalogueItemType.Solution), false)]
+        [TestCase(nameof(CatalogueItemType.AdditionalService), true)]
+        [TestCase(nameof(CatalogueItemType.AssociatedService), false)]
+        public void AddOrderItem_OrderItem_CatalogueItemType_AssociatedServicesViewedMatchExpectedValue(
             string catalogueItemTypeNameInput,
             bool expectedInput)
         {
@@ -253,6 +275,105 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
                 Guid.NewGuid().ToString());
 
             order.Should().BeEquivalentTo(expected);
+        }
+
+        [Test]
+        public void CalculateCostPerYear_Recurring_OrderItemCostTypeRecurring_ReturnsTotalOrderItemCost()
+        {
+            const int orderItemId1 = 1;
+            const int orderItemId2 = 1;
+
+            var orderItem1 = OrderItemBuilder
+                .Create()
+                .WithOrderItemId(orderItemId1)
+                .WithCatalogueItemType(CatalogueItemType.Solution)
+                .WithProvisioningType(ProvisioningType.Declarative)
+                .WithPrice(120)
+                .WithQuantity(2)
+                .Build();
+
+            var orderItem2 = OrderItemBuilder
+                .Create()
+                .WithOrderItemId(orderItemId2)
+                .WithCatalogueItemType(CatalogueItemType.AdditionalService)
+                .WithProvisioningType(ProvisioningType.Patient)
+                .WithPrice(240)
+                .WithQuantity(2)
+                .Build();
+
+            var order = OrderBuilder
+                .Create()
+                .WithOrderItem(orderItem1)
+                .WithOrderItem(orderItem2)
+                .Build();
+
+            order.CalculateCostPerYear(CostType.Recurring).Should().Be(2880);
+        }
+
+        [Test]
+        public void CalculateCostPerYear_Recurring_OrderItemCostTypeOneOff_ReturnsZero()
+        {
+            const int orderItemId = 1;
+
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithOrderItemId(orderItemId)
+                .WithCatalogueItemType(CatalogueItemType.AssociatedService)
+                .WithProvisioningType(ProvisioningType.Declarative)
+                .Build();
+
+            var order = OrderBuilder
+                .Create()
+                .WithOrderItem(orderItem)
+                .Build();
+
+            order.CalculateCostPerYear(CostType.Recurring).Should().Be(0);
+        }
+
+        [Test]
+        public void CalculateCostPerYear_OneOff_OrderItemCostTypeOneOff_ReturnsTotalOneOffCost()
+        {
+            const int orderItemId = 1;
+
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithOrderItemId(orderItemId)
+                .WithCatalogueItemType(CatalogueItemType.AssociatedService)
+                .WithProvisioningType(ProvisioningType.Declarative)
+                .WithPrice(5)
+                .WithQuantity(10)
+                .WithEstimationPeriod(null)
+                .WithPriceTimeUnit(null)
+                .Build();
+
+            var order = OrderBuilder
+                .Create()
+                .WithOrderItem(orderItem)
+                .Build();
+
+            order.CalculateCostPerYear(CostType.OneOff).Should().Be(50);
+        }
+
+        [Test]
+        public void CalculateCostPerYear_OneOff_OrderItemCostTypeRecurring_ReturnsZero()
+        {
+            const int orderItemId = 1;
+
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithOrderItemId(orderItemId)
+                .WithCatalogueItemType(CatalogueItemType.AssociatedService)
+                .WithProvisioningType(ProvisioningType.OnDemand)
+                .WithPrice(5)
+                .WithQuantity(10)
+                .Build();
+
+            var order = OrderBuilder
+                .Create()
+                .WithOrderItem(orderItem)
+                .Build();
+
+            order.CalculateCostPerYear(CostType.OneOff).Should().Be(0);
         }
     }
 }

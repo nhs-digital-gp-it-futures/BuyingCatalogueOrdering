@@ -12,11 +12,11 @@ Scenario: 1. A user can create a order and data is persisted to the database;
         | OrganisationId                       | Description                         |
         | 4af62b99-638c-4247-875e-965239cd0c48 | This is an order for organisation 2 |
     Then a response with status code 201 is returned
-    And the order is created in the database with orderId C000000-01 and data
+    And the order is created in the database with orderId C010000-01 and data
         | OrderId    | Description                         | OrderStatusId | OrganisationId                       | LastUpdatedBy                        | LastUpdatedByName |
-        | C000000-01 | This is an order for organisation 2 | 2             | 4af62b99-638c-4247-875e-965239cd0c48 | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
-    And the order with orderId C000000-01 has LastUpdated time present and it is the current time
-    And the order with orderId C000000-01 has Created time present and it is the current time
+        | C010000-01 | This is an order for organisation 2 | 2             | 4af62b99-638c-4247-875e-965239cd0c48 | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
+    And the order with orderId C010000-01 has LastUpdated time present and it is the current time
+    And the order with orderId C010000-01 has Created time present and it is the current time
 
 @6739
 Scenario: 2. A user creates an order when existing orders are present, The order is created with a incremented orderId
@@ -54,7 +54,7 @@ Scenario: 4. A user can create a order when no orders exist and a defualt OrderI
         | OrganisationId                       | Description                         |
         | 4af62b99-638c-4247-875e-965239cd0c48 | This is an order for organisation 2 |
     Then a response with status code 201 is returned
-    And a create order response is returned with the OrderId C000000-01
+    And a create order response is returned with the OrderId C010000-01
 
 @6739
 Scenario: 5. A user creates an order without specifing an Organisation Id a Status Code of 403 is returned

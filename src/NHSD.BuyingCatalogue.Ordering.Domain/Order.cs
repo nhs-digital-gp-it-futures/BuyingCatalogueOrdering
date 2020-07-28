@@ -77,6 +77,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public bool AdditionalServicesViewed { get; set; }
 
+        public bool AssociatedServicesViewed { get; set; }
+
+        public bool? FundingSourceOnlyGMS { get; set; }
+
         public IReadOnlyList<OrderItem> OrderItems =>
             _orderItems.AsReadOnly();
 
@@ -86,6 +90,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         public void SetDescription(OrderDescription orderDescription)
         {
             Description = orderDescription ?? throw new ArgumentNullException(nameof(orderDescription));
+        }
+        public decimal CalculateCostPerYear(CostType costType)
+        {
+            return _orderItems.Where(x => x.CostType == costType).Sum(y => y.CalculateTotalCostPerYear());
         }
 
         public void SetLastUpdatedBy(Guid userId, string name)

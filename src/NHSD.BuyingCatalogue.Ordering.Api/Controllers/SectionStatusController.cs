@@ -8,7 +8,6 @@ using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
@@ -25,7 +24,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         private static readonly Dictionary<string, Action<Order>> _completeSectionActionsDictionary = new Dictionary<string, Action<Order>>
         {
             { SectionModel.CatalogueSolutions.Id, o => o.CatalogueSolutionsViewed = true },
-            { SectionModel.AdditionalServices.Id, o => o.AdditionalServicesViewed = true }
+            { SectionModel.AdditionalServices.Id, o => o.AdditionalServicesViewed = true },
+            { SectionModel.AssociatedServices.Id, o => o.AssociatedServicesViewed = true }
         };
 
         public SectionStatusController(IOrderRepository orderRepository)

@@ -53,10 +53,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Then(@"the order item is updated")]
         public async Task ThenTheOrderItemIsUpdated()
         {
+            var original = _orderContext.OrderItemReferenceList
+                .FindByOrderItemId(_updateOrderItemRequest.OrderItemId);
+
             var orderItem = await OrderItemEntity.FetchByOrderItemId(_settings.ConnectionString,
                 _updateOrderItemRequest.OrderItemId);
 
-            _updateOrderItemRequest.AssertPayload(orderItem);
+            _updateOrderItemRequest.AssertPayload(orderItem, original);
         }
     }
 }

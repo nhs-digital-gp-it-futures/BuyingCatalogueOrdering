@@ -53,6 +53,25 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
+            var calculatedCostPerYear = order.CalculateCostPerYear(CostType.Recurring);
+            const int monthsPerYear = 12;
+
+            var serviceRecipientDictionary = order.ServiceRecipients.Select(serviceRecipient =>
+                    new ServiceRecipientModel {Name = serviceRecipient.Name, OdsCode = serviceRecipient.OdsCode})
+                .ToDictionary(x => x.OdsCode);
+
+            var orderItems = order.OrderItems;
+            var orderOrganisationOdsCode = order.OrganisationOdsCode;
+
+            if (orderItems.Select(x => x.OdsCode).Contains(orderOrganisationOdsCode))
+            {
+                if (!serviceRecipientDictionary.ContainsKey(orderOrganisationOdsCode))
+                {
+                    serviceRecipientDictionary.TryAdd(orderOrganisationOdsCode.ToUpperInvariant(),
+                        new ServiceRecipientModel { Name = order.OrganisationName, OdsCode = orderOrganisationOdsCode });
+                }
+            }
+
             return new OrderModel
             {
                 Description = order.Description.Value,
@@ -70,16 +89,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     Address = order.SupplierAddress.ToModel(),
                     PrimaryContact = order.SupplierContact.ToModel()
                 },
-                TotalOneOffCost = 0m,
-                TotalRecurringCostPerMonth = 0m,
-                TotalRecurringCostPerYear = 0m,
+                TotalOneOffCost = order.CalculateCostPerYear(CostType.OneOff),
+                TotalRecurringCostPerMonth = calculatedCostPerYear / monthsPerYear,
+                TotalRecurringCostPerYear = calculatedCostPerYear,
                 TotalOwnershipCost = 0m,
-                ServiceRecipients = order.ServiceRecipients.Select(serviceRecipient =>
-                    new ServiceRecipientModel
-                    {
-                        Name = serviceRecipient.Name,
-                        OdsCode = serviceRecipient.OdsCode
-                    }),
+                ServiceRecipients = serviceRecipientDictionary.Values,
                 OrderItems = order.OrderItems.Select(orderItem =>
                     new OrderItemModel
                     {
@@ -143,6 +157,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             int serviceRecipientsCount = await _serviceRecipientRepository.GetCountByOrderIdAsync(orderId);
             int catalogueSolutionsCount = order.OrderItems.Count(y => y.CatalogueItemType.Equals(CatalogueItemType.Solution));
+            int associatedServicesCount = order.OrderItems.Count(y => y.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
+            int additionalServicesCount = order.OrderItems.Count(y => y.CatalogueItemType.Equals(CatalogueItemType.AdditionalService));
 
             OrderSummaryModel orderSummaryModel = new OrderSummaryModel
             {
@@ -155,7 +171,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     SectionModel.OrderingParty.WithStatus(order.IsOrderingPartySectionComplete() ? "complete" : "incomplete"),
                     SectionModel.Supplier.WithStatus(order.IsSupplierSectionComplete() ? "complete" : "incomplete"),
                     SectionModel.CommencementDate.WithStatus(order.IsCommencementDateSectionComplete() ? "complete" : "incomplete"),
-                    SectionModel.AssociatedServices,
+                    SectionModel.AssociatedServices
+                        .WithStatus(order.IsAssociatedServicesSectionComplete() ? "complete" : "incomplete")
+                        .WithCount(associatedServicesCount),
                     SectionModel
                         .ServiceRecipients
                         .WithStatus(order.IsServiceRecipientsSectionComplete() ? "complete" : "incomplete")
@@ -164,8 +182,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                         .WithStatus(order.IsCatalogueSolutionsSectionComplete() ? "complete" : "incomplete")
                         .WithCount(catalogueSolutionsCount),
                     SectionModel.AdditionalServices
-                        .WithStatus(order.IsAdditionalServicesSectionComplete() ? "complete": "incomplete"),
-                    SectionModel.FundingSource
+                        .WithStatus(order.IsAdditionalServicesSectionComplete() ? "complete": "incomplete")
+                        .WithCount(additionalServicesCount),
+                    SectionModel.FundingSource.WithStatus(order.IsFundingSourceComplete() ? "complete" : "incomplete")
                 }
             };
 

@@ -13,6 +13,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             {
                 Description = "Some Description",
                 OrganisationId = Guid.NewGuid(),
+                OrganisationOdsCode = "test",
                 OrganisationAddressId = null,
                 OrganisationBillingAddressId = null,
                 OrganisationContactId = null,
@@ -154,9 +155,21 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             return this;
         }
 
-        public OrderEntityBuilder WithAdditionalServicesViewed(bool AdditionalServicesViewed)
+        public OrderEntityBuilder WithAdditionalServicesViewed(bool additionalServicesViewed)
         {
-            _orderEntity.AdditionalServicesViewed = AdditionalServicesViewed;
+            _orderEntity.AdditionalServicesViewed = additionalServicesViewed;
+            return this;
+        }
+
+        public OrderEntityBuilder WithAssociatedServicesViewed(bool associatedServicesViewed)
+        {
+            _orderEntity.AssociatedServicesViewed = associatedServicesViewed;
+            return this;
+        }
+
+        public OrderEntityBuilder WithFundingSourceOnlyGMS(bool? fundingSourceOnlyGMS)
+        {
+            _orderEntity.FundingSourceOnlyGMS = fundingSourceOnlyGMS;
             return this;
         }
 

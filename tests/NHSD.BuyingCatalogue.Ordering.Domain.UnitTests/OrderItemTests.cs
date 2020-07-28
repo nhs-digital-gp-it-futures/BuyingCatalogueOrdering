@@ -165,6 +165,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         {
             var orderItem = OrderItemBuilder
                 .Create()
+                .WithProvisioningType(ProvisioningType.OnDemand)
                 .WithDeliveryDate(DateTime.UtcNow)
                 .WithEstimationPeriod(TimeUnit.PerYear)
                 .Build();
@@ -187,6 +188,34 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             orderItem.Should().BeEquivalentTo(expected);
         }
 
+        [Test]
+        public void ChangePrice_ChangeValues_NullEstimationPeriod_ExpectedPropertiesUpdated()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithProvisioningType(ProvisioningType.Patient)
+                .WithDeliveryDate(DateTime.UtcNow)
+                .WithEstimationPeriod(TimeUnit.PerYear)
+                .Build();
+
+            var expected = new
+            {
+                DeliveryDate = orderItem.DeliveryDate?.AddDays(1),
+                Quantity = orderItem.Quantity + 1,
+                EstimationPeriod = TimeUnit.PerYear,
+                Price = orderItem.Price + 1m
+            };
+
+            orderItem.ChangePrice(
+                expected.DeliveryDate,
+                expected.Quantity,
+                null,
+                expected.Price,
+                null);
+
+            orderItem.Should().BeEquivalentTo(expected);
+        }
+
         [TestCase(0, 0, false, 0, 0)]
         [TestCase(1, 0, false, 0, 1)]
         [TestCase(0, 1, false, 0, 1)]
@@ -203,6 +232,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
             var orderItem = OrderItemBuilder
                 .Create()
+                .WithProvisioningType(ProvisioningType.OnDemand)
                 .WithEstimationPeriod(TimeUnit.PerYear)
                 .Build();
 
@@ -352,17 +382,53 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void CalculateCost_WithNoPriceTypeOrEstimationPeriod_ThrowsException()
+        public void CalculateCost_WithNoPriceTypeOrEstimationPeriod_PriceIsPriceTimesQuanitiy()
         {
+            var price = 26;
+            var quantity = 13;
             var orderItem = OrderItemBuilder
                 .Create()
-                .WithPrice(1m)
-                .WithQuantity(10)
+                .WithPrice(price)
+                .WithQuantity(quantity)
                 .WithPriceTimeUnit(null)
                 .WithEstimationPeriod(null)
                 .Build();
 
-            Assert.Throws<InvalidOperationException>(() => orderItem.CalculateTotalCostPerYear());
+            orderItem.CalculateTotalCostPerYear().Should().Be(price * quantity);
+        }
+
+        [Test]
+        public void CostType_OrderItemIsOneOff_ReturnsCorrectCostType()
+        {
+            var orderItem = CreateOrderItem(CatalogueItemType.AssociatedService, ProvisioningType.Declarative);
+            orderItem.CostType.Should().Be(CostType.OneOff);
+        }
+
+        [TestCase(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.Declarative), CostType.Recurring)]
+        [TestCase(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.OnDemand), CostType.Recurring)]
+        [TestCase(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.Patient), CostType.Recurring)]
+        [TestCase(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.Declarative), CostType.Recurring)]
+        [TestCase(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.OnDemand), CostType.Recurring)]
+        [TestCase(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.Patient), CostType.Recurring)]
+        [TestCase(nameof(CatalogueItemType.AssociatedService), nameof(ProvisioningType.OnDemand), CostType.Recurring)]
+        [TestCase(nameof(CatalogueItemType.AssociatedService), nameof(ProvisioningType.Patient), CostType.Recurring)]
+        [TestCase(nameof(CatalogueItemType.AssociatedService), nameof(ProvisioningType.Declarative), CostType.OneOff)]
+        public void CostType_DeterminesTheCostType_ReturnsCorrectCostType(string catalogueItemTypeName, string provisioningTypeName, CostType costType)
+        {
+            var catalogueItemType = CatalogueItemType.FromName(catalogueItemTypeName);
+            var provisioningType = ProvisioningType.FromName(provisioningTypeName);
+            var orderItem = CreateOrderItem(catalogueItemType, provisioningType);
+
+            orderItem.CostType.Should().Be(costType);
+        }
+
+        private OrderItem CreateOrderItem(CatalogueItemType catalogueItemType, ProvisioningType provisioningType)
+        {
+            return OrderItemBuilder
+                .Create()
+                .WithCatalogueItemType(catalogueItemType)
+                .WithProvisioningType(provisioningType)
+                .Build();
         }
     }
 }
