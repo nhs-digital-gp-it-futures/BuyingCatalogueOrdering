@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -44,8 +44,6 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
     <PackageReference Include="SpecFlow" Version="3.1.86" />
     <PackageReference Include="SpecFlow.NUnit" Version="3.1.86" />
-    <PackageReference Include="SpecFlow" Version="3.3.57" />
-    <PackageReference Include="SpecFlow.NUnit" Version="3.3.57" />
     <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.3.57" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.7.1" />
   </ItemGroup>
