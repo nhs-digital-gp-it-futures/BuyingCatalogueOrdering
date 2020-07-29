@@ -78,7 +78,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Then(@"the order Section Status is (.*)")]
-        public async Task ThenTheOrderSummarySectionStatusIs(string expectedStatus)
+        public async Task ThenTheOrderSectionStatusIs(string expectedStatus)
         {
             var response = await _response.ReadBodyAsJsonAsync();
 

@@ -27,7 +27,6 @@ Scenario: 1. Get the order summary
         | catalogue-solutions | incomplete | 0     |
         | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
-    And the order Section Status is incomplete
 
 @4619
 Scenario: 2. Get the order summary when the order has a primary ordering party contact
@@ -53,7 +52,6 @@ Scenario: 2. Get the order summary when the order has a primary ordering party c
         | catalogue-solutions | incomplete | 0     |
         | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
-    And the order Section Status is incomplete
 
 @4619
 Scenario: 3. Get the order summary when the order has a primary supplier contact
@@ -79,7 +77,6 @@ Scenario: 3. Get the order summary when the order has a primary supplier contact
         | catalogue-solutions | incomplete | 0     |
         | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
-    And the order Section Status is incomplete
 
 @4619
 Scenario: 4. Get the order summary when the order has a commencement date
@@ -102,7 +99,6 @@ Scenario: 4. Get the order summary when the order has a commencement date
         | catalogue-solutions | incomplete | 0     |
         | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
-    And the order Section Status is incomplete
 
 @5115
 Scenario: 5. Get the order summary after a section has been viewed
@@ -125,7 +121,6 @@ Scenario: 5. Get the order summary after a section has been viewed
         | catalogue-solutions | <catalogue-solutions-status> | 0     |
         | additional-services | <additional-services-status> | 0     |
         | funding-source      | <funding-source-status>      |       |
-    And the order Section Status is incomplete
 
     Examples: Sections
         | service-recipients-viewed | additional-services-viewed | catalogue-solutions-viewed | associated-services-viewed | funding-source-only-gms | service-recipients-status | additional-services-status | catalogue-solutions-status | associated-services-status | funding-source-status |
@@ -160,7 +155,6 @@ Scenario: 6. Get the order summary that includes a list of service recipients
         | catalogue-solutions | incomplete | 0     |
         | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
-    And the order Section Status is incomplete
 
 @5123
 Scenario: 7. Get the order summary that includes a list of Catalogue Solutions
@@ -191,7 +185,6 @@ Scenario: 7. Get the order summary that includes a list of Catalogue Solutions
         | catalogue-solutions | complete   | 2     |
         | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
-    And the order Section Status is incomplete
 
 @5115
 Scenario: 8. Get the order summary that includes a list of associated services
@@ -221,7 +214,6 @@ Scenario: 8. Get the order summary that includes a list of associated services
         | catalogue-solutions | incomplete | 0     |
         | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
-    And the order Section Status is incomplete
 
 @5115
 Scenario: 9. Get the order summary that includes a list of additional services
@@ -251,7 +243,6 @@ Scenario: 9. Get the order summary that includes a list of additional services
         | catalogue-solutions | incomplete | 0     |
         | additional-services | complete   | 2     |
         | funding-source      | incomplete |       |
-    And the order Section Status is incomplete
 
 @5291
 Scenario:10. Get the order section status is set when conditions are met 

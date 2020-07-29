@@ -59,27 +59,25 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 
         public static bool IsSectionStatusComplete(this Order order, int serviceRecipientsCount, int catalogueSolutionsCount, int associatedServicesCount)
         {
-            var scenario1 = catalogueSolutionsCount > 0 
+            if (!IsFundingSourceComplete(order)) return false;
+
+            var solutionAndAssociatedServices = catalogueSolutionsCount > 0
+                                                && associatedServicesCount > 0;
+
+            var solutionAndNoAssociatedServices = catalogueSolutionsCount > 0 
                             && associatedServicesCount == 0 
-                            && IsAssociatedServicesSectionComplete(order) 
-                            && IsFundingSourceComplete(order);
+                            && IsAssociatedServicesSectionComplete(order);
 
-            var scenario2 = catalogueSolutionsCount > 0 
-                            && associatedServicesCount > 0
-                            && IsFundingSourceComplete(order);
+            var noSolutionsAndAssociatedServices = serviceRecipientsCount > 0
+                                                   && catalogueSolutionsCount == 0
+                                                   && IsCatalogueSolutionsSectionComplete(order)
+                                                   && associatedServicesCount > 0;
 
-            var scenario3 =  serviceRecipientsCount == 0 
+            var recipientsAndAssociatedServices =  serviceRecipientsCount == 0 
                             && IsServiceRecipientsSectionComplete(order)
-                            && associatedServicesCount > 0
-                            && IsFundingSourceComplete(order);
+                            && associatedServicesCount > 0;
 
-            var scenario4 = serviceRecipientsCount > 0
-                            && catalogueSolutionsCount == 0
-                            && IsCatalogueSolutionsSectionComplete(order)
-                            && associatedServicesCount > 0
-                            && IsFundingSourceComplete(order);
-
-            return scenario1 || scenario2 || scenario3 || scenario4 ;
+            return solutionAndNoAssociatedServices || solutionAndAssociatedServices || recipientsAndAssociatedServices || noSolutionsAndAssociatedServices;
         }
     }
 }

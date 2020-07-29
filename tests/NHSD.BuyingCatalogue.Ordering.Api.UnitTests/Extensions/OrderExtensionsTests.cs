@@ -153,75 +153,25 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
             actual.Should().BeFalse();
         }
 
-        [Test]
-        public void IsSectionStatusCompleteComplete_IncompleteOrder_ReturnsFalse()
+        [TestCase(null, false, false, false,0,0,0 , false)]
+        [TestCase(true, true, true, true, 1, 1, 0, true)]
+        [TestCase(true, true, true, true, 1, 1, 1, true)]
+        [TestCase(true, true, true, true, 0, 0, 1, true)]
+        [TestCase(true, true, true, true, 1, 0, 1,true)]
+
+        public void IsSectionStatusCompleteComplete_whenCalled_ReturnsCorrectResult(bool? fundingComplete,
+            bool recipientViewed, bool associatedViewed, bool solutionViewed, int recipientCount, int solutionCount, int associatedCount, bool expectedResult)
         {
             var order = OrderBuilder
                 .Create()
-                .WithFundingSourceOnlyGms(null)
-                .WithServiceRecipientsViewed(false)
-                .WithAssociatedServicesViewed(false)
-                .WithCatalogueSolutionsViewed(false)
+                .WithFundingSourceOnlyGms(fundingComplete)
+                .WithServiceRecipientsViewed(recipientViewed)
+                .WithAssociatedServicesViewed(associatedViewed)
+                .WithCatalogueSolutionsViewed(solutionViewed)
                 .Build();
 
-            var actual = OrderExtensions.IsSectionStatusComplete(order, 0, 0, 0);
-            actual.Should().BeFalse();
-        }
-
-        [Test]
-        public void IsSectionStatusCompleteComplete_FundingCompleteCatalogSolutionCompleteOrder_ReturnsTrue()
-        {
-            var order = OrderBuilder
-                .Create()
-                .WithFundingSourceOnlyGms(true)
-                .WithServiceRecipientsViewed(true)
-                .WithAssociatedServicesViewed(true)
-                .WithCatalogueSolutionsViewed(true)
-                .Build();
-            var actual = OrderExtensions.IsSectionStatusComplete(order, 1, 1, 0);
-            actual.Should().BeTrue();
-        }
-
-        [Test]
-        public void IsSectionStatusCompleteComplete_FundingCompleteCatalogSolutionCompleteAssociatedServiceCompleteOrder_ReturnsTrue()
-        {
-            var order = OrderBuilder
-                .Create()
-                .WithFundingSourceOnlyGms(true)
-                .WithServiceRecipientsViewed(true)
-                .WithAssociatedServicesViewed(true)
-                .WithCatalogueSolutionsViewed(true)
-                .Build();
-            var actual = OrderExtensions.IsSectionStatusComplete(order, 1, 1, 1);
-            actual.Should().BeTrue();
-        }
-
-        [Test]
-        public void IsSectionStatusCompleteComplete_FundingCompleteNoRecipientsAndAssociatedService_ReturnsTrue()
-        {
-            var order = OrderBuilder
-                .Create()
-                .WithFundingSourceOnlyGms(true)
-                .WithServiceRecipientsViewed(true)
-                .WithAssociatedServicesViewed(true)
-                .WithCatalogueSolutionsViewed(true)
-                .Build();
-            var actual = OrderExtensions.IsSectionStatusComplete(order, 0, 0, 1);
-            actual.Should().BeTrue();
-        }
-
-        [Test]
-        public void IsSectionStatusCompleteComplete_FundingCompleteRecipientsPresentsAndAssociatedService_ReturnsTrue()
-        {
-            var order = OrderBuilder
-                .Create()
-                .WithFundingSourceOnlyGms(true)
-                .WithServiceRecipientsViewed(true)
-                .WithAssociatedServicesViewed(true)
-                .WithCatalogueSolutionsViewed(true)
-                .Build();
-            var actual = OrderExtensions.IsSectionStatusComplete(order, 1, 0, 1);
-            actual.Should().BeTrue();
+            var actual = OrderExtensions.IsSectionStatusComplete(order, recipientCount, solutionCount, associatedCount);
+            actual.Should().Be(expectedResult);
         }
     }
 }
