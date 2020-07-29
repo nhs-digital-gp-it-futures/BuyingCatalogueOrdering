@@ -1098,7 +1098,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                             .WithSectionStatus("complete")
                             .Build());
 
-
                     yield return new TestCaseData(
                         OrderBuilder
                             .Create()

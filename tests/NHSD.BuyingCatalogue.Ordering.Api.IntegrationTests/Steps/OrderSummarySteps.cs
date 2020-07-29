@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
@@ -19,11 +20,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
         private readonly string _orderSummaryUrl;
 
-        public OrderSummarySteps(Response response, Request request, Settings settings)
+        private OrderSummaryDataFactory _dataFactory;
+
+        public OrderSummarySteps(Response response, Request request, Settings settings,OrderSummaryDataFactory dataFactory)
         {
             _response = response;
             _request = request;
             _orderSummaryUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/summary";
+            _dataFactory = dataFactory;
+        }
+
+        [Given(@"the user creates a new ""(.*)"" order with id (.*)")]
+        public async Task GivenTheDatabaseHasBeenInitialisedWithTheOrderData(string datasetKey, string orderId)
+        {
+            await _dataFactory.CreateData(datasetKey, orderId);
         }
 
         [When(@"the user makes a request to retrieve the order summary with the ID (.*)")]

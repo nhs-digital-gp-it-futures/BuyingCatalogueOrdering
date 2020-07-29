@@ -254,139 +254,45 @@ Scenario: 9. Get the order summary that includes a list of additional services
     And the order Section Status is incomplete
 
 @5291
-Scenario: 10. Get the order section setus is complete when Catalogue Solution viewed with > 0 items , Associated Service viewed with 0 items and Funding source is complete
-    Given Orders exist
-        | OrderId    | Description   | OrganisationId                       | ServiceRecipientsViewed | AdditionalServicesViewed | CatalogueSolutionsViewed | AssociatedServicesViewed | FundingSourceOnlyGMS |
-        | C000017-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | false                   | false                    | true                     | true                     | true                 |
-    And Order items exist
-        | OrderId    | OdsCode | CatalogueItemName | CatalogueItemType |
-        | C000017-01 | Ods1    | Order Item 1      | Solution          |
-        | C000017-01 | Ods2    | Order Item 2      | Solution          |
-    When the user makes a request to retrieve the order summary with the ID C000017-01
+Scenario:10. Get the order section status is set when conditions are met 
+    Given the user creates a new "<order-data-key>" order with id <order-id>
+    When the user makes a request to retrieve the order summary with the ID <order-id>
     Then a response with status code 200 is returned
-    And the order summary is returned with the following values
-        | OrderId    | OrganisationId                       | Description   |
-        | C000017-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
-    And the order Summary Sections have the following values
-        | Id                  | Status     | Count |
-        | description         | complete   |       |
-        | ordering-party      | incomplete |       |
-        | supplier            | incomplete |       |
-        | commencement-date   | incomplete |       |
-        | associated-services | complete   | 0     |
-        | service-recipients  | incomplete | 0     |
-        | catalogue-solutions | complete   | 2     |
-        | additional-services | incomplete | 0     |
-        | funding-source      | complete   |       |
-    And the order Section Status is complete
-
-@5291
-Scenario: 11. Get the order section setus is complete when Catalogue Solution viewed with > 0 items , Associated Service viewed with > 0 items and Funding source is complete
-    Given Orders exist
-        | OrderId    | Description   | OrganisationId                       | ServiceRecipientsViewed | AdditionalServicesViewed | CatalogueSolutionsViewed | AssociatedServicesViewed | FundingSourceOnlyGMS |
-        | C000017-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | false                   | false                    | true                     | true                     | true                 |
-    And Order items exist
-        | OrderId    | OdsCode | CatalogueItemName | CatalogueItemType |
-        | C000017-01 | Ods1    | Order Item 1      | Solution          |
-        | C000017-01 | Ods2    | Order Item 2      | AssociatedService          |
-    When the user makes a request to retrieve the order summary with the ID C000017-01
-    Then a response with status code 200 is returned
-    And the order summary is returned with the following values
-        | OrderId    | OrganisationId                       | Description   |
-        | C000017-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
-    And the order Summary Sections have the following values
-        | Id                  | Status     | Count |
-        | description         | complete   |       |
-        | ordering-party      | incomplete |       |
-        | supplier            | incomplete |       |
-        | commencement-date   | incomplete |       |
-        | associated-services | complete   | 1     |
-        | service-recipients  | incomplete | 0     |
-        | catalogue-solutions | complete   | 1     |
-        | additional-services | incomplete | 0     |
-        | funding-source      | complete   |       |
-    And the order Section Status is complete
-
-@5291
-Scenario: 12. Get the order section setus is complete when Service Recipient Count = 0 items , Associated Service viewed with >0  items and Funding source is complete
-    Given Orders exist
-        | OrderId    | Description   | OrganisationId                       | ServiceRecipientsViewed | AdditionalServicesViewed | CatalogueSolutionsViewed | AssociatedServicesViewed | FundingSourceOnlyGMS |
-        | C000017-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                    | false                    | true                     | true                     | true                 |
-    And Order items exist
-        | OrderId    | OdsCode | CatalogueItemName | CatalogueItemType |
-        | C000017-01 | Ods2    | Order Item 2      | AssociatedService |
-    When the user makes a request to retrieve the order summary with the ID C000017-01
-    Then a response with status code 200 is returned
-    And the order summary is returned with the following values
-        | OrderId    | OrganisationId                       | Description   |
-        | C000017-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
-    And the order Summary Sections have the following values
-        | Id                  | Status     | Count |
-        | description         | complete   |       |
-        | ordering-party      | incomplete |       |
-        | supplier            | incomplete |       |
-        | commencement-date   | incomplete |       |
-        | associated-services | complete   | 1     |
-        | service-recipients  | complete   | 0     |
-        | catalogue-solutions | complete   | 0     |
-        | additional-services | incomplete | 0     |
-        | funding-source      | complete   |       |
-    And the order Section Status is complete
-
-@5291
-Scenario: 13. Get the order section setus is complete when Service Recipient Count > 0 items , Associated Service viewed with > 0  items and Funding source is complete
-    Given Orders exist
-        | OrderId    | Description   | OrganisationId                       | ServiceRecipientsViewed | AdditionalServicesViewed | CatalogueSolutionsViewed | AssociatedServicesViewed | FundingSourceOnlyGMS |
-        | C000017-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                    | false                    | true                     | true                     | true                 |
-    And Service Recipients exist
-        | OdsCode | Name                      | OrderId    |
-        | Ods1    | Updated Service Recipient | C000017-01 |
-    And Order items exist
-        | OrderId    | OdsCode | CatalogueItemName | CatalogueItemType |
-        | C000017-01 | Ods2    | Order Item 2      | AssociatedService |
-    When the user makes a request to retrieve the order summary with the ID C000017-01
-    Then a response with status code 200 is returned
-    And the order summary is returned with the following values
-        | OrderId    | OrganisationId                       | Description   |
-        | C000017-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
-    And the order Summary Sections have the following values
-        | Id                  | Status     | Count |
-        | description         | complete   |       |
-        | ordering-party      | incomplete |       |
-        | supplier            | incomplete |       |
-        | commencement-date   | incomplete |       |
-        | associated-services | complete   | 1     |
-        | service-recipients  | complete   | 1     |
-        | catalogue-solutions | complete   | 0     |
-        | additional-services | incomplete | 0     |
-        | funding-source      | complete   |       |
-    And the order Section Status is complete
+    And the order Section Status is <section-status>
+    Examples: OrderData
+        | order-id   | order-data-key                                               | section-status |
+        | C000016-01 | complete                                                     | complete       |
+        | C000016-01 | complete-with-1recipient-1associatedservice-fundingcomplete  | complete       |
+        | C000017-01 | complete-with-0recipient-1associatedservice-fundingcomplete  | complete       |
+        | C000018-01 | complete-with-1solution-1associatedservice-fundingcomplete   | complete       |
+        | C000019-01 | complete-with-1solution-0associatedservice-fundingcomplete   | complete       |
+        | C000020-01 | complete-with-1solution-1associatedservice-fundingincomplete | incomplete     |
 
 @5321
-Scenario: 14. If the order ID does not exist, return not found
+Scenario: 11. If the order ID does not exist, return not found
     When the user makes a request to retrieve the order summary with the ID INVALID
     Then a response with status code 404 is returned
 
 @5321
-Scenario: 15. If a user is not authorised then they cannot access the order summary
+Scenario: 12. If a user is not authorised then they cannot access the order summary
     Given no user is logged in
     When the user makes a request to retrieve the order summary with the ID C000014-01
     Then a response with status code 401 is returned
 
 @5321
-Scenario: 16. A non buyer user cannot access the order summary
+Scenario: 13. A non buyer user cannot access the order summary
     Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
     When the user makes a request to retrieve the order summary with the ID C000014-01
     Then a response with status code 403 is returned
 
 @5321
-Scenario: 17. A buyer user cannot access the order summary for an organisation they don't belong to
+Scenario: 14. A buyer user cannot access the order summary for an organisation they don't belong to
     Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
     When the user makes a request to retrieve the order summary with the ID C000014-01
     Then a response with status code 403 is returned
 
 @5321
-Scenario: 18. Service Failure
+Scenario: 15. Service Failure
     Given the call to the database will fail
     When the user makes a request to retrieve the order summary with the ID C000014-01
     Then a response with status code 500 is returned

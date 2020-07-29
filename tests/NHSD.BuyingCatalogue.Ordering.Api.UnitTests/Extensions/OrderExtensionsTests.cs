@@ -168,7 +168,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
             actual.Should().BeFalse();
         }
 
-
         [Test]
         public void IsSectionStatusCompleteComplete_FundingCompleteCatalogSolutionCompleteOrder_ReturnsTrue()
         {

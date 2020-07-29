@@ -189,8 +189,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 SectionStatus = order.IsSectionStatusComplete(serviceRecipientsCount, catalogueSolutionsCount, associatedServicesCount) ? "complete" : "incomplete"
             };
 
-            var test = order.IsFundingSourceComplete() ? "complete" : "incomplete";
-
             return Ok(orderSummaryModel);
         }
 
