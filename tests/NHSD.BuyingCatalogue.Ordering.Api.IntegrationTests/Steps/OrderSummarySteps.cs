@@ -22,7 +22,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
         private OrderSummaryDataFactory _dataFactory;
 
-        public OrderSummarySteps(Response response, Request request, Settings settings,OrderSummaryDataFactory dataFactory)
+        public OrderSummarySteps(Response response, Request request, Settings settings, OrderSummaryDataFactory dataFactory)
         {
             _response = response;
             _request = request;
