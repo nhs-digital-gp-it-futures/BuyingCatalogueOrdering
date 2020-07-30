@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
-using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
 
@@ -54,10 +53,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                     .InsertAsync(_setting.ConnectionString)
                 },
                 {"complete-with-1solution-1associatedservice-fundingincomplete", async (orderId) => await OrderSummaryDataBuilder.Create(orderId)
-                    .WithOrderEntities(null)
-                    .WithAdditionalServicesEntities(null)
-                    .WithServiceRecipientEntities(null)
-                    .AddOrderEntity(
+                    .WithOrderEntity(
                         OrderEntityBuilder.Create()
                             .WithOrderStatusId((int)OrderStatus.Unsubmitted)
                             .WithOrderId(orderId)
@@ -69,6 +65,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                             .WithAssociatedServicesViewed(true)
                             .WithFundingSourceOnlyGMS(null)
                             .Build())
+                    .WithAdditionalServicesEntities(null)
+                    .WithServiceRecipientEntities(null)
                     .Build()
                     .InsertAsync(_setting.ConnectionString)
                 }

@@ -49,7 +49,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NHSD.BuyingCatalogue.Ordering.Domain.UnitTests\NHSD.BuyingCatalogue.Ordering.Domain.UnitTests.csproj" />
     <ProjectReference Include="..\NHSD.BuyingCatalouge.Ordering.Api.Testing.Data\NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.csproj" />
   </ItemGroup>
 </Project>

@@ -6,25 +6,22 @@ using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
 {
-    public class OrderSummaryData
+    internal sealed class OrderSummaryData
     {
-        public List<OrderEntity> OrderEntities { get; }
+        public OrderEntity OrderEntity { get; }
         public List<OrderItemEntity> OrderItemEntities { get; }
         public List<ServiceRecipientEntity> ServiceRecipientEntities { get; set; }
 
-        public OrderSummaryData(List<OrderEntity> orderEntities, List<OrderItemEntity> orderItemEntities, List<ServiceRecipientEntity> serviceRecipientEntities)
+        public OrderSummaryData(OrderEntity orderEntity, List<OrderItemEntity> orderItemEntities, List<ServiceRecipientEntity> serviceRecipientEntities)
         {
-            OrderEntities = orderEntities;
+            OrderEntity = orderEntity;
             OrderItemEntities = orderItemEntities;
             ServiceRecipientEntities = serviceRecipientEntities;
         }
 
         public async Task InsertAsync(string connectionString)
         {
-            foreach (var order in OrderEntities)
-            {
-                await order.InsertAsync(connectionString);
-            }
+            await OrderEntity.InsertAsync(connectionString);
 
             foreach (var recipients in ServiceRecipientEntities)
             {

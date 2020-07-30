@@ -3,16 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
-using CatalogueItemType = NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data.CatalogueItemType;
+using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
 {
     internal sealed class OrderSummaryDataBuilder
     {
-        private List<OrderEntity> _orderEntities = new List<OrderEntity>();
+        private OrderEntity _orderEntity;
         private List<OrderItemEntity> _associatedServiceEntities = new List<OrderItemEntity>();
         private List<OrderItemEntity> _catalogueSolutionEntities = new List<OrderItemEntity>();
         private List<OrderItemEntity> _additionalServiceEntities = new List<OrderItemEntity>();
@@ -20,7 +19,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
 
         private OrderSummaryDataBuilder(string orderId="C000016-01")
         {
-            AddOrderEntity(
+            WithOrderEntity(
                 OrderEntityBuilder.Create()
                     .WithOrderStatusId((int)OrderStatus.Unsubmitted)
                     .WithOrderId(orderId)
@@ -64,16 +63,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
         public static OrderSummaryDataBuilder Create(string orderId="C000016-01") =>
             new OrderSummaryDataBuilder(orderId);
 
-
-        public OrderSummaryDataBuilder WithOrderEntities(List<OrderEntity> orderEntities)
+        public OrderSummaryDataBuilder WithOrderEntity(OrderEntity orderEntity)
         {
-            _orderEntities = orderEntities ?? new List<OrderEntity>();
-            return this;
-        }
-
-        public OrderSummaryDataBuilder AddOrderEntity(OrderEntity orders)
-        {
-            _orderEntities.Add(orders);
+            _orderEntity = orderEntity;
             return this;
         }
 
@@ -137,7 +129,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
         public OrderSummaryData Build()
         {
             IEnumerable<OrderItemEntity> orderItems = _additionalServiceEntities.Union(_associatedServiceEntities).Union(_catalogueSolutionEntities);
-            return new OrderSummaryData(_orderEntities, orderItems.ToList(), _serviceRecipientEntities);
+            return new OrderSummaryData(_orderEntity, orderItems.ToList(), _serviceRecipientEntities);
         }
     }
 }
