@@ -376,8 +376,31 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             order.CalculateCostPerYear(CostType.OneOff).Should().Be(0);
         }
 
+        [TestCase(nameof(CatalogueItemType.AssociatedService), nameof(ProvisioningType.OnDemand), 10, 2, 720)]
+        [TestCase(nameof(CatalogueItemType.AssociatedService), nameof(ProvisioningType.Declarative), 20, 4, 960)]
+        public void CalculateTotalOwnershipCost_SingleOneOffOrRecurringOrderItem_ReturnsTotalOwnershipCost(string catalogueItemTypeName, string provisioningTypeName, decimal price, int quantity, decimal totalOwnershipCost)
+        {
+            const int orderItemId = 1;
+
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithOrderItemId(orderItemId)
+                .WithCatalogueItemType(CatalogueItemType.FromName(catalogueItemTypeName))
+                .WithProvisioningType(ProvisioningType.FromName(provisioningTypeName))
+                .WithPrice(price)
+                .WithQuantity(quantity)
+                .Build();
+
+            var order = OrderBuilder
+                .Create()
+                .WithOrderItem(orderItem)
+                .Build();
+
+            order.CalculateTotalOwnershipCost().Should().Be(totalOwnershipCost);
+        }
+
         [Test]
-        public void CalculateTotalOwnershipCost_RecurringAndOneOff_CalculatesTotalOwnership()
+        public void CalculateTotalOwnershipCost_RecurringAndOneOff_ReturnsTotalOwershipCost()
         {
             const int orderItemId1 = 1;
             const int orderItemId2 = 2;
