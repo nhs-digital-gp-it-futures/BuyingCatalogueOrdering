@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
 {
-    class OrderSummaryDataFactory
+    internal sealed class OrderSummaryDataFactory
     {
         private readonly Settings _setting;
 
-        OrderSummaryDataFactory(Settings setting)
+        internal OrderSummaryDataFactory(Settings setting)
         {
             _setting = setting;
         }
@@ -22,43 +23,43 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
             await DataFactory[key](orderId);
         }
 
-        protected IDictionary<string, Func<string,Task>> DataFactory =>
+        public IDictionary<string, Func<string,Task>> DataFactory =>
             new Dictionary<string, Func<string,Task>>()
             {
-                {"complete", async (orderId) => await  OrderSummaryDataBuilder.CreateOrderSummaryData(orderId).Build().InsertAsync(_setting.ConnectionString)},
-                {"complete-with-1recipient-1associatedservice-fundingcomplete", async (orderId) => await  OrderSummaryDataBuilder.CreateOrderSummaryData(orderId)
-                    .RemoveAdditionalServices()
-                    .RemoveSolutionsServices()
+                {"complete", async (orderId) => await  OrderSummaryDataBuilder.Create(orderId).Build().InsertAsync(_setting.ConnectionString)},
+                {"complete-with-1recipient-1associatedservice-fundingcomplete", async (orderId) => await  OrderSummaryDataBuilder.Create(orderId)
+                    .WithAdditionalServicesEntities(null)
+                    .WithCatalogueSolutionEntities(null)
                     .Build()
                     .InsertAsync(_setting.ConnectionString)
                 },
-                {"complete-with-0recipient-1associatedservice-fundingcomplete", async (string orderId) => await OrderSummaryDataBuilder.CreateOrderSummaryData(orderId)
-                    .RemoveServiceRecipients()
-                    .RemoveAdditionalServices()
-                    .RemoveSolutionsServices()
+                {"complete-with-0recipient-1associatedservice-fundingcomplete", async (orderId) => await OrderSummaryDataBuilder.Create(orderId)
+                    .WithServiceRecipientEntities(null)
+                    .WithAdditionalServicesEntities(null)
+                    .WithCatalogueSolutionEntities(null)
                     .Build()
                     .InsertAsync(_setting.ConnectionString)
                 },
-                {"complete-with-1solution-1associatedservice-fundingcomplete", async (string orderId) => await OrderSummaryDataBuilder.CreateOrderSummaryData(orderId)
-                    .RemoveAdditionalServices()
-                    .RemoveServiceRecipients()
+                {"complete-with-1solution-1associatedservice-fundingcomplete", async ( orderId) => await OrderSummaryDataBuilder.Create(orderId)
+                    .WithAdditionalServicesEntities(null)
+                    .WithServiceRecipientEntities(null)
                     .Build()
                     .InsertAsync(_setting.ConnectionString)
                 },
-                {"complete-with-1solution-0associatedservice-fundingcomplete", async (string orderId) => await OrderSummaryDataBuilder.CreateOrderSummaryData(orderId)
-                    .RemoveAdditionalServices()
-                    .RemoveAssociatedServices()
-                    .RemoveServiceRecipients()
+                {"complete-with-1solution-0associatedservice-fundingcomplete", async (orderId) => await OrderSummaryDataBuilder.Create(orderId)
+                    .WithAdditionalServicesEntities(null)
+                    .WithAssociatedServicesEntities(null)
+                    .WithServiceRecipientEntities(null)
                     .Build()
                     .InsertAsync(_setting.ConnectionString)
                 },
-                {"complete-with-1solution-1associatedservice-fundingincomplete", async (string orderId) => await OrderSummaryDataBuilder.CreateOrderSummaryData(orderId)
-                    .RemoveOrders()
-                    .RemoveAdditionalServices()
-                    .RemoveServiceRecipients()
+                {"complete-with-1solution-1associatedservice-fundingincomplete", async (orderId) => await OrderSummaryDataBuilder.Create(orderId)
+                    .WithOrderEntities(null)
+                    .WithAdditionalServicesEntities(null)
+                    .WithServiceRecipientEntities(null)
                     .AddOrderEntity(
                         OrderEntityBuilder.Create()
-                            .WithOrderStatusId(2)
+                            .WithOrderStatusId((int)OrderStatus.Unsubmitted)
                             .WithOrderId(orderId)
                             .WithDescription("A Description")
                             .WithOrganisationId(new Guid("4af62b99-638c-4247-875e-965239cd0c48"))

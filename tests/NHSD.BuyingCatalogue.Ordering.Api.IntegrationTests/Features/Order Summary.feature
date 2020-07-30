@@ -246,18 +246,18 @@ Scenario: 9. Get the order summary that includes a list of additional services
 
 @5291
 Scenario:10. Get the order section status is set when conditions are met 
-    Given the user creates a new "<order-data-key>" order with id <order-id>
-    When the user makes a request to retrieve the order summary with the ID <order-id>
+    Given the user creates a new "<OrderDataKey>" order with id <OrderId>
+    When the user makes a request to retrieve the order summary with the ID <OrderId>
     Then a response with status code 200 is returned
-    And the order Section Status is <section-status>
+    And the order Section Status is <SectionStatus>
     Examples: OrderData
-        | order-id   | order-data-key                                               | section-status |
-        | C000016-01 | complete                                                     | complete       |
-        | C000016-01 | complete-with-1recipient-1associatedservice-fundingcomplete  | complete       |
-        | C000017-01 | complete-with-0recipient-1associatedservice-fundingcomplete  | complete       |
-        | C000018-01 | complete-with-1solution-1associatedservice-fundingcomplete   | complete       |
-        | C000019-01 | complete-with-1solution-0associatedservice-fundingcomplete   | complete       |
-        | C000020-01 | complete-with-1solution-1associatedservice-fundingincomplete | incomplete     |
+        | OrderId    | OrderDataKey                                                 | SectionStatus |
+        | C000016-01 | complete                                                     | complete      |
+        | C000016-01 | complete-with-1recipient-1associatedservice-fundingcomplete  | complete      |
+        | C000017-01 | complete-with-0recipient-1associatedservice-fundingcomplete  | complete      |
+        | C000018-01 | complete-with-1solution-1associatedservice-fundingcomplete   | complete      |
+        | C000019-01 | complete-with-1solution-0associatedservice-fundingcomplete   | complete      |
+        | C000020-01 | complete-with-1solution-1associatedservice-fundingincomplete | incomplete    |
 
 @5321
 Scenario: 11. If the order ID does not exist, return not found
