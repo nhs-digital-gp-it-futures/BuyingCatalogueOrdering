@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net.Mime;
@@ -54,7 +55,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             var serviceRecipientDictionary = order.ServiceRecipients.Select(serviceRecipient =>
-                    new ServiceRecipientModel {Name = serviceRecipient.Name, OdsCode = serviceRecipient.OdsCode})
+                    new ServiceRecipientModel { Name = serviceRecipient.Name, OdsCode = serviceRecipient.OdsCode })
                 .ToDictionary(x => x.OdsCode);
 
             var orderItems = order.OrderItems;
@@ -225,6 +226,51 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             createOrderResponse.Errors = result.Errors.Select(x => new ErrorModel(x.Id, x.Field));
             return BadRequest(createOrderResponse);
+        }
+
+        [HttpPut]
+        [Route("{orderId}/status")]
+        public async Task<ActionResult> UpdateStatusAsync(string orderId, StatusModel model)
+        {
+            if (model is null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+
+            if (order is null)
+            {
+                return NotFound();
+            }
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
+            //if (!orderComplete)
+            //{
+
+            //    var createOrderResponse = new CreateOrderResponseModel();
+            //    createOrderResponse.Errors = new[] { new ErrorModel("OrderNotComplete", "Order") };
+            //    return BadRequest(createOrderResponse);
+            //}
+
+            var enumParsedCorrectly = Enum.TryParse<OrderStatus>(model.Status, out var orderStatus);
+            if (!enumParsedCorrectly)
+            {
+                throw new InvalidEnumArgumentException(nameof(model.Status));
+            }
+
+            order.OrderStatus = orderStatus;
+
+            var name = User.Identity.Name;
+            order.SetLastUpdatedBy(User.GetUserId(), name);
+
+            await _orderRepository.UpdateOrderAsync(order);
+            return NoContent();
         }
     }
 }
