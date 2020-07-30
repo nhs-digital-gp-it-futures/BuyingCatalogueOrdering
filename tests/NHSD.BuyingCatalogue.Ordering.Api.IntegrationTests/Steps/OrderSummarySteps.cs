@@ -31,7 +31,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Given(@"the user creates a new ""(.*)"" order with id (.*)")]
-        public async Task GivenTheDatabaseHasBeenInitialisedWithTheOrderData(string datasetKey, string orderId)
+        public async Task GivenTheUserCreatesANewOrderWithOrderId(string datasetKey, string orderId)
         {
             await _dataFactory.CreateData(datasetKey, orderId);
         }

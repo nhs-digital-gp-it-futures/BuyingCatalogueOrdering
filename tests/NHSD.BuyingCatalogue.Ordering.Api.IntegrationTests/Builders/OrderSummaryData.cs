@@ -9,28 +9,44 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
     internal sealed class OrderSummaryData
     {
         public OrderEntity OrderEntity { get; }
-        public List<OrderItemEntity> OrderItemEntities { get; }
-        public List<ServiceRecipientEntity> ServiceRecipientEntities { get; set; }
+        public OrderItemEntity OrderItemEntities { get; }
+        public ServiceRecipientEntity ServiceRecipientEntity { get; set; }
+        public OrderItemEntity CatalogueSolutionEntity { get; set; }
+        public OrderItemEntity AdditionalServiceEntity { get; set; }
+        public OrderItemEntity AssociatedServiceEntity { get; set; }
 
-        public OrderSummaryData(OrderEntity orderEntity, List<OrderItemEntity> orderItemEntities, List<ServiceRecipientEntity> serviceRecipientEntities)
+        public OrderSummaryData(OrderEntity orderEntity, ServiceRecipientEntity serviceRecipientEntity, OrderItemEntity catalogueSolutionEntity, OrderItemEntity additionalServiceEntity, OrderItemEntity associatedServiceEntity)
         {
             OrderEntity = orderEntity;
-            OrderItemEntities = orderItemEntities;
-            ServiceRecipientEntities = serviceRecipientEntities;
+            
+            ServiceRecipientEntity = serviceRecipientEntity;
+            CatalogueSolutionEntity = catalogueSolutionEntity;
+            AdditionalServiceEntity = additionalServiceEntity;
+            AssociatedServiceEntity = associatedServiceEntity;
         }
 
         public async Task InsertAsync(string connectionString)
         {
             await OrderEntity.InsertAsync(connectionString);
 
-            foreach (var recipients in ServiceRecipientEntities)
+            if (ServiceRecipientEntity != null)
             {
-                await recipients.InsertAsync(connectionString);
+                await ServiceRecipientEntity.InsertAsync(connectionString);
             }
 
-            foreach (var orderItem in OrderItemEntities)
+            if (CatalogueSolutionEntity != null)
             {
-                await orderItem.InsertAsync(connectionString);
+                await CatalogueSolutionEntity.InsertAsync(connectionString);
+            }
+
+            if (AdditionalServiceEntity != null)
+            {
+                await AdditionalServiceEntity.InsertAsync(connectionString);
+            }
+
+            if (AssociatedServiceEntity != null)
+            {
+                await AssociatedServiceEntity.InsertAsync(connectionString);
             }
         }
     }

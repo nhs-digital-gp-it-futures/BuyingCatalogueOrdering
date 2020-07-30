@@ -12,10 +12,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
     internal sealed class OrderSummaryDataBuilder
     {
         private OrderEntity _orderEntity;
-        private List<OrderItemEntity> _associatedServiceEntities = new List<OrderItemEntity>();
-        private List<OrderItemEntity> _catalogueSolutionEntities = new List<OrderItemEntity>();
-        private List<OrderItemEntity> _additionalServiceEntities = new List<OrderItemEntity>();
-        private List<ServiceRecipientEntity> _serviceRecipientEntities = new List<ServiceRecipientEntity>();
+        private ServiceRecipientEntity _serviceRecipientEntity;
+        private OrderItemEntity _catalogueSolutionEntity;
+        private OrderItemEntity _associatedServiceEntity;
+        private OrderItemEntity _additionalServiceEntity;
 
         private OrderSummaryDataBuilder(string orderId="C000016-01")
         {
@@ -30,34 +30,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
                     .WithCatalogueSolutionsViewed(true)
                     .WithAssociatedServicesViewed(true)
                     .WithFundingSourceOnlyGMS(true)
-                    .Build())
-                .AddServiceRecipientEntity(
-                    ServiceRecipientBuilder.Create()
-                        .WithOrderId(orderId)
-                        .WithOdsCode("Od1")
-                        .WithName("Service Recipient")
-                        .Build())
-                .AddCatalogSolutionEntity(
-                    OrderItemEntityBuilder.Create()
-                        .WithOrderId(orderId)
-                        .WithOdsCode("Ods1")
-                        .WithCatalogueItemName("Order Item 1 ")
-                        .WithCatalogueItemType(CatalogueItemType.Solution)
-                        .Build())
-                .AddAssociatedServiceEntity(
-                    OrderItemEntityBuilder.Create()
-                        .WithOrderId(orderId)
-                        .WithOdsCode("Ods2")
-                        .WithCatalogueItemName("Order Item 2 ")
-                        .WithCatalogueItemType(CatalogueItemType.AssociatedService)
-                        .Build())
-                .AddAdditionalServiceEntity(
-                    OrderItemEntityBuilder.Create()
-                        .WithOrderId(orderId)
-                        .WithOdsCode("Ods3")
-                        .WithCatalogueItemName("Order Item 3 ")
-                        .WithCatalogueItemType(CatalogueItemType.AdditionalService)
-                        .Build());
+                    .Build());
         }
 
         public static OrderSummaryDataBuilder Create(string orderId="C000016-01") =>
@@ -69,67 +42,33 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
             return this;
         }
 
-        public OrderSummaryDataBuilder AddServiceRecipientEntity(ServiceRecipientEntity serviceRecipient)
+        public OrderSummaryDataBuilder WithCatalogueSolutionEntity(OrderItemEntity catalogueSolutionEntity)
         {
-            _serviceRecipientEntities.Add(serviceRecipient);
+            _associatedServiceEntity = catalogueSolutionEntity;
             return this;
         }
 
-        public OrderSummaryDataBuilder WithServiceRecipientEntities(List<ServiceRecipientEntity> serviceRecipientEntities)
+        public OrderSummaryDataBuilder WithServiceRecipientEntity(ServiceRecipientEntity serviceRecipientEntity)
         {
-            _serviceRecipientEntities = serviceRecipientEntities ?? new List<ServiceRecipientEntity>();
+            _serviceRecipientEntity = serviceRecipientEntity;
             return this;
         }
 
-        public OrderSummaryDataBuilder WithAdditionalServicesEntities(List<OrderItemEntity> additionalServiceEntities)
+        public OrderSummaryDataBuilder WithAdditionalServicesEntity(OrderItemEntity additionalServiceEntity)
         {
-            _additionalServiceEntities = additionalServiceEntities ?? new List<OrderItemEntity>();
+            _additionalServiceEntity = additionalServiceEntity;
             return this;
         }
 
-        public OrderSummaryDataBuilder  AddAdditionalServiceEntity(OrderItemEntity additionalServiceEntity)
+        public OrderSummaryDataBuilder WithAssociatedServicesEntity(OrderItemEntity associatedServicesEntity)
         {
-            if (additionalServiceEntity.CatalogueItemType == CatalogueItemType.AdditionalService)
-            {
-                _additionalServiceEntities.Add(additionalServiceEntity);
-            }
-            return this;
-        }
-
-        public OrderSummaryDataBuilder WithAssociatedServicesEntities(List<OrderItemEntity> associatedServicesEntities)
-        {
-            _associatedServiceEntities = associatedServicesEntities ?? new List<OrderItemEntity>();
-            return this;
-        }
-
-        public OrderSummaryDataBuilder AddAssociatedServiceEntity(OrderItemEntity associatedServiceEntity)
-        {
-            if (associatedServiceEntity.CatalogueItemType == CatalogueItemType.AssociatedService)
-            {
-                _associatedServiceEntities.Add(associatedServiceEntity);
-            }
-            return this;
-        }
-
-        public OrderSummaryDataBuilder WithCatalogueSolutionEntities(List<OrderItemEntity> catalogueSolutionEntities)
-        {
-            _associatedServiceEntities = catalogueSolutionEntities ?? new List<OrderItemEntity>();
-            return this;
-        }
-
-        public OrderSummaryDataBuilder AddCatalogSolutionEntity(OrderItemEntity catalogueSolutionEntity)
-        {
-            if (catalogueSolutionEntity.CatalogueItemType == CatalogueItemType.Solution)
-            {
-                _catalogueSolutionEntities.Add(catalogueSolutionEntity);
-            }
+            _associatedServiceEntity = associatedServicesEntity;
             return this;
         }
 
         public OrderSummaryData Build()
         {
-            IEnumerable<OrderItemEntity> orderItems = _additionalServiceEntities.Union(_associatedServiceEntities).Union(_catalogueSolutionEntities);
-            return new OrderSummaryData(_orderEntity, orderItems.ToList(), _serviceRecipientEntities);
+            return new OrderSummaryData(_orderEntity, _serviceRecipientEntity, _catalogueSolutionEntity, _additionalServiceEntity, _associatedServiceEntity);
         }
     }
 }
