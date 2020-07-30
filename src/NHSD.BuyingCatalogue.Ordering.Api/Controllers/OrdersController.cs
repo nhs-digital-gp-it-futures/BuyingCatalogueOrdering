@@ -94,6 +94,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 TotalRecurringCostPerYear = calculatedCostPerYear,
                 TotalOwnershipCost = 0m,
                 ServiceRecipients = serviceRecipientDictionary.Values,
+                Status = order.OrderStatus.ToString(),
                 OrderItems = order.OrderItems.Select(orderItem =>
                     new OrderItemModel
                     {
