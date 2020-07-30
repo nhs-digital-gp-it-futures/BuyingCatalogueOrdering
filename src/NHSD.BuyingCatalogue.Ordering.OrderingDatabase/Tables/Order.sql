@@ -23,7 +23,7 @@
     LastUpdated DATETIME2 NOT NULL,
     LastUpdatedBy UNIQUEIDENTIFIER NOT NULL,
     LastUpdatedByName NVARCHAR(256) NULL,
-    IsDeleted BIT DEFAULT 0,
+    IsDeleted BIT DEFAULT 0 NOT NULL,
     
     CONSTRAINT PK_OrderId PRIMARY KEY (OrderId),
     CONSTRAINT FK_Order_OrderStatus FOREIGN KEY (OrderStatusId) REFERENCES OrderStatus (OrderStatusId),
