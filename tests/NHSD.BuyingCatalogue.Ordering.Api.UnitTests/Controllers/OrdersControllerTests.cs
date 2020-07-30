@@ -546,8 +546,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             repositoryOrder.AddOrderItem(oneOffOrderItem, Guid.Empty, string.Empty);
             repositoryOrder.SetServiceRecipient(serviceRecipients, Guid.Empty, string.Empty);
 
-            var calculatedCostPerYear = repositoryOrder.CalculateCostPerYear(CostType.Recurring);
             const int monthsPerYear = 12;
+            const int defaultContractLength = 3;
+            var calculatedCostPerYear = repositoryOrder.CalculateCostPerYear(CostType.Recurring);
+            var totalOneOffCost = repositoryOrder.CalculateCostPerYear(CostType.OneOff);
 
             return (order: repositoryOrder, expectedOrder: new OrderModel
             {
@@ -566,9 +568,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     Address = repositoryOrder.SupplierAddress.ToModel(),
                     PrimaryContact = repositoryOrder.SupplierContact.ToModel()
                 },
-                TotalOneOffCost = repositoryOrder.CalculateCostPerYear(CostType.OneOff),
+                TotalOneOffCost = totalOneOffCost,
                 TotalRecurringCostPerMonth = calculatedCostPerYear / monthsPerYear,
                 TotalRecurringCostPerYear = calculatedCostPerYear,
+                TotalOwnershipCost = totalOneOffCost + (defaultContractLength * calculatedCostPerYear),
                 ServiceRecipients = repositoryOrder.ServiceRecipients.Select(serviceRecipient =>
                     new ServiceRecipientModel
                     {
