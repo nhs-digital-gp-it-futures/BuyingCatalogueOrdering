@@ -281,7 +281,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         public void CalculateCostPerYear_Recurring_OrderItemCostTypeRecurring_ReturnsTotalOrderItemCost()
         {
             const int orderItemId1 = 1;
-            const int orderItemId2 = 1;
+            const int orderItemId2 = 2;
 
             var orderItem1 = OrderItemBuilder
                 .Create()
@@ -307,7 +307,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
                 .WithOrderItem(orderItem2)
                 .Build();
 
-            order.CalculateCostPerYear(CostType.Recurring).Should().Be(2880);
+            order.CalculateCostPerYear(CostType.Recurring).Should().Be(8640);
         }
 
         [Test]
@@ -374,6 +374,49 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
                 .Build();
 
             order.CalculateCostPerYear(CostType.OneOff).Should().Be(0);
+        }
+
+        [Test]
+        public void CalculateTotalOwnershipCost_RecurringAndOneOff_CalculatesTotalOwnership()
+        {
+            const int orderItemId1 = 1;
+            const int orderItemId2 = 2;
+
+            var orderItem1 = OrderItemBuilder
+                .Create()
+                .WithOrderItemId(orderItemId1)
+                .WithCatalogueItemType(CatalogueItemType.AssociatedService)
+                .WithProvisioningType(ProvisioningType.OnDemand)
+                .WithPrice(5)
+                .WithQuantity(10)
+                .Build();
+
+            var orderItem2 = OrderItemBuilder
+                .Create()
+                .WithOrderItemId(orderItemId2)
+                .WithCatalogueItemType(CatalogueItemType.AdditionalService)
+                .WithProvisioningType(ProvisioningType.Patient)
+                .WithPrice(240)
+                .WithQuantity(2)
+                .Build();
+
+            var order = OrderBuilder
+                .Create()
+                .WithOrderItem(orderItem1)
+                .WithOrderItem(orderItem2)
+                .Build();
+
+            order.CalculateTotalOwnershipCost().Should().Be(19080);
+        }
+
+        [Test]
+        public void CalculateTotalOwnershipCost__NoOrderItemsExist_ReturnsZero()
+        {
+            var order = OrderBuilder
+                .Create()
+                .Build();
+
+            order.CalculateTotalOwnershipCost().Should().Be(0);
         }
     }
 }
