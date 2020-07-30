@@ -410,7 +410,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void CalculateTotalOwnershipCost__NoOrderItemsExist_ReturnsZero()
+        public void CalculateTotalOwnershipCost_NoOrderItemsExist_ReturnsZero()
         {
             var order = OrderBuilder
                 .Create()
