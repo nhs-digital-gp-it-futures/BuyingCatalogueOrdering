@@ -70,7 +70,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
             
             const int monthsPerYear = 12;
-            const int defaultContractLength = 3;
             var calculatedCostPerYear = order.CalculateCostPerYear(CostType.Recurring);
             var totalOneOffCost = order.CalculateCostPerYear(CostType.OneOff);
             
@@ -94,7 +93,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 TotalOneOffCost = totalOneOffCost,
                 TotalRecurringCostPerMonth = calculatedCostPerYear / monthsPerYear,
                 TotalRecurringCostPerYear = calculatedCostPerYear,
-                TotalOwnershipCost = totalOneOffCost + (defaultContractLength * calculatedCostPerYear),
+                TotalOwnershipCost = order.CalculateTotalOwnershipCost(),
                 ServiceRecipients = serviceRecipientDictionary.Values,
                 OrderItems = order.OrderItems.Select(orderItem =>
                     new OrderItemModel
