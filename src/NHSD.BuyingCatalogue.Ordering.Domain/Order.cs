@@ -96,6 +96,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             return _orderItems.Where(x => x.CostType == costType).Sum(y => y.CalculateTotalCostPerYear());
         }
 
+        public decimal CalculateTotalOwnershipCost()
+        {
+            const int defaultContractLength = 3;
+
+            return CalculateCostPerYear(CostType.OneOff) + (defaultContractLength * CalculateCostPerYear(CostType.Recurring));
+        }
+
         public void SetLastUpdatedBy(Guid userId, string name)
         {
             LastUpdatedBy = userId;

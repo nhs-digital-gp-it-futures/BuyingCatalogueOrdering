@@ -53,9 +53,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            var calculatedCostPerYear = order.CalculateCostPerYear(CostType.Recurring);
-            const int monthsPerYear = 12;
-
             var serviceRecipientDictionary = order.ServiceRecipients.Select(serviceRecipient =>
                     new ServiceRecipientModel {Name = serviceRecipient.Name, OdsCode = serviceRecipient.OdsCode})
                 .ToDictionary(x => x.OdsCode);
@@ -71,7 +68,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                         new ServiceRecipientModel { Name = order.OrganisationName, OdsCode = orderOrganisationOdsCode });
                 }
             }
-
+            
+            const int monthsPerYear = 12;
+            var calculatedCostPerYear = order.CalculateCostPerYear(CostType.Recurring);
+            var totalOneOffCost = order.CalculateCostPerYear(CostType.OneOff);
+            
             return new OrderModel
             {
                 Description = order.Description.Value,
@@ -89,10 +90,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     Address = order.SupplierAddress.ToModel(),
                     PrimaryContact = order.SupplierContact.ToModel()
                 },
-                TotalOneOffCost = order.CalculateCostPerYear(CostType.OneOff),
+                TotalOneOffCost = totalOneOffCost,
                 TotalRecurringCostPerMonth = calculatedCostPerYear / monthsPerYear,
                 TotalRecurringCostPerYear = calculatedCostPerYear,
-                TotalOwnershipCost = 0m,
+                TotalOwnershipCost = order.CalculateTotalOwnershipCost(),
                 ServiceRecipients = serviceRecipientDictionary.Values,
                 OrderItems = order.OrderItems.Select(orderItem =>
                     new OrderItemModel

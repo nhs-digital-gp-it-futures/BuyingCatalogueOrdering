@@ -49,11 +49,12 @@ Scenario: 2. Verify the price calculations for an order with multiple order item
     And the get order response contains a totalRecurringCostPerMonth of <RecurringPerMonthValue> for the order
     And the get order response contains a totalRecurringCostPerYear of <RecurringPerYearValue> for the order
     And the get order response contains a totalOneOffCost of <TotalOneOffCost> for the order
+    And the get order response contains a totalOwnershipCost of <TotalOwnershipCost> for the order
 
     Examples:
-        | CatalogueItemType | ProvisioningType | TimeUnit | Price | Quantity | EstimationPeriod | RecurringPerMonthValue | RecurringPerYearValue | TotalOneOffCost |
-        | Solution          | OnDemand         | Null     | 0     | 0        | Month            | 2600                   | 31200                 | 200             |
-        | AssociatedService | OnDemand         | Null     | 1     | 10       | Month            | 2610                   | 31320                 | 200             |
-        | AdditionalService | Declarative      | Month    | 9000  | 1        | Year             | 11600                  | 139200                | 200             |
-        | Solution          | Patient          | Year     | 450   | 3        | Month            | 2712.5                 | 32550                 | 200             |
-        | AssociatedService | Declarative      | NULL     | 125   | 100      | NULL             | 2600                   | 31200                 | 12700           |
+        | CatalogueItemType | ProvisioningType | TimeUnit | Price | Quantity | EstimationPeriod | RecurringPerMonthValue | RecurringPerYearValue | TotalOneOffCost | TotalOwnershipCost |
+        | Solution          | OnDemand         | Null     | 0     | 0        | Month            | 2600                   | 31200                 | 200             | 93800              |
+        | AssociatedService | OnDemand         | Null     | 1     | 10       | Month            | 2610                   | 31320                 | 200             | 94160              |
+        | AdditionalService | Declarative      | Month    | 9000  | 1        | Year             | 11600                  | 139200                | 200             | 417800             |
+        | Solution          | Patient          | Year     | 450   | 3        | Month            | 2712.5                 | 32550                 | 200             | 97850              |
+        | AssociatedService | Declarative      | NULL     | 125   | 100      | NULL             | 2600                   | 31200                 | 12700           | 106300             |
