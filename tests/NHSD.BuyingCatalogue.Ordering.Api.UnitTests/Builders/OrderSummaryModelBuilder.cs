@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
@@ -10,6 +11,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         private readonly string _description;
         private Guid _organisationId;
         private IEnumerable<SectionModel> _sections;
+        private readonly string _status;
 
         private OrderSummaryModelBuilder()
         {
@@ -17,6 +19,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _description = "Some Description";
             _organisationId = Guid.NewGuid();
             _sections = SectionModelListBuilder.Create().Build();
+            _status = OrderStatus.Unsubmitted.ToString();
         }
 
         public static OrderSummaryModelBuilder Create()
@@ -49,7 +52,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
                 OrderId = _orderId,
                 Description = _description,
                 OrganisationId = _organisationId,
-                Sections = _sections
+                Sections = _sections,
+                Status = _status
             };
         }
     }
