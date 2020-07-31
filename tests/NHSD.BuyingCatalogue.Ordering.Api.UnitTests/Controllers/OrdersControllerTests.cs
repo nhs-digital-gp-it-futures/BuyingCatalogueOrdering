@@ -51,7 +51,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task GetAsync_OrderDoesNotExist_ReturnsNotFound()
         {
             var context = OrdersControllerTestContext.Setup();
-
+            context.Order = null;
             var response = await context.OrdersController.GetAsync("INVALID");
             response.Result.Should().BeOfType<NotFoundResult>();
         }
@@ -460,6 +460,50 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             Assert.ThrowsAsync<ArgumentNullException>(CreateOrder);
         }
 
+        [Test]
+        public async Task DeleteOrderAsync_DeleteOrderSuccessful_ReturnsNoContent()
+        {
+            var context = OrdersControllerTestContext.Setup();
+
+            var response = await context.OrdersController.DeleteOrderAsync("Order");
+            response.Should().BeOfType<NoContentResult>();
+            context.Order.IsDeleted.Should().BeTrue();
+            context.Order.LastUpdatedBy.Should().Be(context.NameIdentity);
+            context.OrderRepositoryMock.Verify(x => x.UpdateOrderAsync(It.Is<Order>(y => y.IsDeleted)));
+        }
+
+        [Test]
+        public async Task DeleteOrderAsync_OrderNotFound_ReturnsNotFound()
+        {
+            var context = OrdersControllerTestContext.Setup();
+            context.Order = null;
+
+            var response = await context.OrdersController.DeleteOrderAsync("Order");
+            response.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        public async Task DeleteOrderAsync_OrderDeleted_ReturnsNotFound()
+        {
+            var context = OrdersControllerTestContext.Setup();
+            context.Order.IsDeleted = true;
+
+            var response = await context.OrdersController.DeleteOrderAsync("Order");
+            response.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        public async Task DeleteOrderAsync_OrderForDifferentOrganisation_ReturnsForbidden()
+        {
+            var context = OrdersControllerTestContext.Setup();
+            context.Order = OrderBuilder.Create()
+                .WithOrganisationId(Guid.NewGuid())
+                .Build();
+
+            var response = await context.OrdersController.DeleteOrderAsync("Order");
+            response.Should().BeOfType<ForbidResult>();
+        }
+
         private static (Order order, OrderListItemModel expectedOrder) CreateOrderTestData(
             string orderId,
             Guid organisationId,
@@ -604,7 +648,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 Name = "Test User";
                 NameIdentity = Guid.NewGuid();
                 PrimaryOrganisationId = primaryOrganisationId;
+
+                Order = OrderBuilder.Create()
+                    .WithOrganisationId(PrimaryOrganisationId)
+                    .Build();
+
                 OrderRepositoryMock = new Mock<IOrderRepository>();
+                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
 
                 CreateOrderServiceMock = new Mock<ICreateOrderService>();
                 CreateOrderServiceMock.Setup(x => x.CreateAsync(It.IsAny<CreateOrderRequest>()))

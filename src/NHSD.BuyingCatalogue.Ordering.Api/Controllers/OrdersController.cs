@@ -226,5 +226,31 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             createOrderResponse.Errors = result.Errors.Select(x => new ErrorModel(x.Id, x.Field));
             return BadRequest(createOrderResponse);
         }
+
+        [HttpDelete]
+        [Route("{orderId}")]
+        [Authorize(Policy = PolicyName.CanManageOrders)]
+        public async Task<ActionResult> DeleteOrderAsync(string orderId)
+        {
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+
+            if (order is null || order.IsDeleted)
+            {
+                return NotFound();
+            }
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
+            order.IsDeleted = true;
+
+            var name = User.Identity.Name;
+            order.SetLastUpdatedBy(User.GetUserId(), name);
+            await _orderRepository.UpdateOrderAsync(order);
+            return NoContent();
+        }
     }
 }
