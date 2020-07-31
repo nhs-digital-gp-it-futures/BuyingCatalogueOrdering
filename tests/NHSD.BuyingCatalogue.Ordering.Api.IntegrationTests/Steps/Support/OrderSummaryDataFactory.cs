@@ -114,18 +114,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                     .InsertAsync(_setting.ConnectionString)
                 },
                 {"funding-incomplete", async (orderId) => await OrderSummaryDataBuilder.Create(orderId)
-                    .WithOrderEntity(
-                        OrderEntityBuilder.Create()
-                            .WithOrderStatusId((int)OrderStatus.Unsubmitted)
-                            .WithOrderId(orderId)
-                            .WithDescription("A Description")
-                            .WithOrganisationId(new Guid("4af62b99-638c-4247-875e-965239cd0c48"))
-                            .WithServiceRecipientsViewed(false)
-                            .WithAdditionalServicesViewed(false)
-                            .WithCatalogueSolutionsViewed(true)
-                            .WithAssociatedServicesViewed(true)
-                            .WithFundingSourceOnlyGMS(null)
-                            .Build())
+                    .WithFundingSourceOnlyGMS(null)
                     .WithCatalogueSolutionEntity(
                         OrderItemEntityBuilder.Create()
                             .WithOrderId(orderId)

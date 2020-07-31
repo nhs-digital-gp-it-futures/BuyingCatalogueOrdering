@@ -16,12 +16,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
         private OrderItemEntity _catalogueSolutionEntity;
         private OrderItemEntity _associatedServiceEntity;
         private OrderItemEntity _additionalServiceEntity;
+        private bool _serviceRecipientsViewed = true;
+        private bool _additionalServicesViewed = true;
+        private bool _associatedServicesViewed = true;
+        private bool _catalogueSolutionsViewed = true;
+        private bool? _fundingSource = true;
 
         private OrderSummaryDataBuilder(string orderId="C000016-01")
         {
             WithOrderEntity(
                 OrderEntityBuilder.Create()
-                    .WithOrderStatusId((int)OrderStatus.Unsubmitted)
+                    .WithOrderStatus(OrderStatus.Unsubmitted)
                     .WithOrderId(orderId)
                     .WithDescription("A Description")
                     .WithOrganisationId(new Guid("4af62b99-638c-4247-875e-965239cd0c48"))
@@ -29,7 +34,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
                     .WithAdditionalServicesViewed(true)
                     .WithCatalogueSolutionsViewed(true)
                     .WithAssociatedServicesViewed(true)
-                    .WithFundingSourceOnlyGMS(true)
+                    .WithFundingSourceOnlyGms(true)
                     .Build());
         }
 
@@ -44,46 +49,31 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
 
         public OrderSummaryDataBuilder WithServiceRecipientViewed(bool viewed)
         {
-            if (_orderEntity != null)
-            {
-                _orderEntity.ServiceRecipientsViewed = viewed;
-            }
+            _serviceRecipientsViewed = viewed;
             return this;
         }
 
         public OrderSummaryDataBuilder WithAdditionalServiceViewed(bool viewed)
         {
-            if (_orderEntity != null)
-            {
-                _orderEntity.AdditionalServicesViewed = viewed;
-            }
+            _additionalServicesViewed = viewed;
             return this;
         }
 
         public OrderSummaryDataBuilder WithAssociatedServicesViewed(bool viewed)
         {
-            if (_orderEntity != null)
-            {
-                _orderEntity.AssociatedServicesViewed = viewed;
-            }
+            _associatedServicesViewed = viewed;
             return this;
         }
 
         public OrderSummaryDataBuilder WithCatalogueSolutionsViewed(bool viewed)
         {
-            if (_orderEntity != null)
-            {
-                _orderEntity.CatalogueSolutionsViewed = viewed;
-            }
+            _catalogueSolutionsViewed = viewed;
             return this;
         }
 
         public OrderSummaryDataBuilder WithFundingSourceOnlyGMS(bool? funded)
         {
-            if (_orderEntity != null)
-            {
-                _orderEntity.FundingSourceOnlyGMS = funded;
-            }
+            _fundingSource = funded;
             return this;
         }
 
@@ -113,6 +103,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
 
         public OrderSummaryData Build()
         {
+            if (_orderEntity != null)
+            {
+                _orderEntity.ServiceRecipientsViewed = _serviceRecipientsViewed;
+                _orderEntity.AdditionalServicesViewed = _additionalServicesViewed;
+                _orderEntity.AssociatedServicesViewed = _associatedServicesViewed;
+                _orderEntity.CatalogueSolutionsViewed = _catalogueSolutionsViewed;
+                _orderEntity.FundingSourceOnlyGMS = _fundingSource;
+            }
+
             return new OrderSummaryData(_orderEntity, _serviceRecipientEntity, _catalogueSolutionEntity, _additionalServiceEntity, _associatedServiceEntity);
         }
     }
