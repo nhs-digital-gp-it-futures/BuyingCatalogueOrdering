@@ -1,18 +1,19 @@
-﻿Feature: Get the details of a single order
+﻿Feature: Get an Order
     As an Buyer user
     I want to be able to view a preview of a given order
     So that I can ensure that the information is complete
 
 Background:
     Given Addresses exist
-        | Line1 | Line2      | Line3      | Line4          | Line5          | Town      | County  | Postcode | Country        |
-        | 4     | Upper Flat | Rocks Lane | Little Village | Bigger Village | Some Town | W Yorks | LS 1 3AP | United Kingdom |
+        | Line1 | Line2      | Line3      | Line4          | Line5           | Town      | County  | Postcode | Country        |
+        | 4     | Upper Flat | Rocks Lane | Little Village | Bigger Village  | Some Town | W Yorks | LS1 3AP  | United Kingdom |
+        | 8     | Lower Flat | Water Lane | Big Village    | Smaller Village | The Town  | E Yorks | LS2 6ZP  | United Kingdom |
     Given Contacts exist
         | FirstName | LastName | EmailAddress            | TelephoneNumber |
         | Fred      | Robinson | Fred.robinson@email.com | 12312543212     |
     Given Orders exist
-        | OrderId    | Description   | OrganisationId                       | OrganisationName | OrganisationOdsCode | OrganisationContactEmail | SupplierAddressPostcode | SupplierContactEmail    |
-        | C000014-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | Hampshire CC     | 432432              | Fred.robinson@email.com  | LS 1 3AP                | Fred.robinson@email.com |
+        | OrderId    | Description   | OrganisationId                       | OrganisationName | OrganisationOdsCode | OrganisationAddressPostcode | OrganisationContactEmail | SupplierId | SupplierName       | SupplierAddressPostcode | SupplierContactEmail    |
+        | C000014-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | Hampshire CC     | 432432              | LS2 6ZP                     | Fred.robinson@email.com  | S123       | Some supplier name | LS1 3AP                 | Fred.robinson@email.com |
     Given Service Recipients exist
         | OrderId    | OdsCode | Name    |
         | C000014-01 | eu      | EU Test |
