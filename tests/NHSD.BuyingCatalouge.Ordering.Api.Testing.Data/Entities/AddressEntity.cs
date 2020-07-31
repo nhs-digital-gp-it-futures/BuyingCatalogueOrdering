@@ -4,6 +4,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 {
     public sealed class AddressEntity : EntityBase
     {
+        public int AddressId { get; set; }
         public string Line1 { get; set; }
         public string Line2 { get; set; }
         public string Line3 { get; set; }
@@ -49,6 +50,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
             }
 
             return (await SqlRunner.QueryFirstAsync<AddressEntity>(connectionString, @"SELECT
+                          AddressId,
                           Line1,
                           Line2,
                           Line3,

@@ -43,25 +43,36 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
         
         [Then(@"the get order response displays the expected order")]
-        public async Task ThenTheGetOrderResponseDisplaysTheExpectedOrder()
+        public void ThenTheGetOrderResponseDisplaysTheExpectedOrder()
         {
             var order = _orderContext.OrderReferenceList.GetByOrderId(_getOrderRequest.OrderId);
+            var orderingPartyAddress = _orderContext.AddressReferenceList.GetByAddressId(order.OrganisationAddressId);
+            var orderingPartyContact = _orderContext.ContactReferenceList.GetByContactId(order.OrganisationContactId);
+            var supplierAddress = _orderContext.AddressReferenceList.GetByAddressId(order.SupplierAddressId);
+            var supplierContact = _orderContext.ContactReferenceList.GetByContactId(order.SupplierContactId);
             var orderItems = _orderContext.OrderItemReferenceList.FindByOrderId(_getOrderRequest.OrderId);
             var serviceRecipients = _orderContext.ServiceRecipientReferenceList.FindByOrderId(_getOrderRequest.OrderId);
 
-            await _getOrderResponse.AssertAsync(order, orderItems, serviceRecipients);
+            _getOrderResponse.AssertOrder(
+                order, 
+                orderingPartyAddress,
+                orderingPartyContact,
+                supplierAddress,
+                supplierContact,
+                orderItems, 
+                serviceRecipients);
         }
 
         [Then(@"the get order response contains a yearly value of (.*) for order item with name '(.*)'")]
-        public async Task ThenTheGetOrderResponseContainsYearlyValue(decimal amount, string orderItemName)
+        public void ThenTheGetOrderResponseContainsYearlyValue(decimal amount, string orderItemName)
         {
-            await _getOrderResponse.AssertOrderItemCost(orderItemName, amount);
+            _getOrderResponse.AssertOrderItemCost(amount);
         }
 
         [Then(@"the get order response contains a (.*) of (.*) for the order")]
-        public async Task ThenTheGetOrderResponseContainsARecurringCostForTheOrder(string item, decimal amount)
+        public void ThenTheGetOrderResponseContainsARecurringCostForTheOrder(string item, decimal amount)
         {
-            await _getOrderResponse.AssertRecurringCost(item, amount);
+            _getOrderResponse.AssertRecurringCost(item, amount);
         }
 
     }

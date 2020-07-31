@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
 
 namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 {
@@ -21,7 +22,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public int? OrganisationContactId { get; set; }
 
-        public int OrderStatusId { get; set; }
+        public OrderStatus OrderStatus { get; set; }
 
         public DateTime Created { get; set; }
 
@@ -91,7 +92,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 @OrganisationAddressId,
                 @OrganisationBillingAddressId,
                 @OrganisationContactId,
-                @OrderStatusId,
+                @OrderStatus,
                 @Created,
                 @LastUpdated,
                 @LastUpdatedBy,
@@ -119,7 +120,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                           OrganisationOdsCode,
                           OrganisationAddressId,
                           OrganisationContactId,
-                          OrderStatusId,
+                          OrderStatusId AS OrderStatus,
                           Created,
                           SupplierId,
                           SupplierName,
