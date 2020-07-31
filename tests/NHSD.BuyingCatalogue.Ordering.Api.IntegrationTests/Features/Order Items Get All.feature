@@ -5,8 +5,8 @@
 
 Background:
     Given Orders exist
-        | OrderId    | Description      | OrderStatusId | LastUpdatedBy                        | OrganisationId                       |
-        | C000014-01 | Some Description | 1             | 335392e4-4bb1-413b-9de5-36a85c9c0422 | 4af62b99-638c-4247-875e-965239cd0c48 |
+        | OrderId    | Description      | LastUpdatedBy                        | OrganisationId                       |
+        | C000014-01 | Some Description | 335392e4-4bb1-413b-9de5-36a85c9c0422 | 4af62b99-638c-4247-875e-965239cd0c48 |
     Given Service Recipients exist
         | OrderId    | OdsCode | Name     |
         | C000014-01 | eu      | EU Test  |

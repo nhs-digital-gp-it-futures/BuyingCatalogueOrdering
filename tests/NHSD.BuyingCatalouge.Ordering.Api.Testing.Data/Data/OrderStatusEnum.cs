@@ -1,8 +1,8 @@
 ﻿namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data
 {
-    public enum OrderStatusEnum
+    public enum OrderStatus
     {
-        Complete = 1,
-        Incomplete = 2
+        Submitted = 1,
+        Unsubmitted = 2
     }
 }

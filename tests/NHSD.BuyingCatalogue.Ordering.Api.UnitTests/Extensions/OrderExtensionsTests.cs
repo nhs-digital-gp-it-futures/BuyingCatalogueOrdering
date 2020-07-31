@@ -130,5 +130,50 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
             var actual = order.IsAssociatedServicesSectionComplete();
             actual.Should().BeFalse();
         }
+
+        [Test]
+        public void IsFundingSourceComplete_OrderFundingViewed_ReturnsTrue()
+        {
+            var order = OrderBuilder.Create().WithFundingSourceOnlyGms(true).Build();
+            var actual = OrderExtensions.IsFundingSourceComplete(order);
+            actual.Should().BeTrue();
+        }
+
+        [Test]
+        public void IsFundingSourceComplete_NullOrder_ReturnsFalse()
+        {
+            var actual = OrderExtensions.IsFundingSourceComplete(null);
+            actual.Should().BeFalse();
+        }
+
+        [Test]
+        public void IsSectionStatusCompleteComplete_NullOrder_ReturnsFalse()
+        {
+            var actual = OrderExtensions.IsSectionStatusComplete(null,0,0,0);
+            actual.Should().BeFalse();
+        }
+
+        [TestCase(null, false, false, false, 0, 0, 0, false)]
+        [TestCase(true, true, true, true, 1, 1, 0, true)]
+        [TestCase(true, true, true, true, 1, 1, 1, true)]
+        [TestCase(true, true, true, true, 0, 0, 1, true)]
+        [TestCase(true, true, true, true, 1, 0, 1, true)]
+        [TestCase(true, true, false, false, 1, 0, 0, false)]
+        [TestCase(true, true, false, true, 1, 1, 0, false)]
+        [TestCase(true, false, true, false, 0, 0, 1, false)]
+        public void IsSectionStatusCompleteComplete_whenCalled_ReturnsCorrectResult(bool? fundingComplete,
+            bool recipientViewed, bool associatedViewed, bool solutionViewed, int recipientCount, int solutionCount, int associatedCount, bool expectedResult)
+        {
+            var order = OrderBuilder
+                .Create()
+                .WithFundingSourceOnlyGms(fundingComplete)
+                .WithServiceRecipientsViewed(recipientViewed)
+                .WithAssociatedServicesViewed(associatedViewed)
+                .WithCatalogueSolutionsViewed(solutionViewed)
+                .Build();
+
+            var actual = OrderExtensions.IsSectionStatusComplete(order, recipientCount, solutionCount, associatedCount);
+            actual.Should().Be(expectedResult);
+        }
     }
 }

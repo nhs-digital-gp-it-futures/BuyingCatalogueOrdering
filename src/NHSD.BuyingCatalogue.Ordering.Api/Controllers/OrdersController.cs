@@ -96,6 +96,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 TotalRecurringCostPerYear = calculatedCostPerYear,
                 TotalOwnershipCost = order.CalculateTotalOwnershipCost(),
                 ServiceRecipients = serviceRecipientDictionary.Values,
+                Status = order.OrderStatus.ToString(),
                 OrderItems = order.OrderItems.Select(orderItem =>
                     new OrderItemModel
                     {
@@ -187,7 +188,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                         .WithStatus(order.IsAdditionalServicesSectionComplete() ? "complete": "incomplete")
                         .WithCount(additionalServicesCount),
                     SectionModel.FundingSource.WithStatus(order.IsFundingSourceComplete() ? "complete" : "incomplete")
-                }
+                },
+                SectionStatus = order.IsSectionStatusComplete(serviceRecipientsCount, catalogueSolutionsCount, associatedServicesCount) ? "complete" : "incomplete"
             };
 
             return Ok(orderSummaryModel);
