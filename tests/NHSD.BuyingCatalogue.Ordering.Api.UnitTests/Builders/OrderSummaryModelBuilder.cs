@@ -11,6 +11,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         private readonly string _description;
         private Guid _organisationId;
         private IEnumerable<SectionModel> _sections;
+        private string _sectionStatus;
         private readonly string _status;
 
         private OrderSummaryModelBuilder()
@@ -19,6 +20,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _description = "Some Description";
             _organisationId = Guid.NewGuid();
             _sections = SectionModelListBuilder.Create().Build();
+            _sectionStatus = "incomplete";
             _status = OrderStatus.Unsubmitted.ToString();
         }
 
@@ -45,6 +47,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
+        public OrderSummaryModelBuilder WithSectionStatus(string sectionStatus)
+        {
+            _sectionStatus = sectionStatus;
+            return this;
+        }
+
         public OrderSummaryModel Build()
         {
             return new OrderSummaryModel
@@ -53,6 +61,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
                 Description = _description,
                 OrganisationId = _organisationId,
                 Sections = _sections,
+                SectionStatus = _sectionStatus,
                 Status = _status
             };
         }
