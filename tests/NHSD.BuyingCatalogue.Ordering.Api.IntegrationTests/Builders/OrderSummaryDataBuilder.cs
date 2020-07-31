@@ -22,7 +22,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
         private bool _catalogueSolutionsViewed = true;
         private bool? _fundingSource = true;
 
-        private OrderSummaryDataBuilder(string orderId="C000016-01")
+        private OrderSummaryDataBuilder(string orderId = "C000016-01")
         {
             WithOrderEntity(
                 OrderEntityBuilder.Create()
