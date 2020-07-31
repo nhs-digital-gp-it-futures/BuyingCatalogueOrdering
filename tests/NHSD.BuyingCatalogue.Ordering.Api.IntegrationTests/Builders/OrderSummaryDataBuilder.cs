@@ -44,7 +44,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
 
         public OrderSummaryDataBuilder WithCatalogueSolutionEntity(OrderItemEntity catalogueSolutionEntity)
         {
-            _associatedServiceEntity = catalogueSolutionEntity;
+            _catalogueSolutionEntity = catalogueSolutionEntity;
             return this;
         }
 
