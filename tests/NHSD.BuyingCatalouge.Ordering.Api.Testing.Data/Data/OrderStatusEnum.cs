@@ -2,7 +2,7 @@
 {
     public enum OrderStatus
     {
-        Submitted = 1,
-        Unsubmitted = 2
+        Complete = 1,
+        Incomplete = 2
     }
 }
