@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
-using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
 using TechTalk.SpecFlow;
@@ -14,22 +13,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     [Binding]
     internal sealed class AddressSteps
     {
-        private readonly ScenarioContext _context;
         private readonly Response _response;
         private readonly Settings _settings;
+        private readonly OrderContext _orderContext;
 
-        public AddressSteps(ScenarioContext context, Response response, Settings settings)
+        public AddressSteps(Response response, Settings settings, OrderContext orderContext)
         {
-            _context = context;
             _response = response;
             _settings = settings;
+            _orderContext = orderContext;
         }
 
         [Given(@"Addresses exist")]
         public async Task GivenAddressesExist(Table table)
         {
-            IDictionary<string, int> addressDictionary = new Dictionary<string, int>();
-
             foreach (var addressItem in table.CreateSet<AddressTable>())
             {
                 var address = AddressEntityBuilder
@@ -46,10 +43,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .Build();
 
                 var addressId = await address.InsertAsync<int>(_settings.ConnectionString);
-                addressDictionary.Add(address.Postcode, addressId);
-            }
+                address.AddressId = addressId;
 
-            _context[ScenarioContextKeys.AddressMapDictionary] = addressDictionary;
+                _orderContext.AddressReferenceList.Add(address);
+            }
         }
 
         [Then(@"the Address is returned")]

@@ -632,6 +632,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 TotalRecurringCostPerMonth = calculatedCostPerYear / monthsPerYear,
                 TotalRecurringCostPerYear = calculatedCostPerYear,
                 TotalOwnershipCost = repositoryOrder.CalculateTotalOwnershipCost(),
+                Status = repositoryOrder.OrderStatus.ToString(),
                 ServiceRecipients = repositoryOrder.ServiceRecipients.Select(serviceRecipient =>
                     new ServiceRecipientModel
                     {
