@@ -14,7 +14,7 @@ Scenario: 1. A user can create a order and data is persisted to the database;
     Then a response with status code 201 is returned
     And the order is created in the database with orderId C010000-01 and data
         | OrderId    | Description                         | OrderStatus | OrganisationId                       | LastUpdatedBy                        | LastUpdatedByName |
-        | C010000-01 | This is an order for organisation 2 | Unsubmitted | 4af62b99-638c-4247-875e-965239cd0c48 | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
+        | C010000-01 | This is an order for organisation 2 | Incomplete | 4af62b99-638c-4247-875e-965239cd0c48 | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
     And the order with orderId C010000-01 has LastUpdated time present and it is the current time
     And the order with orderId C010000-01 has Created time present and it is the current time
 
@@ -30,7 +30,7 @@ Scenario: 2. A user creates an order when existing orders are present, The order
     And a create order response is returned with the OrderId C000015-01
     And the order is created in the database with orderId C000015-01 and data
         | OrderId    | Description                         | OrderStatus | OrganisationId                       | LastUpdatedBy                        | LastUpdatedByName |
-        | C000015-01 | This is an order for organisation 2 | Unsubmitted | 4af62b99-638c-4247-875e-965239cd0c48 | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
+        | C000015-01 | This is an order for organisation 2 | Incomplete | 4af62b99-638c-4247-875e-965239cd0c48 | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
     And the order with orderId C000015-01 has LastUpdated time present and it is the current time
     And the order with orderId C000015-01 has Created time present and it is the current time
 

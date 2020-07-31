@@ -18,7 +18,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         {
             Description = orderDescription ?? throw new ArgumentNullException(nameof(orderDescription));
             OrganisationId = organisationId;
-            OrderStatus = OrderStatus.Unsubmitted;
+            OrderStatus = OrderStatus.Incomplete;
             Created = DateTime.UtcNow;
         }
 
