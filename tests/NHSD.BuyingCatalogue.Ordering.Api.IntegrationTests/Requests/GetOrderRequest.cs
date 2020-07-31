@@ -27,7 +27,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
         public async Task<GetOrderResponse> ExecuteAsync()
         {
             var response  = await _request.GetAsync(_getOrderUrl);
-            return new GetOrderResponse(response);
+            return await GetOrderResponse.CreateAsync(response);
         }
     }
 }

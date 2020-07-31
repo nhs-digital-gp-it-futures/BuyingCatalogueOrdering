@@ -15,5 +15,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
         public decimal TotalRecurringCostPerMonth { get; set; }
         public decimal TotalRecurringCostPerYear { get; set; }
         public decimal TotalOwnershipCost { get; set; }
+        public string Status { get; set; }
     }
 }

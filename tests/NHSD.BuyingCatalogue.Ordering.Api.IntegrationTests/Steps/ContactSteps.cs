@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
-using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
 using TechTalk.SpecFlow;
@@ -14,13 +13,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     [Binding]
     internal sealed class ContactSteps
     {
-        private readonly ScenarioContext _context;
+        private readonly OrderContext _orderContext;
         private readonly Response _response;
         private readonly Settings _settings;
 
-        public ContactSteps(ScenarioContext context, Response response, Settings settings)
+        public ContactSteps(OrderContext orderContext, Response response, Settings settings)
         {
-            _context = context;
+            _orderContext = orderContext;
             _response = response;
             _settings = settings;
         }
@@ -28,8 +27,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Given(@"Contacts exist")]
         public async Task GivenContactsExist(Table table)
         {
-            IDictionary<string, int> contactDictionary = new Dictionary<string, int>();
-
             foreach (var contactItem in table.CreateSet<ContactTable>())
             {
                 var contact = ContactEntityBuilder
@@ -41,10 +38,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .Build();
 
                 var contactId = await contact.InsertAsync<int>(_settings.ConnectionString);
-                contactDictionary.Add(contact.Email, contactId);
-            }
+                contact.ContactId = contactId;
 
-            _context[ScenarioContextKeys.ContactMapDictionary] = contactDictionary;
+                _orderContext.ContactReferenceList.Add(contact);
+            }
         }
 
         [Then(@"the Contact section (.*) is returned")]
