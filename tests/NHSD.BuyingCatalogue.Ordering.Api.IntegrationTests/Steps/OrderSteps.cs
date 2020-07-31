@@ -7,6 +7,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
+using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
@@ -17,7 +18,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     [Binding]
     internal sealed class OrderSteps
     {
-        private readonly ScenarioContext _context;
         private readonly Request _request;
         private readonly Response _response;
         private readonly Settings _settings;
@@ -26,13 +26,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private readonly string _orderOrganisationsUrl;
 
         public OrderSteps(
-            ScenarioContext context,
             Request request, 
             Response response, 
             Settings settings,
             OrderContext orderContext)
         {
-            _context = context;
             _request = request;
             _response = response;
             _settings = settings;
@@ -60,11 +58,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             foreach (var ordersTableItem in table.CreateSet<OrdersTable>())
             {
-                int? organisationAddressId = _context.GetAddressIdByPostcode(ordersTableItem.OrganisationAddressPostcode);
-                int? organisationContactId = _context.GetContactIdByEmail(ordersTableItem.OrganisationContactEmail);
+                var addressReferenceList = _orderContext.AddressReferenceList;
+                var contactReferenceList = _orderContext.ContactReferenceList;
 
-                int? supplierAddressId = _context.GetAddressIdByPostcode(ordersTableItem.SupplierAddressPostcode);
-                int? supplierContactId = _context.GetContactIdByEmail(ordersTableItem.SupplierContactEmail);
+                int? organisationAddressId = addressReferenceList.GetByPostcode(ordersTableItem.OrganisationAddressPostcode)?.AddressId;
+                int? organisationContactId = contactReferenceList.GetByEmail(ordersTableItem.OrganisationContactEmail)?.ContactId;
+
+                int? supplierAddressId = addressReferenceList.GetByPostcode(ordersTableItem.SupplierAddressPostcode)?.AddressId;
+                int? supplierContactId = contactReferenceList.GetByEmail(ordersTableItem.SupplierContactEmail)?.ContactId;
 
                 DateTime? commencementDate = null;
                 if (ordersTableItem.CommencementDate != DateTime.MinValue)
@@ -84,7 +85,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithOrganisationAddressId(organisationAddressId)
                     .WithOrganisationBillingAddressId(ordersTableItem.OrganisationBillingAddressId)
                     .WithOrganisationContactId(organisationContactId)
-                    .WithOrderStatusId(ordersTableItem.OrderStatusId)
+                    .WithOrderStatus(ordersTableItem.OrderStatus)
                     .WithDateCreated(ordersTableItem.Created != DateTime.MinValue ? ordersTableItem.Created : DateTime.UtcNow)
                     .WithLastUpdatedBy(ordersTableItem.LastUpdatedBy)
                     .WithLastUpdatedName(ordersTableItem.LastUpdatedByName)
@@ -93,7 +94,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithCatalogueSolutionsViewed(ordersTableItem.CatalogueSolutionsViewed)
                     .WithAdditionalServicesViewed(ordersTableItem.AdditionalServicesViewed)
                     .WithAssociatedServicesViewed(ordersTableItem.AssociatedServicesViewed)
-                    .WithFundingSourceOnlyGMS(ordersTableItem.FundingSourceOnlyGMS)
+                    .WithFundingSourceOnlyGms(ordersTableItem.FundingSourceOnlyGMS)
                     .WithSupplierId(ordersTableItem.SupplierId)
                     .WithSupplierName(ordersTableItem.SupplierName)
                     .WithSupplierAddressId(supplierAddressId)
@@ -152,7 +153,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
             var actual = await ContactEntity.FetchContactById(_settings.ConnectionString, order.OrganisationContactId);
 
-            actual.Should().BeEquivalentTo(expected);
+            actual.Should().BeEquivalentTo(expected, options => options.Excluding(x => x.ContactId));
         }
 
         [Then(@"the order with orderId (.*) is updated and has a Organisation Address with data")]
@@ -223,7 +224,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             public int? OrganisationBillingAddressId { get; set; }
 
-            public int OrderStatusId { get; set; } = 1;
+            public OrderStatus OrderStatus { get; set; } = OrderStatus.Submitted;
 
             public DateTime Created { get; set; }
 
