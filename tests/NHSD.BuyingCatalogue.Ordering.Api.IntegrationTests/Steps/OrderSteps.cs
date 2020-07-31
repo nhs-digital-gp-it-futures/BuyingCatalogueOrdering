@@ -99,6 +99,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithSupplierAddressId(supplierAddressId)
                     .WithSupplierContactId(supplierContactId)
                     .WithCommencementDate(commencementDate)
+                    .WithIsDeleted(ordersTableItem.IsDeleted)
                     .Build();
 
                 await order.InsertAsync(_settings.ConnectionString);
@@ -252,6 +253,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public bool AssociatedServicesViewed { get; set; }
 
             public bool? FundingSourceOnlyGMS { get; set; }
+
+            public bool IsDeleted { get; set; }
         }
     }
 }

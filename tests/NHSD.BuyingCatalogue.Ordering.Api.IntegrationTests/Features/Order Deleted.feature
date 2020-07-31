@@ -1,4 +1,4 @@
-﻿Feature: Get the details of a single order
+﻿Feature: Get the details of a single deleted order
     As an Buyer user
     I want to be able to view a preview of a given order
     So that I can ensure that the information is complete
@@ -11,8 +11,8 @@ Background:
         | FirstName | LastName | EmailAddress            | TelephoneNumber |
         | Fred      | Robinson | Fred.robinson@email.com | 12312543212     |
     Given Orders exist
-        | OrderId    | Description   | OrganisationId                       | OrganisationName | OrganisationOdsCode | OrganisationContactEmail | SupplierAddressPostcode | SupplierContactEmail    |
-        | C000014-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | Hampshire CC     | 432432              | Fred.robinson@email.com  | LS 1 3AP                | Fred.robinson@email.com |
+        | OrderId    | Description     | OrganisationId                       | OrganisationName | OrganisationOdsCode | OrganisationContactEmail | SupplierAddressPostcode | SupplierContactEmail    | IsDeleted |
+        | C000014-01 | A Deleted order | 4af62b99-638c-4247-875e-965239cd0c48 | Hampshire CC     | 432432              | Fred.robinson@email.com  | LS 1 3AP                | Fred.robinson@email.com | true      |
     Given Service Recipients exist
         | OrderId    | OdsCode | Name    |
         | C000014-01 | eu      | EU Test |
@@ -25,7 +25,7 @@ Background:
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @8122
-Scenario: 1. Get an order
+Scenario: 1. Get a deleted order
     Given the user creates a request to retrieve the details of an order by ID 'C000014-01'
     When the user sends the get order request
     Then a response with status code 200 is returned

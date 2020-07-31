@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <SpecFlowObsoleteCodeBehindFiles Remove="Features\Order Get - Copy.feature.cs" />
     <SpecFlowObsoleteCodeBehindFiles Remove="Features\Order Summary - Copy.feature.cs" />
   </ItemGroup>
 
@@ -50,5 +51,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\NHSD.BuyingCatalouge.Ordering.Api.Testing.Data\NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SpecFlowFeatureFiles Update="Features\Order Deleted.feature">
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </SpecFlowFeatureFiles>
   </ItemGroup>
 </Project>

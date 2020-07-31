@@ -173,6 +173,12 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             return this;
         }
 
+        public OrderEntityBuilder WithIsDeleted(bool isDeleted)
+        {
+            _orderEntity.IsDeleted = isDeleted;
+            return this;
+        }
+
         public OrderEntity Build()
         {
             return _orderEntity;
