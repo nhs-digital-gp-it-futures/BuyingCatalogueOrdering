@@ -158,6 +158,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         [TestCase(true, true, true, true, 1, 1, 1, true)]
         [TestCase(true, true, true, true, 0, 0, 1, true)]
         [TestCase(true, true, true, true, 1, 0, 1, true)]
+        [TestCase(true, true, false, false, 1, 0, 0, false)]
+        [TestCase(true, true, false, true, 1, 1, 0, false)]
+        [TestCase(true, false, true, false, 0, 0, 1, false)]
         public void IsSectionStatusCompleteComplete_whenCalled_ReturnsCorrectResult(bool? fundingComplete,
             bool recipientViewed, bool associatedViewed, bool solutionViewed, int recipientCount, int solutionCount, int associatedCount, bool expectedResult)
         {

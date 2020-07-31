@@ -42,6 +42,51 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
             return this;
         }
 
+        public OrderSummaryDataBuilder WithServiceRecipientViewed(bool viewed)
+        {
+            if (_orderEntity != null)
+            {
+                _orderEntity.ServiceRecipientsViewed = viewed;
+            }
+            return this;
+        }
+
+        public OrderSummaryDataBuilder WithAdditionalServiceViewed(bool viewed)
+        {
+            if (_orderEntity != null)
+            {
+                _orderEntity.AdditionalServicesViewed = viewed;
+            }
+            return this;
+        }
+
+        public OrderSummaryDataBuilder WithAssociatedServicesViewed(bool viewed)
+        {
+            if (_orderEntity != null)
+            {
+                _orderEntity.AssociatedServicesViewed = viewed;
+            }
+            return this;
+        }
+
+        public OrderSummaryDataBuilder WithCatalogueSolutionsViewed(bool viewed)
+        {
+            if (_orderEntity != null)
+            {
+                _orderEntity.CatalogueSolutionsViewed = viewed;
+            }
+            return this;
+        }
+
+        public OrderSummaryDataBuilder WithFundingSourceOnlyGMS(bool? funded)
+        {
+            if (_orderEntity != null)
+            {
+                _orderEntity.FundingSourceOnlyGMS = funded;
+            }
+            return this;
+        }
+
         public OrderSummaryDataBuilder WithCatalogueSolutionEntity(OrderItemEntity catalogueSolutionEntity)
         {
             _catalogueSolutionEntity = catalogueSolutionEntity;
