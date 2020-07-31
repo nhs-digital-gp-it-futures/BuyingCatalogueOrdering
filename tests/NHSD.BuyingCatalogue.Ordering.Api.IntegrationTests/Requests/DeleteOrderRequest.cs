@@ -27,8 +27,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 
         public async Task<Response> ExecuteAsync()
         {
-            var response = await _request.DeleteAsync(_deleteOrderUrl);
-            return response;
+            return await _request.DeleteAsync(_deleteOrderUrl);
         }
     }
 }

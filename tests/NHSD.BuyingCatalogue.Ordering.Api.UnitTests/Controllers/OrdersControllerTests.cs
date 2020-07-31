@@ -467,9 +467,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var response = await context.OrdersController.DeleteOrderAsync("Order");
             response.Should().BeOfType<NoContentResult>();
+        }
+
+        [Test]
+        public async Task DeleteOrderAsync_DeleteOrderSuccessful_DeletesAndUpdatesOrder()
+        {
+            var context = OrdersControllerTestContext.Setup();
+
+            await context.OrdersController.DeleteOrderAsync("Order");
             context.Order.IsDeleted.Should().BeTrue();
-            context.Order.LastUpdatedBy.Should().Be(context.NameIdentity);
             context.OrderRepositoryMock.Verify(x => x.UpdateOrderAsync(It.Is<Order>(y => y.IsDeleted)));
+        }
+
+        [Test]
+        public async Task DeleteOrderAsync_DeleteOrderSuccessful_LastUpdatedIsUpdated()
+        {
+            var context = OrdersControllerTestContext.Setup();
+            await context.OrdersController.DeleteOrderAsync("Order");
+            context.Order.LastUpdatedBy.Should().Be(context.NameIdentity);
+            context.Order.LastUpdatedByName.Should().Be(context.Name);
+            context.Order.LastUpdated.Should().NotBe(DateTime.MinValue);
         }
 
         [Test]
@@ -651,6 +668,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
                 Order = OrderBuilder.Create()
                     .WithOrganisationId(PrimaryOrganisationId)
+                    .WithLastUpdated(DateTime.MinValue)
                     .Build();
 
                 OrderRepositoryMock = new Mock<IOrderRepository>();
