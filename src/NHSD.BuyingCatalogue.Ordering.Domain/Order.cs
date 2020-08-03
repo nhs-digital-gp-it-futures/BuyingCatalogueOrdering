@@ -81,6 +81,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public bool? FundingSourceOnlyGMS { get; set; }
 
+        public bool IsDeleted { get; set; }
+
         public IReadOnlyList<OrderItem> OrderItems =>
             _orderItems.AsReadOnly();
 
