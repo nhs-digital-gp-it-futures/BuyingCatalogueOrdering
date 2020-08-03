@@ -15,12 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <SpecFlowObsoleteCodeBehindFiles Remove="Features\Order Get - Copy.feature.cs" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Features\Order Get Deleted - Copy.feature.cs" />
-    <SpecFlowObsoleteCodeBehindFiles Remove="Features\Order Summary - Copy.feature.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
