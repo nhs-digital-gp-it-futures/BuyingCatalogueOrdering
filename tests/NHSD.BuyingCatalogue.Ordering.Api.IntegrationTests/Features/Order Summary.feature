@@ -6,7 +6,7 @@
 Background:
     Given Orders exist
         | OrderId    | Description   | OrganisationId                       | OrderStatus |
-        | C000014-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | Submitted   |
+        | C000014-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | Complete    |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @5321
@@ -15,7 +15,7 @@ Scenario: 1. Get the order summary
     Then a response with status code 200 is returned
     And the order summary is returned with the following values
         | OrderId    | OrganisationId                       | Description   | OrderStatus |
-        | C000014-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description | Submitted   |
+        | C000014-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description | Complete    |
     And the order Summary Sections have the following values
         | Id                  | Status     | Count |
         | description         | complete   |       |
@@ -224,11 +224,12 @@ Scenario: 9. Get the order summary that includes a list of additional services
         | funding-source      | incomplete |       |
 
 @5291
-Scenario:10. Get the order section status is set when conditions are met 
+Scenario:10. Get the order section status is set when conditions are met
     Given the user creates a new "<OrderDataKey>" order with id <OrderId>
     When the user makes a request to retrieve the order summary with the ID <OrderId>
     Then a response with status code 200 is returned
     And the order Section Status is <SectionStatus>
+
     Examples: OrderData
         | OrderId    | OrderDataKey                                                                                | SectionStatus |
         | C000016-01 | complete                                                                                    | complete      |

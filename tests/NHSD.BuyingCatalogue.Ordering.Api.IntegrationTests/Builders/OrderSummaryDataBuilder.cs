@@ -26,7 +26,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
         {
             WithOrderEntity(
                 OrderEntityBuilder.Create()
-                    .WithOrderStatus(OrderStatus.Unsubmitted)
+                    .WithOrderStatus(OrderStatus.Incomplete)
                     .WithOrderId(orderId)
                     .WithDescription("A Description")
                     .WithOrganisationId(new Guid("4af62b99-638c-4247-875e-965239cd0c48"))

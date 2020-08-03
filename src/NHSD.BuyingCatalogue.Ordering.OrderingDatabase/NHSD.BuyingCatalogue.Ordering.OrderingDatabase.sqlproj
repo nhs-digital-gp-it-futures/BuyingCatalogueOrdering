@@ -67,7 +67,7 @@
     <None Include="Security\Users\NHSD.sql" />
     <None Include="Security\Logins\NHSD.sql" />
     <None Include="Deployment\CreateTables.sql" />
-    <None Include="Deployment\CreateOrderStatuses.sql" />
+    <None Include="Deployment\InsertOrderStatuses.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\OrderStatus.sql" />
