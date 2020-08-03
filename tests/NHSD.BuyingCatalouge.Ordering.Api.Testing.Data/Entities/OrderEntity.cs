@@ -80,7 +80,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 AdditionalServicesViewed,
                 AssociatedServicesViewed,
                 FundingSourceOnlyGMS,
-                IsDeleted,
+                IsDeleted
             )
             VALUES
             (
