@@ -29,6 +29,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
         private bool _additionalServicesViewed;
         private bool _associatedServicesViewed;
         private bool? _fundingSourceOnlyGms;
+        public bool _isDeleted;
 
         private OrderEntityBuilder()
         {
@@ -54,6 +55,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             _catalogueSolutionsViewed = false;
             _additionalServicesViewed = false;
             _fundingSourceOnlyGms = null;
+            _isDeleted = false;
         }
 
         public static OrderEntityBuilder Create()
@@ -199,6 +201,12 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             return this;
         }
 
+        public OrderEntityBuilder WithIsDeleted(bool isDeleted)
+        {
+            _isDeleted = isDeleted;
+            return this;
+        }
+
         public OrderEntity Build()
         {
             return new OrderEntity
@@ -225,7 +233,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
                 CatalogueSolutionsViewed = _catalogueSolutionsViewed,
                 AdditionalServicesViewed = _additionalServicesViewed,
                 AssociatedServicesViewed = _associatedServicesViewed,
-                FundingSourceOnlyGMS = _fundingSourceOnlyGms
+                FundingSourceOnlyGMS = _fundingSourceOnlyGms,
+                IsDeleted = _isDeleted
             };
         }
     }
