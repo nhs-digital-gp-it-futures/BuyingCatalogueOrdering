@@ -225,7 +225,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             public int? OrganisationBillingAddressId { get; set; }
 
-            public OrderStatus OrderStatus { get; set; } = OrderStatus.Submitted;
+            public OrderStatus OrderStatus { get; set; } = OrderStatus.Complete;
 
             public DateTime Created { get; set; }
 
