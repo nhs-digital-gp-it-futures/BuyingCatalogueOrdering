@@ -14,5 +14,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models.Summary
         public string SectionStatus { get; set; }
 
         public IEnumerable<SectionModel> Sections { get; set; }
+
+        public string Status { get; set; }
     }
 }

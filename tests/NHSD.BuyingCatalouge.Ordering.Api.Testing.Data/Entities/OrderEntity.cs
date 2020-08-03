@@ -52,6 +52,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public bool? FundingSourceOnlyGMS { get; set; }
 
+        public bool IsDeleted { get; set; }
+
         protected override string InsertSql => @"
             INSERT INTO dbo.[Order]
             (
@@ -77,7 +79,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 CatalogueSolutionsViewed,
                 AdditionalServicesViewed,
                 AssociatedServicesViewed,
-                FundingSourceOnlyGMS
+                FundingSourceOnlyGMS,
+                IsDeleted
             )
             VALUES
             (
@@ -103,7 +106,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 @CatalogueSolutionsViewed,
                 @AdditionalServicesViewed,
                 @AssociatedServicesViewed,
-                @FundingSourceOnlyGMS
+                @FundingSourceOnlyGMS,
+                @IsDeleted
             );";
 
         public static async Task<OrderEntity> FetchOrderByOrderId(string connectionString, string orderId)
@@ -132,7 +136,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                           CatalogueSolutionsViewed,
                           AdditionalServicesViewed,
                           AssociatedServicesViewed,
-                          FundingSourceOnlyGMS
+                          FundingSourceOnlyGMS,
+                          IsDeleted
                          FROM dbo.[Order]
                          WHERE OrderId = @orderId;", new { orderId }));
         }

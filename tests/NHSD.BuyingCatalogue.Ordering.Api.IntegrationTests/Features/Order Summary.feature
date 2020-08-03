@@ -5,8 +5,8 @@
 
 Background:
     Given Orders exist
-        | OrderId    | Description   | OrganisationId                       |
-        | C000014-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 |
+        | OrderId    | Description   | OrganisationId                       | OrderStatus |
+        | C000014-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | Complete    |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @5321
@@ -14,8 +14,8 @@ Scenario: 1. Get the order summary
     When the user makes a request to retrieve the order summary with the ID C000014-01
     Then a response with status code 200 is returned
     And the order summary is returned with the following values
-        | OrderId    | OrganisationId                       | Description   |
-        | C000014-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
+        | OrderId    | OrganisationId                       | Description   | OrderStatus |
+        | C000014-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description | Complete    |
     And the order Summary Sections have the following values
         | Id                  | Status     | Count |
         | description         | complete   |       |
@@ -38,9 +38,6 @@ Scenario: 2. Get the order summary when the order has a primary ordering party c
         | C000015-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | Fred.robinson@email.com  |
     When the user makes a request to retrieve the order summary with the ID C000015-01
     Then a response with status code 200 is returned
-    And the order summary is returned with the following values
-        | OrderId    | OrganisationId                       | Description   |
-        | C000015-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
     And the order Summary Sections have the following values
         | Id                  | Status     | Count |
         | description         | complete   |       |
@@ -63,9 +60,6 @@ Scenario: 3. Get the order summary when the order has a primary supplier contact
         | C000015-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | Fred.robinson@email.com |
     When the user makes a request to retrieve the order summary with the ID C000015-01
     Then a response with status code 200 is returned
-    And the order summary is returned with the following values
-        | OrderId    | OrganisationId                       | Description   |
-        | C000015-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
     And the order Summary Sections have the following values
         | Id                  | Status     | Count |
         | description         | complete   |       |
@@ -85,9 +79,6 @@ Scenario: 4. Get the order summary when the order has a commencement date
         | C000015-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | 31/05/2020       |
     When the user makes a request to retrieve the order summary with the ID C000015-01
     Then a response with status code 200 is returned
-    And the order summary is returned with the following values
-        | OrderId    | OrganisationId                       | Description   |
-        | C000015-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
     And the order Summary Sections have the following values
         | Id                  | Status     | Count |
         | description         | complete   |       |
@@ -107,9 +98,6 @@ Scenario: 5. Get the order summary after a section has been viewed
         | C000015-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | <service-recipients-viewed> | <additional-services-viewed> | <catalogue-solutions-viewed> | <associated-services-viewed> | <funding-source-only-gms> |
     When the user makes a request to retrieve the order summary with the ID C000015-01
     Then a response with status code 200 is returned
-    And the order summary is returned with the following values
-        | OrderId    | OrganisationId                       | Description   |
-        | C000015-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
     And the order Summary Sections have the following values
         | Id                  | Status                       | Count |
         | description         | complete                     |       |
@@ -141,9 +129,6 @@ Scenario: 6. Get the order summary that includes a list of service recipients
         | Ods2    | Another Name              | C000016-01 |
     When the user makes a request to retrieve the order summary with the ID C000016-01
     Then a response with status code 200 is returned
-    And the order summary is returned with the following values
-        | OrderId    | OrganisationId                       | Description   |
-        | C000016-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
     And the order Summary Sections have the following values
         | Id                  | Status     | Count |
         | description         | complete   |       |
@@ -171,9 +156,6 @@ Scenario: 7. Get the order summary that includes a list of Catalogue Solutions
         | C000016-01 | Ods2    | Order Item 2      | Solution          |
     When the user makes a request to retrieve the order summary with the ID C000016-01
     Then a response with status code 200 is returned
-    And the order summary is returned with the following values
-        | OrderId    | OrganisationId                       | Description   |
-        | C000016-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
     And the order Summary Sections have the following values
         | Id                  | Status     | Count |
         | description         | complete   |       |
@@ -200,9 +182,6 @@ Scenario: 8. Get the order summary that includes a list of associated services
         | C000016-01 | Ods1    | Associated Item 2 | AssociatedService |
     When the user makes a request to retrieve the order summary with the ID C000016-01
     Then a response with status code 200 is returned
-    And the order summary is returned with the following values
-        | OrderId    | OrganisationId                       | Description   |
-        | C000016-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
     And the order Summary Sections have the following values
         | Id                  | Status     | Count |
         | description         | complete   |       |
@@ -245,11 +224,12 @@ Scenario: 9. Get the order summary that includes a list of additional services
         | funding-source      | incomplete |       |
 
 @5291
-Scenario:10. Get the order section status is set when conditions are met 
+Scenario:10. Get the order section status is set when conditions are met
     Given the user creates a new "<OrderDataKey>" order with id <OrderId>
     When the user makes a request to retrieve the order summary with the ID <OrderId>
     Then a response with status code 200 is returned
     And the order Section Status is <SectionStatus>
+
     Examples: OrderData
         | OrderId    | OrderDataKey                                                                                | SectionStatus |
         | C000016-01 | complete                                                                                    | complete      |

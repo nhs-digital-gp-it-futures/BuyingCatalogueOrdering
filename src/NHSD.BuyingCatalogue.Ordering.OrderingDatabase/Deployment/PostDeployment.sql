@@ -1,4 +1,4 @@
-﻿:r ./CreateOrderStatuses.sql
+﻿:r ./InsertOrderStatuses.sql
 :r ./InsertCatalogueItemTypes.sql
 :r ./InsertCataloguePriceTypes.sql
 :r ./InsertProvisioningTypes.sql
