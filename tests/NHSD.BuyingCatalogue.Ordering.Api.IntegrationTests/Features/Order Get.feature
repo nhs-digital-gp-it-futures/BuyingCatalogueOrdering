@@ -26,7 +26,6 @@ Background:
         | C000014-01 | Cat Item 3      | Sol3              | AdditionalService | eu      | Desc                          | 3532.12 | Patient          | 1        | Year          | Year             | NULL         |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
-
 @8122
 Scenario: 1. Get an order
     Given the user creates a request to retrieve the details of an order by ID 'C000014-01'
