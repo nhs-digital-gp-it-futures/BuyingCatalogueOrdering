@@ -44,9 +44,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public async Task ThenTheOrderStatusIsSetCorrectly()
         {
             var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, _updateOrderStatusRequest.OrderId);
-            Enum.TryParse<OrderStatusEnum>(_updateOrderStatusRequest.Payload.Status, out var orderStatus);
+            Enum.TryParse<OrderStatus>(_updateOrderStatusRequest.Payload.Status, out var orderStatus);
 
-            order.OrderStatusId.Should().Be((int)orderStatus);
+            order.OrderStatus.Should().Be(orderStatus);
         }
     }
 }

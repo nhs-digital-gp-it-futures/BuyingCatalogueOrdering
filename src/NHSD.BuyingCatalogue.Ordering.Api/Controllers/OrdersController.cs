@@ -189,7 +189,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                         .WithCount(additionalServicesCount),
                     SectionModel.FundingSource.WithStatus(order.IsFundingSourceComplete() ? "complete" : "incomplete")
                 },
-                SectionStatus = order.IsSectionStatusComplete(serviceRecipientsCount, catalogueSolutionsCount, associatedServicesCount) ? "complete" : "incomplete",
+                SectionStatus = order.IsSectionStatusComplete(serviceRecipientsCount) ? "complete" : "incomplete",
                 Status = order.OrderStatus.ToString()
             };
 
@@ -198,7 +198,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpPost]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult<CreateOrderResponseModel>> CreateOrderAsync([FromBody][Required] CreateOrderModel order)
+        public async Task<ActionResult<ErrorResponseModel>> CreateOrderAsync([FromBody][Required] CreateOrderModel order)
         {
             if (order is null)
             {
@@ -219,7 +219,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 OrganisationId = order.OrganisationId,
             });
 
-            var createOrderResponse = new CreateOrderResponseModel();
+            var createOrderResponse = new ErrorResponseModel();
 
             if (result.IsSuccess)
             {
@@ -259,7 +259,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpPut]
         [Route("{orderId}/status")]
-        public async Task<ActionResult> UpdateStatusAsync(string orderId, StatusModel model)
+        public async Task<ActionResult<ErrorResponseModel>> UpdateStatusAsync(string orderId, StatusModel model)
         {
             if (model is null)
             {
@@ -279,16 +279,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            //if (!orderComplete)
-            //{
+            int serviceRecipientsCount = await _serviceRecipientRepository.GetCountByOrderIdAsync(orderId);
+            if (!order.IsSectionStatusComplete(serviceRecipientsCount))
+            {
+                var createOrderResponse = new ErrorResponseModel();
+                createOrderResponse.Errors = new[] { new ErrorModel("OrderNotComplete", "Order") };
+                return BadRequest(createOrderResponse);
+            }
 
-            //    var createOrderResponse = new CreateOrderResponseModel();
-            //    createOrderResponse.Errors = new[] { new ErrorModel("OrderNotComplete", "Order") };
-            //    return BadRequest(createOrderResponse);
-            //}
-
-            var enumParsedCorrectly = Enum.TryParse<OrderStatus>(model.Status, out var orderStatus);
-            if (!enumParsedCorrectly)
+            var enumParsed = Enum.TryParse<OrderStatus>(model.Status, out var orderStatus);
+            if (!enumParsed)
             {
                 throw new InvalidEnumArgumentException(nameof(model.Status));
             }

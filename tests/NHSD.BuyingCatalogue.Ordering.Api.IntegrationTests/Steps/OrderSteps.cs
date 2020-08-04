@@ -253,8 +253,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public bool AssociatedServicesViewed { get; set; }
 
             public bool? FundingSourceOnlyGMS { get; set; }
-
-            public OrderStatusEnum OrderStatus { get; set; }
         }
     }
 }
