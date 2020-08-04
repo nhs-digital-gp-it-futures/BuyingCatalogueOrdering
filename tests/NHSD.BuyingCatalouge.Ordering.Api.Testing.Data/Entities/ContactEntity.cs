@@ -4,6 +4,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 {
     public sealed class ContactEntity : EntityBase
     {
+        public int ContactId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
@@ -34,10 +35,11 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
             }
 
             return (await SqlRunner.QueryFirstAsync<ContactEntity>(connectionString, @"SELECT
-                          FirstName,
-                          LastName,
-                          Email,
-                          Phone
+                         ContactId,
+                         FirstName,
+                         LastName,
+                         Email,
+                         Phone
                          FROM dbo.Contact
                          WHERE ContactId = @contactId;", new { contactId }));
         }

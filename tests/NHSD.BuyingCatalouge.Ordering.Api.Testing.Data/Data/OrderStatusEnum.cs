@@ -1,4 +1,4 @@
-﻿namespace NHSD.BuyingCatalogue.Ordering.Domain
+﻿namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data
 {
     public enum OrderStatus
     {

@@ -18,7 +18,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         {
             Description = orderDescription ?? throw new ArgumentNullException(nameof(orderDescription));
             OrganisationId = organisationId;
-            OrderStatus = OrderStatus.Unsubmitted;
+            OrderStatus = OrderStatus.Incomplete;
             Created = DateTime.UtcNow;
         }
 
@@ -81,6 +81,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public bool? FundingSourceOnlyGMS { get; set; }
 
+        public bool IsDeleted { get; set; }
+
         public IReadOnlyList<OrderItem> OrderItems =>
             _orderItems.AsReadOnly();
 
@@ -94,6 +96,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         public decimal CalculateCostPerYear(CostType costType)
         {
             return _orderItems.Where(x => x.CostType == costType).Sum(y => y.CalculateTotalCostPerYear());
+        }
+
+        public decimal CalculateTotalOwnershipCost()
+        {
+            const int defaultContractLength = 3;
+
+            return CalculateCostPerYear(CostType.OneOff) + (defaultContractLength * CalculateCostPerYear(CostType.Recurring));
         }
 
         public void SetLastUpdatedBy(Guid userId, string name)

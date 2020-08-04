@@ -53,9 +53,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            var calculatedCostPerYear = order.CalculateCostPerYear(CostType.Recurring);
-            const int monthsPerYear = 12;
-
             var serviceRecipientDictionary = order.ServiceRecipients.Select(serviceRecipient =>
                     new ServiceRecipientModel {Name = serviceRecipient.Name, OdsCode = serviceRecipient.OdsCode})
                 .ToDictionary(x => x.OdsCode);
@@ -71,7 +68,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                         new ServiceRecipientModel { Name = order.OrganisationName, OdsCode = orderOrganisationOdsCode });
                 }
             }
-
+            
+            const int monthsPerYear = 12;
+            var calculatedCostPerYear = order.CalculateCostPerYear(CostType.Recurring);
+            var totalOneOffCost = order.CalculateCostPerYear(CostType.OneOff);
+            
             return new OrderModel
             {
                 Description = order.Description.Value,
@@ -89,11 +90,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     Address = order.SupplierAddress.ToModel(),
                     PrimaryContact = order.SupplierContact.ToModel()
                 },
-                TotalOneOffCost = order.CalculateCostPerYear(CostType.OneOff),
+                TotalOneOffCost = totalOneOffCost,
                 TotalRecurringCostPerMonth = calculatedCostPerYear / monthsPerYear,
                 TotalRecurringCostPerYear = calculatedCostPerYear,
-                TotalOwnershipCost = 0m,
+                TotalOwnershipCost = order.CalculateTotalOwnershipCost(),
                 ServiceRecipients = serviceRecipientDictionary.Values,
+                Status = order.OrderStatus.ToString(),
                 OrderItems = order.OrderItems.Select(orderItem =>
                     new OrderItemModel
                     {
@@ -185,7 +187,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                         .WithStatus(order.IsAdditionalServicesSectionComplete() ? "complete": "incomplete")
                         .WithCount(additionalServicesCount),
                     SectionModel.FundingSource.WithStatus(order.IsFundingSourceComplete() ? "complete" : "incomplete")
-                }
+                },
+                SectionStatus = order.IsSectionStatusComplete(serviceRecipientsCount, catalogueSolutionsCount, associatedServicesCount) ? "complete" : "incomplete",
+                Status = order.OrderStatus.ToString()
             };
 
             return Ok(orderSummaryModel);
@@ -224,6 +228,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             createOrderResponse.Errors = result.Errors.Select(x => new ErrorModel(x.Id, x.Field));
             return BadRequest(createOrderResponse);
+        }
+
+        [HttpDelete]
+        [Route("{orderId}")]
+        [Authorize(Policy = PolicyName.CanManageOrders)]
+        public async Task<ActionResult> DeleteOrderAsync(string orderId)
+        {
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+
+            if (order is null || order.IsDeleted)
+            {
+                return NotFound();
+            }
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
+            order.IsDeleted = true;
+
+            var name = User.Identity.Name;
+            order.SetLastUpdatedBy(User.GetUserId(), name);
+            await _orderRepository.UpdateOrderAsync(order);
+            return NoContent();
         }
     }
 }

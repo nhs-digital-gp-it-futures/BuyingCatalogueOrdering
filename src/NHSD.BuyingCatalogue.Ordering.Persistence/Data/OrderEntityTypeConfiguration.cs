@@ -32,6 +32,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 
             builder.HasMany(x => x.ServiceRecipients)
                 .WithOne(x => x.Order);
+
+            builder.HasQueryFilter(p => !p.IsDeleted);
         }
     }
 }
