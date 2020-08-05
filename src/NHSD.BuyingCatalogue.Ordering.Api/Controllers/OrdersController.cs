@@ -198,7 +198,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpPost]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult<ErrorResponseModel>> CreateOrderAsync([FromBody][Required] CreateOrderModel order)
+        public async Task<ActionResult<ErrorResponseModel>> CreateOrderAsync(CreateOrderModel order)
         {
             if (order is null)
             {

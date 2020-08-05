@@ -8,10 +8,10 @@ Background:
         | OrderId    | Description            | OrganisationId                       | CatalogueSolutionsViewed | AssociatedServicesViewed | FundingSourceOnlyGMS |
         | C000014-01 | Some Description       | 4af62b99-638c-4247-875e-965239cd0c48 | True                     | True                     | True                 |
         | C000014-02 | Some Other Description | 4af62b99-638c-4247-875e-965239cd0c48 | True                     | True                     | NULL                 |
-    Given Service Recipients exist
+    And Service Recipients exist
         | OrderId    | OdsCode | Name    |
         | C000014-01 | eu      | EU Test |
-    Given Order items exist
+    And Order items exist
         | OrderId    | CatalogueItemName | CatalogueItemType | OdsCode | PriceTimeUnit | EstimationPeriod |
         | C000014-01 | Item 1            | Solution          | eu      | Month         | Month            |
         | C000014-02 | Item 2            | Solution          | eu      | Month         | Month            |

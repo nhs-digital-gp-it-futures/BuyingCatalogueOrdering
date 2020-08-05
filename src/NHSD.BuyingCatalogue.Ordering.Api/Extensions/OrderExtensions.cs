@@ -62,8 +62,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
         {
             if (!IsFundingSourceComplete(order)) return false;
 
-            int catalogueSolutionsCount = order.OrderItems.Count(y => y.CatalogueItemType.Equals(CatalogueItemType.Solution));
-            int associatedServicesCount = order.OrderItems.Count(y => y.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
+            int catalogueSolutionsCount = order.OrderItems.Count(o => o.CatalogueItemType.Equals(CatalogueItemType.Solution));
+            int associatedServicesCount = order.OrderItems.Count(o => o.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
 
             var solutionAndAssociatedServices = catalogueSolutionsCount > 0
                                                 && associatedServicesCount > 0;

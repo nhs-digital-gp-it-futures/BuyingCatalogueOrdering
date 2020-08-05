@@ -635,8 +635,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .Build();
 
             await context.OrdersController.UpdateStatusAsync("Order", new StatusModel { Status = inputStatus });
-            context.OrderRepositoryMock.Verify(x => x.UpdateOrderAsync(It.Is<Order>(y => 
-                y.OrderStatus == expectedStatus
+            context.OrderRepositoryMock.Verify(x => x.UpdateOrderAsync(It.Is<Order>(o => 
+                o.OrderStatus == expectedStatus
                 )));
         }
 

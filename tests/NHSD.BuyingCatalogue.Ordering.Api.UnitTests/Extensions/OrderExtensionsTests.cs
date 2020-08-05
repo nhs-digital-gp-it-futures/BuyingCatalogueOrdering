@@ -162,8 +162,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         [TestCase(true, true, false, false, 1, false, false, false)]
         [TestCase(true, true, false, true, 1, true, false, false)]
         [TestCase(true, false, true, false, 0, false, true, false)]
-        public void IsSectionStatusCompleteComplete_whenCalled_ReturnsCorrectResult(bool? fundingComplete,
-            bool recipientViewed, bool associatedViewed, bool solutionViewed, int recipientCount, bool hasSolution, bool hasAssociated, bool expectedResult)
+        public void IsSectionStatusCompleteComplete_whenCalled_ReturnsCorrectResult(
+            bool? fundingComplete,
+            bool recipientViewed, 
+            bool associatedViewed, 
+            bool solutionViewed, 
+            int recipientCount, 
+            bool hasSolution, 
+            bool hasAssociated, 
+            bool expectedResult)
         {
             var orderBuilder = OrderBuilder
                 .Create()
