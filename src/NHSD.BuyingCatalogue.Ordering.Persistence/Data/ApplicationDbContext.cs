@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
@@ -13,11 +14,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 
         public DbSet<ServiceRecipient> ServiceRecipient { get; set; }
 
+        private readonly IHostEnvironment _hostEnvironment;
+
         public ApplicationDbContext(
-            DbContextOptions<ApplicationDbContext> options, 
-            ILoggerFactory loggerFactory = null) 
+            DbContextOptions<ApplicationDbContext> options,
+            IHostEnvironment hostEnvironment,
+            ILoggerFactory loggerFactory = null)
             : base(options)
         {
+            _hostEnvironment = hostEnvironment;
             _loggerFactory = loggerFactory;
         }
 
@@ -25,7 +30,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
         {
             base.OnConfiguring(optionsBuilder);
 
-            optionsBuilder?.UseLoggerFactory(_loggerFactory).EnableSensitiveDataLogging();
+            optionsBuilder?.UseLoggerFactory(_loggerFactory).EnableSensitiveDataLogging(_hostEnvironment.IsDevelopment());
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
