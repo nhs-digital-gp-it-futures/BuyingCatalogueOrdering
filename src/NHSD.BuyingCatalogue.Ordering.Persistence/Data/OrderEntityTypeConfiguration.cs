@@ -33,6 +33,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
             builder.HasMany(x => x.ServiceRecipients)
                 .WithOne(x => x.Order);
 
+            builder
+                .Property(orderItem => orderItem.OrderStatus)
+                .HasConversion(input => input.Id, output => OrderStatus.FromId(output))
+                .HasColumnName("OrderStatusId");
+
             builder.HasQueryFilter(p => !p.IsDeleted);
         }
     }

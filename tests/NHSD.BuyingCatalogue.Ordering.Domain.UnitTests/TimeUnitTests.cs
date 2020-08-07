@@ -40,7 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         [TestCase("Month")]
         [TestCase("month")]
         [TestCase("mONTh")]
-        public void FromName_TimeUnitId_ReturnsExpectedType(string timeUnitName)
+        public void FromName_TimeUnitName_ReturnsExpectedType(string timeUnitName)
         {
             var actual = TimeUnit.FromName(timeUnitName);
 
@@ -51,7 +51,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         [TestCase(null)]
         [TestCase("")]
         [TestCase("   ")]
-        public void FromName_UnknownTimeUnitId_ReturnsNull(string name)
+        public void FromName_UnknownTimeUnitName_ReturnsNull(string name)
         {
             var actual = TimeUnit.FromName(name);
             actual.Should().BeNull();

@@ -14,6 +14,7 @@ using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Api.Models.Errors;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -68,11 +69,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                         new ServiceRecipientModel { Name = order.OrganisationName, OdsCode = orderOrganisationOdsCode });
                 }
             }
-
+            
             const int monthsPerYear = 12;
             var calculatedCostPerYear = order.CalculateCostPerYear(CostType.Recurring);
             var totalOneOffCost = order.CalculateCostPerYear(CostType.OneOff);
-
+            
             return new OrderModel
             {
                 Description = order.Description.Value,
@@ -95,7 +96,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 TotalRecurringCostPerYear = calculatedCostPerYear,
                 TotalOwnershipCost = order.CalculateTotalOwnershipCost(),
                 ServiceRecipients = serviceRecipientDictionary.Values,
-                Status = order.OrderStatus.ToString(),
+                Status = order.OrderStatus.Name,
                 OrderItems = order.OrderItems.Select(orderItem =>
                     new OrderItemModel
                     {
@@ -135,7 +136,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 LastUpdated = order.LastUpdated,
                 DateCreated = order.Created,
                 DateCompleted = order.Completed,
-                Status = order.OrderStatus.ToString(),
+                Status = order.OrderStatus.Name,
             }).ToList();
 
             return orderModelResult;
@@ -189,7 +190,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     SectionModel.FundingSource.WithStatus(order.IsFundingSourceComplete() ? "complete" : "incomplete")
                 },
                 SectionStatus = order.IsSectionStatusComplete(serviceRecipientsCount) ? "complete" : "incomplete",
-                Status = order.OrderStatus.ToString()
+                Status = order.OrderStatus.Name
             };
 
             return Ok(orderSummaryModel);
@@ -265,8 +266,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 throw new ArgumentNullException(nameof(model));
             }
 
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            var orderStatus = OrderStatus.FromName(model.Status);
+            if (orderStatus is null)
+            {
+                return BadRequest(new ErrorResponseModel
+                {
+                    Errors = new[] { ErrorMessages.InvalidOrderStatus() }
+                });
+            }
 
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
             {
                 return NotFound();
@@ -281,15 +290,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             int serviceRecipientsCount = await _serviceRecipientRepository.GetCountByOrderIdAsync(orderId);
             if (!order.IsSectionStatusComplete(serviceRecipientsCount))
             {
-                var createOrderResponse = new ErrorResponseModel();
-                createOrderResponse.Errors = new[] { new ErrorModel("OrderNotComplete", "Order") };
-                return BadRequest(createOrderResponse);
-            }
-
-            var enumParsed = Enum.TryParse<OrderStatus>(model.Status, out var orderStatus);
-            if (!enumParsed)
-            {
-                throw new InvalidEnumArgumentException(nameof(model.Status));
+                return BadRequest(new ErrorResponseModel {Errors = new[] { ErrorMessages.OrderNotComplete() } });
             }
 
             order.OrderStatus = orderStatus;

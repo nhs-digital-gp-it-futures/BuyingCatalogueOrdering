@@ -10,6 +10,7 @@ using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using NHSD.BuyingCatalogue.Ordering.Api.Models.Errors;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
@@ -316,7 +317,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             actual.Should().BeEquivalentTo(expected);
         }
 
-        [TestCase]
+        [Test]
         public async Task GetOrderSummaryAsync_AssociatedServiceCount_ReturnsCountOfTwo()
         {
             var order = OrderBuilder.Create()
@@ -528,56 +529,74 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public void UpdateOrderStatusAsync_NullModel_ThrowsException()
+        public void UpdateStatusAsync_NullModel_ThrowsException()
         {
             var context = OrdersControllerTestContext.Setup();
             Assert.ThrowsAsync<ArgumentNullException>(() => context.OrdersController.UpdateStatusAsync("Order", null));
         }
 
         [Test]
-        public async Task UpdateOrderStatusAsync_NullOrder_ReturnsNotFound()
+        public async Task UpdateStatusAsync_NullOrder_ReturnsNotFound()
         {
             var context = OrdersControllerTestContext.Setup();
             context.Order = null;
 
-            var response = await context.OrdersController.UpdateStatusAsync("Order", new StatusModel());
+            var response = await context.OrdersController.UpdateStatusAsync("Order", context.CompleteOrderStatusModel);
             response.Result.Should().BeOfType<NotFoundResult>();
         }
 
         [Test]
-        public async Task UpdateOrderAsync_OrderForDifferentOrganisation_ReturnsForbidden()
+        public async Task UpdateStatusAsync_OrderForDifferentOrganisation_ReturnsBadRequest()
         {
             var context = OrdersControllerTestContext.Setup();
             context.Order = OrderBuilder.Create()
                 .WithOrganisationId(Guid.NewGuid())
                 .Build();
 
-            var response = await context.OrdersController.UpdateStatusAsync("Order", new StatusModel());
+            var response = await context.OrdersController.UpdateStatusAsync("Order", context.CompleteOrderStatusModel);
             response.Result.Should().BeOfType<ForbidResult>();
         }
 
         [Test]
-        public async Task UpdateOrderAsync_OrderNotComplete_ReturnsBadRequest()
+        public async Task UpdateStatusAsync_OrderNotComplete_ReturnsBadRequest()
         {
             var context = OrdersControllerTestContext.Setup();
-            var orderItem = OrderItemBuilder.Create().Build();
-            context.Order = OrderBuilder.Create()
+            context.Order = OrderBuilder
+                .Create()
                 .WithOrganisationId(context.PrimaryOrganisationId)
-                .WithOrderItem(orderItem)
+                .WithOrderItem(OrderItemBuilder
+                    .Create()
+                    .Build())
                 .Build();
 
-            var response = await context.OrdersController.UpdateStatusAsync("Order", new StatusModel());
-            response.Should().BeOfType<ActionResult<ErrorResponseModel>>();
-            var actual = response.Result;
+            var response = await context.OrdersController.UpdateStatusAsync("Order", context.CompleteOrderStatusModel);
+            response.Result.Should().BeOfType<BadRequestObjectResult>();
+        }
 
-            var expectedErrors =
-                new List<ErrorModel> { new ErrorModel("OrderNotComplete", "Order") };
-            var expected = new BadRequestObjectResult(new ErrorResponseModel { Errors = expectedErrors });
+        [Test]
+        public async Task UpdateStatusAsync_OrderNotComplete_ReturnsOrderNotCompleteError()
+        {
+            var context = OrdersControllerTestContext.Setup();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(context.PrimaryOrganisationId)
+                .WithOrderItem(OrderItemBuilder
+                    .Create()
+                    .Build())
+                .Build();
+
+            var response = await context.OrdersController.UpdateStatusAsync("Order", context.CompleteOrderStatusModel);
+            var actual = response.Result.As<BadRequestObjectResult>().Value;
+
+            var expected = new ErrorResponseModel
+            {
+                Errors = new List<ErrorModel> { ErrorMessages.OrderNotComplete() }
+            };
             actual.Should().BeEquivalentTo(expected);
         }
 
         [Test]
-        public async Task UpdateOrderAsync_OrderIsComplete_ReturnsNoContent()
+        public async Task UpdateStatusAsync_OrderIsComplete_ReturnsNoContent()
         {
             var context = OrdersControllerTestContext.Setup();
             var orderItem = OrderItemBuilder.Create()
@@ -592,12 +611,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithCatalogueSolutionsViewed(true)
                 .Build();
 
-            var response = await context.OrdersController.UpdateStatusAsync("Order", new StatusModel { Status = "Complete" });
+            var response = await context.OrdersController.UpdateStatusAsync("Order", context.CompleteOrderStatusModel);
             response.Result.Should().BeOfType<NoContentResult>();
         }
 
         [Test]
-        public async Task UpdateOrderAsync_OrderIsComplete_LastUpdatedIsUpdated()
+        public async Task UpdateStatusAsync_OrderIsComplete_LastUpdatedIsUpdated()
         {
             var context = OrdersControllerTestContext.Setup();
             var orderItem = OrderItemBuilder.Create()
@@ -612,16 +631,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithCatalogueSolutionsViewed(true)
                 .Build();
 
-            await context.OrdersController.UpdateStatusAsync("Order", new StatusModel { Status = "Complete" });
+            await context.OrdersController.UpdateStatusAsync("Order", context.CompleteOrderStatusModel);
 
             context.Order.LastUpdatedBy.Should().Be(context.NameIdentity);
             context.Order.LastUpdatedByName.Should().Be(context.Name);
             context.Order.LastUpdated.Should().NotBe(DateTime.MinValue);
         }
 
-        [TestCase("Complete", OrderStatus.Complete)]
-        [TestCase("Incomplete", OrderStatus.Incomplete)]
-        public async Task UpdateOrderAsync_OrderIsComplete_UpdatesAndSavesTheOrder(string inputStatus, OrderStatus expectedStatus)
+        [TestCase("Complete", "complete")]
+        [TestCase("Incomplete", "incomplete")]
+        public async Task UpdateStatusAsync_OrderIsComplete_UpdatesAndSavesTheOrder(string inputStatus, string statusName)
         {
             var context = OrdersControllerTestContext.Setup();
             var orderItem = OrderItemBuilder.Create()
@@ -637,8 +656,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .Build();
 
             await context.OrdersController.UpdateStatusAsync("Order", new StatusModel { Status = inputStatus });
-            context.OrderRepositoryMock.Verify(x => x.UpdateOrderAsync(It.Is<Order>(o =>
-                o.OrderStatus == expectedStatus
+            context.OrderRepositoryMock.Verify(x => x.UpdateOrderAsync(It.Is<Order>(o => 
+                o.OrderStatus.Equals(OrderStatus.FromName(statusName))
                 )));
         }
 
@@ -659,7 +678,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 {
                     OrderId = repositoryOrder.OrderId,
                     Description = repositoryOrder.Description.Value,
-                    Status = repositoryOrder.OrderStatus.ToString(),
+                    Status = repositoryOrder.OrderStatus.Name,
                     DateCreated = repositoryOrder.Created,
                     LastUpdated = repositoryOrder.LastUpdated,
                     LastUpdatedBy = repositoryOrder.LastUpdatedByName
@@ -753,7 +772,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 TotalRecurringCostPerMonth = calculatedCostPerYear / monthsPerYear,
                 TotalRecurringCostPerYear = calculatedCostPerYear,
                 TotalOwnershipCost = repositoryOrder.CalculateTotalOwnershipCost(),
-                Status = repositoryOrder.OrderStatus.ToString(),
+                Status = repositoryOrder.OrderStatus.Name,
                 ServiceRecipients = repositoryOrder.ServiceRecipients.Select(serviceRecipient =>
                     new ServiceRecipientModel
                     {
@@ -833,6 +852,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 };
             }
 
+            internal StatusModel CompleteOrderStatusModel { get; } = new StatusModel { Status  = "complete" };
+
             internal string Name { get; }
 
             internal Guid NameIdentity { get; }
@@ -840,6 +861,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             internal Guid PrimaryOrganisationId { get; }
 
             internal int ServiceRecipientListCount { get; set; }
+
+            private ClaimsPrincipal ClaimsPrincipal { get; }
 
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
 
@@ -854,8 +877,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             internal Order Order { get; set; }
 
             internal OrdersController OrdersController { get; }
-
-            private ClaimsPrincipal ClaimsPrincipal { get; }
 
             internal static OrdersControllerTestContext Setup()
             {
@@ -1317,7 +1338,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                             .WithOrganisationId(organisationId)
                             .WithCatalogueSolutionsViewed(true)
                             .WithServiceRecipientsViewed(true)
-                            .WithServiceRecipient(("ODS1", "Recip1"))
+                            .WithServiceRecipient(("ODS1","Recip1"))
                             .WithAssociatedServicesViewed(true)
                             .WithOrderItem(OrderItemBuilder.Create().WithCatalogueItemType(CatalogueItemType.AssociatedService).Build())
                             .WithFundingSourceOnlyGms(true)

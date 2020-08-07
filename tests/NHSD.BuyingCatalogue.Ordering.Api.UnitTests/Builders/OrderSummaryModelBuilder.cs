@@ -21,7 +21,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _organisationId = Guid.NewGuid();
             _sections = SectionModelListBuilder.Create().Build();
             _sectionStatus = "incomplete";
-            _status = OrderStatus.Incomplete.ToString();
+            _status = OrderStatus.Incomplete.Name;
         }
 
         public static OrderSummaryModelBuilder Create()
