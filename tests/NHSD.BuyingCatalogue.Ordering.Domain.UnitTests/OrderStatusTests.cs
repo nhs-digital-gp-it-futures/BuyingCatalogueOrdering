@@ -40,7 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         [TestCase("Complete")]
         [TestCase("complete")]
         [TestCase("comPLete")]
-        public void FromName_OrderStatusId_ReturnsExpectedType(string orderStatusName)
+        public void FromName_OrderStatusName_ReturnsExpectedType(string orderStatusName)
         {
             var actual = OrderStatus.FromName(orderStatusName);
 

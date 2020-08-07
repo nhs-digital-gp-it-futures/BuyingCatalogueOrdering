@@ -42,7 +42,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         [TestCase("Declarative")]
         [TestCase("declarative")]
         [TestCase("dEclArative")]
-        public void FromName_ProvisioningTypeId_ReturnsExpectedType(string provisioningTypeName)
+        public void FromName_ProvisioningTypeName_ReturnsExpectedType(string provisioningTypeName)
         {
             var actual = ProvisioningType.FromName(provisioningTypeName);
 
@@ -50,7 +50,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void FromName_UnknownProvisioningTypeId_ReturnsNull()
+        public void FromName_UnknownProvisioningTypeName_ReturnsNull()
         {
             var actual = ProvisioningType.FromName("Unknown");
             actual.Should().BeNull();
