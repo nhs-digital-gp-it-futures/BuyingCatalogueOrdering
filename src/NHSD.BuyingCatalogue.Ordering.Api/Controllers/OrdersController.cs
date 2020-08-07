@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
@@ -9,9 +8,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
+using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Domain;
@@ -69,11 +68,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                         new ServiceRecipientModel { Name = order.OrganisationName, OdsCode = orderOrganisationOdsCode });
                 }
             }
-            
+
             const int monthsPerYear = 12;
             var calculatedCostPerYear = order.CalculateCostPerYear(CostType.Recurring);
             var totalOneOffCost = order.CalculateCostPerYear(CostType.OneOff);
-            
+
             return new OrderModel
             {
                 Description = order.Description.Value,
@@ -119,7 +118,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpGet]
         [Route("/api/v1/organisations/{organisationId}/[controller]")]
-        public async Task<ActionResult> GetAllAsync(Guid organisationId)
+        public async Task<ActionResult<IList<OrderListItemModel>>> GetAllAsync(Guid organisationId)
         {
             var primaryOrganisationId = User.GetPrimaryOrganisationId();
             if (primaryOrganisationId != organisationId)
@@ -135,11 +134,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 LastUpdatedBy = order.LastUpdatedByName,
                 LastUpdated = order.LastUpdated,
                 DateCreated = order.Created,
-                Status = order.OrderStatus.ToString()
-            })
-                .ToList();
+                DateCompleted = order.Completed,
+                Status = order.OrderStatus.ToString(),
+            }).ToList();
 
-            return Ok(orderModelResult);
+            return orderModelResult;
         }
 
         [HttpGet]
