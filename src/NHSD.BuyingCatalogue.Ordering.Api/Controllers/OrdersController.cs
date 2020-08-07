@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
@@ -7,9 +8,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
+using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Domain;
@@ -35,31 +36,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
             _createOrderService = createOrderService ?? throw new ArgumentNullException(nameof(createOrderService));
             _serviceRecipientRepository = serviceRecipientRepository ?? throw new ArgumentNullException(nameof(serviceRecipientRepository));
-        }
-
-        [HttpGet]
-        [Route("/api/v1/organisations/{organisationId}/[controller]")]
-        public async Task<ActionResult> ListAsync(Guid organisationId)
-        {
-            var primaryOrganisationId = User.GetPrimaryOrganisationId();
-            if (primaryOrganisationId != organisationId)
-            {
-                return Forbid();
-            }
-
-            var orders = await _orderRepository.ListOrdersByOrganisationIdAsync(organisationId);
-            var orderModelResult = orders.Select(order => new OrderListItemModel
-                {
-                    OrderId = order.OrderId,
-                    Description = order.Description.Value,
-                    LastUpdatedBy = order.LastUpdatedByName,
-                    LastUpdated = order.LastUpdated,
-                    DateCreated = order.Created,
-                    Status = order.OrderStatus.Name.ToString()
-                })
-                .ToList();
-
-            return Ok(orderModelResult);
         }
 
         [HttpGet]
@@ -139,6 +115,31 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                         CostPerYear = orderItem.CalculateTotalCostPerYear()
                     })
             };
+        }
+
+        [HttpGet]
+        [Route("/api/v1/organisations/{organisationId}/[controller]")]
+        public async Task<ActionResult<IList<OrderListItemModel>>> GetAllAsync(Guid organisationId)
+        {
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != organisationId)
+            {
+                return Forbid();
+            }
+
+            var orders = await _orderRepository.ListOrdersByOrganisationIdAsync(organisationId);
+            var orderModelResult = orders.Select(order => new OrderListItemModel
+            {
+                OrderId = order.OrderId,
+                Description = order.Description.Value,
+                LastUpdatedBy = order.LastUpdatedByName,
+                LastUpdated = order.LastUpdated,
+                DateCreated = order.Created,
+                DateCompleted = order.Completed,
+                Status = order.OrderStatus.ToString(),
+            }).ToList();
+
+            return orderModelResult;
         }
 
         [HttpGet]

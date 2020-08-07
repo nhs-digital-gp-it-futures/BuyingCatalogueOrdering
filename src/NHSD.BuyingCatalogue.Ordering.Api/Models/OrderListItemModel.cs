@@ -12,6 +12,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 
         public DateTime DateCreated { get; set; }
 
+        public DateTime? DateCompleted { get; set; }
+
         public DateTime LastUpdated { get; set; }
 
         public string LastUpdatedBy { get; set; }

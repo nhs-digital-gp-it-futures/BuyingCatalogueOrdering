@@ -84,20 +84,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task ListAsync_NoOrdersExist_ReturnsEmptyResult()
+        public async Task GetAllAsync_NoOrdersExist_ReturnsEmptyResult()
         {
             var context = OrdersControllerTestContext.Setup();
 
             var controller = context.OrdersController;
 
-            var result = await controller.ListAsync(context.PrimaryOrganisationId) as OkObjectResult;
-            var orders = result.Value as List<OrderListItemModel>;
+            var result = await controller.GetAllAsync(context.PrimaryOrganisationId);
+            var orders = result.Value;
             orders.Should().BeEmpty();
         }
 
         [TestCase(null, "Some Description")]
         [TestCase("C0000014-01", "Some Description")]
-        public async Task ListAsync_SingleOrderWithOrganisationIdExists_ReturnsTheOrder(string orderId,
+        public async Task GetAllAsync_SingleOrderWithOrganisationIdExists_ReturnsTheOrder(
+            string orderId,
             string orderDescription)
         {
             var context = OrdersControllerTestContext.Setup();
@@ -110,14 +111,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var controller = context.OrdersController;
 
-            var result = await controller.ListAsync(context.PrimaryOrganisationId) as OkObjectResult;
-            var ordersResult = result.Value as List<OrderListItemModel>;
+            var result = await controller.GetAllAsync(context.PrimaryOrganisationId);
+            var ordersResult = result.Value;
             ordersResult.Should().ContainSingle();
             ordersResult.Should().BeEquivalentTo(orders.Select(x => x.expected));
         }
 
         [Test]
-        public async Task ListAsync_SingleOrderWithOtherOrganisationIdExists_ReturnsForbidden()
+        public async Task GetAllAsync_SingleOrderWithOtherOrganisationIdExists_ReturnsForbidden()
         {
             var otherOrganisationId = Guid.NewGuid();
             var context = OrdersControllerTestContext.Setup();
@@ -130,12 +131,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var controller = context.OrdersController;
 
-            var result = await controller.ListAsync(otherOrganisationId);
-            result.Should().BeOfType<ForbidResult>();
+            var result = await controller.GetAllAsync(otherOrganisationId);
+            result.Should().NotBeNull();
+            result.Result.Should().BeOfType<ForbidResult>();
         }
 
         [Test]
-        public async Task ListAsync_MultipleOrdersWithOrganisationIdExist_ReturnsAllOrders()
+        public async Task GetAllAsync_MultipleOrdersWithOrganisationIdExist_ReturnsAllOrders()
         {
             var context = OrdersControllerTestContext.Setup();
 
@@ -149,8 +151,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var controller = context.OrdersController;
 
-            var result = await controller.ListAsync(context.PrimaryOrganisationId) as OkObjectResult;
-            var ordersResult = result.Value as List<OrderListItemModel>;
+            var result = await controller.GetAllAsync(context.PrimaryOrganisationId);
+            var ordersResult = result.Value;
             ordersResult.Count.Should().Be(2);
             ordersResult.Should().BeEquivalentTo(orders.Select(x => x.expected));
         }
@@ -162,7 +164,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var controller = context.OrdersController;
 
-            await controller.ListAsync(context.PrimaryOrganisationId);
+            await controller.GetAllAsync(context.PrimaryOrganisationId);
 
             context.OrderRepositoryMock.Verify(x => x.ListOrdersByOrganisationIdAsync(context.PrimaryOrganisationId),
                 Times.Once);

@@ -26,6 +26,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
 
         public DateTime Created { get; set; }
 
+        public DateTime? Completed { get; set; }
+
         public DateTime LastUpdated { get; set; }
 
         public Guid LastUpdatedBy { get; set; }
@@ -80,7 +82,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 AdditionalServicesViewed,
                 AssociatedServicesViewed,
                 FundingSourceOnlyGMS,
-                IsDeleted
+                IsDeleted,
+                Completed
             )
             VALUES
             (
@@ -107,7 +110,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                 @AdditionalServicesViewed,
                 @AssociatedServicesViewed,
                 @FundingSourceOnlyGMS,
-                @IsDeleted
+                @IsDeleted,
+                @Completed
             );";
 
         public static async Task<OrderEntity> FetchOrderByOrderId(string connectionString, string orderId)
@@ -137,7 +141,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
                           AdditionalServicesViewed,
                           AssociatedServicesViewed,
                           FundingSourceOnlyGMS,
-                          IsDeleted
+                          IsDeleted,
+                          Completed
                          FROM dbo.[Order]
                          WHERE OrderId = @orderId;", new { orderId }));
         }
