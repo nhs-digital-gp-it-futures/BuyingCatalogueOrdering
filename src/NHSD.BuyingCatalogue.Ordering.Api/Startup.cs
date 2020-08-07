@@ -107,7 +107,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
+            {
+                options.UseSqlServer(connectionString).EnableSensitiveDataLogging(_environment.IsDevelopment());
+            });
 
             services.AddAuthorization(options =>
             {
