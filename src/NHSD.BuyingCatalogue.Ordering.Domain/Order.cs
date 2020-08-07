@@ -22,17 +22,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             Created = DateTime.UtcNow;
         }
 
-        public static Order Create(
-            OrderDescription orderDescription,
-            Guid organisationId,
-            Guid lastUpdatedBy,
-            string lastUpdatedByName)
-        {
-            var order = new Order(orderDescription, organisationId);
-            order.SetLastUpdatedBy(lastUpdatedBy, lastUpdatedByName);
-            return order;
-        }
-
         public string OrderId { get; set; }
 
         public OrderDescription Description { get; private set; }
@@ -50,6 +39,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         public Contact OrganisationContact { get; set; }
 
         public DateTime Created { get; set; }
+
+        public DateTime? Completed { get; set; }
 
         public DateTime LastUpdated { get; set; }
 
@@ -89,10 +80,22 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         public IReadOnlyList<ServiceRecipient> ServiceRecipients =>
             _serviceRecipients.AsReadOnly();
 
+        public static Order Create(
+                                                                                                                                                                                                                            OrderDescription orderDescription,
+            Guid organisationId,
+            Guid lastUpdatedBy,
+            string lastUpdatedByName)
+        {
+            var order = new Order(orderDescription, organisationId);
+            order.SetLastUpdatedBy(lastUpdatedBy, lastUpdatedByName);
+            return order;
+        }
+
         public void SetDescription(OrderDescription orderDescription)
         {
             Description = orderDescription ?? throw new ArgumentNullException(nameof(orderDescription));
         }
+
         public decimal CalculateCostPerYear(CostType costType)
         {
             return _orderItems.Where(x => x.CostType == costType).Sum(y => y.CalculateTotalCostPerYear());
@@ -131,19 +134,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public void UpdateOrderItem(
             int orderItemId,
-            DateTime? deliveryDate, 
-            int quantity, 
-            TimeUnit estimationPeriod, 
+            DateTime? deliveryDate,
+            int quantity,
+            TimeUnit estimationPeriod,
             decimal? price,
-            Guid userId, 
+            Guid userId,
             string name)
         {
             var orderItem = _orderItems.FirstOrDefault(item => orderItemId.Equals(item.OrderItemId));
 
             orderItem?.ChangePrice(
-                deliveryDate, 
-                quantity, 
-                estimationPeriod, 
+                deliveryDate,
+                quantity,
+                estimationPeriod,
                 price,
                 () => SetLastUpdatedBy(userId, name));
         }
