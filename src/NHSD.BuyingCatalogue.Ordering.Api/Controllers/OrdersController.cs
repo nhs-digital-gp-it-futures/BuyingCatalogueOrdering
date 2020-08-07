@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net.Mime;
@@ -54,7 +55,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             var serviceRecipientDictionary = order.ServiceRecipients.Select(serviceRecipient =>
-                    new ServiceRecipientModel {Name = serviceRecipient.Name, OdsCode = serviceRecipient.OdsCode})
+                    new ServiceRecipientModel { Name = serviceRecipient.Name, OdsCode = serviceRecipient.OdsCode })
                 .ToDictionary(x => x.OdsCode);
 
             var orderItems = order.OrderItems;
@@ -188,7 +189,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                         .WithCount(additionalServicesCount),
                     SectionModel.FundingSource.WithStatus(order.IsFundingSourceComplete() ? "complete" : "incomplete")
                 },
-                SectionStatus = order.IsSectionStatusComplete(serviceRecipientsCount, catalogueSolutionsCount, associatedServicesCount) ? "complete" : "incomplete",
+                SectionStatus = order.IsSectionStatusComplete(serviceRecipientsCount) ? "complete" : "incomplete",
                 Status = order.OrderStatus.ToString()
             };
 
@@ -197,7 +198,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpPost]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult<CreateOrderResponseModel>> CreateOrderAsync([FromBody][Required] CreateOrderModel order)
+        public async Task<ActionResult<ErrorResponseModel>> CreateOrderAsync(CreateOrderModel order)
         {
             if (order is null)
             {
@@ -218,7 +219,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 OrganisationId = order.OrganisationId,
             });
 
-            var createOrderResponse = new CreateOrderResponseModel();
+            var createOrderResponse = new ErrorResponseModel();
 
             if (result.IsSuccess)
             {
@@ -252,6 +253,51 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             var name = User.Identity.Name;
             order.SetLastUpdatedBy(User.GetUserId(), name);
+            await _orderRepository.UpdateOrderAsync(order);
+            return NoContent();
+        }
+
+        [HttpPut]
+        [Route("{orderId}/status")]
+        public async Task<ActionResult<ErrorResponseModel>> UpdateStatusAsync(string orderId, StatusModel model)
+        {
+            if (model is null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+
+            if (order is null)
+            {
+                return NotFound();
+            }
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
+            int serviceRecipientsCount = await _serviceRecipientRepository.GetCountByOrderIdAsync(orderId);
+            if (!order.IsSectionStatusComplete(serviceRecipientsCount))
+            {
+                var createOrderResponse = new ErrorResponseModel();
+                createOrderResponse.Errors = new[] { new ErrorModel("OrderNotComplete", "Order") };
+                return BadRequest(createOrderResponse);
+            }
+
+            var enumParsed = Enum.TryParse<OrderStatus>(model.Status, out var orderStatus);
+            if (!enumParsed)
+            {
+                throw new InvalidEnumArgumentException(nameof(model.Status));
+            }
+
+            order.OrderStatus = orderStatus;
+
+            var name = User.Identity.Name;
+            order.SetLastUpdatedBy(User.GetUserId(), name);
+
             await _orderRepository.UpdateOrderAsync(order);
             return NoContent();
         }

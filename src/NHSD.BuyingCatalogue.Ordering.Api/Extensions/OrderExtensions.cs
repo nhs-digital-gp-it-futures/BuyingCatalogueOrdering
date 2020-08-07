@@ -1,4 +1,5 @@
-﻿using NHSD.BuyingCatalogue.Ordering.Domain;
+﻿using System.Linq;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 {
@@ -57,9 +58,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
             return !(order is null) && order.AssociatedServicesViewed;
         }
 
-        public static bool IsSectionStatusComplete(this Order order, int serviceRecipientsCount, int catalogueSolutionsCount, int associatedServicesCount)
+        public static bool IsSectionStatusComplete(this Order order, int serviceRecipientsCount)
         {
             if (!IsFundingSourceComplete(order)) return false;
+
+            int catalogueSolutionsCount = order.OrderItems.Count(o => o.CatalogueItemType.Equals(CatalogueItemType.Solution));
+            int associatedServicesCount = order.OrderItems.Count(o => o.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
 
             var solutionAndAssociatedServices = catalogueSolutionsCount > 0
                                                 && associatedServicesCount > 0;

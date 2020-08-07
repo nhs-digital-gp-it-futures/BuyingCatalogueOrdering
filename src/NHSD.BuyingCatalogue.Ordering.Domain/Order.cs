@@ -57,7 +57,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public string LastUpdatedByName { get; set; }
 
-        public OrderStatus OrderStatus { get; }
+        public OrderStatus OrderStatus { get; set; }
 
         public bool ServiceRecipientsViewed { get; set; }
 
