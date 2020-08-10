@@ -681,7 +681,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     Status = repositoryOrder.OrderStatus.Name,
                     DateCreated = repositoryOrder.Created,
                     LastUpdated = repositoryOrder.LastUpdated,
-                    LastUpdatedBy = repositoryOrder.LastUpdatedByName
+                    LastUpdatedBy = repositoryOrder.LastUpdatedByName,
+                    OnlyGms = repositoryOrder.FundingSourceOnlyGMS
                 });
         }
 
