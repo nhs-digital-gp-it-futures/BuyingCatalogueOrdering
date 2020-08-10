@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
+using NHSD.BuyingCatalogue.Ordering.Domain.Orders;
+using NHSD.BuyingCatalogue.Ordering.Domain.Results;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
@@ -440,6 +442,183 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
                 .Build();
 
             order.CalculateTotalOwnershipCost().Should().Be(0);
+        }
+
+        [TestCase(null, false, false, false, false, false, false, false)]
+        [TestCase(true, true, true, true, true, true, false, true)]
+        [TestCase(true, true, true, true, true, true, true, true)]
+        [TestCase(true, true, true, true, false, false, true, true)]
+        [TestCase(true, true, true, true, true, false, true, true)]
+        [TestCase(true, true, false, false, true, false, false, false)]
+        [TestCase(true, true, false, true, true, true, false, false)]
+        [TestCase(true, false, true, false, false, false, true, false)]
+        public void CanComplete_ReturnsCorrectResult(
+            bool? fundingComplete,
+            bool recipientViewed,
+            bool associatedViewed,
+            bool solutionViewed,
+            bool hasRecipient,
+            bool hasSolution,
+            bool hasAssociated,
+            bool expectedResult)
+        {
+            var orderBuilder = OrderBuilder
+                .Create()
+                .WithFundingSourceOnlyGms(fundingComplete)
+                .WithServiceRecipientsViewed(recipientViewed)
+                .WithAssociatedServicesViewed(associatedViewed)
+                .WithCatalogueSolutionsViewed(solutionViewed);
+
+            if (hasRecipient)
+            {
+                orderBuilder.WithServiceRecipient(("ODS1", "Some service recipient"));
+            }
+
+            if (hasSolution)
+            {
+                orderBuilder.WithOrderItem(OrderItemBuilder
+                    .Create()
+                    .WithCatalogueItemType(CatalogueItemType.Solution)
+                    .Build());
+            }
+
+            if (hasAssociated)
+            {
+                orderBuilder.WithOrderItem(OrderItemBuilder
+                    .Create()
+                    .WithCatalogueItemType(CatalogueItemType.AssociatedService)
+                    .Build());
+            }
+
+            var order = orderBuilder.Build();
+
+            order.CanComplete().Should().Be(expectedResult);
+        }
+
+        [Test]
+        public void Complete_CanCompleteOrder_ReturnsSuccessfulResult()
+        {
+            var order = OrderBuilder
+                .Create()
+                .WithFundingSourceOnlyGms(true)
+                .WithServiceRecipientsViewed(true)
+                .WithAssociatedServicesViewed(true)
+                .WithOrderItem(OrderItemBuilder
+                    .Create()
+                    .WithCatalogueItemType(CatalogueItemType.AssociatedService)
+                    .Build()).Build();
+            
+            var actual = order.Complete(Guid.Empty, string.Empty);
+
+            actual.Should().BeEquivalentTo(Result.Success());
+        }
+
+        [Test]
+        public void Complete_CanCompleteOrder_ReturnsCompleteOrderStatus()
+        {
+            var order = OrderBuilder
+                .Create()
+                .WithFundingSourceOnlyGms(true)
+                .WithServiceRecipientsViewed(true)
+                .WithAssociatedServicesViewed(true)
+                .WithOrderItem(OrderItemBuilder
+                    .Create()
+                    .WithCatalogueItemType(CatalogueItemType.AssociatedService)
+                    .Build()).Build();
+
+            order.OrderStatus.Should().Be(OrderStatus.Incomplete);
+
+            order.Complete(Guid.Empty, string.Empty);
+
+            order.OrderStatus.Should().Be(OrderStatus.Complete);
+        }
+
+        [Test]
+        public void Complete_CanCompleteOrder_CompletedDateIsUpdated()
+        {
+            var order = OrderBuilder
+                .Create()
+                .WithFundingSourceOnlyGms(true)
+                .WithServiceRecipientsViewed(true)
+                .WithAssociatedServicesViewed(true)
+                .WithOrderItem(OrderItemBuilder
+                    .Create()
+                    .WithCatalogueItemType(CatalogueItemType.AssociatedService)
+                    .Build()).Build();
+
+            order.Completed.Should().BeNull();
+
+            order.Complete(Guid.Empty, string.Empty);
+
+            order.Completed.Should().NotBeNull();
+        }
+
+        [Test]
+        public void Complete_CanCompleteOrder_LastUpdatedByChanged()
+        {
+            var lastUpdatedBy = Guid.NewGuid();
+
+            var order = OrderBuilder
+                .Create()
+                .WithFundingSourceOnlyGms(true)
+                .WithServiceRecipientsViewed(true)
+                .WithAssociatedServicesViewed(true)
+                .WithOrderItem(OrderItemBuilder
+                    .Create()
+                    .WithCatalogueItemType(CatalogueItemType.AssociatedService)
+                    .Build()).Build();
+
+            order.LastUpdatedBy.Should().NotBe(lastUpdatedBy);
+
+            order.Complete(lastUpdatedBy, String.Empty);
+
+            order.LastUpdatedBy.Should().Be(lastUpdatedBy);
+        }
+
+        [Test]
+        public void Complete_CanCompleteOrder_LastUpdatedByNameChanged()
+        {
+            var lastUpdatedByName = Guid.NewGuid().ToString();
+
+            var order = OrderBuilder
+                .Create()
+                .WithFundingSourceOnlyGms(true)
+                .WithServiceRecipientsViewed(true)
+                .WithAssociatedServicesViewed(true)
+                .WithOrderItem(OrderItemBuilder
+                    .Create()
+                    .WithCatalogueItemType(CatalogueItemType.AssociatedService)
+                    .Build()).Build();
+
+            order.LastUpdatedByName.Should().NotBe(lastUpdatedByName);
+
+            order.Complete(Guid.Empty, lastUpdatedByName);
+
+            order.LastUpdatedByName.Should().Be(lastUpdatedByName);
+        }
+
+        [Test]
+        public void Complete_CanNotCompleteOrder_ReturnsFailedResult()
+        {
+            var order = OrderBuilder
+                .Create()
+                .Build();
+
+            var actual = order.Complete(Guid.Empty, string.Empty);
+
+            actual.Should().Be(Result.Failure(OrderErrors.OrderNotComplete()));
+        }
+
+        [Test]
+        public void Complete_CanNotCompleteOrder_ReturnsIncompleteOrderStatus()
+        {
+            var order = OrderBuilder
+                .Create()
+                .Build();
+
+            order.Complete(Guid.Empty, string.Empty);
+
+            order.OrderStatus.Should().Be(OrderStatus.Incomplete);
         }
     }
 }

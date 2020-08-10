@@ -8,6 +8,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public string Field { get; }
 
+        public ErrorDetails(string id) : this(id, null)
+        {
+        }
+
         public ErrorDetails(string id, string field)
         {
             Id = id ?? throw new ArgumentNullException(nameof(id));

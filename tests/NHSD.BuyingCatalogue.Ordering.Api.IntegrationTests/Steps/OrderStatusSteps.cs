@@ -48,5 +48,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             order.OrderStatus.Should().Be(orderStatus);
         }
+
+        [Then(@"the order completed date is set")]
+        public async Task ThenTheOrderCompletedDateIsSet()
+        {
+            var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, _updateOrderStatusRequest.OrderId);
+            order.Completed.Should().NotBeNull();
+        }
     }
 }

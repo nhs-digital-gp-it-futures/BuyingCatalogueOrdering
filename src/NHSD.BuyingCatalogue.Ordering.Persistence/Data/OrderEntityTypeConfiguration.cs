@@ -39,6 +39,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
                 .HasColumnName("OrderStatusId");
 
             builder.HasQueryFilter(p => !p.IsDeleted);
+
+            builder.Property(order => order.Completed)
+                .HasColumnName("Completed");
         }
     }
 }

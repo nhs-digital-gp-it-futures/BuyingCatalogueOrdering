@@ -5,9 +5,9 @@
 
 Background:
     Given Orders exist
-        | OrderId    | Description            | OrganisationId                       | CatalogueSolutionsViewed | AssociatedServicesViewed | FundingSourceOnlyGMS |
-        | C000014-01 | Some Description       | 4af62b99-638c-4247-875e-965239cd0c48 | True                     | True                     | True                 |
-        | C000014-02 | Some Other Description | 4af62b99-638c-4247-875e-965239cd0c48 | True                     | True                     | NULL                 |
+        | OrderId    | Description            | OrganisationId                       | CatalogueSolutionsViewed | AssociatedServicesViewed | FundingSourceOnlyGMS | Completed |
+        | C000014-01 | Some Description       | 4af62b99-638c-4247-875e-965239cd0c48 | True                     | True                     | True                 | NULL      |
+        | C000014-02 | Some Other Description | 4af62b99-638c-4247-875e-965239cd0c48 | True                     | True                     | NULL                 | NULL      |
     And Service Recipients exist
         | OrderId    | OdsCode | Name    |
         | C000014-01 | eu      | EU Test |
@@ -26,9 +26,8 @@ Scenario: 1. Update an order status
     And the order status is set correctly
 
     Examples:
-        | StatusPayload           |
-        | order-status-complete   |
-        | order-status-incomplete |
+        | StatusPayload         |
+        | order-status-complete |
 
 @5145
 Scenario: 2. Update an order status sets last updated correctly
@@ -42,9 +41,8 @@ Scenario: 2. Update an order status sets last updated correctly
     And the order with orderId C000014-01 has LastUpdated time present and it is the current time
 
     Examples:
-        | StatusPayload           |
-        | order-status-complete   |
-        | order-status-incomplete |
+        | StatusPayload         |
+        | order-status-complete |
 
 @5145
 Scenario: 3. An invalid order status provides an appropriate error message
@@ -57,9 +55,10 @@ Scenario: 3. An invalid order status provides an appropriate error message
         | <ErrorId> | <ErrorField> |
 
     Examples:
-        | StatusPayload        | ErrorId        | ErrorField |
-        | order-status-missing | StatusRequired | Status     |
-        | order-status-invalid | InvalidStatus  | Status     |
+        | StatusPayload           | ErrorId        | ErrorField |
+        | order-status-missing    | StatusRequired | Status     |
+        | order-status-incomplete | InvalidStatus  | Status     |
+        | order-status-invalid    | InvalidStatus  | Status     |
 
 @5145
 Scenario: 4. Updating the status of an unfinished order provides an appropriate error message
@@ -69,7 +68,7 @@ Scenario: 4. Updating the status of an unfinished order provides an appropriate 
     Then a response with status code 400 is returned
     And the response contains the following errors
         | id               | field |
-        | OrderNotComplete | Order |
+        | OrderNotComplete | NULL  |
 
 @5322
 Scenario: 5. If a user is not authorised, then they cannot update the orders description
@@ -110,3 +109,11 @@ Scenario: 9. Service Failure
     And the user enters the 'order-status-complete' update order status request payload
     When the user sends the update order status request
     Then a response with status code 500 is returned
+
+@6859
+Scenario: 10. Update an order status sets the complete date
+    Given the user creates a request to update the order status for the order with ID 'C000014-01'
+    And the user enters the 'order-status-complete' update order status request payload
+    When the user sends the update order status request
+    Then a response with status code 204 is returned
+    And the order completed date is set
