@@ -1,6 +1,6 @@
 ﻿namespace NHSD.BuyingCatalogue.Ordering.Domain.Orders
 {
-    public static class OrderErrors
+    internal static class OrderErrors
     {
         public static ErrorDetails OrderDescriptionRequired()
         {
@@ -15,6 +15,11 @@
         public static ErrorDetails OrderOrganisationIdRequired()
         {
             return new ErrorDetails("OrganisationIdRequired", nameof(Order.OrganisationId));
+        }
+
+        public static ErrorDetails OrderNotComplete()
+        {
+            return new ErrorDetails("OrderNotComplete");
         }
     }
 }

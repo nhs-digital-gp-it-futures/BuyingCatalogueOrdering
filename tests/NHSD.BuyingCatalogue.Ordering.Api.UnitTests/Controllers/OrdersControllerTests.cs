@@ -590,7 +590,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var expected = new ErrorResponseModel
             {
-                Errors = new List<ErrorModel> { ErrorMessages.OrderNotComplete() }
+                Errors = new List<ErrorModel> { new ErrorModel("OrderNotComplete") }
             };
             actual.Should().BeEquivalentTo(expected);
         }
@@ -638,8 +638,36 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             context.Order.LastUpdated.Should().NotBe(DateTime.MinValue);
         }
 
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase("Incomplete")]
+        public async Task UpdateStatusAsync_InvalidOrderStatus_ReturnsInvalidOrderStatusError(string orderStatusInput)
+        {
+            var context = OrdersControllerTestContext.Setup();
+            var orderItem = OrderItemBuilder.Create()
+                .WithCatalogueItemType(CatalogueItemType.Solution)
+                .Build();
+
+            context.Order = OrderBuilder.Create()
+                .WithOrganisationId(context.PrimaryOrganisationId)
+                .WithOrderItem(orderItem)
+                .WithFundingSourceOnlyGms(true)
+                .WithAssociatedServicesViewed(true)
+                .WithCatalogueSolutionsViewed(true)
+                .Build();
+
+            var response = await context.OrdersController.UpdateStatusAsync("Order", new StatusModel { Status = orderStatusInput });
+            var actual = response.Result.As<BadRequestObjectResult>().Value;
+
+            var expected = new ErrorResponseModel
+            {
+                Errors = new List<ErrorModel> { ErrorMessages.InvalidOrderStatus() }
+            };
+
+            actual.Should().BeEquivalentTo(expected);
+        }
+
         [TestCase("Complete", "complete")]
-        [TestCase("Incomplete", "incomplete")]
         public async Task UpdateStatusAsync_OrderIsComplete_UpdatesAndSavesTheOrder(string inputStatus, string statusName)
         {
             var context = OrdersControllerTestContext.Setup();
@@ -852,6 +880,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     HttpContext = new DefaultHttpContext { User = ClaimsPrincipal }
                 };
             }
+
+            internal StatusModel IncompleteOrderStatusModel { get; } = new StatusModel { Status  = "incomplete" };
 
             internal StatusModel CompleteOrderStatusModel { get; } = new StatusModel { Status  = "complete" };
 

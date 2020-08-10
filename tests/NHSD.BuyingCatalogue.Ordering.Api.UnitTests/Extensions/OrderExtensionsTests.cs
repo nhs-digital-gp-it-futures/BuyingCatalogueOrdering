@@ -150,7 +150,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         [Test]
         public void IsSectionStatusCompleteComplete_NullOrder_ReturnsFalse()
         {
-            var actual = OrderExtensions.IsSectionStatusComplete(null, 0);
+            var actual = OrderExtensions.IsSectionStatusComplete(null);
             actual.Should().BeFalse();
         }
 
@@ -194,7 +194,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
             }
 
             var order = orderBuilder.Build();
-            var actual = OrderExtensions.IsSectionStatusComplete(order, recipientCount);
+            var actual = order.IsSectionStatusComplete();
             actual.Should().Be(expectedResult);
         }
     }

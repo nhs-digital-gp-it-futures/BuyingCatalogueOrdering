@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using NHSD.BuyingCatalogue.Ordering.Domain.Orders;
+using NHSD.BuyingCatalogue.Ordering.Domain.Results;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
@@ -40,7 +42,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public DateTime Created { get; set; }
 
-        public DateTime? Completed { get; set; }
+        public DateTime? Completed { get; private set; }
 
         public DateTime LastUpdated { get; set; }
 
@@ -169,6 +171,47 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             }
 
             SetLastUpdatedBy(userId, lastUpdatedName);
+        }
+
+        public bool CanComplete()
+        {
+            if (!FundingSourceOnlyGMS.HasValue)
+                return false;
+
+            int serviceRecipientsCount = ServiceRecipients.Count;
+            int catalogueSolutionsCount = OrderItems.Count(o => o.CatalogueItemType.Equals(CatalogueItemType.Solution));
+            int associatedServicesCount = OrderItems.Count(o => o.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
+
+            var solutionAndAssociatedServices = catalogueSolutionsCount > 0
+                                                && associatedServicesCount > 0;
+
+            var solutionAndNoAssociatedServices = catalogueSolutionsCount > 0 
+                                                  && associatedServicesCount == 0 
+                                                  && AssociatedServicesViewed;
+
+            var noSolutionsAndAssociatedServices = serviceRecipientsCount > 0
+                                                   && catalogueSolutionsCount == 0
+                                                   && CatalogueSolutionsViewed
+                                                   && associatedServicesCount > 0;
+
+            var recipientsAndAssociatedServices =  serviceRecipientsCount == 0 
+                                                   && ServiceRecipientsViewed
+                                                   && associatedServicesCount > 0;
+
+            return solutionAndNoAssociatedServices || solutionAndAssociatedServices || recipientsAndAssociatedServices || noSolutionsAndAssociatedServices;
+        }
+
+        public Result Complete(Guid lastUpdatedBy, string lastUpdatedByName)
+        {
+            if (!CanComplete())
+                return Result.Failure(OrderErrors.OrderNotComplete());
+
+            OrderStatus = OrderStatus.Complete;
+            Completed = DateTime.UtcNow;
+
+            SetLastUpdatedBy(lastUpdatedBy, lastUpdatedByName);
+
+            return Result.Success();
         }
     }
 }
