@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
@@ -17,5 +18,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
         public DateTime LastUpdated { get; set; }
 
         public string LastUpdatedBy { get; set; }
+
+        [JsonPropertyName("onlyGMS")]
+        public bool? OnlyGms { get; set; }
     }
 }
