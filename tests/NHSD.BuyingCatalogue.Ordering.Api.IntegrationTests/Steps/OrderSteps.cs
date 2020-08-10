@@ -190,6 +190,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 LastUpdatedByName = token.Value<string>("lastUpdatedBy"),
                 Created = token.Value<DateTime>("dateCreated"),
                 Completed = token.Value<DateTime>("dateCompleted"),
+                FundingSourceOnlyGMS = token.Value<bool?>("onlyGMS")
             };
         }
 
@@ -206,6 +207,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public DateTime LastUpdated { get; set; }
 
             public string LastUpdatedByName { get; set; }
+
+            public bool? FundingSourceOnlyGMS { get; set; }
         }
 
         private sealed class OrdersTable
