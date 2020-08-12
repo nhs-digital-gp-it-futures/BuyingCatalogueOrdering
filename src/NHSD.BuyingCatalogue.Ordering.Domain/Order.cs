@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using NHSD.BuyingCatalogue.Ordering.Domain.Orders;
+using NHSD.BuyingCatalogue.Ordering.Domain.Results;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
@@ -22,17 +24,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             Created = DateTime.UtcNow;
         }
 
-        public static Order Create(
-            OrderDescription orderDescription,
-            Guid organisationId,
-            Guid lastUpdatedBy,
-            string lastUpdatedByName)
-        {
-            var order = new Order(orderDescription, organisationId);
-            order.SetLastUpdatedBy(lastUpdatedBy, lastUpdatedByName);
-            return order;
-        }
-
         public string OrderId { get; set; }
 
         public OrderDescription Description { get; private set; }
@@ -51,13 +42,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public DateTime Created { get; set; }
 
+        public DateTime? Completed { get; private set; }
+
         public DateTime LastUpdated { get; set; }
 
         public Guid LastUpdatedBy { get; set; }
 
         public string LastUpdatedByName { get; set; }
 
-        public OrderStatus OrderStatus { get; }
+        public OrderStatus OrderStatus { get; set; }
 
         public bool ServiceRecipientsViewed { get; set; }
 
@@ -89,10 +82,22 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         public IReadOnlyList<ServiceRecipient> ServiceRecipients =>
             _serviceRecipients.AsReadOnly();
 
+        public static Order Create(
+                                                                                                                                                                                                                            OrderDescription orderDescription,
+            Guid organisationId,
+            Guid lastUpdatedBy,
+            string lastUpdatedByName)
+        {
+            var order = new Order(orderDescription, organisationId);
+            order.SetLastUpdatedBy(lastUpdatedBy, lastUpdatedByName);
+            return order;
+        }
+
         public void SetDescription(OrderDescription orderDescription)
         {
             Description = orderDescription ?? throw new ArgumentNullException(nameof(orderDescription));
         }
+
         public decimal CalculateCostPerYear(CostType costType)
         {
             return _orderItems.Where(x => x.CostType == costType).Sum(y => y.CalculateTotalCostPerYear());
@@ -131,19 +136,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public void UpdateOrderItem(
             int orderItemId,
-            DateTime? deliveryDate, 
-            int quantity, 
-            TimeUnit estimationPeriod, 
+            DateTime? deliveryDate,
+            int quantity,
+            TimeUnit estimationPeriod,
             decimal? price,
-            Guid userId, 
+            Guid userId,
             string name)
         {
             var orderItem = _orderItems.FirstOrDefault(item => orderItemId.Equals(item.OrderItemId));
 
             orderItem?.ChangePrice(
-                deliveryDate, 
-                quantity, 
-                estimationPeriod, 
+                deliveryDate,
+                quantity,
+                estimationPeriod,
                 price,
                 () => SetLastUpdatedBy(userId, name));
         }
@@ -166,6 +171,47 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             }
 
             SetLastUpdatedBy(userId, lastUpdatedName);
+        }
+
+        public bool CanComplete()
+        {
+            if (!FundingSourceOnlyGMS.HasValue)
+                return false;
+
+            int serviceRecipientsCount = ServiceRecipients.Count;
+            int catalogueSolutionsCount = OrderItems.Count(o => o.CatalogueItemType.Equals(CatalogueItemType.Solution));
+            int associatedServicesCount = OrderItems.Count(o => o.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
+
+            var solutionAndAssociatedServices = catalogueSolutionsCount > 0
+                                                && associatedServicesCount > 0;
+
+            var solutionAndNoAssociatedServices = catalogueSolutionsCount > 0 
+                                                  && associatedServicesCount == 0 
+                                                  && AssociatedServicesViewed;
+
+            var noSolutionsAndAssociatedServices = serviceRecipientsCount > 0
+                                                   && catalogueSolutionsCount == 0
+                                                   && CatalogueSolutionsViewed
+                                                   && associatedServicesCount > 0;
+
+            var recipientsAndAssociatedServices =  serviceRecipientsCount == 0 
+                                                   && ServiceRecipientsViewed
+                                                   && associatedServicesCount > 0;
+
+            return solutionAndNoAssociatedServices || solutionAndAssociatedServices || recipientsAndAssociatedServices || noSolutionsAndAssociatedServices;
+        }
+
+        public Result Complete(Guid lastUpdatedBy, string lastUpdatedByName)
+        {
+            if (!CanComplete())
+                return Result.Failure(OrderErrors.OrderNotComplete());
+
+            OrderStatus = OrderStatus.Complete;
+            Completed = DateTime.UtcNow;
+
+            SetLastUpdatedBy(lastUpdatedBy, lastUpdatedByName);
+
+            return Result.Success();
         }
     }
 }

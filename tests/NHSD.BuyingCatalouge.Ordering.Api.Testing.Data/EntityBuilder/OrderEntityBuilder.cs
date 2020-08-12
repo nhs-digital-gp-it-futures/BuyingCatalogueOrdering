@@ -8,7 +8,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
     {
         private string _orderId;
         private string _description;
-        private Guid   _organisationId;
+        private Guid _organisationId;
         private string _organisationName;
         private string _organisationOdsCode;
         private int? _organisationAddressId;
@@ -19,6 +19,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
         private Guid _lastUpdatedBy;
         private string _lastUpdatedByName;
         private DateTime _created;
+        private DateTime? _completed;
         private string _supplierId;
         private string _supplierName;
         private int? _supplierAddressId;
@@ -29,7 +30,7 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
         private bool _additionalServicesViewed;
         private bool _associatedServicesViewed;
         private bool? _fundingSourceOnlyGms;
-        public bool _isDeleted;
+        private bool _isDeleted;
 
         private OrderEntityBuilder()
         {
@@ -207,6 +208,12 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
             return this;
         }
 
+        public OrderEntityBuilder WithDateCompleted(DateTime? dateCompleted)
+        {
+            _completed = dateCompleted;
+            return this;
+        }
+
         public OrderEntity Build()
         {
             return new OrderEntity
@@ -234,7 +241,8 @@ namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
                 AdditionalServicesViewed = _additionalServicesViewed,
                 AssociatedServicesViewed = _associatedServicesViewed,
                 FundingSourceOnlyGMS = _fundingSourceOnlyGms,
-                IsDeleted = _isDeleted
+                IsDeleted = _isDeleted,
+                Completed = _completed,
             };
         }
     }

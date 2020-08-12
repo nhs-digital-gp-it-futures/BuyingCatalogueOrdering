@@ -4,12 +4,11 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
-using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
-using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
+using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 
@@ -26,8 +25,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private readonly string _orderOrganisationsUrl;
 
         public OrderSteps(
-            Request request, 
-            Response response, 
+            Request request,
+            Response response,
             Settings settings,
             OrderContext orderContext)
         {
@@ -101,6 +100,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithSupplierContactId(supplierContactId)
                     .WithCommencementDate(commencementDate)
                     .WithIsDeleted(ordersTableItem.IsDeleted)
+                    .WithDateCompleted(ordersTableItem.Completed)
                     .Build();
 
                 await order.InsertAsync(_settings.ConnectionString);
@@ -188,7 +188,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 Status = token.Value<string>("status"),
                 LastUpdated = token.Value<DateTime>("lastUpdated"),
                 LastUpdatedByName = token.Value<string>("lastUpdatedBy"),
-                Created = token.Value<DateTime>("dateCreated")
+                Created = token.Value<DateTime>("dateCreated"),
+                Completed = token.Value<DateTime>("dateCompleted"),
+                FundingSourceOnlyGMS = token.Value<bool?>("onlyGMS")
             };
         }
 
@@ -205,6 +207,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public DateTime LastUpdated { get; set; }
 
             public string LastUpdatedByName { get; set; }
+
+            public bool? FundingSourceOnlyGMS { get; set; }
         }
 
         private sealed class OrdersTable
@@ -256,6 +260,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public bool? FundingSourceOnlyGMS { get; set; }
 
             public bool IsDeleted { get; set; }
+
+            public DateTime? Completed { get; set; }
         }
     }
 }

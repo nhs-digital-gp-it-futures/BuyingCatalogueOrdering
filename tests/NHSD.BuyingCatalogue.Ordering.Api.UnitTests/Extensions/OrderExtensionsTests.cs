@@ -3,6 +3,7 @@ using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
@@ -149,30 +150,51 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         [Test]
         public void IsSectionStatusCompleteComplete_NullOrder_ReturnsFalse()
         {
-            var actual = OrderExtensions.IsSectionStatusComplete(null,0,0,0);
+            var actual = OrderExtensions.IsSectionStatusComplete(null);
             actual.Should().BeFalse();
         }
 
-        [TestCase(null, false, false, false, 0, 0, 0, false)]
-        [TestCase(true, true, true, true, 1, 1, 0, true)]
-        [TestCase(true, true, true, true, 1, 1, 1, true)]
-        [TestCase(true, true, true, true, 0, 0, 1, true)]
-        [TestCase(true, true, true, true, 1, 0, 1, true)]
-        [TestCase(true, true, false, false, 1, 0, 0, false)]
-        [TestCase(true, true, false, true, 1, 1, 0, false)]
-        [TestCase(true, false, true, false, 0, 0, 1, false)]
-        public void IsSectionStatusCompleteComplete_whenCalled_ReturnsCorrectResult(bool? fundingComplete,
-            bool recipientViewed, bool associatedViewed, bool solutionViewed, int recipientCount, int solutionCount, int associatedCount, bool expectedResult)
+        [TestCase(null, false, false, false, 0, false, false, false)]
+        [TestCase(true, true, true, true, 1, true, false, true)]
+        [TestCase(true, true, true, true, 1, true, true, true)]
+        [TestCase(true, true, true, true, 0, false, true, true)]
+        [TestCase(true, true, true, true, 1, false, true, true)]
+        [TestCase(true, true, false, false, 1, false, false, false)]
+        [TestCase(true, true, false, true, 1, true, false, false)]
+        [TestCase(true, false, true, false, 0, false, true, false)]
+        public void IsSectionStatusCompleteComplete_whenCalled_ReturnsCorrectResult(
+            bool? fundingComplete,
+            bool recipientViewed, 
+            bool associatedViewed, 
+            bool solutionViewed, 
+            int recipientCount, 
+            bool hasSolution, 
+            bool hasAssociated, 
+            bool expectedResult)
         {
-            var order = OrderBuilder
+            var orderBuilder = OrderBuilder
                 .Create()
                 .WithFundingSourceOnlyGms(fundingComplete)
                 .WithServiceRecipientsViewed(recipientViewed)
                 .WithAssociatedServicesViewed(associatedViewed)
-                .WithCatalogueSolutionsViewed(solutionViewed)
-                .Build();
+                .WithCatalogueSolutionsViewed(solutionViewed);
 
-            var actual = OrderExtensions.IsSectionStatusComplete(order, recipientCount, solutionCount, associatedCount);
+            if (hasSolution)
+            {
+                var orderItem = OrderItemBuilder.Create();
+                orderItem.WithCatalogueItemType(CatalogueItemType.Solution);
+                orderBuilder.WithOrderItem(orderItem.Build());
+            }
+
+            if (hasAssociated)
+            {
+                var orderItem = OrderItemBuilder.Create();
+                orderItem.WithCatalogueItemType(CatalogueItemType.AssociatedService);
+                orderBuilder.WithOrderItem(orderItem.Build());
+            }
+
+            var order = orderBuilder.Build();
+            var actual = order.IsSectionStatusComplete();
             actual.Should().Be(expectedResult);
         }
     }

@@ -41,7 +41,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         [TestCase("Tiered")]
         [TestCase("tiered")]
         [TestCase("tiERed")]
-        public void FromName_CataloguePriceTypeId_ReturnsExpectedType(string cataloguePriceTypeName)
+        public void FromName_CataloguePriceTypeName_ReturnsExpectedType(string cataloguePriceTypeName)
         {
             var actual = CataloguePriceType.FromName(cataloguePriceTypeName);
 
@@ -49,7 +49,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void FromName_UnknownCataloguePriceTypeId_ReturnsNull()
+        public void FromName_UnknownCataloguePriceTypeName_ReturnsNull()
         {
             var actual = CataloguePriceType.FromName("Unknown");
             actual.Should().BeNull();

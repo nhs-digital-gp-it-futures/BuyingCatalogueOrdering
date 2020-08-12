@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
@@ -8,12 +7,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
+using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Api.Models.Errors;
+using NHSD.BuyingCatalogue.Ordering.Domain.Results;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -54,7 +55,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             var serviceRecipientDictionary = order.ServiceRecipients.Select(serviceRecipient =>
-                    new ServiceRecipientModel {Name = serviceRecipient.Name, OdsCode = serviceRecipient.OdsCode})
+                    new ServiceRecipientModel { Name = serviceRecipient.Name, OdsCode = serviceRecipient.OdsCode })
                 .ToDictionary(x => x.OdsCode);
 
             var orderItems = order.OrderItems;
@@ -68,11 +69,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                         new ServiceRecipientModel { Name = order.OrganisationName, OdsCode = orderOrganisationOdsCode });
                 }
             }
-            
+
             const int monthsPerYear = 12;
             var calculatedCostPerYear = order.CalculateCostPerYear(CostType.Recurring);
             var totalOneOffCost = order.CalculateCostPerYear(CostType.OneOff);
-            
+
             return new OrderModel
             {
                 Description = order.Description.Value,
@@ -95,7 +96,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 TotalRecurringCostPerYear = calculatedCostPerYear,
                 TotalOwnershipCost = order.CalculateTotalOwnershipCost(),
                 ServiceRecipients = serviceRecipientDictionary.Values,
-                Status = order.OrderStatus.ToString(),
+                Status = order.OrderStatus.Name,
                 OrderItems = order.OrderItems.Select(orderItem =>
                     new OrderItemModel
                     {
@@ -118,7 +119,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpGet]
         [Route("/api/v1/organisations/{organisationId}/[controller]")]
-        public async Task<ActionResult> GetAllAsync(Guid organisationId)
+        public async Task<ActionResult<IList<OrderListItemModel>>> GetAllAsync(Guid organisationId)
         {
             var primaryOrganisationId = User.GetPrimaryOrganisationId();
             if (primaryOrganisationId != organisationId)
@@ -134,11 +135,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 LastUpdatedBy = order.LastUpdatedByName,
                 LastUpdated = order.LastUpdated,
                 DateCreated = order.Created,
-                Status = order.OrderStatus.ToString()
-            })
-                .ToList();
+                DateCompleted = order.Completed,
+                Status = order.OrderStatus.Name,
+                OnlyGms = order.FundingSourceOnlyGMS
+            }).ToList();
 
-            return Ok(orderModelResult);
+            return orderModelResult;
         }
 
         [HttpGet]
@@ -188,8 +190,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                         .WithCount(additionalServicesCount),
                     SectionModel.FundingSource.WithStatus(order.IsFundingSourceComplete() ? "complete" : "incomplete")
                 },
-                SectionStatus = order.IsSectionStatusComplete(serviceRecipientsCount, catalogueSolutionsCount, associatedServicesCount) ? "complete" : "incomplete",
-                Status = order.OrderStatus.ToString()
+                SectionStatus = order.IsSectionStatusComplete() ? "complete" : "incomplete",
+                Status = order.OrderStatus.Name
             };
 
             return Ok(orderSummaryModel);
@@ -197,7 +199,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpPost]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult<CreateOrderResponseModel>> CreateOrderAsync([FromBody][Required] CreateOrderModel order)
+        public async Task<ActionResult<ErrorResponseModel>> CreateOrderAsync(CreateOrderModel order)
         {
             if (order is null)
             {
@@ -218,7 +220,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 OrganisationId = order.OrganisationId,
             });
 
-            var createOrderResponse = new CreateOrderResponseModel();
+            var createOrderResponse = new ErrorResponseModel();
 
             if (result.IsSuccess)
             {
@@ -253,6 +255,54 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             var name = User.Identity.Name;
             order.SetLastUpdatedBy(User.GetUserId(), name);
             await _orderRepository.UpdateOrderAsync(order);
+            return NoContent();
+        }
+
+        private static readonly IDictionary<OrderStatus, Func<Order, Guid, string, Result>> _updateOrderStatusActionFactory = new Dictionary<OrderStatus, Func<Order, Guid, string, Result>>
+        {
+            { OrderStatus.Complete, ((order, lastUpdatedBy, lastUpdatedByName) => order.Complete(lastUpdatedBy, lastUpdatedByName)) }
+        };
+
+        [HttpPut]
+        [Route("{orderId}/status")]
+        public async Task<ActionResult<ErrorResponseModel>> UpdateStatusAsync(string orderId, StatusModel model)
+        {
+            if (model is null)
+            {
+                throw new ArgumentNullException(nameof(model));
+            }
+
+            var orderStatus = OrderStatus.FromName(model.Status);
+            if (orderStatus is null ||
+                !_updateOrderStatusActionFactory.TryGetValue(orderStatus, out var updateOrderStatusFunction))
+            {
+                return BadRequest(new ErrorResponseModel
+                {
+                    Errors = new[] { ErrorMessages.InvalidOrderStatus() }
+                });
+            }
+
+            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            if (order is null)
+            {
+                return NotFound();
+            }
+
+            var primaryOrganisationId = User.GetPrimaryOrganisationId();
+            if (primaryOrganisationId != order.OrganisationId)
+            {
+                return Forbid();
+            }
+
+            var updateOrderStatusResult = updateOrderStatusFunction(order, User.GetUserId(), User.GetUserName());
+            if (!updateOrderStatusResult.IsSuccess)
+                return BadRequest(new ErrorResponseModel
+                {
+                    Errors = updateOrderStatusResult.Errors.Select(error => new ErrorModel(error.Id, error.Field))
+                });
+
+            await _orderRepository.UpdateOrderAsync(order);
+
             return NoContent();
         }
     }

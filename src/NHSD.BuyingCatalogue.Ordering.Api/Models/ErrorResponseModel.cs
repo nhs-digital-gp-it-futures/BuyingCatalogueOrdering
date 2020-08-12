@@ -2,7 +2,7 @@
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
-    public class CreateOrderResponseModel
+    public class ErrorResponseModel
     {
         public string OrderId { get; set; }
 

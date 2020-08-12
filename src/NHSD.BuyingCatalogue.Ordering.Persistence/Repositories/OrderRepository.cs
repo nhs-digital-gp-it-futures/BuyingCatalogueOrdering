@@ -98,7 +98,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
 
         private async Task<string> GetLatestOrderIdByCreationDateAsync()
         {
-            var latestOrder = await _context.Order.OrderByDescending(o => o.Created).FirstOrDefaultAsync();
+            var latestOrder = await _context
+                .Order
+                .IgnoreQueryFilters()
+                .OrderByDescending(o => o.Created).FirstOrDefaultAsync();
+
             return latestOrder?.OrderId;
         }
     }
