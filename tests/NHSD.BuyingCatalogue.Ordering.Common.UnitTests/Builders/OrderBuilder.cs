@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
@@ -211,7 +212,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             order.FundingSourceOnlyGMS = _fundingSourceOnlyGms;
             order.Created = _created;
             order.LastUpdated = _lastUpdated;
-            order.Completed = _completed;
+
+            if (_completed != null)
+            {
+                var completedFieldInfo =
+                    order.GetType().GetField("_completed", BindingFlags.Instance | BindingFlags.NonPublic);
+                completedFieldInfo?.SetValue(order, _completed);
+            }
 
             return order;
         }

@@ -9,6 +9,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class Order
     {
+#pragma warning disable 649
+        private DateTime? _completed;
+#pragma warning restore 649
+
         private readonly List<OrderItem> _orderItems = new List<OrderItem>();
         private readonly List<ServiceRecipient> _serviceRecipients = new List<ServiceRecipient>();
 
@@ -42,7 +46,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public DateTime Created { get; set; }
 
-        public DateTime? Completed { get; set; }
+        /// <summary>
+        /// Gets the completed date and time.
+        /// </summary>
+        /// <remarks>
+        /// Do not need to convert this to an auto property as recommended by ReSharper.
+        /// ReSharper disable once ConvertToAutoProperty
+        /// </remarks>
+        public DateTime? Completed
+        {
+            get
+            {
+                return _completed;
+            }
+            private set
+            {
+                _completed = value;
+            }
+        }
 
         public DateTime LastUpdated { get; set; }
 
