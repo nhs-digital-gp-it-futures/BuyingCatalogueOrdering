@@ -42,7 +42,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public DateTime Created { get; set; }
 
-        public DateTime? Completed { get; private set; }
+        public DateTime? Completed { get; set; }
 
         public DateTime LastUpdated { get; set; }
 

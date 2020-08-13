@@ -753,6 +753,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var repositoryOrder = OrderBuilder.Create()
                 .WithOrderId(orderId)
                 .WithOrganisationId(organisationId)
+                .WithCompleted(DateTime.UtcNow)
                 .Build();
 
             var repositoryOrderItem = OrderItemBuilder.Create()
@@ -802,6 +803,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 TotalRecurringCostPerYear = calculatedCostPerYear,
                 TotalOwnershipCost = repositoryOrder.CalculateTotalOwnershipCost(),
                 Status = repositoryOrder.OrderStatus.Name,
+                DateCompleted = repositoryOrder.Completed,
                 ServiceRecipients = repositoryOrder.ServiceRecipients.Select(serviceRecipient =>
                     new ServiceRecipientModel
                     {
