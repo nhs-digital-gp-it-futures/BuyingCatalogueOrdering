@@ -97,6 +97,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 TotalOwnershipCost = order.CalculateTotalOwnershipCost(),
                 ServiceRecipients = serviceRecipientDictionary.Values,
                 Status = order.OrderStatus.Name,
+                DateCompleted = order.Completed,
                 OrderItems = order.OrderItems.Select(orderItem =>
                     new OrderItemModel
                     {
