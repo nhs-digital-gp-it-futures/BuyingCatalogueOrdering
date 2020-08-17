@@ -12,6 +12,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Errors;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
@@ -557,41 +558,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             response.Result.Should().BeOfType<ForbidResult>();
         }
 
-        [Test]
-        public async Task UpdateStatusAsync_OrderNotComplete_ReturnsBadRequest()
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase("Incomplete")]
+        public async Task UpdateStatusAsync_InvalidOrderStatus_ReturnsInvalidOrderStatusError(string orderStatusInput)
         {
             var context = OrdersControllerTestContext.Setup();
-            context.Order = OrderBuilder
-                .Create()
-                .WithOrganisationId(context.PrimaryOrganisationId)
-                .WithOrderItem(OrderItemBuilder
-                    .Create()
-                    .Build())
-                .Build();
 
-            var response = await context.OrdersController.UpdateStatusAsync("Order", context.CompleteOrderStatusModel);
-            response.Result.Should().BeOfType<BadRequestObjectResult>();
-        }
-
-        [Test]
-        public async Task UpdateStatusAsync_OrderNotComplete_ReturnsOrderNotCompleteError()
-        {
-            var context = OrdersControllerTestContext.Setup();
-            context.Order = OrderBuilder
-                .Create()
-                .WithOrganisationId(context.PrimaryOrganisationId)
-                .WithOrderItem(OrderItemBuilder
-                    .Create()
-                    .Build())
-                .Build();
-
-            var response = await context.OrdersController.UpdateStatusAsync("Order", context.CompleteOrderStatusModel);
+            var response = await context.OrdersController.UpdateStatusAsync("Order", new StatusModel { Status = orderStatusInput });
             var actual = response.Result.As<BadRequestObjectResult>().Value;
 
             var expected = new ErrorResponseModel
             {
-                Errors = new List<ErrorModel> { new ErrorModel("OrderNotComplete") }
+                Errors = new List<ErrorModel> { ErrorMessages.InvalidOrderStatus() }
             };
+
             actual.Should().BeEquivalentTo(expected);
         }
 
@@ -616,7 +597,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task UpdateStatusAsync_OrderIsComplete_LastUpdatedIsUpdated()
+        public async Task UpdateStatusAsync_OrderStatus_Complete_CompleteOrderServiceCalledOnce()
         {
             var context = OrdersControllerTestContext.Setup();
             var orderItem = OrderItemBuilder.Create()
@@ -633,15 +614,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             await context.OrdersController.UpdateStatusAsync("Order", context.CompleteOrderStatusModel);
 
-            context.Order.LastUpdatedBy.Should().Be(context.NameIdentity);
-            context.Order.LastUpdatedByName.Should().Be(context.Name);
-            context.Order.LastUpdated.Should().NotBe(DateTime.MinValue);
+            context.CompleteOrderServiceMock
+                .Verify(x => x.CompleteAsync(It.IsNotNull<CompleteOrderRequest>()), Times.Once);
         }
 
-        [TestCase(null)]
-        [TestCase("")]
-        [TestCase("Incomplete")]
-        public async Task UpdateStatusAsync_InvalidOrderStatus_ReturnsInvalidOrderStatusError(string orderStatusInput)
+        [Test]
+        public async Task UpdateStatusAsync_CompleteOrderFailed_ReturnsError()
         {
             var context = OrdersControllerTestContext.Setup();
             var orderItem = OrderItemBuilder.Create()
@@ -656,37 +634,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithCatalogueSolutionsViewed(true)
                 .Build();
 
-            var response = await context.OrdersController.UpdateStatusAsync("Order", new StatusModel { Status = orderStatusInput });
+            var expectedErrorDetails = new ErrorDetails("Some error", "Some field name");
+            context.CompleteOrderResult = Result.Failure(expectedErrorDetails);
+
+            var response = await context.OrdersController.UpdateStatusAsync("Order", context.CompleteOrderStatusModel);
             var actual = response.Result.As<BadRequestObjectResult>().Value;
 
             var expected = new ErrorResponseModel
             {
-                Errors = new List<ErrorModel> { ErrorMessages.InvalidOrderStatus() }
+                Errors = new List<ErrorModel> { new ErrorModel(expectedErrorDetails.Id, expectedErrorDetails.Field) }
             };
 
             actual.Should().BeEquivalentTo(expected);
-        }
-
-        [TestCase("Complete", "complete")]
-        public async Task UpdateStatusAsync_OrderIsComplete_UpdatesAndSavesTheOrder(string inputStatus, string statusName)
-        {
-            var context = OrdersControllerTestContext.Setup();
-            var orderItem = OrderItemBuilder.Create()
-                .WithCatalogueItemType(CatalogueItemType.Solution)
-                .Build();
-
-            context.Order = OrderBuilder.Create()
-                .WithOrganisationId(context.PrimaryOrganisationId)
-                .WithOrderItem(orderItem)
-                .WithFundingSourceOnlyGms(true)
-                .WithAssociatedServicesViewed(true)
-                .WithCatalogueSolutionsViewed(true)
-                .Build();
-
-            await context.OrdersController.UpdateStatusAsync("Order", new StatusModel { Status = inputStatus });
-            context.OrderRepositoryMock.Verify(x => x.UpdateOrderAsync(It.Is<Order>(o => 
-                o.OrderStatus.Equals(OrderStatus.FromName(statusName))
-                )));
         }
 
         private static (Order order, OrderListItemModel expectedOrder) CreateOrderTestData(
@@ -861,6 +820,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     .Setup(x => x.GetCountByOrderIdAsync(It.IsNotNull<string>()))
                     .ReturnsAsync(() => ServiceRecipientListCount);
 
+                CompleteOrderServiceMock = new Mock<ICompleteOrderService>();
+                CompleteOrderServiceMock
+                    .Setup(x => x.CompleteAsync(It.IsNotNull<CompleteOrderRequest>()))
+                    .ReturnsAsync(() => CompleteOrderResult);
+
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
                     new[]
                     {
@@ -875,6 +839,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     .WithOrderRepository(OrderRepositoryMock.Object)
                     .WithServiceRecipientRepository(ServiceRecipientRepositoryMock.Object)
                     .WithCreateOrderService(CreateOrderServiceMock.Object)
+                    .WithCompleteOrderService(CompleteOrderServiceMock.Object)
                     .Build();
 
                 OrdersController.ControllerContext = new ControllerContext
@@ -903,7 +868,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             internal Mock<IServiceRecipientRepository> ServiceRecipientRepositoryMock { get; }
 
+            internal Mock<ICompleteOrderService> CompleteOrderServiceMock { get; }
+
             internal Result<string> CreateOrderResult { get; set; } = Result.Success("NewOrderId");
+
+            internal Result CompleteOrderResult { get; set; } = Result.Success();
 
             internal IEnumerable<Order> Orders { get; set; }
 

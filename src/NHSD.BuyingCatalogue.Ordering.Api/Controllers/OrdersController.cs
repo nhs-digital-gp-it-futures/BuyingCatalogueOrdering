@@ -14,6 +14,7 @@ using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Errors;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder;
 using NHSD.BuyingCatalogue.Ordering.Domain.Results;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
@@ -27,15 +28,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         private readonly IOrderRepository _orderRepository;
         private readonly ICreateOrderService _createOrderService;
         private readonly IServiceRecipientRepository _serviceRecipientRepository;
+        private readonly IDictionary<OrderStatus, Func<Order, Task<Result>>> _updateOrderStatusActionFactory 
+            = new Dictionary<OrderStatus, Func<Order, Task<Result>>>();
 
         public OrdersController(
             IOrderRepository orderRepository,
             ICreateOrderService createOrderService,
-            IServiceRecipientRepository serviceRecipientRepository)
+            IServiceRecipientRepository serviceRecipientRepository,
+            ICompleteOrderService completeOrderService)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
             _createOrderService = createOrderService ?? throw new ArgumentNullException(nameof(createOrderService));
             _serviceRecipientRepository = serviceRecipientRepository ?? throw new ArgumentNullException(nameof(serviceRecipientRepository));
+
+            if (completeOrderService is null)
+                throw new ArgumentNullException(nameof(completeOrderService));
+
+            _updateOrderStatusActionFactory.Add(OrderStatus.Complete, order => completeOrderService.CompleteAsync(new CompleteOrderRequest(order)));
         }
 
         [HttpGet]
@@ -259,13 +268,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             return NoContent();
         }
 
-        private static readonly IDictionary<OrderStatus, Func<Order, Guid, string, Result>> _updateOrderStatusActionFactory = new Dictionary<OrderStatus, Func<Order, Guid, string, Result>>
-        {
-            { OrderStatus.Complete, ((order, lastUpdatedBy, lastUpdatedByName) => order.Complete(lastUpdatedBy, lastUpdatedByName)) }
-        };
-
         [HttpPut]
         [Route("{orderId}/status")]
+        [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult<ErrorResponseModel>> UpdateStatusAsync(string orderId, StatusModel model)
         {
             if (model is null)
@@ -275,7 +280,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             var orderStatus = OrderStatus.FromName(model.Status);
             if (orderStatus is null ||
-                !_updateOrderStatusActionFactory.TryGetValue(orderStatus, out var updateOrderStatusFunction))
+                !_updateOrderStatusActionFactory.TryGetValue(orderStatus, out var updateOrderStatusAsync))
             {
                 return BadRequest(new ErrorResponseModel
                 {
@@ -295,14 +300,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            var updateOrderStatusResult = updateOrderStatusFunction(order, User.GetUserId(), User.GetUserName());
-            if (!updateOrderStatusResult.IsSuccess)
+            var completeOrderResult = await updateOrderStatusAsync(order);
+            if (!completeOrderResult.IsSuccess)
+            {
                 return BadRequest(new ErrorResponseModel
                 {
-                    Errors = updateOrderStatusResult.Errors.Select(error => new ErrorModel(error.Id, error.Field))
+                    Errors = completeOrderResult.Errors.Select(error => new ErrorModel(error.Id, error.Field))
                 });
-
-            await _orderRepository.UpdateOrderAsync(order);
+            }
 
             return NoContent();
         }

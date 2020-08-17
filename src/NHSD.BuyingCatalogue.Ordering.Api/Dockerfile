@@ -10,6 +10,7 @@ COPY ["src/NHSD.BuyingCatalogue.Ordering.Common/NHSD.BuyingCatalogue.Ordering.Co
 COPY ["src/NHSD.BuyingCatalogue.Ordering.Application/NHSD.BuyingCatalogue.Ordering.Application.csproj", "src/NHSD.BuyingCatalogue.Ordering.Application/"]
 COPY ["src/NHSD.BuyingCatalogue.Ordering.Domain/NHSD.BuyingCatalogue.Ordering.Domain.csproj", "src/NHSD.BuyingCatalogue.Ordering.Domain/"]
 COPY ["src/NHSD.BuyingCatalogue.Ordering.Persistence/NHSD.BuyingCatalogue.Ordering.Persistence.csproj", "src/NHSD.BuyingCatalogue.Ordering.Persistence/"]
+COPY .nuget/NuGet.config ./
 RUN dotnet restore "src/NHSD.BuyingCatalogue.Ordering.Api/NHSD.BuyingCatalogue.Ordering.Api.csproj"
 COPY . .
 WORKDIR "/src/src/NHSD.BuyingCatalogue.Ordering.Api"
