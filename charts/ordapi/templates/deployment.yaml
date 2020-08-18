@@ -124,7 +124,7 @@ spec:
               value: {{ .textBody | quote }}
             {{- end }}                              
             {{- end }} #email Message 
-            {{- end }} #password reset
+            {{- end }} #purchasing
             {{- if .Values.env.values -}}
             {{- range .Values.env.values }}
               - name: {{ .name }}
