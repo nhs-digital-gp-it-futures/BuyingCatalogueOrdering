@@ -60,6 +60,71 @@ spec:
                   key: {{ .Values.serviceDependencies.oidc.baseUriConfig.key | quote }}
             - name: ALLOWINVALIDCERTIFICATE
               value: {{ .Values.allowInvalidCertificate | quote }}
+            {{- with .Values.serviceDependencies.email }}
+            - name: SMTPSERVER__HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .hostUriConfig.name | quote }}
+                  key: {{ .hostUriConfig.key | quote }}
+            - name: SMTPSERVER__PORT
+              value: {{ .port | quote }}
+            - name: SMTPSERVER__EMAILSUBJECTPREFIX
+              value: {{ .subjectPrefix | quote }}
+            {{- if .allowInvalidCertificate }}
+            - name: SMTPSERVER__ALLOWINVALIDCERTIFICATE
+              value: {{ .allowInvalidCertificate | quote }}
+            {{- end }}
+            - name: SMTPSERVER__AUTHENTICATION__ISREQUIRED
+              value: {{ .authenticationRequired | quote }}
+            {{- if .authenticationRequired }}
+            {{- with .userName }}
+            - name: SMTPSERVER__AUTHENTICATION__USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .name | quote }}
+                  key: {{ .key | quote }}
+            {{- end }}
+            {{- with .password }}
+            - name: SMTPSERVER__AUTHENTICATION__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .name | quote }}
+                  key: {{ .key | quote }}
+            {{- end }} #pw
+            {{- end }} #auth
+            {{- end }} #email
+            {{- if .Values.purchasing }}
+            {{- with .Values.purchasing.emailMessage }}
+            {{- if .senderName }}
+            - name: PURCHASING__EMAILMESSAGE__SENDER__NAME
+              value: {{ .senderName | quote }}
+            {{- end }}
+            {{- if .senderAddress }}
+            - name: PURCHASING__EMAILMESSAGE__SENDER__ADDRESS
+              value: {{ .senderAddress | quote }}
+            {{- end }}
+            {{- if .recipientName }}
+            - name: PURCHASING__EMAILMESSAGE__RECIPIENT__NAME
+              value: {{ .recipientName | quote }}
+            {{- end }}
+            {{- if .recipientAddress }}
+            - name: PURCHASING__EMAILMESSAGE__RECIPIENT__ADDRESS
+              value: {{ .recipientAddress | quote }}
+            {{- end }}
+            {{- if .subject }}
+            - name: PURCHASING__EMAILMESSAGE__SUBJECT
+              value: {{ .subject | quote }}
+            {{- end }}
+            {{- if .htmlBody }}
+            - name: PURCHASING__EMAILMESSAGE__HTMLBODY
+              value: {{ .htmlBody | quote }}
+            {{- end }}
+            {{- if .textBody }}
+            - name: PURCHASING__EMAILMESSAGE__TEXTBODY
+              value: {{ .textBody | quote }}
+            {{- end }}                              
+            {{- end }} #email Message 
+            {{- end }} #password reset
             {{- if .Values.env.values -}}
             {{- range .Values.env.values }}
               - name: {{ .name }}
