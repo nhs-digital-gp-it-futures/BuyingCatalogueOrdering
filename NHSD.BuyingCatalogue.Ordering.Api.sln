@@ -36,16 +36,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E1A361EF-8081-43E7-B169-6A31A7C034C9}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		NuGet.config = NuGet.config
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHSD.BuyingCatalogue.Ordering.OrderingDatabase.Deployment", "src\NHSD.BuyingCatalogue.Ordering.OrderingDatabase.Deployment\NHSD.BuyingCatalogue.Ordering.OrderingDatabase.Deployment.csproj", "{BD446434-F4B2-42AB-A5F8-FEF23E1C6EF0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHSD.BuyingCatalogue.Ordering.Common.UnitTests", "tests\NHSD.BuyingCatalogue.Ordering.Common.UnitTests\NHSD.BuyingCatalogue.Ordering.Common.UnitTests.csproj", "{7DE7169A-3890-42DD-9FB7-D774BE912241}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{7AD8079C-B4A1-491B-BC94-D161408E5926}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.config = .nuget\NuGet.config
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
