@@ -31,37 +31,37 @@ jobs:
   - script: echo semVer $(setVersionStep.semVer)
     name: echovar
 
-- job: build
-  displayName: Build database project & publish dacpac
-  pool:
-    vmImage: windows-2019
-  steps:
-  - task: VSBuild@1
-    displayName: 'Build database solution'
-    inputs:
-      solution: src/NHSD.BuyingCatalogue.Ordering.OrderingDatabase/NHSD.BuyingCatalogue.Ordering.OrderingDatabase.sqlproj
+# - job: build
+#   displayName: Build database project & publish dacpac
+#   pool:
+#     vmImage: windows-2019
+#   steps:
+#   - task: VSBuild@1
+#     displayName: 'Build database solution'
+#     inputs:
+#       solution: src/NHSD.BuyingCatalogue.Ordering.OrderingDatabase/NHSD.BuyingCatalogue.Ordering.OrderingDatabase.sqlproj
 
-  - task: CopyFiles@2
-    displayName: 'Copy Files to: $(build.artifactstagingdirectory)/database'
-    inputs:
-      SourceFolder: src
-      Contents: '**\*.dacpac'
-      TargetFolder: '$(build.artifactstagingdirectory)/database'
-      CleanTargetFolder: true
+#   - task: CopyFiles@2
+#     displayName: 'Copy Files to: $(build.artifactstagingdirectory)/database'
+#     inputs:
+#       SourceFolder: src
+#       Contents: '**\*.dacpac'
+#       TargetFolder: '$(build.artifactstagingdirectory)/database'
+#       CleanTargetFolder: true
 
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact: database'
-    inputs:
-      PathtoPublish: '$(build.artifactstagingdirectory)/database'
-      ArtifactName: database
+#   - task: PublishBuildArtifacts@1
+#     displayName: 'Publish Artifact: database'
+#     inputs:
+#       PathtoPublish: '$(build.artifactstagingdirectory)/database'
+#       ArtifactName: database
 
-  - task: colinsalmcorner.colinsalmcorner-buildtasks.dacpac-report-task.DacPacReport@1
-    displayName: 'DacPac Schema Compare NHSD.BuyingCatalogue.Ordering.OrderingDatabase.dacpac'
-    inputs:
-      dropName: database
-      dacpacName: NHSD.BuyingCatalogue.Ordering.OrderingDatabase
-      targetDacPacPath: '$(build.artifactstagingdirectory)/database'
-    enabled: false
+#   - task: colinsalmcorner.colinsalmcorner-buildtasks.dacpac-report-task.DacPacReport@1
+#     displayName: 'DacPac Schema Compare NHSD.BuyingCatalogue.Ordering.OrderingDatabase.dacpac'
+#     inputs:
+#       dropName: database
+#       dacpacName: NHSD.BuyingCatalogue.Ordering.OrderingDatabase
+#       targetDacPacPath: '$(build.artifactstagingdirectory)/database'
+#     enabled: false
 
 - job: dockerBuildAndPush
   displayName: Run Unit & Integration tests and build & push docker containers to the acr
@@ -78,19 +78,13 @@ jobs:
       version: $(dotnetVersion)
       includePreviewVersions: false
 
-  - task: DockerInstaller@0
-    inputs:
-      dockerVersion: $(dockerVersion)
-
-  - script: docker-compose up --build -d
-    displayName: 'Docker up'
-
   - task: DotNetCoreCLI@2
     displayName: 'Run dotnet restore'
     inputs:
       command: restore
       projects: '**/*UnitTests.csproj'
-      arguments: ''
+      nugetConfigPath: '.nuget/NuGet.config'
+      arguments: '-v n'
 
   - task: DotNetCoreCLI@2
     displayName: 'Run dotnet build'
@@ -106,6 +100,13 @@ jobs:
       projects: '**/*UnitTests.csproj'
       arguments: '--no-build -v n --collect "Code coverage"'
     
+  - task: DockerInstaller@0
+    inputs:
+      dockerVersion: $(dockerVersion)
+
+  - script: docker-compose up --build -d
+    displayName: 'Docker up'
+
   - task: DotNetCoreCLI@2
     displayName: 'Run Integration tests'
     inputs:
