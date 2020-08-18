@@ -69,6 +69,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
+        public async Task CompleteAsync_CompleteOrder_LastUpdatedByIsChanged()
+        {
+            var context = CompleteOrderServiceTestContext.Setup();
+
+            await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
+
+            context.UpdateOrder.LastUpdatedBy.Should().Be(context.UserId);
+        }
+
+        [Test]
+        public async Task CompleteAsync_CompleteOrder_LastUpdatedByNameIsChanged()
+        {
+            var context = CompleteOrderServiceTestContext.Setup();
+
+            await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
+
+            context.UpdateOrder.LastUpdatedByName.Should().Be(context.UserName);
+        }
+
+        [Test]
         public async Task CompleteAsync_IdentityService_CalledTwice()
         {
             var context = CompleteOrderServiceTestContext.Setup();
@@ -90,7 +110,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
 
             context.OrderRepositoryMock.Verify(orderRepository => 
-                orderRepository.UpdateOrderAsync(It.IsNotNull<Order>()), Times.Once);
+                orderRepository.UpdateOrderAsync(It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))), Times.Once);
+        }
+
+        [Test]
+        public async Task CompleteAsync_OrderRepository_OrderStatusIsComplete()
+        {
+            var context = CompleteOrderServiceTestContext.Setup();
+
+            await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
+
+            context.UpdateOrder.OrderStatus.Should().Be(OrderStatus.Complete);
         }
 
         [Test]
@@ -109,11 +139,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             private CompleteOrderServiceTestContext()
             {
                 UserId = Guid.NewGuid();
-                UserName = "Bob";
+                UserName = $"Username {Guid.NewGuid()}";
                 PurchasingSettings = new PurchasingSettings();
                 CompleteOrderRequest = new CompleteOrderRequest(
                     OrderBuilder
                     .Create()
+                    .WithOrderId(Guid.NewGuid().ToString())
                     .WithServiceRecipientsViewed(true)
                     .WithAssociatedServicesViewed(true)
                     .WithOrderItem(
@@ -125,7 +156,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                     .Build());
 
                 OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(x => x.UpdateOrderAsync(It.IsAny<Order>())).Callback<Order>(x => Order = x);
+                OrderRepositoryMock.Setup(x => x.UpdateOrderAsync(It.IsAny<Order>())).Callback<Order>(x => UpdateOrder = x);
 
                 IdentityServiceMock = new Mock<IIdentityService>();
                 IdentityServiceMock.Setup(identityService => identityService.GetUserIdentity()).Returns(() => UserId);
@@ -153,11 +184,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             internal CompleteOrderService CompleteOrderService { get; }
 
-            internal Order Order { get; private set; }
+            internal Order UpdateOrder { get; private set; }
 
-            private string UserName { get; }
+            internal string UserName { get; }
 
-            private Guid UserId { get; }
+            internal Guid UserId { get; }
 
             internal CompleteOrderRequest CompleteOrderRequest { get; }
 

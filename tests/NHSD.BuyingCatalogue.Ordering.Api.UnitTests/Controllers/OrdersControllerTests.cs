@@ -615,7 +615,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             await context.OrdersController.UpdateStatusAsync("Order", context.CompleteOrderStatusModel);
 
             context.CompleteOrderServiceMock
-                .Verify(x => x.CompleteAsync(It.IsNotNull<CompleteOrderRequest>()), Times.Once);
+                .Verify(x => x.CompleteAsync(
+                    It.Is<CompleteOrderRequest>(request => request.Order.Equals(context.Order))), Times.Once);
         }
 
         [Test]

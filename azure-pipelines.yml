@@ -77,6 +77,27 @@ jobs:
       version: $(dotnetVersion)
       includePreviewVersions: false
 
+  - task: DotNetCoreCLI@2
+    displayName: 'Run dotnet restore'
+    inputs:
+      command: restore
+      projects: '**/*UnitTests.csproj'
+      arguments: '-v n'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Run dotnet build'
+    inputs:
+      command: build
+      projects: '**/*UnitTests.csproj'
+      arguments: '--no-restore'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Run unit tests'
+    inputs:
+      command: test
+      projects: '**/*UnitTests.csproj'
+      arguments: '-v n --no-build --collect "Code coverage"'
+    
   - task: DockerInstaller@0
     inputs:
       dockerVersion: $(dockerVersion)
@@ -85,18 +106,11 @@ jobs:
     displayName: 'Docker up'
 
   - task: DotNetCoreCLI@2
-    displayName: 'Run unit tests'
-    inputs:
-      command: test
-      projects: '**/*UnitTests.csproj'
-      arguments: '-v n  --collect "Code coverage"'
-    
-  - task: DotNetCoreCLI@2
     displayName: 'Run Integration tests'
     inputs:
       command: test
       projects: '**/*IntegrationTests.csproj'
-      arguments: '-v n'
+      arguments: '-v n --no-build'
 
   - script: docker-compose down -v
     displayName: 'Docker down'
