@@ -50,7 +50,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             var requireHttps = _configuration.GetValue<bool>("RequireHttps");
             var allowInvalidCertificate = _configuration.GetValue<bool>("AllowInvalidCertificate");
             var bypassIdentity = _configuration.GetValue<bool>("BypassIdentity");
-;
             var validationSettings = new ValidationSettings
             {
                 MaxDeliveryDateWeekOffset = _configuration.GetValue<int>("MaxDeliveryDateWeekOffset")
