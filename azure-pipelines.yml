@@ -84,7 +84,7 @@ jobs:
       command: restore
       projects: '**/*UnitTests.csproj'
       feedsToUse: config
-      nugetConfigPath: '**/NuGet.config'
+      nugetConfigPath: '.nuget/NuGet.config'
       arguments: '-v n'
 
   - task: DotNetCoreCLI@2
