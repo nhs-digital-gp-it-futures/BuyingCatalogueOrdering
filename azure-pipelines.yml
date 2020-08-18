@@ -83,7 +83,7 @@ jobs:
     inputs:
       command: restore
       projects: '**/*UnitTests.csproj'
-      nugetConfigPath: '/.nuget/NuGet.config'
+      nugetConfigPath: '**/NuGet.config'
       arguments: '-v n'
 
   - task: DotNetCoreCLI@2
