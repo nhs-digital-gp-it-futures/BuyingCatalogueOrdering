@@ -10,6 +10,7 @@ variables:
 trigger:
 - master
 - development
+- feature/*
 
 pr:
 - master
@@ -85,11 +86,25 @@ jobs:
     displayName: 'Docker up'
 
   - task: DotNetCoreCLI@2
+    displayName: 'Run dotnet restore'
+    inputs:
+      command: restore
+      projects: '**/*UnitTests.csproj'
+      arguments: ''
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Run dotnet build'
+    inputs:
+      command: build
+      projects: '**/*UnitTests.csproj'
+      arguments: '--no-restore'
+
+  - task: DotNetCoreCLI@2
     displayName: 'Run unit tests'
     inputs:
       command: test
       projects: '**/*UnitTests.csproj'
-      arguments: '-v n  --collect "Code coverage"'
+      arguments: '--no-build -v n --collect "Code coverage"'
     
   - task: DotNetCoreCLI@2
     displayName: 'Run Integration tests'
@@ -101,106 +116,105 @@ jobs:
   - script: docker-compose down -v
     displayName: 'Docker down'
 
-  - task: DockerCompose@0
-    displayName: 'Build: Dev'
-    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
-    inputs:
-      containerregistrytype: 'Azure Container Registry'
-      azureSubscription: 'NHSAPP-BuyingCatalogue (Non-Prod)'
-      azureContainerRegistry: '{"loginServer":"gpitfuturesdevacr.azurecr.io", "id" : "/subscriptions/7b12a8a2-f06f-456f-b6f9-aa2d92e0b2ec/resourceGroups/gpitfutures-dev-rg-acr/providers/Microsoft.ContainerRegistry/registries/gpitfuturesdevacr"}'
-      dockerComposeFile: '**/docker-compose-build.yml'
-      action: 'Build services'
-      additionalImageTags: '$(semVer)'
-      includeSourceTags: true
+  # - task: DockerCompose@0
+  #   displayName: 'Build: Dev'
+  #   condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
+  #   inputs:
+  #     containerregistrytype: 'Azure Container Registry'
+  #     azureSubscription: 'NHSAPP-BuyingCatalogue (Non-Prod)'
+  #     azureContainerRegistry: '{"loginServer":"gpitfuturesdevacr.azurecr.io", "id" : "/subscriptions/7b12a8a2-f06f-456f-b6f9-aa2d92e0b2ec/resourceGroups/gpitfutures-dev-rg-acr/providers/Microsoft.ContainerRegistry/registries/gpitfuturesdevacr"}'
+  #     dockerComposeFile: '**/docker-compose-build.yml'
+  #     action: 'Build services'
+  #     additionalImageTags: '$(semVer)'
+  #     includeSourceTags: true
 
-  - task: DockerCompose@0
-    displayName: 'Push: Dev'
-    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
-    inputs:
-      containerregistrytype: 'Azure Container Registry'
-      azureSubscription: 'NHSAPP-BuyingCatalogue (Non-Prod)'
-      azureContainerRegistry: '{"loginServer":"gpitfuturesdevacr.azurecr.io", "id" : "/subscriptions/7b12a8a2-f06f-456f-b6f9-aa2d92e0b2ec/resourceGroups/gpitfutures-dev-rg-acr/providers/Microsoft.ContainerRegistry/registries/gpitfuturesdevacr"}'
-      dockerComposeFile: '**/docker-compose-build.yml'
-      action: 'Push services'
-      additionalImageTags: '$(semVer)'
-      includeSourceTags: true
+  # - task: DockerCompose@0
+  #   displayName: 'Push: Dev'
+  #   condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
+  #   inputs:
+  #     containerregistrytype: 'Azure Container Registry'
+  #     azureSubscription: 'NHSAPP-BuyingCatalogue (Non-Prod)'
+  #     azureContainerRegistry: '{"loginServer":"gpitfuturesdevacr.azurecr.io", "id" : "/subscriptions/7b12a8a2-f06f-456f-b6f9-aa2d92e0b2ec/resourceGroups/gpitfutures-dev-rg-acr/providers/Microsoft.ContainerRegistry/registries/gpitfuturesdevacr"}'
+  #     dockerComposeFile: '**/docker-compose-build.yml'
+  #     action: 'Push services'
+  #     additionalImageTags: '$(semVer)'
+  #     includeSourceTags: true
 
-  - task: HelmInstaller@1
-    displayName: 'Install helm'
-    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
-    inputs:
-      helmVersionToInstall: 'latest'
-  - bash: |
-      cd charts
-      for chart in *; do
-        helm package \
-            --version $(semVer) \
-            --app-version $(semVer) \
-            $chart
-      done;
-    failOnStderr: true
-    displayName: 'Helm package'
-    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
-  - bash: |
-      cd charts  
-      for chartPackage in *.tgz; do
-        az acr helm push --force \
-          -n "gpitfuturesdevacr" \
-          -u "gpitfuturesdevacr" \
-          -p $(gpitfuturesdevacr-pass) \
-          $chartPackage
-      done; 
-    failOnStderr: false
-    name: helmPush
-    displayName: 'Push helm to az acr'
-    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
+  # - task: HelmInstaller@1
+  #   displayName: 'Install helm'
+  #   condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
+  #   inputs:
+  #     helmVersionToInstall: 'latest'
+  # - bash: |
+  #     cd charts
+  #     for chart in *; do
+  #       helm package \
+  #           --version $(semVer) \
+  #           --app-version $(semVer) \
+  #           $chart
+  #     done;
+  #   failOnStderr: true
+  #   displayName: 'Helm package'
+  #   condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
+  # - bash: |
+  #     cd charts  
+  #     for chartPackage in *.tgz; do
+  #       az acr helm push --force \
+  #         -n "gpitfuturesdevacr" \
+  #         -u "gpitfuturesdevacr" \
+  #         -p $(gpitfuturesdevacr-pass) \
+  #         $chartPackage
+  #     done; 
+  #   failOnStderr: false
+  #   name: helmPush
+  #   displayName: 'Push helm to az acr'
+  #   condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
 
+  # - task: DockerCompose@0
+  #   displayName: 'Build: Test'
+  #   condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/development')))
+  #   inputs:
+  #     containerregistrytype: 'Azure Container Registry'
+  #     azureSubscription: 'NHSAPP-BuyingCatalogue (Non-Prod)'
+  #     azureContainerRegistry: '{"loginServer":"gpitfuturestestacr.azurecr.io", "id" : "/subscriptions/7b12a8a2-f06f-456f-b6f9-aa2d92e0b2ec/resourceGroups/gpitfutures-test-rg-acr/providers/Microsoft.ContainerRegistry/registries/gpitfuturestestacr"}'
+  #     dockerComposeFile: '**/docker-compose-build.yml'
+  #     action: 'Build services'
+  #     additionalImageTags: '$(semVer)'
+  #     includeSourceTags: true
 
-  - task: DockerCompose@0
-    displayName: 'Build: Test'
-    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/development')))
-    inputs:
-      containerregistrytype: 'Azure Container Registry'
-      azureSubscription: 'NHSAPP-BuyingCatalogue (Non-Prod)'
-      azureContainerRegistry: '{"loginServer":"gpitfuturestestacr.azurecr.io", "id" : "/subscriptions/7b12a8a2-f06f-456f-b6f9-aa2d92e0b2ec/resourceGroups/gpitfutures-test-rg-acr/providers/Microsoft.ContainerRegistry/registries/gpitfuturestestacr"}'
-      dockerComposeFile: '**/docker-compose-build.yml'
-      action: 'Build services'
-      additionalImageTags: '$(semVer)'
-      includeSourceTags: true
+  # - task: DockerCompose@0
+  #   displayName: 'Push: Test'
+  #   condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/development')))
+  #   inputs:
+  #     containerregistrytype: 'Azure Container Registry'
+  #     azureSubscription: 'NHSAPP-BuyingCatalogue (Non-Prod)'
+  #     azureContainerRegistry: '{"loginServer":"gpitfuturestestacr.azurecr.io", "id" : "/subscriptions/7b12a8a2-f06f-456f-b6f9-aa2d92e0b2ec/resourceGroups/gpitfutures-test-rg-acr/providers/Microsoft.ContainerRegistry/registries/gpitfuturestestacr"}'
+  #     dockerComposeFile: '**/docker-compose-build.yml'
+  #     action: 'Push services'
+  #     additionalImageTags: '$(semVer)'
+  #     includeSourceTags: true
 
-  - task: DockerCompose@0
-    displayName: 'Push: Test'
-    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/development')))
-    inputs:
-      containerregistrytype: 'Azure Container Registry'
-      azureSubscription: 'NHSAPP-BuyingCatalogue (Non-Prod)'
-      azureContainerRegistry: '{"loginServer":"gpitfuturestestacr.azurecr.io", "id" : "/subscriptions/7b12a8a2-f06f-456f-b6f9-aa2d92e0b2ec/resourceGroups/gpitfutures-test-rg-acr/providers/Microsoft.ContainerRegistry/registries/gpitfuturestestacr"}'
-      dockerComposeFile: '**/docker-compose-build.yml'
-      action: 'Push services'
-      additionalImageTags: '$(semVer)'
-      includeSourceTags: true
+  # - task: DockerCompose@0
+  #   displayName: 'Build: Prod'
+  #   condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  #   inputs:
+  #     containerregistrytype: 'Azure Container Registry'
+  #     azureSubscription: 'NHSAPP-BuyingCatalogue (Prod)'
+  #     azureContainerRegistry: '{"loginServer":"gpitfuturesprodacr.azurecr.io", "id" : "/subscriptions/d1be8dbc-1a9f-4b7b-ba51-037116110e00/resourceGroups/gpitfutures-prod-rg-acr/providers/Microsoft.ContainerRegistry/registries/gpitfuturesprodacr"}'
+  #     dockerComposeFile: '**/docker-compose-build.yml'
+  #     action: 'Build services'
+  #     additionalImageTags: '$(semVer)'
+  #     includeSourceTags: true
 
-  - task: DockerCompose@0
-    displayName: 'Build: Prod'
-    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-    inputs:
-      containerregistrytype: 'Azure Container Registry'
-      azureSubscription: 'NHSAPP-BuyingCatalogue (Prod)'
-      azureContainerRegistry: '{"loginServer":"gpitfuturesprodacr.azurecr.io", "id" : "/subscriptions/d1be8dbc-1a9f-4b7b-ba51-037116110e00/resourceGroups/gpitfutures-prod-rg-acr/providers/Microsoft.ContainerRegistry/registries/gpitfuturesprodacr"}'
-      dockerComposeFile: '**/docker-compose-build.yml'
-      action: 'Build services'
-      additionalImageTags: '$(semVer)'
-      includeSourceTags: true
-
-  - task: DockerCompose@0
-    displayName: 'Push: Prod'
-    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-    inputs:
-      containerregistrytype: 'Azure Container Registry'
-      azureSubscription: 'NHSAPP-BuyingCatalogue (Prod)'
-      azureContainerRegistry: '{"loginServer":"gpitfuturesprodacr.azurecr.io", "id" : "/subscriptions/d1be8dbc-1a9f-4b7b-ba51-037116110e00/resourceGroups/gpitfutures-prod-rg-acr/providers/Microsoft.ContainerRegistry/registries/gpitfuturesprodacr"}'
-      dockerComposeFile: '**/docker-compose-build.yml'
-      action: 'Push services'
-      additionalImageTags: '$(semVer)'
-      includeSourceTags: true
+  # - task: DockerCompose@0
+  #   displayName: 'Push: Prod'
+  #   condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  #   inputs:
+  #     containerregistrytype: 'Azure Container Registry'
+  #     azureSubscription: 'NHSAPP-BuyingCatalogue (Prod)'
+  #     azureContainerRegistry: '{"loginServer":"gpitfuturesprodacr.azurecr.io", "id" : "/subscriptions/d1be8dbc-1a9f-4b7b-ba51-037116110e00/resourceGroups/gpitfutures-prod-rg-acr/providers/Microsoft.ContainerRegistry/registries/gpitfuturesprodacr"}'
+  #     dockerComposeFile: '**/docker-compose-build.yml'
+  #     action: 'Push services'
+  #     additionalImageTags: '$(semVer)'
+  #     includeSourceTags: true
 
