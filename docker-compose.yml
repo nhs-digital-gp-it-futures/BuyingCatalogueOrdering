@@ -43,7 +43,18 @@ services:
       DB_NAME: "CatalogueOrdering"
       DB_SERVER: nhsd.buyingcatalogue.ordering.api.ordering.db
       NHSD_PASSWORD: "DisruptTheMarket1!"
-      
+  
+  nhsd.buyingcatalogue.ordering.email:
+    <<: *networked
+    image: ${REGISTRY:-nhsd}/buying-catalogue/smtp-server:${TAG:-latest}
+    container_name: ordering_api_smtp_server
+    build: 
+      context: src/NHSD.BuyingCatalogue.Smtp
+    ports:
+      - "1025:25"
+      - "1180:80"
+      - "1587:587"
+
   nhsd.buyingcatalogue.ordering.api:
     <<: *dependsOnDb
     image: ${REGISTRY:-nhsd}/buying-catalogue/ordering-api:${TAG:-latest}
@@ -56,6 +67,12 @@ services:
       - CONNECTIONSTRINGS__ORDERINGDB=Data Source=nhsd.buyingcatalogue.ordering.api.ordering.db;Initial Catalog=CatalogueOrdering;MultipleActiveResultSets=true;User ID=NHSD-ORDAPI;Password=DisruptTheMarket1!
       - BYPASSIDENTITY=True
       - PATHBASE=/ordapi
+      - SMTPSERVER__HOST=nhsd.buyingcatalogue.ordering.email
+      - SMTPSERVER__PORT=587
+      - SMTPSERVER__EMAILSUBJECTPREFIX=INTEGRATION_TEST
+      - ALLOWINVALIDCERTIFICATE=True
+    depends_on:
+      - nhsd.buyingcatalogue.ordering.email
     ports:
       - "8076:80"
 
@@ -67,4 +84,3 @@ networks:
 volumes:
   nhsd_ordering_db_volume:
     name: nhsd_ordering_db_volume
-

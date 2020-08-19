@@ -14,7 +14,9 @@
       "launchBrowser": false,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ConnectionStrings__OrderingDb": "Data Source=localhost,1552;Initial Catalog=CatalogueOrdering;MultipleActiveResultSets=true;User Id=NHSD-ORDAPI;Password=DisruptTheMarket1!"
+        "BYPASSIDENTITY": true,
+        "ConnectionStrings__OrderingDb": "Data Source=localhost,1552;Initial Catalog=CatalogueOrdering;MultipleActiveResultSets=true;User Id=NHSD-ORDAPI;Password=DisruptTheMarket1!",
+        "SmtpServer__Port": "1587"
       },
       "applicationUrl": "http://localhost:8076"
     }

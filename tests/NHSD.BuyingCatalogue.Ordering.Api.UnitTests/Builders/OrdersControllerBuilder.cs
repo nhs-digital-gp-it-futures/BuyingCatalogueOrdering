@@ -1,4 +1,5 @@
 ﻿using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 
@@ -9,6 +10,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         private IOrderRepository _orderRepository;
         private IServiceRecipientRepository _serviceRecipientRepository;
         private ICreateOrderService _createOrderService;
+        private ICompleteOrderService _completeOrderService;
 
         private OrdersControllerBuilder()
         {
@@ -37,9 +39,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
+        internal OrdersControllerBuilder WithCompleteOrderService(ICompleteOrderService completeOrderService)
+        {
+            _completeOrderService = completeOrderService;
+            return this;
+        }
+
         internal OrdersController Build()
         {
-            return new OrdersController(_orderRepository, _createOrderService, _serviceRecipientRepository);
+            return new OrdersController(_orderRepository, _createOrderService, _serviceRecipientRepository, _completeOrderService);
         }
     }
 }
