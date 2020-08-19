@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.EmailClient;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.DocumentService;
 using NHSD.BuyingCatalogue.Ordering.Api.Settings;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Application.Services;
@@ -13,17 +15,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
         private readonly IIdentityService _identityService;
         private readonly IOrderRepository _orderRepository;
         private readonly IEmailService _emailService;
+        private readonly IPurchasingDocumentService _purchasingDocumentService;
         private readonly PurchasingSettings _purchasingSettings;
 
         public CompleteOrderService(
             IIdentityService identityService,
             IOrderRepository orderRepository,
             IEmailService emailService,
+            IPurchasingDocumentService purchasingDocumentService,
             PurchasingSettings purchasingSettings)
         {
             _identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
+            _purchasingDocumentService = purchasingDocumentService ?? throw new ArgumentNullException(nameof(purchasingDocumentService));
             _purchasingSettings = purchasingSettings ?? throw new ArgumentNullException(nameof(purchasingSettings));
         }
 
@@ -39,7 +44,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
                 return result;
 
             await _orderRepository.UpdateOrderAsync(order);
-            await _emailService.SendEmailAsync(_purchasingSettings.EmailMessage);
+
+            using var stream = new MemoryStream();
+            await _purchasingDocumentService.Create(order, stream);
+            
+            var a = _purchasingSettings.EmailMessage;
+            a.Attachments.Add(new EmailAttachment("newFile.csv", stream));
+
+            await _emailService.SendEmailAsync(a);
 
             return Result.Success();
         }

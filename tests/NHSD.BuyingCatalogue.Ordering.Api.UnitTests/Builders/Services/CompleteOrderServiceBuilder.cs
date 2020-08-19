@@ -1,5 +1,6 @@
 ﻿using NHSD.BuyingCatalogue.EmailClient;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.DocumentService;
 using NHSD.BuyingCatalogue.Ordering.Api.Settings;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Application.Services;
@@ -11,6 +12,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
         private IIdentityService _identityService;
         private IOrderRepository _orderRepository;
         private IEmailService _emailService;
+        private IPurchasingDocumentService _purchasingDocumentService;
+
         private PurchasingSettings _purchasingSettings;
 
         private CompleteOrderServiceBuilder()
@@ -38,6 +41,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
             return this;
         }
 
+        public CompleteOrderServiceBuilder WithPurchasingDocumentService(
+            IPurchasingDocumentService purchasingDocumentService)
+        {
+            _purchasingDocumentService = purchasingDocumentService;
+            return this;
+        }
+
         public CompleteOrderServiceBuilder WithPurchasingSettings(PurchasingSettings purchasingSettings)
         {
             _purchasingSettings = purchasingSettings;
@@ -45,6 +55,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
         }
 
         public CompleteOrderService Build() => 
-            new CompleteOrderService(_identityService, _orderRepository, _emailService, _purchasingSettings);
+            new CompleteOrderService(_identityService, _orderRepository, _emailService, _purchasingDocumentService, _purchasingSettings);
     }
 }
