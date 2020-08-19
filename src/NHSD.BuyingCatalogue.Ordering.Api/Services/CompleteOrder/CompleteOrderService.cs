@@ -45,13 +45,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
 
             await _orderRepository.UpdateOrderAsync(order);
 
-            using var stream = new MemoryStream();
-            await _purchasingDocumentService.Create(order, stream);
-            
-            var a = _purchasingSettings.EmailMessage;
-            a.Attachments.Add(new EmailAttachment("newFile.csv", stream));
+            await using var stream = new MemoryStream();
+            await _purchasingDocumentService.Create(stream, order);
+            stream.Position = 0;
 
-            await _emailService.SendEmailAsync(a);
+            var emailMessage = _purchasingSettings.EmailMessage;
+            emailMessage.Attachments.Add(new EmailAttachment("CompletedOrder.csv", stream));
+            await _emailService.SendEmailAsync(emailMessage);
 
             return Result.Success();
         }

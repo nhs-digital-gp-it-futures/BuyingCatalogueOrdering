@@ -11,7 +11,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.DocumentService
 {
     public sealed class PurchasingDocumentService : IPurchasingDocumentService
     {
-        public async Task Create(Order order, Stream stream)
+        public async Task Create(Stream stream, Order order)
         {
             if (order is null)
                 throw new ArgumentNullException(nameof(order));
@@ -21,11 +21,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.DocumentService
                 new PurchaseDocumentSettings{ CallOffPartyId = order.OrderId }
             };
 
-            await using var writer = new StreamWriter(stream);
-            await using var csv = new CsvWriter(writer, CultureInfo.CurrentCulture);
-            csv.Configuration.RegisterClassMap<PurchaseDocumentSettingsMap>();
-            await csv.WriteRecordsAsync(records);
-            //await csv.FlushAsync();
+            await using var streamWriter = new StreamWriter(stream, leaveOpen:true);
+            await using var csvWriter = new CsvWriter(streamWriter, CultureInfo.CurrentCulture);
+
+            csvWriter.Configuration.RegisterClassMap<PurchaseDocumentSettingsMap>();
+            await csvWriter.WriteRecordsAsync(records);
         }
     }
 }
