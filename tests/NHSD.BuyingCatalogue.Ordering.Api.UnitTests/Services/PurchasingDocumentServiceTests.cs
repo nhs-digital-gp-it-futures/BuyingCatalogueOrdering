@@ -3,9 +3,8 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.DocumentService;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument;
 using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
-using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
@@ -21,16 +20,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         {
             var purchasingDocumentService = new PurchasingDocumentService();
 
-            Stream stream = null;
-            Order order = null;
-
-            if(hasStream)
-                stream = new MemoryStream();
-            if (hasOrder)
-                order = OrderBuilder.Create().Build();
-
             Assert.ThrowsAsync<ArgumentNullException>(() =>
-                purchasingDocumentService.CreateDocumentAsync(stream, order));
+                purchasingDocumentService.CreateDocumentAsync(
+                    hasStream ? new MemoryStream() : null,
+                    hasOrder ? OrderBuilder.Create().Build() : null));
         }
 
         [Test]
@@ -38,15 +31,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         {
             var purchasingDocumentService = new PurchasingDocumentService();
 
-            var stream = new MemoryStream();
+            await using var stream = new MemoryStream();
             var order = OrderBuilder.Create().Build();
             await purchasingDocumentService.CreateDocumentAsync(stream, OrderBuilder.Create().Build());
 
-            var expectedContent = $"Call off Party Id{Environment.NewLine}{order.OrderId}{Environment.NewLine}";
-            var streamBytes = stream.ToArray();
-            var contentBytes = Encoding.UTF8.GetBytes(expectedContent);
+            var expectedStreamContent = stream.ToArray();
+            var actualStreamContent = Encoding.UTF8.GetBytes($"Call off Party Id{Environment.NewLine}{order.OrderId}{Environment.NewLine}");
 
-            streamBytes.Should().BeEquivalentTo(contentBytes);
+            expectedStreamContent.Should().BeEquivalentTo(actualStreamContent);
         }
     }
 }

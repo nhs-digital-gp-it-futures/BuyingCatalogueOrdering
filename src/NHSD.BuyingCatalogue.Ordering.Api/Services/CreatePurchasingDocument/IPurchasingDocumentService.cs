@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
-namespace NHSD.BuyingCatalogue.Ordering.Api.Services.DocumentService
+namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
 {
     public interface IPurchasingDocumentService
     {

@@ -19,7 +19,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Services;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.DocumentService;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Settings;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;

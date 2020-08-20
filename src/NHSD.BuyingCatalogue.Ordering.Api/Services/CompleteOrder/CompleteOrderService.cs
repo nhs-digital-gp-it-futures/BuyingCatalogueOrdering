@@ -2,7 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.EmailClient;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.DocumentService;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument;
 using NHSD.BuyingCatalogue.Ordering.Api.Settings;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Application.Services;
