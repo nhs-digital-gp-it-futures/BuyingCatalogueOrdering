@@ -46,7 +46,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
             await _orderRepository.UpdateOrderAsync(order);
 
             await using var stream = new MemoryStream();
-            await _purchasingDocumentService.Create(stream, order);
+            await _purchasingDocumentService.CreateDocumentAsync(stream, order);
             stream.Position = 0;
 
             var emailMessage = _purchasingSettings.EmailMessage;

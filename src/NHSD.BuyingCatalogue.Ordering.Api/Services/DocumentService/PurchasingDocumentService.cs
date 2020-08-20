@@ -11,8 +11,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.DocumentService
 {
     public sealed class PurchasingDocumentService : IPurchasingDocumentService
     {
-        public async Task Create(Stream stream, Order order)
+        public async Task CreateDocumentAsync(Stream stream, Order order)
         {
+            if (stream is null)
+                throw new ArgumentNullException(nameof(stream));
+
             if (order is null)
                 throw new ArgumentNullException(nameof(order));
 
