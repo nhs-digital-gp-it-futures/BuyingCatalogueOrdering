@@ -81,8 +81,34 @@ serviceDependencies:
     baseUriConfig:
       name: 
       key: 
+  email:
+    hostUriConfig:
+      name:
+      key:  
+    port:
+    #allowInvalidCertificate: false # note, if not set, will default to the global allowInvalidCertificate setting for ordapi
+    authenticationRequired: false
+    # userName:
+    #   name:
+    #   key:
+    # password:
+    #   name:
+    #   key:
+    subjectPrefix:
+
+# use these settings to adjust the purchasing email
+purchasing:
+  emailMessage:
+    senderName:
+    senderAddress:
+    recipientName:
+    recipientAddress:
+    subject:
+    htmlBody:
+    textBody:
 
 env:
   configmap:
   secrets:
-  values:    
+  values:
+    
