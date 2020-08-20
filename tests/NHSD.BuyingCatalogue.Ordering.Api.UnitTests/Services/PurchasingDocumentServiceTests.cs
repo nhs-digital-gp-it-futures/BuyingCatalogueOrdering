@@ -42,7 +42,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             var order = OrderBuilder.Create().Build();
             await purchasingDocumentService.CreateDocumentAsync(stream, OrderBuilder.Create().Build());
 
-            var expectedContent = $"Call off Party Id\r\n{order.OrderId}\r\n";
+            var expectedContent = $"Call off Party Id{Environment.NewLine}{order.OrderId}{Environment.NewLine}";
             var streamBytes = stream.ToArray();
             var contentBytes = Encoding.UTF8.GetBytes(expectedContent);
 
