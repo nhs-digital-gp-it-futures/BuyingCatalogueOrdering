@@ -19,6 +19,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Services;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Settings;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
@@ -89,6 +90,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 .AddTransient<ICreateOrderItemService, CreateOrderItemService>()
                 .AddTransient<IUpdateOrderItemService, UpdateOrderItemService>()
                 .AddTransient<ICompleteOrderService, CompleteOrderService>()
+                .AddTransient<ICreatePurchasingDocumentService, CreatePurchasingDocumentService>()
                 .AddTransient<ICreateOrderItemValidator, OrderItemValidator>()
                 .AddTransient<IUpdateOrderItemValidator, OrderItemValidator>();
 
