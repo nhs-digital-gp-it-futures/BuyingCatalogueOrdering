@@ -11,14 +11,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class PurchasingDocumentServiceTests
+    internal sealed class CreatePurchasingDocumentServiceTests
     {
         [TestCase(true, false)]
         [TestCase(false, true)]
         [TestCase(false, false)]
         public void CreateDocumentAsync_ArgumentsAreNull_ReturnNullArgumentException(bool hasStream, bool hasOrder)
         {
-            var purchasingDocumentService = new PurchasingDocumentService();
+            var purchasingDocumentService = new CreatePurchasingDocumentService();
 
             Assert.ThrowsAsync<ArgumentNullException>(() =>
                 purchasingDocumentService.CreateDocumentAsync(
@@ -29,7 +29,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [Test]
         public async Task CreateDocumentAsync_DocumentIsCreated_StreamIsAsExpected()
         {
-            var purchasingDocumentService = new PurchasingDocumentService();
+            var purchasingDocumentService = new CreatePurchasingDocumentService();
 
             await using var stream = new MemoryStream();
             var order = OrderBuilder.Create().Build();

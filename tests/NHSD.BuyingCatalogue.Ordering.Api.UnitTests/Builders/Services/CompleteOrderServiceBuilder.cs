@@ -12,7 +12,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
         private IIdentityService _identityService;
         private IOrderRepository _orderRepository;
         private IEmailService _emailService;
-        private IPurchasingDocumentService _purchasingDocumentService;
+        private ICreatePurchasingDocumentService _createPurchasingDocumentService;
 
         private PurchasingSettings _purchasingSettings;
 
@@ -41,10 +41,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
             return this;
         }
 
-        public CompleteOrderServiceBuilder WithPurchasingDocumentService(
-            IPurchasingDocumentService purchasingDocumentService)
+        public CompleteOrderServiceBuilder WithCreatePurchasingDocumentService(
+            ICreatePurchasingDocumentService createPurchasingDocumentService)
         {
-            _purchasingDocumentService = purchasingDocumentService;
+            _createPurchasingDocumentService = createPurchasingDocumentService;
             return this;
         }
 
@@ -54,7 +54,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
             return this;
         }
 
-        public CompleteOrderService Build() => 
-            new CompleteOrderService(_identityService, _orderRepository, _emailService, _purchasingDocumentService, _purchasingSettings);
+        public CompleteOrderService Build() =>
+            new CompleteOrderService(_identityService, _orderRepository, _emailService,
+                _createPurchasingDocumentService, _purchasingSettings);
     }
 }

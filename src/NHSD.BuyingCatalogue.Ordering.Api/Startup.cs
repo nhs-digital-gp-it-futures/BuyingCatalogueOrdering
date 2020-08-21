@@ -90,7 +90,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 .AddTransient<ICreateOrderItemService, CreateOrderItemService>()
                 .AddTransient<IUpdateOrderItemService, UpdateOrderItemService>()
                 .AddTransient<ICompleteOrderService, CompleteOrderService>()
-                .AddTransient<IPurchasingDocumentService, PurchasingDocumentService>()
+                .AddTransient<ICreatePurchasingDocumentService, CreatePurchasingDocumentService>()
                 .AddTransient<ICreateOrderItemValidator, OrderItemValidator>()
                 .AddTransient<IUpdateOrderItemValidator, OrderItemValidator>();
 

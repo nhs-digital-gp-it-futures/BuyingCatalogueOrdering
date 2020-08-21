@@ -5,12 +5,11 @@ using System.IO;
 using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
-using NHSD.BuyingCatalogue.Ordering.Api.Settings;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
 {
-    public sealed class PurchasingDocumentService : IPurchasingDocumentService
+    public sealed class CreatePurchasingDocumentService : ICreatePurchasingDocumentService
     {
         public async Task CreateDocumentAsync(Stream stream, Order order)
         {
@@ -22,10 +21,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
 
             var records = new List<PurchaseOrderItem>
             {
-                new PurchaseOrderItem{ CallOffPartyId = order.OrderId }
+                new PurchaseOrderItem { CallOffPartyId = order.OrderId }
             };
 
-            await using var streamWriter = new StreamWriter(stream, leaveOpen:true);
+            await using var streamWriter = new StreamWriter(stream, leaveOpen: true);
             await using var csvWriter = new CsvWriter(streamWriter, CultureInfo.CurrentCulture);
 
             csvWriter.Configuration.RegisterClassMap<PurchaseDocumentSettingsMap>();

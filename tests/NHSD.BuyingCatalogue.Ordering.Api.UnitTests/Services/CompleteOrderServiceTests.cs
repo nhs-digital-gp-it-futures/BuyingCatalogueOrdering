@@ -167,15 +167,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
                 EmailServiceMock = new Mock<IEmailService>();
                 EmailServiceMock.Setup(x => x.SendEmailAsync(It.IsAny<EmailMessage>()));
-                PurchaseDocumentServiceMock = new Mock<IPurchasingDocumentService>();
-                PurchaseDocumentServiceMock.Setup(x => x.CreateDocumentAsync(It.IsAny<Stream>(), It.IsAny<Order>()));
+                CreatePurchaseDocumentServiceMock = new Mock<ICreatePurchasingDocumentService>();
+                CreatePurchaseDocumentServiceMock.Setup(x => x.CreateDocumentAsync(It.IsAny<Stream>(), It.IsAny<Order>()));
 
                 CompleteOrderService = CompleteOrderServiceBuilder
                     .Create()
                     .WithOrderRepository(OrderRepositoryMock.Object)
                     .WithIdentityService(IdentityServiceMock.Object)
                     .WithEmailService(EmailServiceMock.Object)
-                    .WithPurchasingDocumentService(PurchaseDocumentServiceMock.Object)
+                    .WithCreatePurchasingDocumentService(CreatePurchaseDocumentServiceMock.Object)
                     .WithPurchasingSettings(PurchasingSettings)
                     .Build();
             }
@@ -186,7 +186,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             internal Mock<IEmailService> EmailServiceMock { get; }
 
-            internal Mock<IPurchasingDocumentService> PurchaseDocumentServiceMock { get; }
+            internal Mock<ICreatePurchasingDocumentService> CreatePurchaseDocumentServiceMock { get; }
 
             internal PurchasingSettings PurchasingSettings { get; }
 

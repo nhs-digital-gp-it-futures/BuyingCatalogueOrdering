@@ -15,20 +15,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
         private readonly IIdentityService _identityService;
         private readonly IOrderRepository _orderRepository;
         private readonly IEmailService _emailService;
-        private readonly IPurchasingDocumentService _purchasingDocumentService;
+        private readonly ICreatePurchasingDocumentService _createPurchasingDocumentService;
         private readonly PurchasingSettings _purchasingSettings;
 
         public CompleteOrderService(
             IIdentityService identityService,
             IOrderRepository orderRepository,
             IEmailService emailService,
-            IPurchasingDocumentService purchasingDocumentService,
+            ICreatePurchasingDocumentService createPurchasingDocumentService,
             PurchasingSettings purchasingSettings)
         {
             _identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
-            _purchasingDocumentService = purchasingDocumentService ?? throw new ArgumentNullException(nameof(purchasingDocumentService));
+            _createPurchasingDocumentService = createPurchasingDocumentService ?? throw new ArgumentNullException(nameof(createPurchasingDocumentService));
             _purchasingSettings = purchasingSettings ?? throw new ArgumentNullException(nameof(purchasingSettings));
         }
 
@@ -46,7 +46,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
             await _orderRepository.UpdateOrderAsync(order);
 
             await using var stream = new MemoryStream();
-            await _purchasingDocumentService.CreateDocumentAsync(stream, order);
+            await _createPurchasingDocumentService.CreateDocumentAsync(stream, order);
             stream.Position = 0;
 
             var emailMessage = _purchasingSettings.EmailMessage;

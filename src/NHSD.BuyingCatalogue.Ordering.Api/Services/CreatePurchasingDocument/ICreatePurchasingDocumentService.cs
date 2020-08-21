@@ -4,7 +4,7 @@ using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
 {
-    public interface IPurchasingDocumentService
+    public interface ICreatePurchasingDocumentService
     {
         Task CreateDocumentAsync(Stream stream, Order order);
     }
