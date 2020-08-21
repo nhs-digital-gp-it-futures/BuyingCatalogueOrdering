@@ -117,3 +117,14 @@ Scenario: 10. Update an order status sets the complete date
     When the user sends the update order status request
     Then a response with status code 204 is returned
     And the order completed date is set
+
+@3928
+Scenario: 11. When an order is complete, an email is sent
+    Given the user creates a request to update the order status for the order with ID 'C000014-01'
+    And the user enters the 'order-status-complete' update order status request payload
+    When the user sends the update order status request
+    Then a response with status code 204 is returned
+    And only one email is sent
+    And the email sent contains the following information
+        | From                           | To                             | Subject                                 |
+        | noreply@buyingcatalogue.nhs.uk | noreply@buyingcatalogue.nhs.uk | INTEGRATION_TEST Order Purchase Details |

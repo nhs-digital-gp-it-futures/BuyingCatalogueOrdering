@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using BoDi;
 using Microsoft.Extensions.Configuration;
+using NHSD.BuyingCatalogue.EmailClient.IntegrationTesting.Drivers;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
@@ -38,6 +39,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
             await ResetDatabaseAsync();
         }
 
+        [AfterScenario]
+        public async Task CleanUpAsync()
+        {
+            await DeleteAllSentEmailsAsync();
+        }
+
         public void RegisterTestConfiguration()
         {
             var configurationBuilder = new ConfigurationBuilder()
@@ -46,6 +53,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
                 .Build();
 
             _objectContainer.RegisterInstanceAs<IConfiguration>(configurationBuilder);
+            _objectContainer.RegisterInstanceAs(
+                new EmailServiceDriverSettings(configurationBuilder.GetValue<Uri>("SmtpServerApiBaseUrl")));
         }
 
         private static void RegisterCustomValueRetrievers()
@@ -59,5 +68,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
 
         private async Task ResetDatabaseAsync() =>
             await IntegrationDatabase.ResetAsync(_objectContainer.Resolve<IConfiguration>());
+
+        private async Task DeleteAllSentEmailsAsync()
+        {
+            var emailServerDriver = _objectContainer.Resolve<EmailServerDriver>();
+            await emailServerDriver.ClearAllEmailsAsync();
+        }
     }
 }
