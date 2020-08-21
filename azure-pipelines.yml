@@ -81,7 +81,7 @@ jobs:
     displayName: 'Run dotnet restore'
     inputs:
       command: restore
-      projects: '**/*UnitTests.csproj'
+      projects: '**/*Tests.csproj'
       feedsToUse: config
       nugetConfigPath: 'NuGet.config'
       arguments: '-v n'
@@ -90,7 +90,7 @@ jobs:
     displayName: 'Run dotnet build'
     inputs:
       command: build
-      projects: '**/*UnitTests.csproj'
+      projects: '**/*Tests.csproj'
       arguments: '--no-restore'
 
   - task: DotNetCoreCLI@2

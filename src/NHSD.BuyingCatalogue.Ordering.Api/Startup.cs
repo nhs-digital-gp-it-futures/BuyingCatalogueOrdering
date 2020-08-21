@@ -77,7 +77,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
 
             services
                 .AddSingleton(validationSettings)
-                .AddSingleton(purchasingSettings);
+                .AddTransient(provider => _configuration.GetSection("Purchasing").Get<PurchasingSettings>());
 
             services
                 .AddSingleton(smtpSettings)
