@@ -136,9 +136,33 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 emailService.SendEmailAsync(context.PurchasingSettings.EmailMessage), Times.Once);
         }
 
+        [Test]
+        public async Task CompleteAsync_PurchasingDocumentServiceFundingSourceTrue_CalledOnce()
+        {
+            var context = CompleteOrderServiceTestContext.Setup();
+
+            await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
+
+            context.CreatePurchaseDocumentServiceMock.Verify(purchasingDocumentService =>
+                purchasingDocumentService.CreateDocumentAsync(It.IsAny<Stream>(),
+                    It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))), Times.Once);
+        }
+
+        [Test]
+        public async Task CompleteAsync_PurchasingDocumentServiceFundingSourceFalse_NotCalled()
+        {
+            var context = CompleteOrderServiceTestContext.Setup(false);
+
+            await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
+
+            context.CreatePurchaseDocumentServiceMock.Verify(purchasingDocumentService =>
+                purchasingDocumentService.CreateDocumentAsync(It.IsAny<Stream>(),
+                    It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))), Times.Never);
+        }
+
         internal sealed class CompleteOrderServiceTestContext
         {
-            private CompleteOrderServiceTestContext()
+            private CompleteOrderServiceTestContext(bool fundingSource)
             {
                 UserId = Guid.NewGuid();
                 UserName = $"Username {Guid.NewGuid()}";
@@ -154,7 +178,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                                 .Create()
                                 .WithCatalogueItemType(CatalogueItemType.AssociatedService)
                                 .Build())
-                        .WithFundingSourceOnlyGms(true)
+                        .WithFundingSourceOnlyGms(fundingSource)
                         .Build());
 
                 OrderRepositoryMock = new Mock<IOrderRepository>();
@@ -200,9 +224,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             internal CompleteOrderRequest CompleteOrderRequest { get; }
 
-            public static CompleteOrderServiceTestContext Setup()
+            public static CompleteOrderServiceTestContext Setup(bool fundingSource = true)
             {
-                return new CompleteOrderServiceTestContext();
+                return new CompleteOrderServiceTestContext(fundingSource);
             }
         }
     }

@@ -30,6 +30,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             emailCount.Should().Be(1);
         }
 
+        [Then(@"no email is sent")]
+        public async Task EmailIsNotSent()
+        {
+            var emails = await _emailServerDriver.FindAllEmailsAsync();
+            emails.Should().BeNullOrEmpty();
+        }
+
         [Then(@"the email sent contains the following information")]
         public async Task ThenEmailContains(Table table)
         {
