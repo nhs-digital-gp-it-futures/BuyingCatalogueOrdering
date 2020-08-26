@@ -40,7 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 Attachments = new List<EmailAttachmentData>
                 {
                     new EmailAttachmentData(
-                        Encoding.UTF8.GetBytes($"{expectedContents.AttachmentHeader1}{Environment.NewLine}{expectedContents.OrderId}{Environment.NewLine}"),
+                        Encoding.UTF8.GetBytes($"{expectedContents.AttachmentHeader1}\r\n{expectedContents.OrderId}\r\n"),
                         expectedContents.FileName,
                         new ContentType("text/csv"))
                 },
@@ -57,8 +57,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             };
             
             var actual = (await _emailServerDriver.FindAllEmailsAsync()).First();
-            expected.Should().BeEquivalentTo(actual, conf => conf.Excluding(x => x.Html));
 
+            actual.Should().BeEquivalentTo(expected, conf => conf.IncludingAllDeclaredProperties());
         }
 
         private sealed class EmailContents

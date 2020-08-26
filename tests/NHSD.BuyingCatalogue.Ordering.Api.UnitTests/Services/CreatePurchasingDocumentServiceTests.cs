@@ -36,7 +36,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             await purchasingDocumentService.CreateDocumentAsync(stream, OrderBuilder.Create().Build());
 
             var expectedStreamContent = stream.ToArray();
-            var actualStreamContent = Encoding.UTF8.GetBytes($"Call off Party Id{Environment.NewLine}{order.OrderId}{Environment.NewLine}");
+            var actualStreamContent = Encoding.UTF8.GetBytes($"Call off Party Id\r\n{order.OrderId}\r\n");
 
             expectedStreamContent.Should().BeEquivalentTo(actualStreamContent);
         }
