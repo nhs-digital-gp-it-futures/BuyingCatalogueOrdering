@@ -33,7 +33,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Then(@"the email sent contains the following information")]
         public async Task ThenEmailContains(Table table)
         {
-            var expectedContents = table.CreateSet<EmailContents>().First();
+            var expectedContents = table.CreateSet<EmailContentsTable>().First();
 
             var expected = new
             {
@@ -61,7 +61,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected, conf => conf.IncludingAllDeclaredProperties());
         }
 
-        private sealed class EmailContents
+        private sealed class EmailContentsTable
         {
             public string From { get; set; }
             public string To { get; set; }
