@@ -54,7 +54,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
 
             _objectContainer.RegisterInstanceAs<IConfiguration>(configurationBuilder);
             _objectContainer.RegisterInstanceAs(
-                new EmailServiceDriverSettings(configurationBuilder.GetValue<Uri>("SmtpServerApiBaseUrl")));
+                new EmailServerDriverSettings(configurationBuilder.GetValue<Uri>("SmtpServerApiBaseUrl")));
         }
 
         private static void RegisterCustomValueRetrievers()

@@ -126,5 +126,5 @@ Scenario: 11. When an order is complete, an email is sent
     Then a response with status code 204 is returned
     And only one email is sent
     And the email sent contains the following information
-        | From                           | To                             | Subject                                 |
-        | noreply@buyingcatalogue.nhs.uk | noreply@buyingcatalogue.nhs.uk | INTEGRATION_TEST Order Purchase Details |
+        | From                           | To                             | Subject                                 | Text                                 | FileName           | AttachmentHeader1 | OrderId    |
+        | noreply@buyingcatalogue.nhs.uk | noreply@buyingcatalogue.nhs.uk | INTEGRATION_TEST Order Purchase Details | Thank you for completing your order. | CompletedOrder.csv | Call off Party Id | C000014-01 |
