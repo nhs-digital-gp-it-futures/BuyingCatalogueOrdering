@@ -8,6 +8,7 @@ Background:
         | OrderId    | Description            | OrganisationId                       | CatalogueSolutionsViewed | AssociatedServicesViewed | FundingSourceOnlyGMS | Completed |
         | C000014-01 | Some Description       | 4af62b99-638c-4247-875e-965239cd0c48 | True                     | True                     | True                 | NULL      |
         | C000014-02 | Some Other Description | 4af62b99-638c-4247-875e-965239cd0c48 | True                     | True                     | NULL                 | NULL      |
+        | C000014-03 | Another Description    | 4af62b99-638c-4247-875e-965239cd0c48 | True                     | True                     | False                | NULL      |
     And Service Recipients exist
         | OrderId    | OdsCode | Name    |
         | C000014-01 | eu      | EU Test |
@@ -15,6 +16,7 @@ Background:
         | OrderId    | CatalogueItemName | CatalogueItemType | OdsCode | PriceTimeUnit | EstimationPeriod |
         | C000014-01 | Item 1            | Solution          | eu      | Month         | Month            |
         | C000014-02 | Item 2            | Solution          | eu      | Month         | Month            |
+        | C000014-03 | Item 3            | Solution          | eu      | Month         | Month            |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @5145
@@ -119,7 +121,15 @@ Scenario: 10. Update an order status sets the complete date
     And the order completed date is set
 
 @3928
-Scenario: 11. When an order is complete, an email is sent
+Scenario: 11. When an order is complete, and the funding source is false, no email is sent
+    Given the user creates a request to update the order status for the order with ID 'C000014-03'
+    And the user enters the 'order-status-complete' update order status request payload
+    When the user sends the update order status request
+    Then a response with status code 204 is returned
+    And no email is sent
+
+@3928
+Scenario: 12. When an order is complete, and the funding source is true, an email is sent
     Given the user creates a request to update the order status for the order with ID 'C000014-01'
     And the user enters the 'order-status-complete' update order status request payload
     When the user sends the update order status request
