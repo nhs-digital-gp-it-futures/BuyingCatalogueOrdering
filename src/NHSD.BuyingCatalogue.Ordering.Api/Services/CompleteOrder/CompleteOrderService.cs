@@ -45,7 +45,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
 
             await _orderRepository.UpdateOrderAsync(order);
 
-            if (order.FundingSourceOnlyGMS != null && (bool)order.FundingSourceOnlyGMS)
+            if (order.FundingSourceOnlyGMS.GetValueOrDefault())
             {
                 await using var stream = new MemoryStream();
                 await _createPurchasingDocumentService.CreateDocumentAsync(stream, order);
