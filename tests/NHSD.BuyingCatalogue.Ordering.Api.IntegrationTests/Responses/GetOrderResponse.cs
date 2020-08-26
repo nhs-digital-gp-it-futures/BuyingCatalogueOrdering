@@ -130,7 +130,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                     serviceRecipient.Name,
                     serviceRecipient.OdsCode
                 }),
-                OrderStatus = orderEntity.OrderStatus.ToString()
+                OrderStatus = orderEntity.OrderStatus.ToString(),
+                orderEntity.Completed
             };
 
             var actual = ReadOrder(responseContent);
@@ -153,6 +154,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 TotalRecurringCostPerMonth = responseContent.Value<decimal>("totalRecurringCostPerMonth"),
                 TotalRecurringCostPerYear = responseContent.Value<decimal>("totalRecurringCostPerYear"),
                 TotalOwnershipCost = responseContent.Value<decimal>("totalOwnershipCost"),
+                Completed = responseContent.Value<DateTime?>("dateCompleted")
             };
         }
 

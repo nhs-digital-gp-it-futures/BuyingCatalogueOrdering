@@ -1,4 +1,6 @@
 ﻿using System.Net.Http;
+using MailKit;
+using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -9,12 +11,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
+using NHSD.BuyingCatalogue.EmailClient;
 using NHSD.BuyingCatalogue.Ordering.Api.ActionFilters;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Logging;
 using NHSD.BuyingCatalogue.Ordering.Api.Services;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Settings;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
@@ -46,33 +51,50 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             var requireHttps = _configuration.GetValue<bool>("RequireHttps");
             var allowInvalidCertificate = _configuration.GetValue<bool>("AllowInvalidCertificate");
             var bypassIdentity = _configuration.GetValue<bool>("BypassIdentity");
-
             var validationSettings = new ValidationSettings
             {
                 MaxDeliveryDateWeekOffset = _configuration.GetValue<int>("MaxDeliveryDateWeekOffset")
             };
 
+            var smtpSettings = _configuration.GetSection("SmtpServer").Get<SmtpSettings>();
+            if (!smtpSettings.AllowInvalidCertificate.HasValue)
+                smtpSettings.AllowInvalidCertificate = allowInvalidCertificate;
+
+            var purchasingSettings = _configuration.GetSection("Purchasing").Get<PurchasingSettings>();
+
             Log.Logger.Information("Authority on ORDAPI is: {@authority}", authority);
             Log.Logger.Information("ORDAPI Require Https: {@requiredHttps}", requireHttps);
             Log.Logger.Information($"ORDAPI Allow Invalid Certificates: {@allowInvalidCertificate}", allowInvalidCertificate);
             Log.Logger.Information("ORDAPI BypassIdentity: {@bypassIdentity}", bypassIdentity);
-            
+            Log.Logger.Information("SMTP settings: {@smtpSettings}", smtpSettings);
+            Log.Logger.Information("Purchasing settings: {@purchasingSettings}", purchasingSettings);
+
             IdentityModelEventSource.ShowPII = _environment.IsDevelopment();
 
             services.AddHttpContextAccessor();
             services.AddTransient<IServiceRecipientRepository, ServiceRecipientRepository>();
             services.AddTransient<IOrderRepository, OrderRepository>();
-            services.AddSingleton(validationSettings);
+
+            services
+                .AddSingleton(validationSettings)
+                .AddTransient(provider => _configuration.GetSection("Purchasing").Get<PurchasingSettings>());
+
+            services
+                .AddSingleton(smtpSettings)
+                .AddScoped<IMailTransport, SmtpClient>()
+                .AddTransient<IEmailService, MailKitEmailService>();
 
             services
                 .AddTransient<IIdentityService, IdentityService>()
                 .AddTransient<ICreateOrderService, CreateOrderService>()
                 .AddTransient<ICreateOrderItemService, CreateOrderItemService>()
                 .AddTransient<IUpdateOrderItemService, UpdateOrderItemService>()
+                .AddTransient<ICompleteOrderService, CompleteOrderService>()
+                .AddTransient<ICreatePurchasingDocumentService, CreatePurchasingDocumentService>()
                 .AddTransient<ICreateOrderItemValidator, OrderItemValidator>()
                 .AddTransient<IUpdateOrderItemValidator, OrderItemValidator>();
 
-            services.RegisterHealthChecks(connectionString);
+            services.RegisterHealthChecks(connectionString, smtpSettings);
 
             services.AddSwaggerDocumentation();
 

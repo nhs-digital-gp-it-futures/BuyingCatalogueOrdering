@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
@@ -27,6 +28,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
         private bool _additionalServicesViewed;
         private bool _associatedServicesViewed;
         private bool? _fundingSourceOnlyGms;
+        private DateTime? _completed;
         private readonly IList<OrderItem> _orderItems = new List<OrderItem>();
         private readonly IList<(string Ods, string Name)> _serviceRecipients = new List<(string Ods, string Name)>();
 
@@ -53,6 +55,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             _additionalServicesViewed = false;
             _associatedServicesViewed = false;
             _fundingSourceOnlyGms = null;
+            _completed = null;
         }
 
         public static OrderBuilder Create() => new OrderBuilder();
@@ -159,6 +162,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             return this;
         }
 
+        public OrderBuilder WithCompleted(DateTime? completed)
+        {
+            _completed = completed;
+            return this;
+        }
+
         public OrderBuilder WithOrderItem(OrderItem orderItem)
         {
             _orderItems.Add(orderItem);
@@ -203,6 +212,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             order.FundingSourceOnlyGMS = _fundingSourceOnlyGms;
             order.Created = _created;
             order.LastUpdated = _lastUpdated;
+
+            if (_completed != null)
+            {
+                var completedFieldInfo =
+                    order.GetType().GetField("_completed", BindingFlags.Instance | BindingFlags.NonPublic);
+                completedFieldInfo?.SetValue(order, _completed);
+            }
 
             return order;
         }

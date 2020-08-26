@@ -12,9 +12,9 @@ Background:
         | FirstName | LastName | EmailAddress            | TelephoneNumber |
         | Fred      | Robinson | Fred.robinson@email.com | 12312543212     |
     Given Orders exist
-        | OrderId    | IsDeleted | Description   | OrganisationId                       | OrganisationName | OrganisationOdsCode | OrganisationAddressPostcode | OrganisationContactEmail | SupplierId | SupplierName       | SupplierAddressPostcode | SupplierContactEmail    |
-        | C000014-01 | false     | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | Hampshire CC     | 432432              | LS2 6ZP                     | Fred.robinson@email.com  | S123       | Some supplier name | LS1 3AP                 | Fred.robinson@email.com |
-        | C000014-02 | true      | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | Hampshire CC     | 432432              | LS2 6ZP                     | Fred.robinson@email.com  | S123       | Some supplier name | LS1 3AP                 | Fred.robinson@email.com |
+        | OrderId    | IsDeleted | Description   | OrganisationId                       | OrganisationName | OrganisationOdsCode | OrganisationAddressPostcode | OrganisationContactEmail | SupplierId | SupplierName       | SupplierAddressPostcode | SupplierContactEmail    | Completed  |
+        | C000014-01 | false     | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | Hampshire CC     | 432432              | LS2 6ZP                     | Fred.robinson@email.com  | S123       | Some supplier name | LS1 3AP                 | Fred.robinson@email.com | 05/15/2020 |
+        | C000014-02 | true      | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | Hampshire CC     | 432432              | LS2 6ZP                     | Fred.robinson@email.com  | S123       | Some supplier name | LS1 3AP                 | Fred.robinson@email.com | NULL       |
     Given Service Recipients exist
         | OrderId    | OdsCode | Name    |
         | C000014-01 | eu      | EU Test |
@@ -34,7 +34,7 @@ Scenario: 1. Get an order
     And the get order response displays the expected order
 
 @8122
-Scenario: 2. Get a single deleted order returns not found 
+Scenario: 2. Get a single deleted order returns not found
     Given the user creates a request to retrieve the details of an order by ID 'C000014-02'
     When the user sends the get order request
     Then a response with status code 404 is returned
