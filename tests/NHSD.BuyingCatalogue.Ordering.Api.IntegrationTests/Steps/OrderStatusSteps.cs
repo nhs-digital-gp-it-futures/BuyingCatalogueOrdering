@@ -12,7 +12,6 @@ using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
 using static System.String;
-using Enum = System.Enum;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 {
