@@ -1,17 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using CsvHelper;
-using CsvHelper.Configuration;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
 {
     public sealed class CreatePurchasingDocumentService : ICreatePurchasingDocumentService
     {
-        public async Task CreateDocumentAsync(Stream stream, Order order)
+        private readonly IAttachmentCsvWriter<PatientNumbersPriceType> _patientNumbersCsvWriter;
+
+        public CreatePurchasingDocumentService(IAttachmentCsvWriter<PatientNumbersPriceType> patientNumbersCsvWriter)
+        {
+            _patientNumbersCsvWriter = patientNumbersCsvWriter ?? throw new ArgumentNullException(nameof(patientNumbersCsvWriter));
+        }
+
+        public async Task CreatePatientNumbersCsvAsync(Stream stream, Order order)
         {
             if (stream is null)
                 throw new ArgumentNullException(nameof(stream));
@@ -19,24 +23,29 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
             if (order is null)
                 throw new ArgumentNullException(nameof(order));
 
-            var records = new List<PurchaseOrderItem>
+            var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(x => x.OdsCode);
+
+            var patientNumbersPriceTypes = order.OrderItems.Select(orderItem => new PatientNumbersPriceType
             {
-                new PurchaseOrderItem { CallOffPartyId = order.OrderId }
-            };
+                CallOffAgreementId = order.OrderId,
+                CallOffOrderingPartyId = order.OrganisationOdsCode,
+                CallOffOrderingPartyName = order.OrganisationName,
+                CallOffCommencementDate = order.CommencementDate,
+                ServiceRecipientId = orderItem.OdsCode,
+                ServiceRecipientName = serviceRecipientDictionary[orderItem.OdsCode]?.Name,
+                ServiceRecipientItemId = $"{orderItem.OrderItemId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
+                SupplierId = order.SupplierId,
+                SupplierName = order.SupplierName,
+                ProductId = orderItem.CatalogueItemId,
+                ProductName = orderItem.CatalogueItemName,
+                ProductType = orderItem.CatalogueItemType.Name,
+                QuantityOrdered = orderItem.Quantity,
+                UnitOfOrder = orderItem.CataloguePriceUnit.Description,
+                Price = orderItem.Price.GetValueOrDefault(),
+                M1Planned = orderItem.DeliveryDate,
+            }).ToList();
 
-            await using var streamWriter = new StreamWriter(stream, leaveOpen: true);
-            await using var csvWriter = new CsvWriter(streamWriter, CultureInfo.CurrentCulture);
-
-            csvWriter.Configuration.RegisterClassMap<PurchaseDocumentSettingsMap>();
-            await csvWriter.WriteRecordsAsync(records);
-        }
-
-        private sealed class PurchaseDocumentSettingsMap : ClassMap<PurchaseOrderItem>
-        {
-            public PurchaseDocumentSettingsMap()
-            {
-                Map(x => x.CallOffPartyId).Index(0).Name("Call off Party Id");
-            }
+            await _patientNumbersCsvWriter.WriteRecordsAsync(stream, patientNumbersPriceTypes);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using FluentAssertions;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
@@ -13,18 +14,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     {
         private readonly Request _request;
         private readonly Settings _settings;
+        private readonly ScenarioContext _scenarioContext;
 
         private UpdateOrderStatusRequest _updateOrderStatusRequest;
 
-        public OrderStatusSteps(Request request, Settings settings)
+        public OrderStatusSteps(Request request, Settings settings, ScenarioContext scenarioContext)
         {
             _request = request;
             _settings = settings;
+            _scenarioContext = scenarioContext;
         }
 
         [Given(@"the user creates a request to update the order status for the order with ID '(.*)'")]
         public void GivenTheUserCreatesARequestToUpdateTheStatusForTheOrderWithId(string orderId)
         {
+            _scenarioContext[ScenarioContextKeys.OrderId] = orderId;
             _updateOrderStatusRequest = new UpdateOrderStatusRequest(_request, _settings.OrderingApiBaseUrl, orderId);
         }
 

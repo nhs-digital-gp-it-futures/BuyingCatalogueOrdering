@@ -144,7 +144,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
 
             context.CreatePurchaseDocumentServiceMock.Verify(purchasingDocumentService =>
-                purchasingDocumentService.CreateDocumentAsync(It.IsAny<Stream>(),
+                purchasingDocumentService.CreatePatientNumbersCsvAsync(It.IsAny<Stream>(),
                     It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))), Times.Once);
         }
 
@@ -156,7 +156,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
 
             context.CreatePurchaseDocumentServiceMock.Verify(purchasingDocumentService =>
-                purchasingDocumentService.CreateDocumentAsync(It.IsAny<Stream>(),
+                purchasingDocumentService.CreatePatientNumbersCsvAsync(It.IsAny<Stream>(),
                     It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))), Times.Never);
         }
 
@@ -192,7 +192,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 EmailServiceMock = new Mock<IEmailService>();
                 EmailServiceMock.Setup(x => x.SendEmailAsync(It.IsAny<EmailMessage>()));
                 CreatePurchaseDocumentServiceMock = new Mock<ICreatePurchasingDocumentService>();
-                CreatePurchaseDocumentServiceMock.Setup(x => x.CreateDocumentAsync(It.IsAny<Stream>(), It.IsAny<Order>()));
+                CreatePurchaseDocumentServiceMock.Setup(x => x.CreatePatientNumbersCsvAsync(It.IsAny<Stream>(), It.IsAny<Order>()));
 
                 CompleteOrderService = CompleteOrderServiceBuilder
                     .Create()
