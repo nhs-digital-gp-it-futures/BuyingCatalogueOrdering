@@ -192,7 +192,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 EmailServiceMock = new Mock<IEmailService>();
                 EmailServiceMock.Setup(x => x.SendEmailAsync(It.IsAny<EmailMessage>()));
                 CreatePurchaseDocumentServiceMock = new Mock<ICreatePurchasingDocumentService>();
-                CreatePurchaseDocumentServiceMock.Setup(x => x.CreatePatientNumbersCsvAsync(It.IsAny<Stream>(), It.IsAny<Order>()));
+                CreatePurchaseDocumentServiceMock.Setup(x =>
+                    x.CreatePatientNumbersCsvAsync(It.IsAny<Stream>(), It.IsAny<Order>()));
 
                 CompleteOrderService = CompleteOrderServiceBuilder
                     .Create()

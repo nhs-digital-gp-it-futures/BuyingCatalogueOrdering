@@ -45,7 +45,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Then(@"the email contains the following information")]
-        public async Task ThenTheEmailContainsTheFolowingInformation(Table table)
+        public async Task ThenTheEmailContainsTheFollowingInformation(Table table)
         {
             var expectedContents = table.CreateSet<EmailContentsTable>().First();
 

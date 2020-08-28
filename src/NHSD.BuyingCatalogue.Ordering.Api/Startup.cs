@@ -95,7 +95,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 .AddTransient<IUpdateOrderItemValidator, OrderItemValidator>()
                 .AddTransient<IAttachmentCsvWriter<PatientNumbersPriceType>, AttachmentCsvWriter<PatientNumbersPriceType, PatientNumbersPriceTypeMap>>();
 
-
             services.RegisterHealthChecks(connectionString, smtpSettings);
 
             services.AddSwaggerDocumentation();
