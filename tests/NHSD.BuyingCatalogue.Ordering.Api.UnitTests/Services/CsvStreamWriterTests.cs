@@ -12,14 +12,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class AttachmentCsvWriterTests
+    internal sealed class CsvStreamWriterTests
     {
         [TestCase(true, false)]
         [TestCase(false, true)]
         [TestCase(false, false)]
         public void WriteRecordsAsync_StreamIsNull_ThrowsArgumentNullException(bool hasStream, bool hasRecords)
         {
-            var csvWriter = new CsvStreamWriter<CsvHeaderContent, CsvHeaderContentMap>();
+            var csvWriter = new CsvStreamStreamWriter<CsvHeaderContent, CsvHeaderContentMap>();
 
             Assert.ThrowsAsync<ArgumentNullException>(async () =>
                 await csvWriter.WriteRecordsAsync(hasStream ? new MemoryStream() : null,
@@ -29,7 +29,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [Test]
         public async Task WriteRecordsAsync_RecordsAreWritten_InformationIsCorrect()
         {
-            var csvWriter = new CsvStreamWriter<CsvHeaderContent, CsvHeaderContentMap>();
+            var csvWriter = new CsvStreamStreamWriter<CsvHeaderContent, CsvHeaderContentMap>();
             await using var stream = new MemoryStream();
 
             var expectedDate = DateTime.UtcNow;

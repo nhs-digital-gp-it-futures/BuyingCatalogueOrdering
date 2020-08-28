@@ -8,11 +8,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
 {
     public sealed class CreatePurchasingDocumentService : ICreatePurchasingDocumentService
     {
-        private readonly IAttachmentCsvWriter<PatientNumbersPriceType> _patientNumbersCsvWriter;
+        private readonly ICsvStreamWriter<PatientNumbersPriceType> _patientNumbersCsvStreamWriter;
 
-        public CreatePurchasingDocumentService(IAttachmentCsvWriter<PatientNumbersPriceType> patientNumbersCsvWriter)
+        public CreatePurchasingDocumentService(ICsvStreamWriter<PatientNumbersPriceType> patientNumbersCsvStreamWriter)
         {
-            _patientNumbersCsvWriter = patientNumbersCsvWriter ?? throw new ArgumentNullException(nameof(patientNumbersCsvWriter));
+            _patientNumbersCsvStreamWriter = patientNumbersCsvStreamWriter ?? throw new ArgumentNullException(nameof(patientNumbersCsvStreamWriter));
         }
 
         public async Task CreatePatientNumbersCsvAsync(Stream stream, Order order)
@@ -45,7 +45,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
                 M1Planned = orderItem.DeliveryDate,
             }).ToList();
 
-            await _patientNumbersCsvWriter.WriteRecordsAsync(stream, patientNumbersPriceTypes);
+            await _patientNumbersCsvStreamWriter.WriteRecordsAsync(stream, patientNumbersPriceTypes);
         }
     }
 }

@@ -56,7 +56,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
     {
         private CreatePurchasingDocumentServiceTestContext()
         {
-            PatientCsvWriterMock = new Mock<IAttachmentCsvWriter<PatientNumbersPriceType>>();
+            PatientCsvWriterMock = new Mock<ICsvStreamWriter<PatientNumbersPriceType>>();
             PatientCsvWriterMock.Setup(x =>
                 x.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<PatientNumbersPriceType>>()));
 
@@ -66,7 +66,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 .Build();
         }
 
-        internal Mock<IAttachmentCsvWriter<PatientNumbersPriceType>> PatientCsvWriterMock;
+        internal Mock<ICsvStreamWriter<PatientNumbersPriceType>> PatientCsvWriterMock;
 
         internal CreatePurchasingDocumentService CreatePurchasingDocumentService { get; }
 

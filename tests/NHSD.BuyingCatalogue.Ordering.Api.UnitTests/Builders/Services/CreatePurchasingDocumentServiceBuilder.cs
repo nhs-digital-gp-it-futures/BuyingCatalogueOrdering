@@ -4,7 +4,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
 {
     internal sealed class CreatePurchasingDocumentServiceBuilder
     {
-        private IAttachmentCsvWriter<PatientNumbersPriceType> _patientNumbersCsvWriter;
+        private ICsvStreamWriter<PatientNumbersPriceType> _patientNumbersCsvStreamWriter;
 
         private CreatePurchasingDocumentServiceBuilder()
         {
@@ -14,13 +14,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
             new CreatePurchasingDocumentServiceBuilder();
 
         public CreatePurchasingDocumentServiceBuilder WithPatientNumbersCsvWriter(
-            IAttachmentCsvWriter<PatientNumbersPriceType> patientNumbersCsvWriter)
+            ICsvStreamWriter<PatientNumbersPriceType> patientNumbersCsvStreamWriter)
         {
-            _patientNumbersCsvWriter = patientNumbersCsvWriter;
+            _patientNumbersCsvStreamWriter = patientNumbersCsvStreamWriter;
             return this;
         }
 
         public CreatePurchasingDocumentService Build() =>
-            new CreatePurchasingDocumentService(_patientNumbersCsvWriter);
+            new CreatePurchasingDocumentService(_patientNumbersCsvStreamWriter);
     }
 }

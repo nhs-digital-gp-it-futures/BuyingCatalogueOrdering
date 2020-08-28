@@ -9,7 +9,7 @@ using CsvHelper.TypeConversion;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
 {
-    internal sealed class CsvStreamWriter<TEntity, TClassMap> : IAttachmentCsvWriter<TEntity> where TClassMap : ClassMap<TEntity>
+    internal sealed class CsvStreamStreamWriter<TEntity, TClassMap> : ICsvStreamWriter<TEntity> where TClassMap : ClassMap<TEntity>
     {
         public async Task WriteRecordsAsync(Stream stream, IEnumerable<TEntity> records)
         {
