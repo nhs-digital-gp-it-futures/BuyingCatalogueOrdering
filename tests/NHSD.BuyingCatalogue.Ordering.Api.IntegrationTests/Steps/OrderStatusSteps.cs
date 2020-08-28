@@ -11,7 +11,6 @@ using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
 using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
-using static System.String;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 {
@@ -143,9 +142,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 orderItem.Price.GetValueOrDefault() == 0 ? 0.ToString() : orderItem.Price.GetValueOrDefault().ToString("#.000"),
                 "Central",
                 orderItem.DeliveryDate?.ToString("dd/MM/yyyy"),
-                Empty,
-                Empty,
-                Empty
+                String.Empty,
+                String.Empty,
+                String.Empty
             };
 
             return data;
