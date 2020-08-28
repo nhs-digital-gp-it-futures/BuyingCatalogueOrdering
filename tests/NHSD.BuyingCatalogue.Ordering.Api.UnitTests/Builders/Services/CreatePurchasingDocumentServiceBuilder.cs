@@ -6,7 +6,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
     {
         private IAttachmentCsvWriter<PatientNumbersPriceType> _patientNumbersCsvWriter;
 
-        public CreatePurchasingDocumentServiceBuilder()
+        private CreatePurchasingDocumentServiceBuilder()
         {
         }
 

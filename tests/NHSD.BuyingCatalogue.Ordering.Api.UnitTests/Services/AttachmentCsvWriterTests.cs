@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using CsvHelper.Configuration;
@@ -13,23 +14,27 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
     [Parallelizable(ParallelScope.All)]
     internal sealed class AttachmentCsvWriterTests
     {
-        [Test]
-        public void WriteRecordsAsync_StreamIsNull_ThrowsArgumentNullException()
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        [TestCase(false, false)]
+        public void WriteRecordsAsync_StreamIsNull_ThrowsArgumentNullException(bool hasStream, bool hasRecords)
         {
-            var csvWriter = new AttachmentCsvWriter<CsvHeaderContent, CsvHeaderContentMap>();
+            var csvWriter = new CsvStreamWriter<CsvHeaderContent, CsvHeaderContentMap>();
 
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await csvWriter.WriteRecordsAsync(null, null));
+            Assert.ThrowsAsync<ArgumentNullException>(async () =>
+                await csvWriter.WriteRecordsAsync(hasStream ? new MemoryStream() : null,
+                    hasRecords ? new List<CsvHeaderContent>() : null));
         }
 
         [Test]
         public async Task WriteRecordsAsync_RecordsAreWritten_InformationIsCorrect()
         {
-            var csvWriter = new AttachmentCsvWriter<CsvHeaderContent, CsvHeaderContentMap>();
+            var csvWriter = new CsvStreamWriter<CsvHeaderContent, CsvHeaderContentMap>();
             await using var stream = new MemoryStream();
 
             var expectedDate = DateTime.UtcNow;
 
-            var records = new[] { new CsvHeaderContent {Created = expectedDate, Name = "Bob Builder" }};
+            var records = new[] { new CsvHeaderContent { Created = expectedDate, Name = "Bob Builder" } };
 
             await csvWriter.WriteRecordsAsync(stream, records);
 

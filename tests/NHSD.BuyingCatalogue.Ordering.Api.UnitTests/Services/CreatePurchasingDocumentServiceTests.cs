@@ -38,7 +38,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public async Task CreatePatientNumbersCsvAsync_DocumentIsCreated_StreamIsAsExpected()
+        public async Task CreatePatientNumbersCsvAsync_DocumentIsCreated_WriteRecordsAsyncCalledOnce()
         {
             var context = CreatePurchasingDocumentServiceTestContext.Setup();
             await using var stream = new MemoryStream();
@@ -46,7 +46,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             await context.CreatePurchasingDocumentService.CreatePatientNumbersCsvAsync(stream, order);
 
-            context.PatientCsvWriterMock.Verify(x => x.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<PatientNumbersPriceType>>()), Times.Once);
+            context.PatientCsvWriterMock.Verify(
+                x => x.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<PatientNumbersPriceType>>()),
+                Times.Once);
         }
     }
 

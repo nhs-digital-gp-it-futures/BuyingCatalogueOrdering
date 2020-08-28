@@ -9,12 +9,17 @@ using CsvHelper.TypeConversion;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
 {
-    public sealed class AttachmentCsvWriter<T, T2> : IAttachmentCsvWriter<T> where T2 : ClassMap<T>
+    internal sealed class CsvStreamWriter<TEntity, TClassMap  > : IAttachmentCsvWriter<TEntity> where TClassMap : ClassMap<TEntity>
     {
-        public async Task WriteRecordsAsync(Stream stream, IEnumerable<T> records)
+        public async Task WriteRecordsAsync(Stream stream, IEnumerable<TEntity> records)
         {
             if (stream is null)
                 throw new ArgumentNullException(nameof(stream));
+
+            if(records is null)
+            {
+                throw new ArgumentNullException(nameof(records));
+            }
 
             await using var streamWriter = new StreamWriter(stream, leaveOpen: true);
             await using var csvWriter = new CsvWriter(streamWriter, CultureInfo.CurrentCulture);
@@ -22,7 +27,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
             var options = new TypeConverterOptions { Formats = new[] { "dd/MM/yyyy" } };
             csvWriter.Configuration.TypeConverterOptionsCache.AddOptions<DateTime?>(options);
 
-            csvWriter.Configuration.RegisterClassMap<T2>();
+            csvWriter.Configuration.RegisterClassMap<TClassMap>();
             await csvWriter.WriteRecordsAsync(records);
         }
     }

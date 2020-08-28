@@ -20,14 +20,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     internal sealed class EmailSteps
     {
         private readonly EmailServerDriver _emailServerDriver;
-        private readonly OrderContext _orderContext;
-        private readonly ScenarioContext _scenarioContext;
 
-        public EmailSteps(EmailServerDriver emailServerDriver, OrderContext orderContext, ScenarioContext scenarioContext)
+        public EmailSteps(EmailServerDriver emailServerDriver)
         {
             _emailServerDriver = emailServerDriver ?? throw new ArgumentNullException(nameof(emailServerDriver));
-            _orderContext = orderContext ?? throw new ArgumentNullException(nameof(orderContext));
-            _scenarioContext = scenarioContext ?? throw new ArgumentNullException(nameof(scenarioContext));
         }
 
         [Then(@"only one email is sent")]
@@ -60,92 +56,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var actual = (await _emailServerDriver.FindAllEmailsAsync()).First();
 
             actual.Should().BeEquivalentTo(expected, conf => conf.IncludingAllDeclaredProperties());
-        }
-
-        [Then(@"the patient numbers price type attachment contains the correct information")]
-        public async Task ThenThePatientNumbersPriceTypeAttachmentContainsTheCorrectInformation()
-        {
-            string[] patientNumbersCsvHeader = {
-                "Call Off Agreement ID",
-                "Call Off Ordering Party ID",
-                "Call Off Ordering Party Name",
-                "Call Off Commencement Date",
-                "Service Recipient ID",
-                "Service Recipient Name",
-                "Service Recipient Item ID",
-                "Supplier ID",
-                "Supplier Name",
-                "Product ID",
-                "Product Name",
-                "Product Type",
-                "Quantity Ordered",
-                "Unit of Order",
-                "Price",
-                "Funding Type",
-                "M1 planned (Delivery Date)",
-                "Actual M1 date",
-                "Buyer verification date (M2)",
-                "Cease Date"
-            };
-
-            var actual = (await _emailServerDriver.FindAllEmailsAsync()).First().Attachments.First();
-
-            var attachmentData = new MemoryStream(actual.AttachmentData.ToArray());
-            var csvText = new TextFieldParser(attachmentData);
-            csvText.SetDelimiters(",");
-
-            csvText.ReadFields().Should().BeEquivalentTo(patientNumbersCsvHeader);
-
-            var orderId = _scenarioContext[ScenarioContextKeys.OrderId].ToString();
-
-            var order = _orderContext.OrderReferenceList.GetByOrderId(orderId);
-            var orderItems = _orderContext.OrderItemReferenceList.FindByOrderId(orderId).ToArray();
-            var serviceRecipients = _orderContext.ServiceRecipientReferenceList.FindByOrderId(orderId).ToList();
-
-            foreach (var orderItem in orderItems)
-            {
-                csvText.EndOfData.Should().BeFalse();
-
-                var row = csvText.ReadFields();
-
-                var data = CreatePatientNumbersTypeAttachmentData(order, orderItem, serviceRecipients);
-
-                row.Should().BeEquivalentTo(data);
-            }
-
-            csvText.EndOfData.Should().BeTrue();
-        }
-
-        private string[] CreatePatientNumbersTypeAttachmentData(OrderEntity order, OrderItemEntity orderItem, IEnumerable<ServiceRecipientEntity> serviceRecipientDictionary)
-        {
-            string[] data =
-            {
-                order.OrderId,
-                order.OrganisationOdsCode,
-                order.OrganisationName,
-                order.CommencementDate?.ToString("dd/MM/yyyy"),
-                orderItem.OdsCode,
-                serviceRecipientDictionary.FirstOrDefault(item =>
-                    string.Equals(orderItem.OdsCode,
-                        item.OdsCode, StringComparison.OrdinalIgnoreCase))
-                    ?.Name,
-                $"{orderItem.OrderItemId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
-                order.SupplierId,
-                order.SupplierName,
-                orderItem.CatalogueItemId,
-                orderItem.CatalogueItemName,
-                orderItem.CatalogueItemType.ToString(),
-                orderItem.Quantity.ToString(),
-                orderItem.PricingUnitDescription,
-                orderItem.Price.GetValueOrDefault() == 0 ? 0.ToString() : orderItem.Price.GetValueOrDefault().ToString("#.000"),
-                "Central",
-                orderItem.DeliveryDate?.ToString("dd/MM/yyyy"),
-                Empty,
-                Empty,
-                Empty
-            };
-
-            return data;
         }
 
         private sealed class EmailContentsTable
