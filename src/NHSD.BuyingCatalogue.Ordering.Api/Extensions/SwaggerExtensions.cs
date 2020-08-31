@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -28,7 +27,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
             var openApiSecurityScheme = new OpenApiSecurityScheme
             {
                 Description = "Buying Catalogue authentication using identity.",
-                OpenIdConnectUrl = new Uri("http://localhost:5102/identity/.well-known/openid-configuration"),
                 Type = SecuritySchemeType.OAuth2,
                 Flows = new OpenApiOAuthFlows
                 {
