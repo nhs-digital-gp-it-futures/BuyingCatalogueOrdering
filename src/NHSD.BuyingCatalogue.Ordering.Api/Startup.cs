@@ -25,7 +25,6 @@ using NHSD.BuyingCatalogue.Ordering.Api.Settings;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Application.Services;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
-using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 using NHSD.BuyingCatalogue.Ordering.Persistence.Repositories;
 using Serilog;
