@@ -148,10 +148,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                     It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))), Times.Once);
         }
 
-        [Test]
-        public async Task CompleteAsync_PurchasingDocumentServiceFundingSourceFalse_NotCalled()
+        [TestCase(false, false, false)]
+        [TestCase(true, false, false)]
+        [TestCase(false, true, false)]
+        [TestCase(false, false, true)]
+        [TestCase(true, false, true)]
+        [TestCase(true, true, false)]
+        [TestCase(false, true, true)]
+        public async Task CompleteAsync_RequirementsArecorrect_CreatePatientNumbersCsvNotCalled(bool fundingSource, bool isPatient, bool isSolution)
         {
-            var context = CompleteOrderServiceTestContext.Setup(false);
+            var context = CompleteOrderServiceTestContext.Setup(fundingSource, isPatient, isSolution);
 
             await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
 
@@ -162,7 +168,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
         internal sealed class CompleteOrderServiceTestContext
         {
-            private CompleteOrderServiceTestContext(bool fundingSource)
+            private CompleteOrderServiceTestContext(bool fundingSource, bool isPatient, bool isSolution)
             {
                 UserId = Guid.NewGuid();
                 UserName = $"Username {Guid.NewGuid()}";
@@ -176,7 +182,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                         .WithOrderItem(
                             OrderItemBuilder
                                 .Create()
-                                .WithCatalogueItemType(CatalogueItemType.AssociatedService)
+                                .WithProvisioningType(isPatient ? ProvisioningType.Patient : ProvisioningType.Declarative)
+                                .WithCatalogueItemType(isSolution ? CatalogueItemType.Solution : CatalogueItemType.AssociatedService)
                                 .Build())
                         .WithFundingSourceOnlyGms(fundingSource)
                         .Build());
@@ -225,9 +232,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             internal CompleteOrderRequest CompleteOrderRequest { get; }
 
-            public static CompleteOrderServiceTestContext Setup(bool fundingSource = true)
+            public static CompleteOrderServiceTestContext Setup(bool fundingSource = true, bool isPatient = true, bool isSolution = true)
             {
-                return new CompleteOrderServiceTestContext(fundingSource);
+                return new CompleteOrderServiceTestContext(fundingSource, isPatient, isSolution);
             }
         }
     }

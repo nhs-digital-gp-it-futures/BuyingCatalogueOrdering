@@ -1,11 +1,13 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.EmailClient;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument;
 using NHSD.BuyingCatalogue.Ordering.Api.Settings;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Application.Services;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Domain.Results;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
@@ -47,13 +49,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
 
             if (order.FundingSourceOnlyGMS.GetValueOrDefault())
             {
-                await using var stream = new MemoryStream();
-                await _createPurchasingDocumentService.CreatePatientNumbersCsvAsync(stream, order);
-                stream.Position = 0;
+                var patientNumbers = order.OrderItems.Where(x =>
+                    x.ProvisioningType.Equals(ProvisioningType.Patient) &&
+                    !x.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
 
-                var emailMessage = _purchasingSettings.EmailMessage;
-                emailMessage.Attachments.Add(new EmailAttachment("CompletedOrder.csv", stream));
-                await _emailService.SendEmailAsync(emailMessage);
+                if (order.OrderItems.Count.Equals(patientNumbers.Count()))
+                {
+                    await using var stream = new MemoryStream();
+                    await _createPurchasingDocumentService.CreatePatientNumbersCsvAsync(stream, order);
+                    stream.Position = 0;
+
+                    var emailMessage = _purchasingSettings.EmailMessage;
+                    emailMessage.Attachments.Add(new EmailAttachment("PatientNumbers.csv", stream));
+                    await _emailService.SendEmailAsync(emailMessage);
+                }
             }
 
             return Result.Success();
