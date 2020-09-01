@@ -2,7 +2,7 @@
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
 {
-    public sealed class PatientNumbersPriceTypeMap : ClassMap<PatientNumbersPriceType>
+    internal sealed class PatientNumbersPriceTypeMap : ClassMap<PatientNumbersPriceType>
     {
         public PatientNumbersPriceTypeMap()
         {

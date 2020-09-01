@@ -38,7 +38,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public async Task CreatePatientNumbersCsvAsync_DocumentIsCreated_StreamIsAsExpected()
+        public async Task CreatePatientNumbersCsvAsync_DocumentIsCreated_WriteRecordsAsyncCalledOnce()
         {
             var context = CreatePurchasingDocumentServiceTestContext.Setup();
             await using var stream = new MemoryStream();
@@ -46,7 +46,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             await context.CreatePurchasingDocumentService.CreatePatientNumbersCsvAsync(stream, order);
 
-            context.PatientCsvWriterMock.Verify(x => x.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<PatientNumbersPriceType>>()), Times.Once);
+            context.PatientCsvWriterMock.Verify(
+                x => x.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<PatientNumbersPriceType>>()),
+                Times.Once);
         }
     }
 
@@ -54,7 +56,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
     {
         private CreatePurchasingDocumentServiceTestContext()
         {
-            PatientCsvWriterMock = new Mock<IAttachmentCsvWriter<PatientNumbersPriceType>>();
+            PatientCsvWriterMock = new Mock<ICsvStreamWriter<PatientNumbersPriceType>>();
             PatientCsvWriterMock.Setup(x =>
                 x.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<PatientNumbersPriceType>>()));
 
@@ -64,7 +66,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 .Build();
         }
 
-        internal Mock<IAttachmentCsvWriter<PatientNumbersPriceType>> PatientCsvWriterMock;
+        internal Mock<ICsvStreamWriter<PatientNumbersPriceType>> PatientCsvWriterMock { get; }
 
         internal CreatePurchasingDocumentService CreatePurchasingDocumentService { get; }
 
