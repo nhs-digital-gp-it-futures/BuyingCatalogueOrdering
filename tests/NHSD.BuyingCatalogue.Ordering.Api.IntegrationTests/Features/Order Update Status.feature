@@ -130,7 +130,7 @@ Scenario: 11. When an order is complete, and the funding source is false, no ema
     And no email is sent
 
 @9283
-Scenario: 12. When an order is complete, and the order does not contain patient numbers
+Scenario: 12. When an order is complete, and the funding source is true, but the order does not contain patient numbers
     Given the user creates a request to update the order status for the order with ID 'C000014-03'
     And the user enters the 'order-status-complete' update order status request payload
     When the user sends the update order status request
@@ -138,7 +138,7 @@ Scenario: 12. When an order is complete, and the order does not contain patient 
     And no email is sent
 
 @9283
-Scenario: 13. When an order is complete, and the order only has patient numbers an email is sent containing a CSV for patient numbers price type
+Scenario: 13. When an order is complete, and the funding source is true, the order only has patient numbers, an email is sent containing a CSV for patient numbers price type
     Given the user creates a request to update the order status for the order with ID 'C000014-01'
     And the user enters the 'order-status-complete' update order status request payload
     When the user sends the update order status request
