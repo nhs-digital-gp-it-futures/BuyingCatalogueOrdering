@@ -48,7 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
             if (order.FundingSourceOnlyGMS.GetValueOrDefault())
             {
                 await using var stream = new MemoryStream();
-                await _createPurchasingDocumentService.CreateDocumentAsync(stream, order);
+                await _createPurchasingDocumentService.CreatePatientNumbersCsvAsync(stream, order);
                 stream.Position = 0;
 
                 var emailMessage = _purchasingSettings.EmailMessage;
