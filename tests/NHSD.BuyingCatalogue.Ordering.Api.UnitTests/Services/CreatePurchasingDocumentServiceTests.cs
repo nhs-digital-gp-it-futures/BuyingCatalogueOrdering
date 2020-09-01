@@ -66,7 +66,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 .Build();
         }
 
-        internal Mock<ICsvStreamWriter<PatientNumbersPriceType>> PatientCsvWriterMock;
+        internal Mock<ICsvStreamWriter<PatientNumbersPriceType>> PatientCsvWriterMock { get; }
 
         internal CreatePurchasingDocumentService CreatePurchasingDocumentService { get; }
 
