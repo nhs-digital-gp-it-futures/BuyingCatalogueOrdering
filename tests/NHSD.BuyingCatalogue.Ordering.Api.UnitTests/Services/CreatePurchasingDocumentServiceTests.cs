@@ -14,12 +14,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
     [Parallelizable(ParallelScope.All)]
     internal sealed class CreatePurchasingDocumentServiceTests
     {
-        [Test]
-        public void Constructor_NullParameter_ThrowsArgumentNullException()
+        [TestCase(false, false)]
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        public void Constructor_NullParameter_ThrowsArgumentNullException(bool hasPatientCsvWriter, bool hasPriceTypeCsvWriter)
         {
+            var context = CreatePurchasingDocumentServiceTestContext.Setup();
+
             var builder = CreatePurchasingDocumentServiceBuilder
                 .Create()
-                .WithPatientNumbersCsvWriter(null);
+                .WithPatientNumbersCsvWriter(hasPatientCsvWriter ? context.PatientCsvWriterMock.Object : null)
+                .WithPriceTypeCsvWriter(hasPriceTypeCsvWriter ? context.PriceCsvWriterMock.Object : null);
 
             Assert.Throws<ArgumentNullException>(() => builder.Build());
         }
@@ -50,6 +55,33 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 x => x.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<PatientNumbersPriceType>>()),
                 Times.Once);
         }
+
+        [TestCase(true, false)]
+        [TestCase(false, true)]
+        [TestCase(false, false)]
+        public void CreatePriceTypeCsvAsync_ArgumentsAreNull_ReturnNullArgumentException(bool hasStream, bool hasOrder)
+        {
+            var context = CreatePurchasingDocumentServiceTestContext.Setup();
+
+            Assert.ThrowsAsync<ArgumentNullException>(() =>
+                context.CreatePurchasingDocumentService.CreatePriceTypeCsvAsync(
+                    hasStream ? new MemoryStream() : null,
+                    hasOrder ? OrderBuilder.Create().Build() : null));
+        }
+
+        [Test]
+        public async Task CreatePriceTypeCsvAsync_DocumentIsCreated_WriteRecordsAsyncCalledOnce()
+        {
+            var context = CreatePurchasingDocumentServiceTestContext.Setup();
+            await using var stream = new MemoryStream();
+            var order = OrderBuilder.Create().Build();
+
+            await context.CreatePurchasingDocumentService.CreatePriceTypeCsvAsync(stream, order);
+
+            context.PriceCsvWriterMock.Verify(
+                x => x.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<PriceType>>()),
+                Times.Once);
+        }
     }
 
     internal sealed class CreatePurchasingDocumentServiceTestContext
@@ -60,13 +92,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             PatientCsvWriterMock.Setup(x =>
                 x.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<PatientNumbersPriceType>>()));
 
+            PriceCsvWriterMock = new Mock<ICsvStreamWriter<PriceType>>();
+            PriceCsvWriterMock.Setup(x => x.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<PriceType>>()));
+
             CreatePurchasingDocumentService = CreatePurchasingDocumentServiceBuilder
                 .Create()
                 .WithPatientNumbersCsvWriter(PatientCsvWriterMock.Object)
+                .WithPriceTypeCsvWriter(PriceCsvWriterMock.Object)
                 .Build();
         }
 
         internal Mock<ICsvStreamWriter<PatientNumbersPriceType>> PatientCsvWriterMock { get; }
+
+        internal Mock<ICsvStreamWriter<PriceType>> PriceCsvWriterMock { get; }
 
         internal CreatePurchasingDocumentService CreatePurchasingDocumentService { get; }
 
