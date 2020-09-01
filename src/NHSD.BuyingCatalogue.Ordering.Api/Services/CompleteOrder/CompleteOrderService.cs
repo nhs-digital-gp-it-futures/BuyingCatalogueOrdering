@@ -50,10 +50,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
             if (order.FundingSourceOnlyGMS.GetValueOrDefault())
             {
                 var patientNumbers = order.OrderItems.Where(x =>
-                    ProvisioningType.Patient.Equals(x.ProvisioningType) &&
-                    !CatalogueItemType.AssociatedService.Equals(x.CatalogueItemType));
+                    x.ProvisioningType.Equals(ProvisioningType.Patient) &&
+                    !x.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
 
-                if (order.OrderItems.Count == patientNumbers.Count())
+                if (order.OrderItems.Count.Equals(patientNumbers.Count()))
                 {
                     await using var stream = new MemoryStream();
                     await _createPurchasingDocumentService.CreatePatientNumbersCsvAsync(stream, order);
