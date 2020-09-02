@@ -23,7 +23,7 @@ Background:
         | C000014-02 | Item 3            | Solution          | eu      | Month         | Month            | NULL         | NULL   | Declarative      |
         | C000014-03 | Item 4            | Solution          | eu      | Month         | Month            | 05/09/2021   | 793.21 | OnDemand         |
         | C000014-04 | Item 5            | AdditionalService | au      | Month         | Month            | 05/09/2021   | 599.99 | Patient          |
-        | C000014-04 | Item 6            | Solution          | au      | Year          | Year             | 24/12/2021   | NULL   | Declarative      |
+        | C000014-04 | Item 6            | AssociatedService | au      | Year          | Year             | 24/12/2021   | NULL   | Declarative      |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @5145
