@@ -58,12 +58,27 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected, conf => conf.IncludingAllDeclaredProperties());
         }
 
+        [Then(@"the email contains the following attachments")]
+        public async Task ThenTheEmailContainsTheFollowingAttachments(Table table)
+        {
+            var expected = table.CreateSet<Attachments>();
+
+            var actual = (await _emailServerDriver.FindAllEmailsAsync()).First().Attachments;
+            actual.Select(x => x.FileName).Should().BeEquivalentTo(expected.Select(x => x.Filename));
+        }
+
+
         private sealed class EmailContentsTable
         {
             public string From { get; set; }
             public string To { get; set; }
             public string Subject { get; set; }
             public string Text { get; set; }
+        }
+
+        private sealed class Attachments
+        {
+            public string Filename { get; set; }
         }
     }
 }

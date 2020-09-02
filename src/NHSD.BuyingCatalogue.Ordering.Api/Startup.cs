@@ -93,7 +93,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 .AddTransient<ICreatePurchasingDocumentService, CreatePurchasingDocumentService>()
                 .AddTransient<ICreateOrderItemValidator, OrderItemValidator>()
                 .AddTransient<IUpdateOrderItemValidator, OrderItemValidator>()
-                .AddTransient<ICsvStreamWriter<PatientNumbersPriceType>, CsvStreamStreamWriter<PatientNumbersPriceType, PatientNumbersPriceTypeMap>>();
+                .AddTransient<ICsvStreamWriter<PatientNumbersPriceType>, CsvStreamStreamWriter<PatientNumbersPriceType, PatientNumbersPriceTypeMap>>()
+                .AddTransient<ICsvStreamWriter<PriceType>, CsvStreamStreamWriter<PriceType, PriceTypeMap>>();
 
             services.RegisterHealthChecks(connectionString, smtpSettings);
 

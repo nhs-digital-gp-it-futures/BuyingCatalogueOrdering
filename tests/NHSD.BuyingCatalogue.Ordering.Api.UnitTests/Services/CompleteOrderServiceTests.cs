@@ -155,7 +155,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [TestCase(true, false, true)]
         [TestCase(true, true, false)]
         [TestCase(false, true, true)]
-        public async Task CompleteAsync_RequirementsArecorrect_CreatePatientNumbersCsvNotCalled(bool fundingSource, bool isPatient, bool isSolution)
+        public async Task CompleteAsync_RequirementsAreIncorrect_CreatePatientNumbersCsvNotCalled(bool fundingSource, bool isPatient, bool isSolution)
         {
             var context = CompleteOrderServiceTestContext.Setup(fundingSource, isPatient, isSolution);
 
@@ -163,6 +163,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             context.CreatePurchaseDocumentServiceMock.Verify(purchasingDocumentService =>
                 purchasingDocumentService.CreatePatientNumbersCsvAsync(It.IsAny<Stream>(),
+                    It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))), Times.Never);
+        }
+
+        [TestCase(false, false)]
+        [TestCase(false, true)]
+        [TestCase(true, false)]
+        public async Task CompleteAsync_RequirementsAreCorrect_CreatePriceTypeCsvCalled(bool isPatient, bool isSolution)
+        {
+            var context = CompleteOrderServiceTestContext.Setup(true, isPatient, isSolution);
+
+            await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
+
+            context.CreatePurchaseDocumentServiceMock.Verify(purchasingDocumentService =>
+                purchasingDocumentService.CreatePriceTypeCsvAsync(It.IsAny<Stream>(),
+                    It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))), Times.Once);
+        }
+
+        [Test]
+        public async Task CompleteAsync_RequirementsAreIncorrect_CreatePriceTypeCsvNotCalled()
+        {
+            var context = CompleteOrderServiceTestContext.Setup(false);
+
+            await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
+
+            context.CreatePurchaseDocumentServiceMock.Verify(purchasingDocumentService =>
+                purchasingDocumentService.CreatePriceTypeCsvAsync(It.IsAny<Stream>(),
                     It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))), Times.Never);
         }
 

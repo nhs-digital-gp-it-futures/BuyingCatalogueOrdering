@@ -8,16 +8,22 @@ Background:
         | OrderId    | Description            | SupplierId | SupplierName | OrganisationId                       | OrganisationName       | CommencementDate | CatalogueSolutionsViewed | AssociatedServicesViewed | FundingSourceOnlyGMS | Completed |
         | C000014-01 | Some Description       | 10101      | Supplier 1   | 4af62b99-638c-4247-875e-965239cd0c48 | NHS NORTHUMBERLAND CCG | 15/12/2020       | True                     | True                     | True                 | NULL      |
         | C000014-02 | Some Other Description | 10101      | Supplier 1   | 4af62b99-638c-4247-875e-965239cd0c48 | NHS NORTHUMBERLAND CCG | 01/10/2020       | True                     | True                     | NULL                 | NULL      |
-        | C000014-03 | Another Description    | 10101      | Supplier 1   | 4af62b99-638c-4247-875e-965239cd0c48 | NHS NORTHUMBERLAND CCG | 01/01/2020       | True                     | True                     | False                | NULL      |
+        | C000014-03 | Another Description    | 10101      | Supplier 1   | 4af62b99-638c-4247-875e-965239cd0c48 | NHS NORTHUMBERLAND CCG | 01/01/2020       | False                    | True                     | False                | NULL      |
+        | C000014-04 | A Description          | 10101      | Supplier 1   | 4af62b99-638c-4247-875e-965239cd0c48 | NHS NORTHUMBERLAND CCG | 07/05/2020       | True                     | True                     | True                 | NULL      |
     And Service Recipients exist
         | OrderId    | OdsCode | Name    |
         | C000014-01 | eu      | EU Test |
+        | C000014-02 | eu      | EU Test |
+        | C000014-03 | eu      | EU Test |
+        | C000014-04 | au      | AU Test |
     And Order items exist
         | OrderId    | CatalogueItemName | CatalogueItemType | OdsCode | PriceTimeUnit | EstimationPeriod | DeliveryDate | Price  | ProvisioningType |
         | C000014-01 | Item 1            | Solution          | eu      | Month         | Month            | 05/09/2021   | 599.99 | Patient          |
         | C000014-01 | Item 2            | Solution          | eu      | Year          | Year             | 24/12/2021   | NULL   | Patient          |
         | C000014-02 | Item 3            | Solution          | eu      | Month         | Month            | NULL         | NULL   | Declarative      |
-        | C000014-03 | Item 4            | Solution          | eu      | Month         | Month            | 05/09/2021   | NULL   | OnDemand         |
+        | C000014-03 | Item 4            | Solution          | eu      | Month         | Month            | 05/09/2021   | 793.21 | OnDemand         |
+        | C000014-04 | Item 5            | AdditionalService | au      | Month         | Month            | 05/09/2021   | 599.99 | Patient          |
+        | C000014-04 | Item 6            | Solution          | au      | Year          | Year             | 24/12/2021   | NULL   | Declarative      |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @5145
@@ -129,16 +135,23 @@ Scenario: 11. When an order is complete, and the funding source is false, no ema
     Then a response with status code 204 is returned
     And no email is sent
 
-@9283
-Scenario: 12. When an order is complete, and the funding source is true, but the order does not contain patient numbers
-    Given the user creates a request to update the order status for the order with ID 'C000014-03'
+@9585
+Scenario: 12. When an order is complete, an the funding source is true, but the order does not contain patient numbers, and email is sent containing a CSV for price types
+    Given the user creates a request to update the order status for the order with ID 'C000014-04'
     And the user enters the 'order-status-complete' update order status request payload
     When the user sends the update order status request
     Then a response with status code 204 is returned
-    And no email is sent
+    And only one email is sent
+    And the email contains the following information
+        | From                           | To                             | Subject                                 | Text                                 |
+        | noreply@buyingcatalogue.nhs.uk | noreply@buyingcatalogue.nhs.uk | INTEGRATION_TEST Order Purchase Details | Thank you for completing your order. |
+    And the email contains the following attachments
+        | Filename               |
+        | PurchasingDocument.csv |
+    And the price type attachment contains the correct information
 
-@9283
-Scenario: 13. When an order is complete, and the funding source is true, the order only has patient numbers, an email is sent containing a CSV for patient numbers price type
+@9585
+Scenario: 13. When an order is complete, and the funding source is true, the order only has patient numbers, an email is sent containing two CSV's
     Given the user creates a request to update the order status for the order with ID 'C000014-01'
     And the user enters the 'order-status-complete' update order status request payload
     When the user sends the update order status request
@@ -147,4 +160,9 @@ Scenario: 13. When an order is complete, and the funding source is true, the ord
     And the email contains the following information
         | From                           | To                             | Subject                                 | Text                                 |
         | noreply@buyingcatalogue.nhs.uk | noreply@buyingcatalogue.nhs.uk | INTEGRATION_TEST Order Purchase Details | Thank you for completing your order. |
+    And the email contains the following attachments
+        | Filename               |
+        | PurchasingDocument.csv |
+        | PatientNumbers.csv     |
     And the patient numbers price type attachment contains the correct information
+    And the price type attachment contains the correct information

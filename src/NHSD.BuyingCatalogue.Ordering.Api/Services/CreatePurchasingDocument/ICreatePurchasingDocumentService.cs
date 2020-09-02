@@ -7,5 +7,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
     public interface ICreatePurchasingDocumentService
     {
         Task CreatePatientNumbersCsvAsync(Stream stream, Order order);
+
+        Task CreatePriceTypeCsvAsync(Stream stream, Order order);
     }
 }
