@@ -126,6 +126,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
+        public async Task CompleteAsync_EmailServiceSubjectIsSet_SubjectNameIsChanged()
+        {
+            var context = CompleteOrderServiceTestContext.Setup();
+
+            await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
+
+            var order = context.CompleteOrderRequest.Order;
+            context.PurchasingSettings.EmailMessage.Subject.Should()
+                .BeEquivalentTo($"New Order {order.OrderId}_{order.OrganisationOdsCode}");
+        }
+
+        [Test]
         public async Task CompleteAsync_EmailService_CalledOnce()
         {
             var context = CompleteOrderServiceTestContext.Setup();

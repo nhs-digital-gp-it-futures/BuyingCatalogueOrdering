@@ -5,11 +5,11 @@
 
 Background:
     Given Orders exist
-        | OrderId    | Description            | SupplierId | SupplierName | OrganisationId                       | OrganisationName       | CommencementDate | CatalogueSolutionsViewed | AssociatedServicesViewed | FundingSourceOnlyGMS | Completed |
-        | C000014-01 | Some Description       | 10101      | Supplier 1   | 4af62b99-638c-4247-875e-965239cd0c48 | NHS NORTHUMBERLAND CCG | 15/12/2020       | True                     | True                     | True                 | NULL      |
-        | C000014-02 | Some Other Description | 10101      | Supplier 1   | 4af62b99-638c-4247-875e-965239cd0c48 | NHS NORTHUMBERLAND CCG | 01/10/2020       | True                     | True                     | NULL                 | NULL      |
-        | C000014-03 | Another Description    | 10101      | Supplier 1   | 4af62b99-638c-4247-875e-965239cd0c48 | NHS NORTHUMBERLAND CCG | 01/01/2020       | False                    | True                     | False                | NULL      |
-        | C000014-04 | A Description          | 10101      | Supplier 1   | 4af62b99-638c-4247-875e-965239cd0c48 | NHS NORTHUMBERLAND CCG | 07/05/2020       | True                     | True                     | True                 | NULL      |
+        | OrderId    | Description            | SupplierId | SupplierName | OrganisationId                       | OrganisationOdsCode | OrganisationName       | CommencementDate | CatalogueSolutionsViewed | AssociatedServicesViewed | FundingSourceOnlyGMS | Completed |
+        | C000014-01 | Some Description       | 10101      | Supplier 1   | 4af62b99-638c-4247-875e-965239cd0c48 | OrgOds              | NHS NORTHUMBERLAND CCG | 15/12/2020       | True                     | True                     | True                 | NULL      |
+        | C000014-02 | Some Other Description | 10101      | Supplier 1   | 4af62b99-638c-4247-875e-965239cd0c48 | OrgOds              | NHS NORTHUMBERLAND CCG | 01/10/2020       | True                     | True                     | NULL                 | NULL      |
+        | C000014-03 | Another Description    | 10101      | Supplier 1   | 4af62b99-638c-4247-875e-965239cd0c48 | OrgOds              | NHS NORTHUMBERLAND CCG | 01/01/2020       | False                    | True                     | False                | NULL      |
+        | C000014-04 | A Description          | 10101      | Supplier 1   | 4af62b99-638c-4247-875e-965239cd0c48 | OrgOds              | NHS NORTHUMBERLAND CCG | 07/05/2020       | True                     | True                     | True                 | NULL      |
     And Service Recipients exist
         | OrderId    | OdsCode | Name    |
         | C000014-01 | eu      | EU Test |
@@ -143,8 +143,8 @@ Scenario: 12. When an order is complete, an the funding source is true, but the 
     Then a response with status code 204 is returned
     And only one email is sent
     And the email contains the following information
-        | From                           | To                             | Subject                                 | Text                                 |
-        | noreply@buyingcatalogue.nhs.uk | noreply@buyingcatalogue.nhs.uk | INTEGRATION_TEST Order Purchase Details | Thank you for completing your order. |
+        | From                           | To                             | Subject                                      | Text                                 |
+        | noreply@buyingcatalogue.nhs.uk | noreply@buyingcatalogue.nhs.uk | INTEGRATION_TEST New Order C000014-04_OrgOds | Thank you for completing your order. |
     And the email contains the following attachments
         | Filename               |
         | PurchasingDocument.csv |
@@ -158,8 +158,8 @@ Scenario: 13. When an order is complete, and the funding source is true, the ord
     Then a response with status code 204 is returned
     And only one email is sent
     And the email contains the following information
-        | From                           | To                             | Subject                                 | Text                                 |
-        | noreply@buyingcatalogue.nhs.uk | noreply@buyingcatalogue.nhs.uk | INTEGRATION_TEST Order Purchase Details | Thank you for completing your order. |
+        | From                           | To                             | Subject                                      | Text                                 |
+        | noreply@buyingcatalogue.nhs.uk | noreply@buyingcatalogue.nhs.uk | INTEGRATION_TEST New Order C000014-01_OrgOds | Thank you for completing your order. |
     And the email contains the following attachments
         | Filename               |
         | PurchasingDocument.csv |

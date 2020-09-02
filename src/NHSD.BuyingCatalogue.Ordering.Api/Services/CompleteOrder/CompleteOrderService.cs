@@ -56,6 +56,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
                 priceTypeStream.Position = 0;
 
                 var emailMessage = _purchasingSettings.EmailMessage;
+                emailMessage.Subject = $"New Order {order.OrderId}_{order.OrganisationOdsCode}";
+
                 emailMessage.Attachments.Add(new EmailAttachment("PurchasingDocument.csv", priceTypeStream));
 
                 var patientNumbers = order.OrderItems.Where(x =>
