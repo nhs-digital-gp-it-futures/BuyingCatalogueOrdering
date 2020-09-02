@@ -188,7 +188,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                         string.Equals(orderItem.OdsCode,
                             item.OdsCode, StringComparison.OrdinalIgnoreCase))
                     ?.Name,
-                $"{orderItem.OrderItemId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
+                $"{order.OrderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
                 order.SupplierId,
                 order.SupplierName,
                 orderItem.CatalogueItemId,
@@ -223,7 +223,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     string.Equals(orderItem.OdsCode,
                         item.OdsCode, StringComparison.OrdinalIgnoreCase))
                     ?.Name,
-                $"{orderItem.OrderItemId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
+                $"{order.OrderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
                 order.SupplierId,
                 order.SupplierName,
                 orderItem.CatalogueItemId,
