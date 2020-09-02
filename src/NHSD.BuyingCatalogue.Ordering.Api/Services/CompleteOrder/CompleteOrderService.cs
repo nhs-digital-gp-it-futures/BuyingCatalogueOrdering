@@ -56,9 +56,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
                 priceTypeStream.Position = 0;
 
                 var emailMessage = _purchasingSettings.EmailMessage;
-                emailMessage.Subject = $"New Order {order.OrderId}_{order.OrganisationOdsCode}";
+                var callOffAgreementId = order.OrderId;
+                var orderingPartyId = order.OrganisationOdsCode;
 
-                emailMessage.Attachments.Add(new EmailAttachment("PurchasingDocument.csv", priceTypeStream));
+                emailMessage.Subject = $"New Order {callOffAgreementId}_{orderingPartyId}";
+
+                emailMessage.Attachments.Add(new EmailAttachment($"{callOffAgreementId}_{orderingPartyId}_Full.csv", priceTypeStream));
 
                 var patientNumbers = order.OrderItems.Where(x =>
                     x.ProvisioningType.Equals(ProvisioningType.Patient) &&
@@ -69,7 +72,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
                     await _createPurchasingDocumentService.CreatePatientNumbersCsvAsync(patientNumbersStream, order);
                     patientNumbersStream.Position = 0;
 
-                    emailMessage.Attachments.Add(new EmailAttachment("PatientNumbers.csv", patientNumbersStream));
+                    emailMessage.Attachments.Add(new EmailAttachment($"{callOffAgreementId}_{orderingPartyId}_Patients.csv", patientNumbersStream));
                 }
                 
                 await _emailService.SendEmailAsync(emailMessage);
