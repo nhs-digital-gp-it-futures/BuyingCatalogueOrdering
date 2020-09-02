@@ -27,7 +27,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
             if (order is null)
                 throw new ArgumentNullException(nameof(order));
 
-            var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(x => x.OdsCode);
+            var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(x => x.OdsCode, x => x.Name);
+            serviceRecipientDictionary.Add(order.OrganisationOdsCode, order.OrganisationName);
 
             var patientNumbersPriceTypes = order.OrderItems.Select(orderItem => new PatientNumbersPriceType
             {
@@ -36,7 +37,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
                 CallOffOrderingPartyName = order.OrganisationName,
                 CallOffCommencementDate = order.CommencementDate,
                 ServiceRecipientId = orderItem.OdsCode,
-                ServiceRecipientName = serviceRecipientDictionary[orderItem.OdsCode]?.Name,
+                ServiceRecipientName = serviceRecipientDictionary[orderItem.OdsCode],
                 ServiceRecipientItemId = $"{order.OrderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
                 SupplierId = order.SupplierId,
                 SupplierName = order.SupplierName,
@@ -60,7 +61,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
             if (order is null)
                 throw new ArgumentNullException(nameof(order));
 
-            var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(x => x.OdsCode);
+            var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(x => x.OdsCode, x => x.Name);
+            serviceRecipientDictionary.Add(order.OrganisationOdsCode, order.OrganisationName);
 
             var priceType = order.OrderItems.Select(orderItem => new PriceType
             {
@@ -69,7 +71,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
                 CallOffOrderingPartyName = order.OrganisationName,
                 CallOffCommencementDate = order.CommencementDate,
                 ServiceRecipientId = orderItem.OdsCode,
-                ServiceRecipientName = serviceRecipientDictionary[orderItem.OdsCode]?.Name,
+                ServiceRecipientName = serviceRecipientDictionary[orderItem.OdsCode],
                 ServiceRecipientItemId = $"{order.OrderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
                 SupplierId = order.SupplierId,
                 SupplierName = order.SupplierName,
