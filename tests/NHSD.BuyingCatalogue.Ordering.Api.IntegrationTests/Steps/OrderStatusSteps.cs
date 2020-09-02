@@ -96,7 +96,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 "Cease Date"
             };
 
-            var actual = (await _emailServerDriver.FindAllEmailsAsync()).First().Attachments.First(x => x.FileName == "PurchasingDocument.csv");
+            var actual = (await _emailServerDriver.FindAllEmailsAsync()).First().Attachments
+                .First(x => x.FileName.Contains("Full.csv"));
 
             await using var attachmentData = new MemoryStream(actual.AttachmentData.ToArray());
             var csvText = new TextFieldParser(attachmentData);
@@ -149,7 +150,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 "Cease Date"
             };
 
-            var actual = (await _emailServerDriver.FindAllEmailsAsync()).First().Attachments.First(x => x.FileName == "PatientNumbers.csv");
+            var actual = (await _emailServerDriver.FindAllEmailsAsync()).First().Attachments
+                .First(x => x.FileName.Contains("Patients.csv"));
 
             await using var attachmentData = new MemoryStream(actual.AttachmentData.ToArray());
             var csvText = new TextFieldParser(attachmentData);
