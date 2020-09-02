@@ -28,7 +28,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
                 throw new ArgumentNullException(nameof(order));
 
             var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(x => x.OdsCode, x => x.Name);
-            serviceRecipientDictionary.Add(order.OrganisationOdsCode, order.OrganisationName);
+            serviceRecipientDictionary.TryAdd(order.OrganisationOdsCode, order.OrganisationName);
 
             var patientNumbersPriceTypes = order.OrderItems.Select(orderItem => new PatientNumbersPriceType
             {
@@ -62,7 +62,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
                 throw new ArgumentNullException(nameof(order));
 
             var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(x => x.OdsCode, x => x.Name);
-            serviceRecipientDictionary.Add(order.OrganisationOdsCode, order.OrganisationName);
+            serviceRecipientDictionary.TryAdd(order.OrganisationOdsCode, order.OrganisationName);
 
             var priceType = order.OrderItems.Select(orderItem => new PriceType
             {
