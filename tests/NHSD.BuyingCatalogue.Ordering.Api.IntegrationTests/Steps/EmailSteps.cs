@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using System.Net.Mime;
-using System.Text;
+using Microsoft.VisualBasic.FileIO;
 using NHSD.BuyingCatalogue.EmailClient.IntegrationTesting.Data;
 using NHSD.BuyingCatalogue.EmailClient.IntegrationTesting.Drivers;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
+using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 using static System.String;
@@ -37,36 +40,33 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             emails.Should().BeNullOrEmpty();
         }
 
-        [Then(@"the email sent contains the following information")]
-        public async Task ThenEmailContains(Table table)
+        [Then(@"the email contains the following information")]
+        public async Task ThenTheEmailContainsTheFollowingInformation(Table table)
         {
             var expectedContents = table.CreateSet<EmailContentsTable>().First();
 
             var expected = new
             {
-                Attachments = new List<EmailAttachmentData>
-                {
-                    new EmailAttachmentData(
-                        Encoding.UTF8.GetBytes($"{expectedContents.AttachmentHeader1}\r\n{expectedContents.OrderId}\r\n"),
-                        expectedContents.FileName,
-                        new ContentType("text/csv"))
-                },
-                From = new List<EmailAddress>
-                {
-                    new EmailAddress(Empty, expectedContents.From)
-                },
+                From = new List<EmailAddress> { new EmailAddress(Empty, expectedContents.From) },
+                To = new List<EmailAddress> { new EmailAddress(Empty, expectedContents.To) },
                 expectedContents.Text,
                 expectedContents.Subject,
-                To = new List<EmailAddress>
-                {
-                    new EmailAddress(Empty, expectedContents.To)
-                }
             };
-            
+
             var actual = (await _emailServerDriver.FindAllEmailsAsync()).First();
 
             actual.Should().BeEquivalentTo(expected, conf => conf.IncludingAllDeclaredProperties());
         }
+
+        [Then(@"the email contains the following attachments")]
+        public async Task ThenTheEmailContainsTheFollowingAttachments(Table table)
+        {
+            var expected = table.CreateSet<Attachments>();
+
+            var actual = (await _emailServerDriver.FindAllEmailsAsync()).First().Attachments;
+            actual.Select(x => x.FileName).Should().BeEquivalentTo(expected.Select(x => x.Filename));
+        }
+
 
         private sealed class EmailContentsTable
         {
@@ -74,9 +74,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string To { get; set; }
             public string Subject { get; set; }
             public string Text { get; set; }
-            public string FileName { get; set; }
-            public string AttachmentHeader1 { get; set; }
-            public string OrderId { get; set; }
+        }
+
+        private sealed class Attachments
+        {
+            public string Filename { get; set; }
         }
     }
 }
