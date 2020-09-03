@@ -146,8 +146,8 @@ Scenario: 12. When an order is complete, an the funding source is true, but the 
         | From                           | To                          | Subject                                      | Text                                 |
         | noreply@buyingcatalogue.nhs.uk | gpitfutures.finance@nhs.net | INTEGRATION_TEST New Order C000014-04_OrgOds | Thank you for completing your order. |
     And the email contains the following attachments
-        | Filename               |
-        | PurchasingDocument.csv |
+        | Filename                   |
+        | C000014-04_OrgOds_Full.csv |
     And the price type attachment contains the correct information
 
 @9585
@@ -161,8 +161,8 @@ Scenario: 13. When an order is complete, and the funding source is true, the ord
         | From                           | To                          | Subject                                      | Text                                 |
         | noreply@buyingcatalogue.nhs.uk | gpitfutures.finance@nhs.net | INTEGRATION_TEST New Order C000014-01_OrgOds | Thank you for completing your order. |
     And the email contains the following attachments
-        | Filename               |
-        | PurchasingDocument.csv |
-        | PatientNumbers.csv     |
+        | Filename                      |
+        | C000014-01_OrgOds_Full.csv    |
+        | C000014-01_OrgOds_Patients.csv |
     And the patient numbers price type attachment contains the correct information
     And the price type attachment contains the correct information
