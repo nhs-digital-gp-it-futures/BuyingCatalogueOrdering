@@ -97,7 +97,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
 
             services.RegisterHealthChecks(connectionString, smtpSettings);
 
-            services.AddSwaggerDocumentation();
+            services.AddSwaggerDocumentation(_configuration);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>

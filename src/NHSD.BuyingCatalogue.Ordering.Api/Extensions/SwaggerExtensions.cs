@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -16,13 +16,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
     {
         private const string Version = "v1";
 
-        internal static IServiceCollection AddSwaggerDocumentation(this IServiceCollection services)
+        internal static IServiceCollection AddSwaggerDocumentation(this IServiceCollection services, IConfiguration configuration)
         {
             if (services is null)
                 throw new ArgumentNullException(nameof(services));
 
-            var authorizationUrl = new UriBuilder("http://localhost:5102/identity/connect/authorize").Uri;
-            var tokenUrl = new UriBuilder("http://localhost:5102/identity/connect/token").Uri;
+            if(configuration is null)
+                throw new ArgumentNullException(nameof(configuration));
+
+            var authorityUrl = configuration.GetValue<string>("Authority");
+            var authorizationUrl = new UriBuilder($"{authorityUrl}/connect/authorize").Uri;
+            var tokenUrl = new UriBuilder($"{authorityUrl}/connect/token").Uri;
 
             var openApiSecurityScheme = new OpenApiSecurityScheme
             {
@@ -69,7 +73,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
             if (app is null)
                 throw new ArgumentNullException(nameof(app));
 
-            string endpointPrefix = !string.IsNullOrWhiteSpace(pathBase) ? pathBase.ToString() : string.Empty;
+            var endpointPrefix = !string.IsNullOrWhiteSpace(pathBase) ? pathBase.ToString() : string.Empty;
 
             app.UseSwagger();
 
@@ -120,7 +124,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
             private static bool HasAuthorizeAttribute(OperationFilterContext context)
             {
                 // Check for authorize attribute
-                MethodInfo contextMethodInfo = context.MethodInfo;
+                var contextMethodInfo = context.MethodInfo;
                 var declaringType = contextMethodInfo.DeclaringType;
                 if (declaringType is null)
                 {
@@ -130,12 +134,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
                 var hasAuthorize = declaringType.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any() ||
                                    contextMethodInfo.GetCustomAttributes(true).OfType<AuthorizeAttribute>().Any();
 
-                if (!hasAuthorize)
-                {
-                    return false;
-                }
-
-                return true;
+                return hasAuthorize;
             }
         }
     }
