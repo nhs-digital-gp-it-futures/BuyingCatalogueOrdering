@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.VisualBasic.FileIO;
 using NHSD.BuyingCatalogue.EmailClient.IntegrationTesting.Data;
 using NHSD.BuyingCatalogue.EmailClient.IntegrationTesting.Drivers;
-using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
-using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
-using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 using static System.String;
@@ -66,8 +61,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var actual = (await _emailServerDriver.FindAllEmailsAsync()).First().Attachments;
             actual.Select(x => x.FileName).Should().BeEquivalentTo(expected.Select(x => x.Filename));
         }
-
-
+        
         private sealed class EmailContentsTable
         {
             public string From { get; set; }

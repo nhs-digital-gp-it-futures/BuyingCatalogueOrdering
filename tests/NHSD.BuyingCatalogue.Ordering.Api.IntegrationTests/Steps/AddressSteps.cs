@@ -4,7 +4,7 @@ using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
-using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
+using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 

@@ -1,8 +1,8 @@
 ﻿using System;
-using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
-using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
+using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Data;
+using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
 
-namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder
+namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
 {
     public sealed class OrderItemEntityBuilder
     {

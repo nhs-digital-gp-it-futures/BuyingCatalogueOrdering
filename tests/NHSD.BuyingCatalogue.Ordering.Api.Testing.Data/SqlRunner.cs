@@ -4,7 +4,7 @@ using System.Data.SqlClient;
 using System.Threading.Tasks;
 using Dapper;
 
-namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data
+namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data
 {
     internal static class SqlRunner
     {

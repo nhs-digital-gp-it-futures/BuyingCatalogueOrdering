@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
+namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 {
     public sealed class AddressEntity : EntityBase
     {

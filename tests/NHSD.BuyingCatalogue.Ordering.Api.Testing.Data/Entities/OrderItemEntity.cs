@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
+using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Data;
 
-namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities
+namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 {
     public sealed class OrderItemEntity : EntityBase
     {
