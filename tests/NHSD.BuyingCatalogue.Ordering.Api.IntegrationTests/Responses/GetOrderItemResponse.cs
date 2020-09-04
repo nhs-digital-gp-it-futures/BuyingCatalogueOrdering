@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
-using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
+using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 {

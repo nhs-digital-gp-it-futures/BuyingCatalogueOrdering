@@ -3,7 +3,7 @@ using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
-using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
+using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
