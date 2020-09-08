@@ -126,6 +126,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
+        public async Task CompleteAsync_EmailServiceSubjectIsSet_SubjectNameIsChanged()
+        {
+            var context = CompleteOrderServiceTestContext.Setup();
+
+            await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
+
+            var order = context.CompleteOrderRequest.Order;
+            context.PurchasingSettings.EmailMessage.Subject.Should()
+                .BeEquivalentTo($"New Order {order.OrderId}_{order.OrganisationOdsCode}");
+        }
+
+        [Test]
         public async Task CompleteAsync_EmailService_CalledOnce()
         {
             var context = CompleteOrderServiceTestContext.Setup();
@@ -144,25 +156,57 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
 
             context.CreatePurchaseDocumentServiceMock.Verify(purchasingDocumentService =>
-                purchasingDocumentService.CreateDocumentAsync(It.IsAny<Stream>(),
+                purchasingDocumentService.CreatePatientNumbersCsvAsync(It.IsAny<Stream>(),
+                    It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))), Times.Once);
+        }
+
+        [TestCase(false, false, false)]
+        [TestCase(true, false, false)]
+        [TestCase(false, true, false)]
+        [TestCase(false, false, true)]
+        [TestCase(true, false, true)]
+        [TestCase(true, true, false)]
+        [TestCase(false, true, true)]
+        public async Task CompleteAsync_RequirementsAreIncorrect_CreatePatientNumbersCsvNotCalled(bool fundingSource, bool isPatient, bool isSolution)
+        {
+            var context = CompleteOrderServiceTestContext.Setup(fundingSource, isPatient, isSolution);
+
+            await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
+
+            context.CreatePurchaseDocumentServiceMock.Verify(purchasingDocumentService =>
+                purchasingDocumentService.CreatePatientNumbersCsvAsync(It.IsAny<Stream>(),
+                    It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))), Times.Never);
+        }
+
+        [TestCase(false, false)]
+        [TestCase(false, true)]
+        [TestCase(true, false)]
+        public async Task CompleteAsync_RequirementsAreCorrect_CreatePriceTypeCsvCalled(bool isPatient, bool isSolution)
+        {
+            var context = CompleteOrderServiceTestContext.Setup(true, isPatient, isSolution);
+
+            await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
+
+            context.CreatePurchaseDocumentServiceMock.Verify(purchasingDocumentService =>
+                purchasingDocumentService.CreatePriceTypeCsvAsync(It.IsAny<Stream>(),
                     It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))), Times.Once);
         }
 
         [Test]
-        public async Task CompleteAsync_PurchasingDocumentServiceFundingSourceFalse_NotCalled()
+        public async Task CompleteAsync_RequirementsAreIncorrect_CreatePriceTypeCsvNotCalled()
         {
             var context = CompleteOrderServiceTestContext.Setup(false);
 
             await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
 
             context.CreatePurchaseDocumentServiceMock.Verify(purchasingDocumentService =>
-                purchasingDocumentService.CreateDocumentAsync(It.IsAny<Stream>(),
+                purchasingDocumentService.CreatePriceTypeCsvAsync(It.IsAny<Stream>(),
                     It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))), Times.Never);
         }
 
         internal sealed class CompleteOrderServiceTestContext
         {
-            private CompleteOrderServiceTestContext(bool fundingSource)
+            private CompleteOrderServiceTestContext(bool fundingSource, bool isPatient, bool isSolution)
             {
                 UserId = Guid.NewGuid();
                 UserName = $"Username {Guid.NewGuid()}";
@@ -176,7 +220,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                         .WithOrderItem(
                             OrderItemBuilder
                                 .Create()
-                                .WithCatalogueItemType(CatalogueItemType.AssociatedService)
+                                .WithProvisioningType(isPatient ? ProvisioningType.Patient : ProvisioningType.Declarative)
+                                .WithCatalogueItemType(isSolution ? CatalogueItemType.Solution : CatalogueItemType.AssociatedService)
                                 .Build())
                         .WithFundingSourceOnlyGms(fundingSource)
                         .Build());
@@ -192,7 +237,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 EmailServiceMock = new Mock<IEmailService>();
                 EmailServiceMock.Setup(x => x.SendEmailAsync(It.IsAny<EmailMessage>()));
                 CreatePurchaseDocumentServiceMock = new Mock<ICreatePurchasingDocumentService>();
-                CreatePurchaseDocumentServiceMock.Setup(x => x.CreateDocumentAsync(It.IsAny<Stream>(), It.IsAny<Order>()));
+                CreatePurchaseDocumentServiceMock.Setup(x =>
+                    x.CreatePatientNumbersCsvAsync(It.IsAny<Stream>(), It.IsAny<Order>()));
 
                 CompleteOrderService = CompleteOrderServiceBuilder
                     .Create()
@@ -224,9 +270,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             internal CompleteOrderRequest CompleteOrderRequest { get; }
 
-            public static CompleteOrderServiceTestContext Setup(bool fundingSource = true)
+            public static CompleteOrderServiceTestContext Setup(bool fundingSource = true, bool isPatient = true, bool isSolution = true)
             {
-                return new CompleteOrderServiceTestContext(fundingSource);
+                return new CompleteOrderServiceTestContext(fundingSource, isPatient, isSolution);
             }
         }
     }

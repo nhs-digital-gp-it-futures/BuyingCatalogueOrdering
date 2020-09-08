@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace NHSD.BuyingCatalogue.Ordering.Api.Models
+namespace NHSD.BuyingCatalogue.Ordering.Api.Models.Errors
 {
     public sealed class ErrorsModel
     {

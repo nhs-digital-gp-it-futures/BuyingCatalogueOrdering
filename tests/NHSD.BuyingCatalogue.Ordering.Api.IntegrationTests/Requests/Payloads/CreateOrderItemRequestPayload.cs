@@ -1,5 +1,5 @@
 ﻿using System;
-using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
+using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests.Payloads
 {

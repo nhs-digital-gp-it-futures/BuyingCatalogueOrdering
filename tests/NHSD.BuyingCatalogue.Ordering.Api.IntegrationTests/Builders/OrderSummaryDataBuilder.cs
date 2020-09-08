@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
-using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.EntityBuilder;
-using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
+using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Data;
+using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
+using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
 {

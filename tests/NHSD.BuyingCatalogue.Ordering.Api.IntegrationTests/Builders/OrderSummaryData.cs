@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
+using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
 {

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.EmailClient;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument;
 using NHSD.BuyingCatalogue.Ordering.Api.Settings;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Application.Services;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Domain.Results;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
@@ -47,12 +49,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
 
             if (order.FundingSourceOnlyGMS.GetValueOrDefault())
             {
-                await using var stream = new MemoryStream();
-                await _createPurchasingDocumentService.CreateDocumentAsync(stream, order);
-                stream.Position = 0;
+                await using var priceTypeStream = new MemoryStream();
+                await using var patientNumbersStream = new MemoryStream();
+
+                await _createPurchasingDocumentService.CreatePriceTypeCsvAsync(priceTypeStream, order);
+                priceTypeStream.Position = 0;
 
                 var emailMessage = _purchasingSettings.EmailMessage;
-                emailMessage.Attachments.Add(new EmailAttachment("CompletedOrder.csv", stream));
+                var callOffAgreementId = order.OrderId;
+                var orderingPartyId = order.OrganisationOdsCode;
+
+                emailMessage.Subject = $"New Order {callOffAgreementId}_{orderingPartyId}";
+
+                emailMessage.Attachments.Add(new EmailAttachment($"{callOffAgreementId}_{orderingPartyId}_Full.csv", priceTypeStream));
+
+                var patientNumbers = order.OrderItems.Where(x =>
+                    x.ProvisioningType.Equals(ProvisioningType.Patient) &&
+                    !x.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
+
+                if (order.OrderItems.Count.Equals(patientNumbers.Count()))
+                {
+                    await _createPurchasingDocumentService.CreatePatientNumbersCsvAsync(patientNumbersStream, order);
+                    patientNumbersStream.Position = 0;
+
+                    emailMessage.Attachments.Add(new EmailAttachment($"{callOffAgreementId}_{orderingPartyId}_Patients.csv", patientNumbersStream));
+                }
+                
                 await _emailService.SendEmailAsync(emailMessage);
             }
 

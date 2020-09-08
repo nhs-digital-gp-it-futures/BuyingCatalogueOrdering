@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data
+namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Data
 {
     public enum TimeUnit
     {

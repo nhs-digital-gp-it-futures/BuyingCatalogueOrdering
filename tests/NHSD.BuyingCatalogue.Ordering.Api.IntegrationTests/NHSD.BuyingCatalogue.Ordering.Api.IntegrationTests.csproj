@@ -46,6 +46,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NHSD.BuyingCatalouge.Ordering.Api.Testing.Data\NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.csproj" />
+    <ProjectReference Include="..\NHSD.BuyingCatalogue.Ordering.Api.Testing.Data\NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.csproj" />
   </ItemGroup>
 </Project>

@@ -25,7 +25,6 @@ using NHSD.BuyingCatalogue.Ordering.Api.Settings;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Application.Services;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
-using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 using NHSD.BuyingCatalogue.Ordering.Persistence.Repositories;
 using Serilog;
@@ -92,11 +91,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 .AddTransient<ICompleteOrderService, CompleteOrderService>()
                 .AddTransient<ICreatePurchasingDocumentService, CreatePurchasingDocumentService>()
                 .AddTransient<ICreateOrderItemValidator, OrderItemValidator>()
-                .AddTransient<IUpdateOrderItemValidator, OrderItemValidator>();
+                .AddTransient<IUpdateOrderItemValidator, OrderItemValidator>()
+                .AddTransient<ICsvStreamWriter<PatientNumbersPriceType>, CsvStreamStreamWriter<PatientNumbersPriceType, PatientNumbersPriceTypeMap>>()
+                .AddTransient<ICsvStreamWriter<PriceType>, CsvStreamStreamWriter<PriceType, PriceTypeMap>>();
 
             services.RegisterHealthChecks(connectionString, smtpSettings);
 
-            services.AddSwaggerDocumentation();
+            services.AddSwaggerDocumentation(_configuration);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>

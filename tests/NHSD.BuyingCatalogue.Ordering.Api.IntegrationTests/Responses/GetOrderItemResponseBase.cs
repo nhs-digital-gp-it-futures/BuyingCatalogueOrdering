@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json.Linq;
-using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Data;
-using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
+using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Data;
+using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 {

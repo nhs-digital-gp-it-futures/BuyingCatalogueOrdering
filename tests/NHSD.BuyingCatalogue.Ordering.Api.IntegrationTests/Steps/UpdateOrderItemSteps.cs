@@ -2,7 +2,7 @@
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
-using NHSD.BuyingCatalouge.Ordering.Api.Testing.Data.Entities;
+using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
