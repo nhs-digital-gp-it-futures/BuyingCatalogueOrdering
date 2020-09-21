@@ -145,7 +145,8 @@ jobs:
     displayName: 'Install helm'
     condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
     inputs:
-      helmVersionToInstall: 'latest'
+      #helmVersionToInstall: 'latest'
+      helmVersionToInstall: '3.3.1'
   - bash: |
       cd charts
       for chart in *; do
