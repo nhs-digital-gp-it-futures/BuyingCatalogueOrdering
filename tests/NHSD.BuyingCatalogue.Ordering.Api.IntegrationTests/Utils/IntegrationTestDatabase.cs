@@ -19,6 +19,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
             await databaseConnection.ExecuteAsync("DELETE FROM dbo.[Order];");
             await databaseConnection.ExecuteAsync("DELETE FROM dbo.[Address];");
             await databaseConnection.ExecuteAsync("DELETE FROM dbo.Contact;");
+            await databaseConnection.ExecuteAsync("DBCC CHECKIDENT ('dbo.OrderItem', RESEED, 0);");
         }
 
         public static async Task RemoveReadRoleAsync(string connectionString)

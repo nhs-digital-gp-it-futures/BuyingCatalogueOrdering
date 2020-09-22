@@ -14,11 +14,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
 {
     public sealed class CompleteOrderService : ICompleteOrderService
     {
-        private readonly IIdentityService _identityService;
-        private readonly IOrderRepository _orderRepository;
-        private readonly IEmailService _emailService;
-        private readonly ICreatePurchasingDocumentService _createPurchasingDocumentService;
-        private readonly PurchasingSettings _purchasingSettings;
+        private readonly ICreatePurchasingDocumentService createPurchasingDocumentService;
+        private readonly IEmailService emailService;
+        private readonly IIdentityService identityService;
+        private readonly IOrderRepository orderRepository;
+        private readonly PurchasingSettings purchasingSettings;
 
         public CompleteOrderService(
             IIdentityService identityService,
@@ -27,11 +27,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
             ICreatePurchasingDocumentService createPurchasingDocumentService,
             PurchasingSettings purchasingSettings)
         {
-            _identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
-            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
-            _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
-            _createPurchasingDocumentService = createPurchasingDocumentService ?? throw new ArgumentNullException(nameof(createPurchasingDocumentService));
-            _purchasingSettings = purchasingSettings ?? throw new ArgumentNullException(nameof(purchasingSettings));
+            this.identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
+            this.orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            this.emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
+            this.createPurchasingDocumentService = createPurchasingDocumentService ?? throw new ArgumentNullException(nameof(createPurchasingDocumentService));
+            this.purchasingSettings = purchasingSettings ?? throw new ArgumentNullException(nameof(purchasingSettings));
         }
 
         public async Task<Result> CompleteAsync(CompleteOrderRequest request)
@@ -41,42 +41,42 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
 
             var order = request.Order;
 
-            var result = order.Complete(_identityService.GetUserIdentity(), _identityService.GetUserName());
+            var result = order.Complete(identityService.GetUserIdentity(), identityService.GetUserName());
             if (!result.IsSuccess)
                 return result;
 
-            await _orderRepository.UpdateOrderAsync(order);
+            await orderRepository.UpdateOrderAsync(order);
 
-            if (order.FundingSourceOnlyGMS.GetValueOrDefault())
+            if (!order.FundingSourceOnlyGMS.GetValueOrDefault())
+                return Result.Success();
+
+            await using var priceTypeStream = new MemoryStream();
+            await using var patientNumbersStream = new MemoryStream();
+
+            await createPurchasingDocumentService.CreateCsvAsync(priceTypeStream, order);
+            priceTypeStream.Position = 0;
+
+            var emailMessage = purchasingSettings.EmailMessage;
+            var callOffAgreementId = order.OrderId;
+            var orderingPartyId = order.OrganisationOdsCode;
+
+            emailMessage.Subject = $"New Order {callOffAgreementId}_{orderingPartyId}";
+
+            emailMessage.Attachments.Add(new EmailAttachment($"{callOffAgreementId}_{orderingPartyId}_Full.csv", priceTypeStream));
+
+            var patientNumbers = order.OrderItems.Where(x =>
+                x.ProvisioningType.Equals(ProvisioningType.Patient) &&
+                !x.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
+
+            if (order.OrderItems.Count.Equals(patientNumbers.Count()))
             {
-                await using var priceTypeStream = new MemoryStream();
-                await using var patientNumbersStream = new MemoryStream();
+                await createPurchasingDocumentService.CreatePatientNumbersCsvAsync(patientNumbersStream, order);
+                patientNumbersStream.Position = 0;
 
-                await _createPurchasingDocumentService.CreatePriceTypeCsvAsync(priceTypeStream, order);
-                priceTypeStream.Position = 0;
-
-                var emailMessage = _purchasingSettings.EmailMessage;
-                var callOffAgreementId = order.OrderId;
-                var orderingPartyId = order.OrganisationOdsCode;
-
-                emailMessage.Subject = $"New Order {callOffAgreementId}_{orderingPartyId}";
-
-                emailMessage.Attachments.Add(new EmailAttachment($"{callOffAgreementId}_{orderingPartyId}_Full.csv", priceTypeStream));
-
-                var patientNumbers = order.OrderItems.Where(x =>
-                    x.ProvisioningType.Equals(ProvisioningType.Patient) &&
-                    !x.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
-
-                if (order.OrderItems.Count.Equals(patientNumbers.Count()))
-                {
-                    await _createPurchasingDocumentService.CreatePatientNumbersCsvAsync(patientNumbersStream, order);
-                    patientNumbersStream.Position = 0;
-
-                    emailMessage.Attachments.Add(new EmailAttachment($"{callOffAgreementId}_{orderingPartyId}_Patients.csv", patientNumbersStream));
-                }
-                
-                await _emailService.SendEmailAsync(emailMessage);
+                emailMessage.Attachments.Add(new EmailAttachment($"{callOffAgreementId}_{orderingPartyId}_Patients.csv", patientNumbersStream));
             }
+
+            await emailService.SendEmailAsync(emailMessage);
 
             return Result.Success();
         }

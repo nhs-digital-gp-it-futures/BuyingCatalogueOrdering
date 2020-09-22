@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -21,7 +22,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
                 throw new ArgumentNullException(nameof(records));
             }
 
-            await using var streamWriter = new StreamWriter(stream, leaveOpen: true);
+            await using var streamWriter = new StreamWriter(stream, Encoding.UTF8, leaveOpen: true);
             await using var csvWriter = new CsvWriter(streamWriter, CultureInfo.CurrentCulture);
 
             var options = new TypeConverterOptions { Formats = new[] { "dd/MM/yyyy" } };

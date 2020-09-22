@@ -2,9 +2,9 @@
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
 {
-    internal sealed class PatientNumbersPriceTypeMap : ClassMap<PatientNumbersPriceType>
+    internal sealed class OdooPatientNumbersOrderItemMap : ClassMap<OdooPatientNumbersOrderItem>
     {
-        public PatientNumbersPriceTypeMap()
+        public OdooPatientNumbersOrderItemMap()
         {
             Map(x => x.CallOffAgreementId).Index(0).Name("Call Off Agreement ID");
             Map(x => x.CallOffOrderingPartyId).Index(1).Name("Call Off Ordering Party ID");

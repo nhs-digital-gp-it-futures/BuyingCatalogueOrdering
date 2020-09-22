@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="15.0.5" />
     <PackageReference Include="Dapper" Version="2.0.35" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
     <PackageReference Include="Flurl.Http" Version="2.4.2" />
@@ -45,6 +46,7 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
     <PackageReference Include="SpecFlow" Version="3.3.57" />
+    <PackageReference Include="SpecFlow.Assist.Dynamic" Version="1.5.0-alpha" />
     <PackageReference Include="SpecFlow.NUnit" Version="3.3.57" />
     <PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.3.57" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">

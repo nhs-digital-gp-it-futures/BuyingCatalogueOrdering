@@ -8,15 +8,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
 {
     public sealed class CreatePurchasingDocumentService : ICreatePurchasingDocumentService
     {
-        private readonly ICsvStreamWriter<PatientNumbersPriceType> _patientNumbersCsvWriter;
-        private readonly ICsvStreamWriter<PriceType> _priceTypeCsvWriter;
+        private readonly ICsvStreamWriter<OdooOrderItem> csvWriter;
+        private readonly ICsvStreamWriter<OdooPatientNumbersOrderItem> patientNumbersCsvWriter;
 
         public CreatePurchasingDocumentService(
-            ICsvStreamWriter<PatientNumbersPriceType> patientNumbersCsvWriter,
-            ICsvStreamWriter<PriceType> priceTypeCsvWriter)
+            ICsvStreamWriter<OdooPatientNumbersOrderItem> patientNumbersCsvWriter,
+            ICsvStreamWriter<OdooOrderItem> csvWriter)
         {
-            _patientNumbersCsvWriter = patientNumbersCsvWriter ?? throw new ArgumentNullException(nameof(patientNumbersCsvWriter));
-            _priceTypeCsvWriter = priceTypeCsvWriter ?? throw new ArgumentNullException(nameof(priceTypeCsvWriter));
+            this.patientNumbersCsvWriter = patientNumbersCsvWriter ?? throw new ArgumentNullException(nameof(patientNumbersCsvWriter));
+            this.csvWriter = csvWriter ?? throw new ArgumentNullException(nameof(csvWriter));
         }
 
         public async Task CreatePatientNumbersCsvAsync(Stream stream, Order order)
@@ -30,7 +30,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
             var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(x => x.OdsCode, x => x.Name);
             serviceRecipientDictionary.TryAdd(order.OrganisationOdsCode, order.OrganisationName);
 
-            var patientNumbersPriceTypes = order.OrderItems.Select(orderItem => new PatientNumbersPriceType
+            var patientNumbersPriceTypes = order.OrderItems.Select(orderItem => new OdooPatientNumbersOrderItem
             {
                 CallOffAgreementId = order.OrderId,
                 CallOffOrderingPartyId = order.OrganisationOdsCode,
@@ -48,12 +48,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
                 UnitOfOrder = orderItem.CataloguePriceUnit.Description,
                 Price = orderItem.Price.GetValueOrDefault(),
                 M1Planned = orderItem.DeliveryDate,
-            }).ToList();
+            });
 
-            await _patientNumbersCsvWriter.WriteRecordsAsync(stream, patientNumbersPriceTypes);
+            await patientNumbersCsvWriter.WriteRecordsAsync(stream, patientNumbersPriceTypes);
         }
 
-        public async Task CreatePriceTypeCsvAsync(Stream stream, Order order)
+        public async Task CreateCsvAsync(Stream stream, Order order)
         {
             if (stream is null)
                 throw new ArgumentNullException(nameof(stream));
@@ -64,30 +64,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
             var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(x => x.OdsCode, x => x.Name);
             serviceRecipientDictionary.TryAdd(order.OrganisationOdsCode, order.OrganisationName);
 
-            var priceType = order.OrderItems.Select(orderItem => new PriceType
-            {
-                CallOffAgreementId = order.OrderId,
-                CallOffOrderingPartyId = order.OrganisationOdsCode,
-                CallOffOrderingPartyName = order.OrganisationName,
-                CallOffCommencementDate = order.CommencementDate,
-                ServiceRecipientId = orderItem.OdsCode,
-                ServiceRecipientName = serviceRecipientDictionary[orderItem.OdsCode],
-                ServiceRecipientItemId = $"{order.OrderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
-                SupplierId = order.SupplierId,
-                SupplierName = order.SupplierName,
-                ProductId = orderItem.CatalogueItemId,
-                ProductName = orderItem.CatalogueItemName,
-                ProductType = orderItem.CatalogueItemType.DisplayName,
-                QuantityOrdered = orderItem.Quantity,
-                UnitOfOrder = orderItem.CataloguePriceUnit.Description,
-                UnitTime = orderItem.PriceTimeUnit?.Description,
-                EstimationPeriod = orderItem.EstimationPeriod?.Description,
-                Price = orderItem.Price.GetValueOrDefault(),
-                OrderType = orderItem.ProvisioningType.Id,
-                M1Planned = orderItem.DeliveryDate,
-            }).ToList();
+            var orderItems = order.OrderItems
+                .Select(o => new OdooOrderItem(order, o, serviceRecipientDictionary[o.OdsCode]));
 
-            await _priceTypeCsvWriter.WriteRecordsAsync(stream, priceType);
+            await csvWriter.WriteRecordsAsync(stream, orderItems);
         }
     }
 }
