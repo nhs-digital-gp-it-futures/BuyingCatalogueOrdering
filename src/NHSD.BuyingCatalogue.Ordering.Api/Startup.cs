@@ -33,33 +33,31 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
 {
     public sealed class Startup
     {
-        private readonly IWebHostEnvironment _environment;
-
-        private readonly IConfiguration _configuration;
+        private readonly IConfiguration configuration;
+        private readonly IWebHostEnvironment environment;
 
         public Startup(IWebHostEnvironment environment, IConfiguration configuration)
         {
-            _configuration = configuration;
-            _environment = environment;
+            this.configuration = configuration;
+            this.environment = environment;
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            var connectionString = _configuration.GetConnectionString("OrderingDb");
-            var authority = _configuration.GetValue<string>("Authority");
-            var requireHttps = _configuration.GetValue<bool>("RequireHttps");
-            var allowInvalidCertificate = _configuration.GetValue<bool>("AllowInvalidCertificate");
-            var bypassIdentity = _configuration.GetValue<bool>("BypassIdentity");
+            var connectionString = configuration.GetConnectionString("OrderingDb");
+            var authority = configuration.GetValue<string>("Authority");
+            var requireHttps = configuration.GetValue<bool>("RequireHttps");
+            var allowInvalidCertificate = configuration.GetValue<bool>("AllowInvalidCertificate");
+            var bypassIdentity = configuration.GetValue<bool>("BypassIdentity");
             var validationSettings = new ValidationSettings
             {
-                MaxDeliveryDateWeekOffset = _configuration.GetValue<int>("MaxDeliveryDateWeekOffset")
+                MaxDeliveryDateWeekOffset = configuration.GetValue<int>("MaxDeliveryDateWeekOffset")
             };
 
-            var smtpSettings = _configuration.GetSection("SmtpServer").Get<SmtpSettings>();
-            if (!smtpSettings.AllowInvalidCertificate.HasValue)
-                smtpSettings.AllowInvalidCertificate = allowInvalidCertificate;
+            var smtpSettings = configuration.GetSection("SmtpServer").Get<SmtpSettings>();
+            smtpSettings.AllowInvalidCertificate ??= allowInvalidCertificate;
 
-            var purchasingSettings = _configuration.GetSection("Purchasing").Get<PurchasingSettings>();
+            var purchasingSettings = configuration.GetSection("Purchasing").Get<PurchasingSettings>();
 
             Log.Logger.Information("Authority on ORDAPI is: {@authority}", authority);
             Log.Logger.Information("ORDAPI Require Https: {@requiredHttps}", requireHttps);
@@ -68,7 +66,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             Log.Logger.Information("SMTP settings: {@smtpSettings}", smtpSettings);
             Log.Logger.Information("Purchasing settings: {@purchasingSettings}", purchasingSettings);
 
-            IdentityModelEventSource.ShowPII = _environment.IsDevelopment();
+            IdentityModelEventSource.ShowPII = environment.IsDevelopment();
 
             services.AddHttpContextAccessor();
             services.AddTransient<IServiceRecipientRepository, ServiceRecipientRepository>();
@@ -76,7 +74,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
 
             services
                 .AddSingleton(validationSettings)
-                .AddTransient(provider => _configuration.GetSection("Purchasing").Get<PurchasingSettings>());
+                .AddTransient(provider => configuration.GetSection("Purchasing").Get<PurchasingSettings>());
 
             services
                 .AddSingleton(smtpSettings)
@@ -92,12 +90,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 .AddTransient<ICreatePurchasingDocumentService, CreatePurchasingDocumentService>()
                 .AddTransient<ICreateOrderItemValidator, OrderItemValidator>()
                 .AddTransient<IUpdateOrderItemValidator, OrderItemValidator>()
-                .AddTransient<ICsvStreamWriter<PatientNumbersPriceType>, CsvStreamStreamWriter<PatientNumbersPriceType, PatientNumbersPriceTypeMap>>()
-                .AddTransient<ICsvStreamWriter<PriceType>, CsvStreamStreamWriter<PriceType, PriceTypeMap>>();
+                .AddTransient<ICsvStreamWriter<OdooPatientNumbersOrderItem>, CsvStreamStreamWriter<OdooPatientNumbersOrderItem, OdooPatientNumbersOrderItemMap>>()
+                .AddTransient<ICsvStreamWriter<OdooOrderItem>, CsvStreamStreamWriter<OdooOrderItem, OdooOrderItemMap>>();
 
             services.RegisterHealthChecks(connectionString, smtpSettings);
 
-            services.AddSwaggerDocumentation(_configuration);
+            services.AddSwaggerDocumentation(configuration);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
@@ -131,7 +129,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
 
             services.AddDbContext<ApplicationDbContext>(options =>
             {
-                options.UseSqlServer(connectionString).EnableSensitiveDataLogging(_environment.IsDevelopment());
+                options.UseSqlServer(connectionString).EnableSensitiveDataLogging(environment.IsDevelopment());
             });
 
             services.AddAuthorization(options =>
@@ -157,14 +155,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 opts.GetLevel = SerilogRequestLoggingOptions.GetLevel;
             });
 
-            var pathBase = _configuration.GetValue<string>("PathBase");
+            var pathBase = configuration.GetValue<string>("PathBase");
             if (!string.IsNullOrWhiteSpace(pathBase))
             {
                 Log.Logger.Information($"USING PATH BASE {pathBase}");
                 app.UsePathBase(pathBase);
             }
 
-            if (_environment.IsDevelopment())
+            if (environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwaggerDocumentation(pathBase);

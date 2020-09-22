@@ -19,10 +19,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class SectionStatusControllerTests
+    internal static class SectionStatusControllerTests
     {
         [Test]
-        public void Constructor_NullParameter_ThrowsArgumentNullException()
+        public static void Constructor_NullParameter_ThrowsArgumentNullException()
         {
             var sectionControllerBuilder = SectionStatusControllerBuilder
                 .Create()
@@ -32,7 +32,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task UpdateStatusAsync_OrderDoesNotExist_ReturnsNotFound()
+        public static async Task UpdateStatusAsync_OrderDoesNotExist_ReturnsNotFound()
         {
             var context = SectionStatusControllerTestContext.Setup();
 
@@ -42,7 +42,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task UpdateStatusAsync_WrongOrganisationId_ReturnsForbidden()
+        public static async Task UpdateStatusAsync_WrongOrganisationId_ReturnsForbidden()
         {
             var context = SectionStatusControllerTestContext.Setup();
 
@@ -54,7 +54,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task UpdateStatusAsync_WrongSectionId_ReturnsForbidden()
+        public static async Task UpdateStatusAsync_WrongSectionId_ReturnsForbidden()
         {
             var context = SectionStatusControllerTestContext.Setup();
 
@@ -68,7 +68,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [TestCase("additional-services")]
         [TestCase("catalogue-solutions")]
         [TestCase("associated-services")]
-        public async Task UpdateStatusAsync_CorrectSectionId_ReturnsNoContentResult(string sectionName)
+        public static async Task UpdateStatusAsync_CorrectSectionId_ReturnsNoContentResult(string sectionName)
         {
             var context = SectionStatusControllerTestContext.Setup();
 
@@ -82,7 +82,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [TestCase("additional-services", true, false, false)]
         [TestCase("catalogue-solutions", false, true, false)]
         [TestCase("associated-services", false, false, true)]
-        public async Task UpdateStatusAsync_WithSectionId_UpdatesTheSelectedStatus(
+        public static async Task UpdateStatusAsync_WithSectionId_UpdatesTheSelectedStatus(
             string sectionId,
             bool additionalServicesViewed,
             bool catalogueSolutionsViewed,
@@ -111,7 +111,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithOrderId(orderId)
                 .WithOrganisationId(organisationId)
                 .WithOrderItem(repositoryOrderItem)
-                .WithServiceRecipient((odsCode, "EU test"))
+                .WithServiceRecipient(odsCode, "EU test")
                 .Build();
 
             return repositoryOrder;
@@ -160,8 +160,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             internal Guid PrimaryOrganisationId { get; }
 
-            private ClaimsPrincipal ClaimsPrincipal { get; }
-
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
 
             internal IEnumerable<Order> Orders { get; set; }
@@ -169,6 +167,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             internal Order Order { get; set; }
 
             internal SectionStatusController SectionStatusController { get; }
+
+            private ClaimsPrincipal ClaimsPrincipal { get; }
 
             internal static SectionStatusControllerTestContext Setup()
             {

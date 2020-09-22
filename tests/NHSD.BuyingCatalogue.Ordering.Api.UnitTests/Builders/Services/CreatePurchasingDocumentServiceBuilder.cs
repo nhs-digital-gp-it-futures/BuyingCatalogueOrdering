@@ -4,8 +4,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
 {
     internal sealed class CreatePurchasingDocumentServiceBuilder
     {
-        private ICsvStreamWriter<PatientNumbersPriceType> _patientNumbersCsvWriter;
-        private ICsvStreamWriter<PriceType> _priceTypeCsvWriter;
+        private ICsvStreamWriter<OdooPatientNumbersOrderItem> patientNumbersCsvWriter;
+        private ICsvStreamWriter<OdooOrderItem> priceTypeCsvWriter;
 
         private CreatePurchasingDocumentServiceBuilder()
         {
@@ -15,20 +15,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
             new CreatePurchasingDocumentServiceBuilder();
 
         public CreatePurchasingDocumentServiceBuilder WithPatientNumbersCsvWriter(
-            ICsvStreamWriter<PatientNumbersPriceType> patientNumbersCsvStreamWriter)
+            ICsvStreamWriter<OdooPatientNumbersOrderItem> patientNumbersCsvStreamWriter)
         {
-            _patientNumbersCsvWriter = patientNumbersCsvStreamWriter;
+            patientNumbersCsvWriter = patientNumbersCsvStreamWriter;
             return this;
         }
 
         public CreatePurchasingDocumentServiceBuilder WithPriceTypeCsvWriter(
-            ICsvStreamWriter<PriceType> priceType)
+            ICsvStreamWriter<OdooOrderItem> priceType)
         {
-            _priceTypeCsvWriter = priceType;
+            priceTypeCsvWriter = priceType;
             return this;
         }
 
         public CreatePurchasingDocumentService Build() =>
-            new CreatePurchasingDocumentService(_patientNumbersCsvWriter, _priceTypeCsvWriter);
+            new CreatePurchasingDocumentService(patientNumbersCsvWriter, priceTypeCsvWriter);
     }
 }

@@ -1,61 +1,61 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using CsvHelper;
 using FluentAssertions;
-using Microsoft.VisualBasic.FileIO;
 using NHSD.BuyingCatalogue.EmailClient.IntegrationTesting.Drivers;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests;
-using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Data;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
+using SpecFlow.Assist.Dynamic.PropertyNameFormatting;
 using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Assist;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 {
     [Binding]
-    internal class OrderStatusSteps
+    internal sealed class OrderStatusSteps
     {
-        private readonly Request _request;
-        private readonly Settings _settings;
-        private readonly OrderContext _orderContext;
-        private readonly EmailServerDriver _emailServerDriver;
+        private readonly Request request;
+        private readonly Settings settings;
+        private readonly EmailServerDriver emailServerDriver;
 
-        private UpdateOrderStatusRequest _updateOrderStatusRequest;
+        private UpdateOrderStatusRequest updateOrderStatusRequest;
 
-        public OrderStatusSteps(Request request, Settings settings, OrderContext orderContext, EmailServerDriver emailServerDriver)
+        public OrderStatusSteps(Request request, Settings settings, EmailServerDriver emailServerDriver)
         {
-            _request = request;
-            _settings = settings;
-            _orderContext = orderContext;
-            _emailServerDriver = emailServerDriver;
+            this.request = request;
+            this.settings = settings;
+            this.emailServerDriver = emailServerDriver;
         }
 
         [Given(@"the user creates a request to update the order status for the order with ID '(.*)'")]
         public void GivenTheUserCreatesARequestToUpdateTheStatusForTheOrderWithId(string orderId)
         {
-            _updateOrderStatusRequest = new UpdateOrderStatusRequest(_request, _settings.OrderingApiBaseUrl, orderId);
+            updateOrderStatusRequest = new UpdateOrderStatusRequest(request, settings.OrderingApiBaseUrl, orderId);
         }
 
         [Given(@"the user enters the '(.*)' update order status request payload")]
         public void GivenTheUserEntersTheUpdateOrderStatusRequestPayload(string payloadTypeKey)
         {
-            _updateOrderStatusRequest.SetPayload(payloadTypeKey);
+            updateOrderStatusRequest.SetPayload(payloadTypeKey);
         }
 
         [When(@"the user sends the update order status request")]
         public async Task WhenTheUserSendsTheUpdateOrderStatusRequest()
         {
-            await _updateOrderStatusRequest.ExecuteAsync();
+            await updateOrderStatusRequest.ExecuteAsync();
         }
 
         [Then(@"the order status is set correctly")]
         public async Task ThenTheOrderStatusIsSetCorrectly()
         {
-            var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, _updateOrderStatusRequest.OrderId);
-            Enum.TryParse<OrderStatus>(_updateOrderStatusRequest.Payload.Status, out var orderStatus);
+            var order = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, updateOrderStatusRequest.OrderId);
+            Enum.TryParse<OrderStatus>(updateOrderStatusRequest.Payload.Status, out var orderStatus);
 
             order.OrderStatus.Should().Be(orderStatus);
         }
@@ -63,185 +63,39 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Then(@"the order completed date is set")]
         public async Task ThenTheOrderCompletedDateIsSet()
         {
-            var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, _updateOrderStatusRequest.OrderId);
+            var order = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, updateOrderStatusRequest.OrderId);
             order.Completed.Should().NotBeNull();
         }
-        
-        [Then(@"the price type attachment contains the correct information")]
-        public async Task ThenThePriceTypeAttachmentContainsTheCorrectInformation()
+
+        [Then(@"the '(.*)' attachment contains the following data")]
+        public async Task ThenTheAttachmentContainsTheFollowingData(string csvFile, Table table)
         {
-            string[] patientNumbersCsvHeader = {
-                "Call Off Agreement ID",
-                "Call Off Ordering Party ID",
-                "Call Off Ordering Party Name",
-                "Call Off Commencement Date",
-                "Service Recipient ID",
-                "Service Recipient Name",
-                "Service Recipient Item ID",
-                "Supplier ID",
-                "Supplier Name",
-                "Product ID",
-                "Product Name",
-                "Product Type",
-                "Quantity Ordered",
-                "Unit of Order",
-                "Unit Time",
-                "Estimation Period",
-                "Price",
-                "Order Type",
-                "Funding Type",
-                "M1 planned (Delivery Date)",
-                "Actual M1 date",
-                "Buyer verification date (M2)",
-                "Cease Date"
-            };
+            var emails = await emailServerDriver.FindAllEmailsAsync();
+            var email = emails.First();
+            var attachment = email.Attachments.First(a => a.FileName.Contains(Path.ChangeExtension(csvFile, ".csv"), StringComparison.OrdinalIgnoreCase));
+            using var attachmentReader = new StreamReader(new MemoryStream(attachment.AttachmentData.ToArray()));
 
-            var actual = (await _emailServerDriver.FindAllEmailsAsync()).First().Attachments
-                .First(x => x.FileName.Contains("Full.csv"));
+            using var csvReader = new CsvReader(attachmentReader, CultureInfo.InvariantCulture);
+            var csvRecords = csvReader.GetRecords<dynamic>().ToList();
 
-            await using var attachmentData = new MemoryStream(actual.AttachmentData.ToArray());
-            var csvText = new TextFieldParser(attachmentData);
-            csvText.SetDelimiters(",");
+            table.CompareToDynamicSet(csvRecords, new PreservePropertyNameFormatter(), false);
+        }
 
-            csvText.ReadFields().Should().BeEquivalentTo(patientNumbersCsvHeader);
+        [Then(@"all attachments use UTF8 encoding")]
+        public async Task ThenAllAttachmentsUseUTFEncoding()
+        {
+            var utf8Preamble = Encoding.UTF8.GetPreamble();
+            var emails = await emailServerDriver.FindAllEmailsAsync();
 
-            var order = _orderContext.OrderReferenceList.GetByOrderId(_updateOrderStatusRequest.OrderId);
-            var orderItems = _orderContext.OrderItemReferenceList.FindByOrderId(_updateOrderStatusRequest.OrderId).ToArray();
-            var serviceRecipients = _orderContext.ServiceRecipientReferenceList.FindByOrderId(_updateOrderStatusRequest.OrderId).ToList();
-
-            foreach (var orderItem in orderItems)
+            foreach (var email in emails)
             {
-                csvText.EndOfData.Should().BeFalse();
-
-                var row = csvText.ReadFields();
-
-                var data = CreatePriceTypeAttachmentData(order, orderItem, serviceRecipients);
-
-                row.Should().BeEquivalentTo(data);
+                foreach (var attachment in email.Attachments)
+                {
+                    using var attachmentReader = new BinaryReader(new MemoryStream(attachment.AttachmentData.ToArray()));
+                    var attachmentPreamble = attachmentReader.ReadBytes(utf8Preamble.Length);
+                    attachmentPreamble.Should().BeEquivalentTo(utf8Preamble);
+                }
             }
-
-            csvText.EndOfData.Should().BeTrue();
-        }
-
-
-        [Then(@"the patient numbers price type attachment contains the correct information")]
-        public async Task ThenThePatientNumbersPriceTypeAttachmentContainsTheCorrectInformation()
-        {
-            string[] patientNumbersCsvHeader = {
-                "Call Off Agreement ID",
-                "Call Off Ordering Party ID",
-                "Call Off Ordering Party Name",
-                "Call Off Commencement Date",
-                "Service Recipient ID",
-                "Service Recipient Name",
-                "Service Recipient Item ID",
-                "Supplier ID",
-                "Supplier Name",
-                "Product ID",
-                "Product Name",
-                "Product Type",
-                "Quantity Ordered",
-                "Unit of Order",
-                "Price",
-                "Funding Type",
-                "M1 planned (Delivery Date)",
-                "Actual M1 date",
-                "Buyer verification date (M2)",
-                "Cease Date"
-            };
-
-            var actual = (await _emailServerDriver.FindAllEmailsAsync()).First().Attachments
-                .First(x => x.FileName.Contains("Patients.csv"));
-
-            await using var attachmentData = new MemoryStream(actual.AttachmentData.ToArray());
-            var csvText = new TextFieldParser(attachmentData);
-            csvText.SetDelimiters(",");
-
-            csvText.ReadFields().Should().BeEquivalentTo(patientNumbersCsvHeader);
-
-            var order = _orderContext.OrderReferenceList.GetByOrderId(_updateOrderStatusRequest.OrderId);
-            var orderItems = _orderContext.OrderItemReferenceList.FindByOrderId(_updateOrderStatusRequest.OrderId).ToArray();
-            var serviceRecipients = _orderContext.ServiceRecipientReferenceList.FindByOrderId(_updateOrderStatusRequest.OrderId).ToList();
-
-            foreach (var orderItem in orderItems)
-            {
-                csvText.EndOfData.Should().BeFalse();
-
-                var row = csvText.ReadFields();
-
-                var data = CreatePatientNumbersTypeAttachmentData(order, orderItem, serviceRecipients);
-
-                row.Should().BeEquivalentTo(data);
-            }
-
-            csvText.EndOfData.Should().BeTrue();
-        }
-
-        private string[] CreatePriceTypeAttachmentData(OrderEntity order, OrderItemEntity orderItem, IEnumerable<ServiceRecipientEntity> serviceRecipientDictionary)
-        {
-            string[] data =
-            {
-                order.OrderId,
-                order.OrganisationOdsCode,
-                order.OrganisationName,
-                order.CommencementDate?.ToString("dd/MM/yyyy"),
-                orderItem.OdsCode,
-                serviceRecipientDictionary.FirstOrDefault(item =>
-                        string.Equals(orderItem.OdsCode,
-                            item.OdsCode, StringComparison.OrdinalIgnoreCase))
-                    ?.Name,
-                $"{order.OrderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
-                order.SupplierId,
-                order.SupplierName,
-                orderItem.CatalogueItemId,
-                orderItem.CatalogueItemName,
-                orderItem.CatalogueItemType.ToDisplayName(),
-                orderItem.Quantity.ToString(),
-                orderItem.PricingUnitDescription,
-                orderItem.TimeUnit.GetValueOrDefault().ToDescription(), 
-                orderItem.EstimationPeriod.GetValueOrDefault().ToDescription(),
-                orderItem.Price.GetValueOrDefault() == 0 ? 0.ToString() : orderItem.Price.GetValueOrDefault().ToString("#.000"),
-                ((int)orderItem.ProvisioningType).ToString(),
-                "Central",
-                orderItem.DeliveryDate?.ToString("dd/MM/yyyy"),
-                String.Empty,
-                String.Empty,
-                String.Empty
-            };
-
-            return data;
-        }
-
-        private string[] CreatePatientNumbersTypeAttachmentData(OrderEntity order, OrderItemEntity orderItem, IEnumerable<ServiceRecipientEntity> serviceRecipientDictionary)
-        {
-            string[] data =
-            {
-                order.OrderId,
-                order.OrganisationOdsCode,
-                order.OrganisationName,
-                order.CommencementDate?.ToString("dd/MM/yyyy"),
-                orderItem.OdsCode,
-                serviceRecipientDictionary.FirstOrDefault(item =>
-                    string.Equals(orderItem.OdsCode,
-                        item.OdsCode, StringComparison.OrdinalIgnoreCase))
-                    ?.Name,
-                $"{order.OrderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
-                order.SupplierId,
-                order.SupplierName,
-                orderItem.CatalogueItemId,
-                orderItem.CatalogueItemName,
-                orderItem.CatalogueItemType.ToDisplayName(),
-                orderItem.Quantity.ToString(),
-                orderItem.PricingUnitDescription,
-                orderItem.Price.GetValueOrDefault() == 0 ? 0.ToString() : orderItem.Price.GetValueOrDefault().ToString("#.000"),
-                "Central",
-                orderItem.DeliveryDate?.ToString("dd/MM/yyyy"),
-                String.Empty,
-                String.Empty,
-                String.Empty
-            };
-
-            return data;
         }
     }
 }

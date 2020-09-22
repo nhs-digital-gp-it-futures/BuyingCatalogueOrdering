@@ -10,10 +10,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class OrderTests
+    internal static class OrderTests
     {
         [Test]
-        public void AddOrderItem_NullOrderItem_ThrowsArgumentNullException()
+        public static void AddOrderItem_NullOrderItem_ThrowsArgumentNullException()
         {
             static void Test()
             {
@@ -27,7 +27,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void AddOrderItem_OrderItem_ItemAdded()
+        public static void AddOrderItem_OrderItem_ItemAdded()
         {
             var order = OrderBuilder.Create().Build();
             var orderItem = OrderItemBuilder.Create().Build();
@@ -41,7 +41,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         [TestCase(nameof(CatalogueItemType.Solution), true)]
         [TestCase(nameof(CatalogueItemType.AdditionalService), false)]
         [TestCase(nameof(CatalogueItemType.AssociatedService), false)]
-        public void AddOrderItem_OrderItem_CatalogueItemType_CatalogueSolutionsViewedMatchExpectedValue(
+        public static void AddOrderItem_OrderItem_CatalogueItemType_CatalogueSolutionsViewedMatchExpectedValue(
             string catalogueItemTypeNameInput,
             bool expectedInput)
         {
@@ -63,7 +63,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         [TestCase(nameof(CatalogueItemType.Solution), false)]
         [TestCase(nameof(CatalogueItemType.AdditionalService), true)]
         [TestCase(nameof(CatalogueItemType.AssociatedService), false)]
-        public void AddOrderItem_OrderItem_CatalogueItemType_AdditionalServicesViewedMatchExpectedValue(
+        public static void AddOrderItem_OrderItem_CatalogueItemType_AdditionalServicesViewedMatchExpectedValue(
             string catalogueItemTypeNameInput,
             bool expectedInput)
         {
@@ -85,7 +85,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         [TestCase(nameof(CatalogueItemType.Solution), false)]
         [TestCase(nameof(CatalogueItemType.AdditionalService), true)]
         [TestCase(nameof(CatalogueItemType.AssociatedService), false)]
-        public void AddOrderItem_OrderItem_CatalogueItemType_AssociatedServicesViewedMatchExpectedValue(
+        public static void AddOrderItem_OrderItem_CatalogueItemType_AssociatedServicesViewedMatchExpectedValue(
             string catalogueItemTypeNameInput,
             bool expectedInput)
         {
@@ -105,7 +105,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void AddOrderItem_AddSameOrderItem_ReturnsOneOrderItem()
+        public static void AddOrderItem_AddSameOrderItem_ReturnsOneOrderItem()
         {
             var order = OrderBuilder.Create().Build();
             var orderItem = OrderItemBuilder.Create().Build();
@@ -118,7 +118,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void AddOrderItem_AddDifferentOrderItem_ReturnsTwoOrderItems()
+        public static void AddOrderItem_AddDifferentOrderItem_ReturnsTwoOrderItems()
         {
             var order = OrderBuilder.Create().Build();
             var orderItem = OrderItemBuilder.Create().Build();
@@ -132,7 +132,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void AddOrderItem_OrderItem_LastUpdatedByChanged()
+        public static void AddOrderItem_OrderItem_LastUpdatedByChanged()
         {
             var lastUpdatedBy = Guid.NewGuid();
 
@@ -150,7 +150,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void AddOrderItem_OrderItemAlreadyExists_LastUpdatedByNotChanged()
+        public static void AddOrderItem_OrderItemAlreadyExists_LastUpdatedByNotChanged()
         {
             var lastUpdatedBy = Guid.NewGuid();
 
@@ -168,7 +168,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void AddOrderItem_OrderItem_LastUpdatedByNameChanged()
+        public static void AddOrderItem_OrderItem_LastUpdatedByNameChanged()
         {
             var lastUpdatedByName = Guid.NewGuid().ToString();
 
@@ -186,7 +186,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void AddOrderItem_OrderItemAlreadyExists_LastUpdatedByNameNotChanged()
+        public static void AddOrderItem_OrderItemAlreadyExists_LastUpdatedByNameNotChanged()
         {
             var lastUpdatedByName = Guid.NewGuid().ToString();
 
@@ -204,7 +204,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void UpdateOrderItem_OrderItemNotFound_NoOrderItemChange()
+        public static void UpdateOrderItem_OrderItemNotFound_NoOrderItemChange()
         {
             const int orderItemId = 1;
             const int unknownOrderItemId = 123;
@@ -241,7 +241,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void UpdateOrderItem_OrderItemNotFound_NoOrderChange()
+        public static void UpdateOrderItem_OrderItemNotFound_NoOrderChange()
         {
             const int orderItemId = 1;
             const int unknownOrderItemId = 123;
@@ -280,7 +280,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void CalculateCostPerYear_Recurring_OrderItemCostTypeRecurring_ReturnsTotalOrderItemCost()
+        public static void CalculateCostPerYear_Recurring_OrderItemCostTypeRecurring_ReturnsTotalOrderItemCost()
         {
             const int orderItemId1 = 1;
             const int orderItemId2 = 2;
@@ -313,7 +313,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void CalculateCostPerYear_Recurring_OrderItemCostTypeOneOff_ReturnsZero()
+        public static void CalculateCostPerYear_Recurring_OrderItemCostTypeOneOff_ReturnsZero()
         {
             const int orderItemId = 1;
 
@@ -333,7 +333,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void CalculateCostPerYear_OneOff_OrderItemCostTypeOneOff_ReturnsTotalOneOffCost()
+        public static void CalculateCostPerYear_OneOff_OrderItemCostTypeOneOff_ReturnsTotalOneOffCost()
         {
             const int orderItemId = 1;
 
@@ -357,7 +357,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void CalculateCostPerYear_OneOff_OrderItemCostTypeRecurring_ReturnsZero()
+        public static void CalculateCostPerYear_OneOff_OrderItemCostTypeRecurring_ReturnsZero()
         {
             const int orderItemId = 1;
 
@@ -380,7 +380,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
         [TestCase(nameof(CatalogueItemType.AssociatedService), nameof(ProvisioningType.OnDemand), 10, 2, 720)]
         [TestCase(nameof(CatalogueItemType.AssociatedService), nameof(ProvisioningType.Declarative), 20, 4, 960)]
-        public void CalculateTotalOwnershipCost_SingleOneOffOrRecurringOrderItem_ReturnsTotalOwnershipCost(string catalogueItemTypeName, string provisioningTypeName, decimal price, int quantity, decimal totalOwnershipCost)
+        public static void CalculateTotalOwnershipCost_SingleOneOffOrRecurringOrderItem_ReturnsTotalOwnershipCost(string catalogueItemTypeName, string provisioningTypeName, decimal price, int quantity, decimal totalOwnershipCost)
         {
             const int orderItemId = 1;
 
@@ -402,7 +402,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void CalculateTotalOwnershipCost_RecurringAndOneOff_ReturnsTotalOwershipCost()
+        public static void CalculateTotalOwnershipCost_RecurringAndOneOff_ReturnsTotalOwershipCost()
         {
             const int orderItemId1 = 1;
             const int orderItemId2 = 2;
@@ -435,7 +435,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void CalculateTotalOwnershipCost_NoOrderItemsExist_ReturnsZero()
+        public static void CalculateTotalOwnershipCost_NoOrderItemsExist_ReturnsZero()
         {
             var order = OrderBuilder
                 .Create()
@@ -452,7 +452,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         [TestCase(true, true, false, false, true, false, false, false)]
         [TestCase(true, true, false, true, true, true, false, false)]
         [TestCase(true, false, true, false, false, false, true, false)]
-        public void CanComplete_ReturnsCorrectResult(
+        public static void CanComplete_ReturnsCorrectResult(
             bool? fundingComplete,
             bool recipientViewed,
             bool associatedViewed,
@@ -471,7 +471,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
             if (hasRecipient)
             {
-                orderBuilder.WithServiceRecipient(("ODS1", "Some service recipient"));
+                orderBuilder.WithServiceRecipient("ODS1", "Some service recipient");
             }
 
             if (hasSolution)
@@ -496,7 +496,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void Complete_CanCompleteOrder_ReturnsSuccessfulResult()
+        public static void Complete_CanCompleteOrder_ReturnsSuccessfulResult()
         {
             var order = OrderBuilder
                 .Create()
@@ -507,14 +507,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
                     .Create()
                     .WithCatalogueItemType(CatalogueItemType.AssociatedService)
                     .Build()).Build();
-            
+
             var actual = order.Complete(Guid.Empty, string.Empty);
 
             actual.Should().BeEquivalentTo(Result.Success());
         }
 
         [Test]
-        public void Complete_CanCompleteOrder_ReturnsCompleteOrderStatus()
+        public static void Complete_CanCompleteOrder_ReturnsCompleteOrderStatus()
         {
             var order = OrderBuilder
                 .Create()
@@ -534,7 +534,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void Complete_CanCompleteOrder_CompletedDateIsUpdated()
+        public static void Complete_CanCompleteOrder_CompletedDateIsUpdated()
         {
             var order = OrderBuilder
                 .Create()
@@ -554,7 +554,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void Complete_CanCompleteOrder_LastUpdatedByChanged()
+        public static void Complete_CanCompleteOrder_LastUpdatedByChanged()
         {
             var lastUpdatedBy = Guid.NewGuid();
 
@@ -576,7 +576,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void Complete_CanCompleteOrder_LastUpdatedByNameChanged()
+        public static void Complete_CanCompleteOrder_LastUpdatedByNameChanged()
         {
             var lastUpdatedByName = Guid.NewGuid().ToString();
 
@@ -598,7 +598,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void Complete_CanNotCompleteOrder_ReturnsFailedResult()
+        public static void Complete_CanNotCompleteOrder_ReturnsFailedResult()
         {
             var order = OrderBuilder
                 .Create()
@@ -610,7 +610,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void Complete_CanNotCompleteOrder_ReturnsIncompleteOrderStatus()
+        public static void Complete_CanNotCompleteOrder_ReturnsIncompleteOrderStatus()
         {
             var order = OrderBuilder
                 .Create()
