@@ -1,21 +1,22 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 {
     public sealed class ApplicationDbContext : DbContext
     {
-        public DbSet<Order> Order { get; set; }
-
-        public DbSet<ServiceRecipient> ServiceRecipient { get; set; }
-
         public ApplicationDbContext(
             DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
+
+        public DbSet<Order> Order { get; set; }
+
+        public DbSet<ServiceRecipient> ServiceRecipient { get; set; }
+
+        public DbSet<DefaultDeliveryDate> DefaultDeliveryDate { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -29,6 +30,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
             modelBuilder.ApplyConfiguration(new OrderEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new OrderItemEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new ServiceRecipientConfiguration());
+            modelBuilder.ApplyConfiguration(new DefaultDeliveryDateEntityTypeConfiguration());
         }
     }
 }

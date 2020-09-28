@@ -69,8 +69,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             IdentityModelEventSource.ShowPII = environment.IsDevelopment();
 
             services.AddHttpContextAccessor();
-            services.AddTransient<IServiceRecipientRepository, ServiceRecipientRepository>();
-            services.AddTransient<IOrderRepository, OrderRepository>();
+            services
+                .AddScoped<IServiceRecipientRepository, ServiceRecipientRepository>()
+                .AddScoped<IOrderRepository, OrderRepository>()
+                .AddScoped<IDefaultDeliveryDateRepository, DefaultDeliveryDateRepository>();
 
             services
                 .AddSingleton(validationSettings)
