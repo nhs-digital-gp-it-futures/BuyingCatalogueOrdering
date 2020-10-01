@@ -22,6 +22,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Settings;
+using NHSD.BuyingCatalogue.Ordering.Api.Validation;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Application.Services;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
@@ -72,6 +73,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             services
                 .AddScoped<IServiceRecipientRepository, ServiceRecipientRepository>()
                 .AddScoped<IOrderRepository, OrderRepository>()
+                .AddScoped<IDefaultDeliveryDateValidator, DefaultDeliveryDateValidator>()
                 .AddScoped<IDefaultDeliveryDateRepository, DefaultDeliveryDateRepository>();
 
             services

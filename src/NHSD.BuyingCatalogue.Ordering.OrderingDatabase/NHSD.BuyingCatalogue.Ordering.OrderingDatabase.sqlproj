@@ -87,4 +87,10 @@
   <ItemGroup>
     <PostDeploy Include="Deployment\PostDeployment.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <SqlCmdVariable Include="NHSD_PASSWORD">
+      <DefaultValue>DisruptTheMarket1!</DefaultValue>
+      <Value>$(SqlCmdVar__1)</Value>
+    </SqlCmdVariable>
+  </ItemGroup>
 </Project>
