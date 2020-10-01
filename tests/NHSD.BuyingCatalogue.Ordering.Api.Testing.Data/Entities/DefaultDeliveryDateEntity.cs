@@ -11,7 +11,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 
         public int PriceId { get; set; }
 
-        public DateTime DeliveryDate { get; set; }
+        public DateTime? DeliveryDate { get; set; }
 
         protected override string InsertSql =>
             "INSERT INTO dbo.DefaultDeliveryDate VALUES(@OrderId, @CatalogueItemId, @PriceId, @DeliveryDate);";

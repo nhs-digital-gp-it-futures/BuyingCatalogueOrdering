@@ -11,7 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using NHSD.BuyingCatalogue.Ordering.Api.Models.Errors;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
+using NHSD.BuyingCatalogue.Ordering.Api.Validation;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
@@ -47,14 +49,56 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [Test]
         [OrderingAutoData]
-        public static async Task AddOrUpdateAsync_InvokesAddOrUpdateAsync(
+        public static async Task AddOrUpdateAsync_BadOrderId_ReturnsNotFound(
             string orderId,
             string catalogueItemId,
             int priceId,
             DefaultDeliveryDateModel defaultDeliveryDate,
-            [Frozen] Mock<IDefaultDeliveryDateRepository> repository,
             DefaultDeliveryDateController controller)
         {
+            var response = await controller.AddOrUpdateAsync(orderId, catalogueItemId, priceId, defaultDeliveryDate);
+
+            response.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task AddOrUpdateAsync_NotValid_ReturnsExpectedReponse(
+            string orderId,
+            string catalogueItemId,
+            int priceId,
+            Order order,
+            DefaultDeliveryDateModel defaultDeliveryDate,
+            [Frozen] Mock<IOrderRepository> orderRepository,
+            [Frozen] Mock<IDefaultDeliveryDateValidator> validator,
+            ErrorsModel errors,
+            DefaultDeliveryDateController controller)
+        {
+            orderRepository.Setup(o => o.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(order);
+            validator.Setup(v => v.Validate(defaultDeliveryDate, order.CommencementDate)).Returns((false, errors));
+
+            var response = await controller.AddOrUpdateAsync(orderId, catalogueItemId, priceId, defaultDeliveryDate);
+
+            response.Should().BeOfType<BadRequestObjectResult>();
+            response.As<BadRequestObjectResult>().Value.Should().Be(errors);
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task AddOrUpdateAsync_InvokesAddOrUpdateAsync(
+            string orderId,
+            string catalogueItemId,
+            int priceId,
+            Order order,
+            DefaultDeliveryDateModel defaultDeliveryDate,
+            [Frozen] Mock<IOrderRepository> orderRepository,
+            [Frozen] Mock<IDefaultDeliveryDateRepository> repository,
+            [Frozen] Mock<IDefaultDeliveryDateValidator> validator,
+            DefaultDeliveryDateController controller)
+        {
+            orderRepository.Setup(o => o.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(order);
+            validator.Setup(v => v.Validate(defaultDeliveryDate, order.CommencementDate)).Returns((true, null));
+
             await controller.AddOrUpdateAsync(orderId, catalogueItemId, priceId, defaultDeliveryDate);
 
             var expectedDeliveryDate = new DefaultDeliveryDate
@@ -62,7 +106,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 OrderId = orderId,
                 CatalogueItemId = catalogueItemId,
                 PriceId = priceId,
-                DeliveryDate = defaultDeliveryDate.DeliveryDate,
+                DeliveryDate = defaultDeliveryDate.DeliveryDate.Value,
             };
 
             repository.Verify(r => r.AddOrUpdateAsync(It.Is<DefaultDeliveryDate>(d => VerifyDeliveryDate(expectedDeliveryDate, d))));
@@ -74,11 +118,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             string orderId,
             string catalogueItemId,
             int priceId,
+            Order order,
             DefaultDeliveryDateModel defaultDeliveryDate,
+            [Frozen] Mock<IOrderRepository> orderRepository,
             [Frozen] Mock<IDefaultDeliveryDateRepository> repository,
+            [Frozen] Mock<IDefaultDeliveryDateValidator> validator,
             DefaultDeliveryDateController controller)
         {
+            orderRepository.Setup(o => o.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(order);
             repository.Setup(r => r.AddOrUpdateAsync(It.IsAny<DefaultDeliveryDate>())).ReturnsAsync(true);
+            validator.Setup(v => v.Validate(defaultDeliveryDate, order.CommencementDate)).Returns((true, null));
 
             var response = await controller.AddOrUpdateAsync(orderId, catalogueItemId, priceId, defaultDeliveryDate);
 
@@ -92,9 +141,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             string orderId,
             string catalogueItemId,
             int priceId,
+            Order order,
             DefaultDeliveryDateModel defaultDeliveryDate,
+            [Frozen] Mock<IOrderRepository> orderRepository,
+            [Frozen] Mock<IDefaultDeliveryDateValidator> validator,
             DefaultDeliveryDateController controller)
         {
+            orderRepository.Setup(o => o.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(order);
+            validator.Setup(v => v.Validate(defaultDeliveryDate, order.CommencementDate)).Returns((true, null));
+
             var response = await controller.AddOrUpdateAsync(orderId, catalogueItemId, priceId, defaultDeliveryDate);
 
             response.Should().BeOfType<OkResult>();

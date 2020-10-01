@@ -1,9 +1,11 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
     public sealed class DefaultDeliveryDateModel
     {
-        public DateTime DeliveryDate { get; set; }
+        [Required(ErrorMessage = nameof(DeliveryDate) + "Required")]
+        public DateTime? DeliveryDate { get; set; }
     }
 }
