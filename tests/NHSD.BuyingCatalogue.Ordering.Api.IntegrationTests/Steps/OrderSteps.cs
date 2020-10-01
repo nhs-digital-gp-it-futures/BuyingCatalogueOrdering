@@ -247,7 +247,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             public string SupplierContactEmail { get; set; }
 
-            public DateTime CommencementDate { get; set; }
+            public DateTime? CommencementDate { get; set; }
 
             public bool ServiceRecipientsViewed { get; set; }
 

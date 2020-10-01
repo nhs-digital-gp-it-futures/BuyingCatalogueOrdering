@@ -4,6 +4,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.Extensions
 {
     public static class StringExtensions
     {
+        public static bool EqualsOrdinalIgnoreCase(this string a, string b)
+        {
+            return string.Equals(a, b, StringComparison.OrdinalIgnoreCase);
+        }
+
         public static string TrimAsync(this string input)
         {
             return TrimSuffix(input, "async", StringComparison.OrdinalIgnoreCase);

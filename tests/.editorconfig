@@ -1,0 +1,45 @@
+# To learn more about .editorconfig see https://aka.ms/editorconfigdocs
+
+###############################
+# Code Analysis Severity      #
+###############################
+
+[*.cs]
+
+# CA1707: Remove the underscores from member name NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Attributes.LimitAttributeTests.IsValid_Int_ReturnsCorrectValue(int, NHSD.BuyingCatalogue.Ordering.Api.Attributes.LimitType, int, bool)
+dotnet_diagnostic.CA1707.severity = none
+
+# Following rules to be re-enabled and fixed later
+
+# CA1031: Do not catch general exception types
+dotnet_diagnostic.CA1031.severity = none
+
+# CA1304: Specify CultureInfo
+dotnet_diagnostic.CA1304.severity = none
+
+# CA1305: Specify IFormatProvider
+dotnet_diagnostic.CA1305.severity = none
+
+# CA1307: Specify StringComparison
+dotnet_diagnostic.CA1307.severity = none
+
+# CA1801: Review unused parameters
+dotnet_diagnostic.CA1801.severity = none
+
+# CA1805: Do not initialize unnecessarily
+dotnet_diagnostic.CA1805.severity = none
+
+# CA1806: Do not ignore method results
+dotnet_diagnostic.CA1806.severity = none
+
+# CA1812: AccessTokenSteps is an internal class that is apparently never instantiated. If so, remove the code from the assembly. If this class is intended to contain only static members, make it static (Shared in Visual Basic).
+dotnet_diagnostic.CA1812.severity = none
+
+# CA1822: Mark members as static
+dotnet_diagnostic.CA1822.severity = none
+
+# CA1826: Do not use Enumerable methods on indexable collections
+dotnet_diagnostic.CA1826.severity = none
+
+# CA2234: Pass system uri objects instead of strings
+dotnet_diagnostic.CA2234.severity = none

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -28,7 +29,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
         }
 
-        private OrganisationPartyPayload GetOrganisationPartyPayloadByOrderId(ScenarioContext context, string orderId)
+        private static OrganisationPartyPayload GetOrganisationPartyPayloadByOrderId(ScenarioContext context, string orderId)
         {
             if (context is null)
             {
@@ -47,7 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             return null;
         }
 
-        private void SetOrganisationPartyPayloadByOrderId(ScenarioContext context,string orderId, OrganisationPartyPayload payload)
+        private static void SetOrganisationPartyPayloadByOrderId(ScenarioContext context,string orderId, OrganisationPartyPayload payload)
         {
             if (context is null)
             {
@@ -110,20 +111,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [When(@"the user makes a request to retrieve the ordering-party section with the ID (.*)")]
         public async Task GivenTheUserMakesARequestToRetrieveTheOrdering_PartySectionWithTheID(string orderId)
         {
-            await _request.GetAsync(string.Format(_orderingPartyUrl, orderId));
+            await _request.GetAsync(string.Format(CultureInfo.InvariantCulture, _orderingPartyUrl, orderId));
         }
 
         [When(@"the user makes a request to update the order party on the order with the ID (.*)")]
         public async Task WhenTheUserMakesARequestToUpdateTheOrderPartyWithOrderId(string orderId)
         {
             var payload = GetOrganisationPartyPayloadByOrderId(_context, orderId);
-            await _request.PutJsonAsync(string.Format(_orderingPartyUrl, orderId), payload);
+            await _request.PutJsonAsync(string.Format(CultureInfo.InvariantCulture, _orderingPartyUrl, orderId), payload);
         }
 
         [When(@"the user makes a request to update the order party with order ID (.*) with no model")]
         public async Task WhenTheUserMakesARequestToUpdateTheOrderPartyWithOrderIdWithNoModel(string orderId)
         {
-            await _request.PutJsonAsync(string.Format(_orderingPartyUrl, orderId), null);
+            await _request.PutJsonAsync(string.Format(CultureInfo.InvariantCulture, _orderingPartyUrl, orderId), null);
         }
 
         [Then(@"the ordering-party is returned")]

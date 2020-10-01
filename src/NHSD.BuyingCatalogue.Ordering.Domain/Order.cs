@@ -9,12 +9,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class Order
     {
+        private readonly List<OrderItem> orderItems = new List<OrderItem>();
+        private readonly List<ServiceRecipient> serviceRecipients = new List<ServiceRecipient>();
+
 #pragma warning disable 649
         private DateTime? _completed;
 #pragma warning restore 649
-
-        private readonly List<OrderItem> _orderItems = new List<OrderItem>();
-        private readonly List<ServiceRecipient> _serviceRecipients = new List<ServiceRecipient>();
 
         private Order()
         {
@@ -98,13 +98,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         public bool IsDeleted { get; set; }
 
         public IReadOnlyList<OrderItem> OrderItems =>
-            _orderItems.AsReadOnly();
+            orderItems.AsReadOnly();
 
         public IReadOnlyList<ServiceRecipient> ServiceRecipients =>
-            _serviceRecipients.AsReadOnly();
+            serviceRecipients.AsReadOnly();
 
         public static Order Create(
-                                                                                                                                                                                                                            OrderDescription orderDescription,
+            OrderDescription orderDescription,
             Guid organisationId,
             Guid lastUpdatedBy,
             string lastUpdatedByName)
@@ -121,7 +121,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public decimal CalculateCostPerYear(CostType costType)
         {
-            return _orderItems.Where(x => x.CostType == costType).Sum(y => y.CalculateTotalCostPerYear());
+            return orderItems.Where(x => x.CostType == costType).Sum(y => y.CalculateTotalCostPerYear());
         }
 
         public decimal CalculateTotalOwnershipCost()
@@ -146,10 +146,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             if (orderItem is null)
                 throw new ArgumentNullException(nameof(orderItem));
 
-            if (_orderItems.Contains(orderItem))
+            if (orderItems.Contains(orderItem))
                 return;
 
-            _orderItems.Add(orderItem);
+            orderItems.Add(orderItem);
             orderItem.MarkOrderSectionAsViewed(this);
 
             SetLastUpdatedBy(userId, name);
@@ -164,7 +164,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             Guid userId,
             string name)
         {
-            var orderItem = _orderItems.FirstOrDefault(item => orderItemId.Equals(item.OrderItemId));
+            var orderItem = orderItems.FirstOrDefault(item => orderItemId.Equals(item.OrderItemId));
 
             orderItem?.ChangePrice(
                 deliveryDate,
@@ -174,19 +174,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 () => SetLastUpdatedBy(userId, name));
         }
 
-        public void SetServiceRecipient(IEnumerable<(string Ods, string Name)> serviceRecipients, Guid userId, string lastUpdatedName)
+        public void SetServiceRecipients(IEnumerable<OdsOrganisation> serviceRecipients, Guid userId, string lastUpdatedName)
         {
             if (serviceRecipients is null)
                 throw new ArgumentNullException(nameof(serviceRecipients));
 
-            _serviceRecipients.Clear();
+            this.serviceRecipients.Clear();
 
-            foreach ((string ods, string name) in serviceRecipients)
+            foreach ((string code, string name) in serviceRecipients)
             {
-                _serviceRecipients.Add(new ServiceRecipient
+                this.serviceRecipients.Add(new ServiceRecipient
                 {
                     Name = name,
-                    OdsCode = ods,
+                    OdsCode = code,
                     Order = this
                 });
             }
@@ -206,8 +206,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             var solutionAndAssociatedServices = catalogueSolutionsCount > 0
                                                 && associatedServicesCount > 0;
 
-            var solutionAndNoAssociatedServices = catalogueSolutionsCount > 0 
-                                                  && associatedServicesCount == 0 
+            var solutionAndNoAssociatedServices = catalogueSolutionsCount > 0
+                                                  && associatedServicesCount == 0
                                                   && AssociatedServicesViewed;
 
             var noSolutionsAndAssociatedServices = serviceRecipientsCount > 0
@@ -215,7 +215,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                                                    && CatalogueSolutionsViewed
                                                    && associatedServicesCount > 0;
 
-            var recipientsAndAssociatedServices =  serviceRecipientsCount == 0 
+            var recipientsAndAssociatedServices = serviceRecipientsCount == 0
                                                    && ServiceRecipientsViewed
                                                    && associatedServicesCount > 0;
 

@@ -8,6 +8,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
     {
         Task CreatePatientNumbersCsvAsync(Stream stream, Order order);
 
-        Task CreatePriceTypeCsvAsync(Stream stream, Order order);
+        Task CreateCsvAsync(Stream stream, Order order);
     }
 }

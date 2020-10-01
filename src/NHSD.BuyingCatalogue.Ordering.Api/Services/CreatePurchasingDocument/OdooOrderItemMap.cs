@@ -2,9 +2,9 @@
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
 {
-    internal sealed class PriceTypeMap : ClassMap<PriceType>
+    internal sealed class OdooOrderItemMap : ClassMap<OdooOrderItem>
     {
-        public PriceTypeMap()
+        public OdooOrderItemMap()
         {
             Map(x => x.CallOffAgreementId).Index(0).Name("Call Off Agreement ID");
             Map(x => x.CallOffOrderingPartyId).Index(1).Name("Call Off Ordering Party ID");

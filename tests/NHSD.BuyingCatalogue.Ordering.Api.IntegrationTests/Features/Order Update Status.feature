@@ -27,7 +27,7 @@ Background:
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @5145
-Scenario: 1. Update an order status
+Scenario: Update an order status
     Given the user creates a request to update the order status for the order with ID 'C000014-01'
     And the user enters the '<StatusPayload>' update order status request payload
     When the user sends the update order status request
@@ -39,7 +39,7 @@ Scenario: 1. Update an order status
         | order-status-complete |
 
 @5145
-Scenario: 2. Update an order status sets last updated correctly
+Scenario: Update an order status sets last updated correctly
     Given the user creates a request to update the order status for the order with ID 'C000014-01'
     And the user enters the '<StatusPayload>' update order status request payload
     When the user sends the update order status request
@@ -54,7 +54,7 @@ Scenario: 2. Update an order status sets last updated correctly
         | order-status-complete |
 
 @5145
-Scenario: 3. An invalid order status provides an appropriate error message
+Scenario: An invalid order status provides an appropriate error message
     Given the user creates a request to update the order status for the order with ID 'C000014-01'
     And the user enters the '<StatusPayload>' update order status request payload
     When the user sends the update order status request
@@ -70,7 +70,7 @@ Scenario: 3. An invalid order status provides an appropriate error message
         | order-status-invalid    | InvalidStatus  | Status     |
 
 @5145
-Scenario: 4. Updating the status of an unfinished order provides an appropriate error message
+Scenario: Updating the status of an unfinished order provides an appropriate error message
     Given the user creates a request to update the order status for the order with ID 'C000014-02'
     And the user enters the 'order-status-complete' update order status request payload
     When the user sends the update order status request
@@ -80,7 +80,7 @@ Scenario: 4. Updating the status of an unfinished order provides an appropriate 
         | OrderNotComplete | NULL  |
 
 @5322
-Scenario: 5. If a user is not authorised, then they cannot update the orders description
+Scenario: If a user is not authorised, then they cannot update the orders description
     Given no user is logged in
     When the user makes a request to update the description with the ID C000014-01
         | Description         |
@@ -88,7 +88,7 @@ Scenario: 5. If a user is not authorised, then they cannot update the orders des
     Then a response with status code 401 is returned
 
 @5322
-Scenario: 6. A non buyer user cannot update an orders status
+Scenario: A non buyer user cannot update an orders status
     Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
     Given the user creates a request to update the order status for the order with ID 'C000014-01'
     And the user enters the 'order-status-complete' update order status request payload
@@ -96,7 +96,7 @@ Scenario: 6. A non buyer user cannot update an orders status
     Then a response with status code 403 is returned
 
 @5322
-Scenario: 7. A buyer user cannot update an orders status for an organisation they don't belong to
+Scenario: A buyer user cannot update an orders status for an organisation they don't belong to
     Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
     Given the user creates a request to update the order status for the order with ID 'C000014-01'
     And the user enters the 'order-status-complete' update order status request payload
@@ -104,7 +104,7 @@ Scenario: 7. A buyer user cannot update an orders status for an organisation the
     Then a response with status code 403 is returned
 
 @5322
-Scenario: 8. A user with read only permissions, cannot update an orders status
+Scenario: A user with read only permissions, cannot update an orders status
     Given the user is logged in with the Readonly-Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
     Given the user creates a request to update the order status for the order with ID 'C000014-01'
     And the user enters the 'order-status-complete' update order status request payload
@@ -112,7 +112,7 @@ Scenario: 8. A user with read only permissions, cannot update an orders status
     Then a response with status code 403 is returned
 
 @5322
-Scenario: 9. Service Failure
+Scenario: Service Failure
     Given the call to the database will fail
     Given the user creates a request to update the order status for the order with ID 'C000014-01'
     And the user enters the 'order-status-complete' update order status request payload
@@ -120,7 +120,7 @@ Scenario: 9. Service Failure
     Then a response with status code 500 is returned
 
 @6859
-Scenario: 10. Update an order status sets the complete date
+Scenario: Update an order status sets the complete date
     Given the user creates a request to update the order status for the order with ID 'C000014-01'
     And the user enters the 'order-status-complete' update order status request payload
     When the user sends the update order status request
@@ -128,7 +128,7 @@ Scenario: 10. Update an order status sets the complete date
     And the order completed date is set
 
 @9283
-Scenario: 11. When an order is complete, and the funding source is false, no email is sent
+Scenario: When an order is complete, and the funding source is false, no email is sent
     Given the user creates a request to update the order status for the order with ID 'C000014-03'
     And the user enters the 'order-status-complete' update order status request payload
     When the user sends the update order status request
@@ -136,7 +136,7 @@ Scenario: 11. When an order is complete, and the funding source is false, no ema
     And no email is sent
 
 @9585
-Scenario: 12. When an order is complete, an the funding source is true, but the order does not contain patient numbers, and email is sent containing a CSV for price types
+Scenario: When an order is complete, an the funding source is true, but the order does not contain patient numbers, and email is sent containing a CSV for price types
     Given the user creates a request to update the order status for the order with ID 'C000014-04'
     And the user enters the 'order-status-complete' update order status request payload
     When the user sends the update order status request
@@ -148,10 +148,14 @@ Scenario: 12. When an order is complete, an the funding source is true, but the 
     And the email contains the following attachments
         | Filename                   |
         | C000014-04_OrgOds_Full.csv |
-    And the price type attachment contains the correct information
+    And all attachments use UTF8 encoding
+    And the 'full' attachment contains the following data
+        | Call Off Agreement ID | Call Off Ordering Party ID | Call Off Ordering Party Name | Call Off Commencement Date | Service Recipient ID | Service Recipient Name | Service Recipient Item ID | Supplier ID | Supplier Name | Product ID | Product Name | Product Type       | Quantity Ordered | Unit of Order | Unit Time | Estimation Period | Price   | Order Type | Funding Type | M1 planned (Delivery Date) | Actual M1 date | Buyer verification date (M2) | Cease Date |
+        | C000014-04            | OrgOds                     | NHS NORTHUMBERLAND CCG       | 07/05/2020                 | au                   | AU Test                | C000014-04-au-5           | 10101       | Supplier 1    | 1000-001   | Item 5       | Additional Service | 1                | per patient   | per month | per month         | 599.990 | 1          | Central      | 05/09/2021                 |                |                              |            |
+        | C000014-04            | OrgOds                     | NHS NORTHUMBERLAND CCG       | 07/05/2020                 | au                   | AU Test                | C000014-04-au-6           | 10101       | Supplier 1    | 1000-001   | Item 6       | Associated Service | 1                | per patient   | per year  |                   | 0       | 2          | Central      | 24/12/2021                 |                |                              |            |
 
 @9585
-Scenario: 13. When an order is complete, and the funding source is true, the order only has patient numbers, an email is sent containing two CSV's
+Scenario: When an order is complete, and the funding source is true, the order only has patient numbers, an email is sent containing two CSV's
     Given the user creates a request to update the order status for the order with ID 'C000014-01'
     And the user enters the 'order-status-complete' update order status request payload
     When the user sends the update order status request
@@ -161,8 +165,15 @@ Scenario: 13. When an order is complete, and the funding source is true, the ord
         | From                           | To                          | Subject                                      | Text                                 |
         | noreply@buyingcatalogue.nhs.uk | gpitfutures.finance@nhs.net | INTEGRATION_TEST New Order C000014-01_OrgOds | Thank you for completing your order. |
     And the email contains the following attachments
-        | Filename                      |
-        | C000014-01_OrgOds_Full.csv    |
+        | Filename                       |
+        | C000014-01_OrgOds_Full.csv     |
         | C000014-01_OrgOds_Patients.csv |
-    And the patient numbers price type attachment contains the correct information
-    And the price type attachment contains the correct information
+    And all attachments use UTF8 encoding
+    And the 'patients' attachment contains the following data
+        | Call Off Agreement ID | Call Off Ordering Party ID | Call Off Ordering Party Name | Call Off Commencement Date | Service Recipient ID | Service Recipient Name | Service Recipient Item ID | Supplier ID | Supplier Name | Product ID | Product Name | Product Type       | Quantity Ordered | Unit of Order | Price   | Funding Type | M1 planned (Delivery Date) | Actual M1 date | Buyer verification date (M2) | Cease Date |
+        | C000014-01            | OrgOds                     | NHS NORTHUMBERLAND CCG       | 15/12/2020                 | eu                   | EU Test                | C000014-01-eu-1           | 10101       | Supplier 1    | 1000-001   | Item 1       | Catalogue Solution | 1                | per patient   | 599.990 | Central      | 05/09/2021                 |                |                              |            |
+        | C000014-01            | OrgOds                     | NHS NORTHUMBERLAND CCG       | 15/12/2020                 | eu                   | EU Test                | C000014-01-eu-2           | 10101       | Supplier 1    | 1000-001   | Item 2       | Catalogue Solution | 1                | per patient   | 0       | Central      | 24/12/2021                 |                |                              |            |
+    And the 'full' attachment contains the following data
+        | Call Off Agreement ID | Call Off Ordering Party ID | Call Off Ordering Party Name | Call Off Commencement Date | Service Recipient ID | Service Recipient Name | Service Recipient Item ID | Supplier ID | Supplier Name | Product ID | Product Name | Product Type       | Quantity Ordered | Unit of Order | Unit Time | Estimation Period | Price   | Order Type | Funding Type | M1 planned (Delivery Date) | Actual M1 date | Buyer verification date (M2) | Cease Date |
+        | C000014-01            | OrgOds                     | NHS NORTHUMBERLAND CCG       | 15/12/2020                 | eu                   | EU Test                | C000014-01-eu-1           | 10101       | Supplier 1    | 1000-001   | Item 1       | Catalogue Solution | 1                | per patient   | per month | per month         | 599.990 | 1          | Central      | 05/09/2021                 |                |                              |            |
+        | C000014-01            | OrgOds                     | NHS NORTHUMBERLAND CCG       | 15/12/2020                 | eu                   | EU Test                | C000014-01-eu-2           | 10101       | Supplier 1    | 1000-001   | Item 2       | Catalogue Solution | 1                | per patient   | per year  | per year          | 0       | 1          | Central      | 24/12/2021                 |                |                              |            |

@@ -19,13 +19,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class CompleteOrderServiceTests
+    internal static class CompleteOrderServiceTests
     {
         [TestCase(false, true, true, true)]
         [TestCase(true, false, true, true)]
         [TestCase(true, true, false, true)]
         [TestCase(true, true, true, false)]
-        public void Constructor_NullParameter_ThrowsArgumentNullException(
+        public static void Constructor_NullParameter_ThrowsArgumentNullException(
             bool hasIdentityService,
             bool hasOrderRepository,
             bool hasEmailService,
@@ -42,7 +42,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public void CompleteAsync_NullRequest_ThrowsArgumentNullException()
+        public static void CompleteAsync_NullRequest_ThrowsArgumentNullException()
         {
             var context = CompleteOrderServiceTestContext.Setup();
 
@@ -50,7 +50,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public async Task CompleteAsync_CompleteOrderRequest_ReturnsSuccessfulResult()
+        public static async Task CompleteAsync_CompleteOrderRequest_ReturnsSuccessfulResult()
         {
             var context = CompleteOrderServiceTestContext.Setup();
 
@@ -60,7 +60,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public async Task CompleteAsync_IncompleteOrderRequest_ReturnsFailureResult()
+        public static async Task CompleteAsync_IncompleteOrderRequest_ReturnsFailureResult()
         {
             var context = CompleteOrderServiceTestContext.Setup();
 
@@ -71,7 +71,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public async Task CompleteAsync_CompleteOrder_LastUpdatedByIsChanged()
+        public static async Task CompleteAsync_CompleteOrder_LastUpdatedByIsChanged()
         {
             var context = CompleteOrderServiceTestContext.Setup();
 
@@ -81,7 +81,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public async Task CompleteAsync_CompleteOrder_LastUpdatedByNameIsChanged()
+        public static async Task CompleteAsync_CompleteOrder_LastUpdatedByNameIsChanged()
         {
             var context = CompleteOrderServiceTestContext.Setup();
 
@@ -91,7 +91,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public async Task CompleteAsync_IdentityService_CalledTwice()
+        public static async Task CompleteAsync_IdentityService_CalledTwice()
         {
             var context = CompleteOrderServiceTestContext.Setup();
 
@@ -105,7 +105,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public async Task CompleteAsync_OrderRepository_CalledOnce()
+        public static async Task CompleteAsync_OrderRepository_CalledOnce()
         {
             var context = CompleteOrderServiceTestContext.Setup();
 
@@ -116,7 +116,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public async Task CompleteAsync_OrderRepository_OrderStatusIsComplete()
+        public static async Task CompleteAsync_OrderRepository_OrderStatusIsComplete()
         {
             var context = CompleteOrderServiceTestContext.Setup();
 
@@ -126,7 +126,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public async Task CompleteAsync_EmailServiceSubjectIsSet_SubjectNameIsChanged()
+        public static async Task CompleteAsync_EmailServiceSubjectIsSet_SubjectNameIsChanged()
         {
             var context = CompleteOrderServiceTestContext.Setup();
 
@@ -138,7 +138,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public async Task CompleteAsync_EmailService_CalledOnce()
+        public static async Task CompleteAsync_EmailService_CalledOnce()
         {
             var context = CompleteOrderServiceTestContext.Setup();
 
@@ -149,7 +149,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public async Task CompleteAsync_PurchasingDocumentServiceFundingSourceTrue_CalledOnce()
+        public static async Task CompleteAsync_PurchasingDocumentServiceFundingSourceTrue_CalledOnce()
         {
             var context = CompleteOrderServiceTestContext.Setup();
 
@@ -167,7 +167,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [TestCase(true, false, true)]
         [TestCase(true, true, false)]
         [TestCase(false, true, true)]
-        public async Task CompleteAsync_RequirementsAreIncorrect_CreatePatientNumbersCsvNotCalled(bool fundingSource, bool isPatient, bool isSolution)
+        public static async Task CompleteAsync_RequirementsAreIncorrect_CreatePatientNumbersCsvNotCalled(bool fundingSource, bool isPatient, bool isSolution)
         {
             var context = CompleteOrderServiceTestContext.Setup(fundingSource, isPatient, isSolution);
 
@@ -181,26 +181,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [TestCase(false, false)]
         [TestCase(false, true)]
         [TestCase(true, false)]
-        public async Task CompleteAsync_RequirementsAreCorrect_CreatePriceTypeCsvCalled(bool isPatient, bool isSolution)
+        public static async Task CompleteAsync_RequirementsAreCorrect_CreatePriceTypeCsvCalled(bool isPatient, bool isSolution)
         {
             var context = CompleteOrderServiceTestContext.Setup(true, isPatient, isSolution);
 
             await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
 
             context.CreatePurchaseDocumentServiceMock.Verify(purchasingDocumentService =>
-                purchasingDocumentService.CreatePriceTypeCsvAsync(It.IsAny<Stream>(),
+                purchasingDocumentService.CreateCsvAsync(It.IsAny<Stream>(),
                     It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))), Times.Once);
         }
 
         [Test]
-        public async Task CompleteAsync_RequirementsAreIncorrect_CreatePriceTypeCsvNotCalled()
+        public static async Task CompleteAsync_RequirementsAreIncorrect_CreatePriceTypeCsvNotCalled()
         {
             var context = CompleteOrderServiceTestContext.Setup(false);
 
             await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
 
             context.CreatePurchaseDocumentServiceMock.Verify(purchasingDocumentService =>
-                purchasingDocumentService.CreatePriceTypeCsvAsync(It.IsAny<Stream>(),
+                purchasingDocumentService.CreateCsvAsync(It.IsAny<Stream>(),
                     It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))), Times.Never);
         }
 

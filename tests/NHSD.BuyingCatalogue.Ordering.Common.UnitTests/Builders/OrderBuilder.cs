@@ -7,217 +7,222 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
 {
     public sealed class OrderBuilder
     {
-        private string _orderId;
-        private string _orderDescription;
-        private Guid _organisationId;
-        private readonly string _organisationName;
-        private readonly string _organisationOdsCode;
-        private readonly Address _organisationAddress;
-        private Contact _organisationContact;
-        private readonly DateTime _created;
-        private DateTime _lastUpdated;
-        private Guid _lastUpdatedBy;
-        private string _lastUpdatedByName;
-        private string _supplierId;
-        private string _supplierName;
-        private Address _supplierAddress;
-        private Contact _supplierContact;
-        private DateTime? _commencementDate;
-        private bool _serviceRecipientsViewed;
-        private bool _catalogueSolutionsViewed;
-        private bool _additionalServicesViewed;
-        private bool _associatedServicesViewed;
-        private bool? _fundingSourceOnlyGms;
-        private DateTime? _completed;
-        private readonly IList<OrderItem> _orderItems = new List<OrderItem>();
-        private readonly IList<(string Ods, string Name)> _serviceRecipients = new List<(string Ods, string Name)>();
+        private readonly string organisationName;
+        private readonly string organisationOdsCode;
+        private readonly Address organisationAddress;
+        private readonly DateTime created;
+        private readonly IList<OrderItem> orderItems = new List<OrderItem>();
+        private readonly IList<OdsOrganisation> serviceRecipients = new List<OdsOrganisation>();
+        private string orderId;
+        private string orderDescription;
+        private Guid organisationId;
+        private Contact organisationContact;
+        private DateTime lastUpdated;
+        private Guid lastUpdatedBy;
+        private string lastUpdatedByName;
+        private string supplierId;
+        private string supplierName;
+        private Address supplierAddress;
+        private Contact supplierContact;
+        private DateTime? commencementDate;
+        private bool serviceRecipientsViewed;
+        private bool catalogueSolutionsViewed;
+        private bool additionalServicesViewed;
+        private bool associatedServicesViewed;
+        private bool? fundingSourceOnlyGms;
+        private DateTime? completed;
 
         private OrderBuilder()
         {
-            _orderId = "C000014-01";
-            _orderDescription = "Some Description";
-            _organisationId = Guid.NewGuid();
-            _organisationName = "Organisation Name";
-            _organisationOdsCode = "Ods Code";
-            _organisationAddress = AddressBuilder.Create().WithLine1("1 Some Ordering Party").Build();
-            _organisationContact = null;
-            _created = DateTime.UtcNow;
-            _lastUpdated = DateTime.UtcNow;
-            _lastUpdatedBy = Guid.NewGuid();
-            _lastUpdatedByName = "Bob Smith";
-            _supplierId = "Some supplier id";
-            _supplierName = "Some supplier name";
-            _supplierAddress = AddressBuilder.Create().WithLine1("1 Some Supplier").Build();
-            _supplierContact = null;
-            _commencementDate = null;
-            _serviceRecipientsViewed = false;
-            _catalogueSolutionsViewed = false;
-            _additionalServicesViewed = false;
-            _associatedServicesViewed = false;
-            _fundingSourceOnlyGms = null;
-            _completed = null;
+            orderId = "C000014-01";
+            orderDescription = "Some Description";
+            organisationId = Guid.NewGuid();
+            organisationName = "Organisation Name";
+            organisationOdsCode = "Ods Code";
+            organisationAddress = AddressBuilder.Create().WithLine1("1 Some Ordering Party").Build();
+            organisationContact = null;
+            created = DateTime.UtcNow;
+            lastUpdated = DateTime.UtcNow;
+            lastUpdatedBy = Guid.NewGuid();
+            lastUpdatedByName = "Bob Smith";
+            supplierId = "Some supplier id";
+            supplierName = "Some supplier name";
+            supplierAddress = AddressBuilder.Create().WithLine1("1 Some Supplier").Build();
+            supplierContact = null;
+            commencementDate = null;
+            serviceRecipientsViewed = false;
+            catalogueSolutionsViewed = false;
+            additionalServicesViewed = false;
+            associatedServicesViewed = false;
+            fundingSourceOnlyGms = null;
+            completed = null;
         }
 
         public static OrderBuilder Create() => new OrderBuilder();
 
         public OrderBuilder WithOrderId(string orderId)
         {
-            _orderId = orderId;
+            this.orderId = orderId;
             return this;
         }
 
         public OrderBuilder WithDescription(string description)
         {
-            _orderDescription = description;
+            orderDescription = description;
             return this;
         }
 
         public OrderBuilder WithOrganisationId(Guid organisationId)
         {
-            _organisationId = organisationId;
+            this.organisationId = organisationId;
             return this;
         }
 
         public OrderBuilder WithOrganisationContact(Contact organisationContact)
         {
-            _organisationContact = organisationContact;
+            this.organisationContact = organisationContact;
             return this;
         }
 
         public OrderBuilder WithSupplierId(string supplierId)
         {
-            _supplierId = supplierId;
+            this.supplierId = supplierId;
             return this;
         }
 
         public OrderBuilder WithSupplierName(string supplierName)
         {
-            _supplierName = supplierName;
+            this.supplierName = supplierName;
             return this;
         }
 
         public OrderBuilder WithSupplierAddress(Address supplierAddress)
         {
-            _supplierAddress = supplierAddress;
+            this.supplierAddress = supplierAddress;
             return this;
         }
 
         public OrderBuilder WithSupplierContact(Contact supplierContact)
         {
-            _supplierContact = supplierContact;
+            this.supplierContact = supplierContact;
             return this;
         }
 
         public OrderBuilder WithCommencementDate(DateTime? commencementDate)
         {
-            _commencementDate = commencementDate;
+            this.commencementDate = commencementDate;
             return this;
         }
 
         public OrderBuilder WithServiceRecipientsViewed(bool serviceRecipientsViewed)
         {
-            _serviceRecipientsViewed = serviceRecipientsViewed;
+            this.serviceRecipientsViewed = serviceRecipientsViewed;
             return this;
         }
 
         public OrderBuilder WithCatalogueSolutionsViewed(bool catalogueSolutionsViewed)
         {
-            _catalogueSolutionsViewed = catalogueSolutionsViewed;
+            this.catalogueSolutionsViewed = catalogueSolutionsViewed;
             return this;
         }
 
         public OrderBuilder WithAdditionalServicesViewed(bool additionalServicesViewed)
         {
-            _additionalServicesViewed = additionalServicesViewed;
+            this.additionalServicesViewed = additionalServicesViewed;
             return this;
         }
 
         public OrderBuilder WithAssociatedServicesViewed(bool associatedServicesViewed)
         {
-            _associatedServicesViewed = associatedServicesViewed;
+            this.associatedServicesViewed = associatedServicesViewed;
             return this;
         }
 
         public OrderBuilder WithFundingSourceOnlyGms(bool? fundingSourceOnlyGms)
         {
-            _fundingSourceOnlyGms = fundingSourceOnlyGms;
+            this.fundingSourceOnlyGms = fundingSourceOnlyGms;
             return this;
         }
 
         public OrderBuilder WithLastUpdatedBy(Guid lastUpdatedBy)
         {
-            _lastUpdatedBy = lastUpdatedBy;
+            this.lastUpdatedBy = lastUpdatedBy;
             return this;
         }
 
         public OrderBuilder WithLastUpdatedByName(string lastUpdatedByName)
         {
-            _lastUpdatedByName = lastUpdatedByName;
+            this.lastUpdatedByName = lastUpdatedByName;
             return this;
         }
 
         public OrderBuilder WithLastUpdated(DateTime lastUpdated)
         {
-            _lastUpdated = lastUpdated;
+            this.lastUpdated = lastUpdated;
             return this;
         }
 
         public OrderBuilder WithCompleted(DateTime? completed)
         {
-            _completed = completed;
+            this.completed = completed;
             return this;
         }
 
         public OrderBuilder WithOrderItem(OrderItem orderItem)
         {
-            _orderItems.Add(orderItem);
+            orderItems.Add(orderItem);
             return this;
         }
 
-        public OrderBuilder WithServiceRecipient((string Ods, string Name) serviceRecipient)
+        public OrderBuilder WithServiceRecipient(string code, string name)
         {
-            _serviceRecipients.Add(serviceRecipient);
+            return WithServiceRecipient(new OdsOrganisation(code, name));
+        }
+
+        public OrderBuilder WithServiceRecipient(OdsOrganisation serviceRecipient)
+        {
+            serviceRecipients.Add(serviceRecipient);
             return this;
         }
 
         public Order Build()
         {
-            var order = Order.Create(OrderDescription.Create(_orderDescription).Value, _organisationId, _lastUpdatedBy, _lastUpdatedByName);
+            var order = Order.Create(OrderDescription.Create(orderDescription).Value, organisationId, lastUpdatedBy, lastUpdatedByName);
 
-            order.OrderId = _orderId;
-            order.OrganisationName = _organisationName;
-            order.OrganisationOdsCode = _organisationOdsCode;
-            order.OrganisationAddress = _organisationAddress;
-            order.OrganisationContact = _organisationContact;
-            order.SupplierId = _supplierId;
-            order.SupplierName = _supplierName;
-            order.SupplierAddress = _supplierAddress;
-            order.SupplierContact = _supplierContact;
-            order.CommencementDate = _commencementDate;
+            order.OrderId = orderId;
+            order.OrganisationName = organisationName;
+            order.OrganisationOdsCode = organisationOdsCode;
+            order.OrganisationAddress = organisationAddress;
+            order.OrganisationContact = organisationContact;
+            order.SupplierId = supplierId;
+            order.SupplierName = supplierName;
+            order.SupplierAddress = supplierAddress;
+            order.SupplierContact = supplierContact;
+            order.CommencementDate = commencementDate;
 
-            foreach (var orderItem in _orderItems)
+            foreach (var orderItem in orderItems)
             {
-                order.AddOrderItem(orderItem, _lastUpdatedBy, _lastUpdatedByName);
+                order.AddOrderItem(orderItem, lastUpdatedBy, lastUpdatedByName);
             }
 
-            order.SetServiceRecipient(
-                _serviceRecipients,
-                _lastUpdatedBy,
-                _lastUpdatedByName);
+            order.SetServiceRecipients(
+                serviceRecipients,
+                lastUpdatedBy,
+                lastUpdatedByName);
 
-            order.AdditionalServicesViewed = _additionalServicesViewed;
-            order.ServiceRecipientsViewed = _serviceRecipientsViewed;
-            order.CatalogueSolutionsViewed = _catalogueSolutionsViewed;
-            order.AssociatedServicesViewed = _associatedServicesViewed;
-            order.FundingSourceOnlyGMS = _fundingSourceOnlyGms;
-            order.Created = _created;
-            order.LastUpdated = _lastUpdated;
+            order.AdditionalServicesViewed = additionalServicesViewed;
+            order.ServiceRecipientsViewed = serviceRecipientsViewed;
+            order.CatalogueSolutionsViewed = catalogueSolutionsViewed;
+            order.AssociatedServicesViewed = associatedServicesViewed;
+            order.FundingSourceOnlyGMS = fundingSourceOnlyGms;
+            order.Created = created;
+            order.LastUpdated = lastUpdated;
 
-            if (_completed != null)
+            if (completed != null)
             {
                 var completedFieldInfo =
-                    order.GetType().GetField("_completed", BindingFlags.Instance | BindingFlags.NonPublic);
-                completedFieldInfo?.SetValue(order, _completed);
+                    order.GetType().GetField("completed", BindingFlags.Instance | BindingFlags.NonPublic);
+                completedFieldInfo?.SetValue(order, completed);
             }
 
             return order;
