@@ -222,9 +222,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         public static void Equals_DifferentType_ReturnsFalse()
         {
             var item = OrderItemBuilder.Create().Build();
+            var anonItem = new
+            {
+                item.OdsCode,
+                item.CatalogueItemId,
+            };
 
-            // ReSharper disable once SuspiciousTypeConversion.Global
-            var isEqual = item.Equals(OrderBuilder.Create().Build());
+            var isEqual = item.Equals(anonItem);
 
             isEqual.Should().BeFalse();
         }

@@ -59,8 +59,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         [AutoData]
         public static void Equals_DifferentType_ReturnsFalse(ErrorDetails details)
         {
-            // ReSharper disable once SuspiciousTypeConversion.Global
-            var isEqual = details.Equals("NotErrorDetails");
+            var anonErrorDetails = new
+            {
+                Id = "Id",
+                Field = "Field",
+            };
+
+            var isEqual = details.Equals(anonErrorDetails);
 
             isEqual.Should().BeFalse();
         }

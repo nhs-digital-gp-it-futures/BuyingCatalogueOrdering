@@ -23,7 +23,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         [ForeignKey("OrderId")]
         public Order Order { get; set; }
-        
+
         public string Name { get; set; }
 
         public bool Equals(ServiceRecipient other)
@@ -34,7 +34,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             if (ReferenceEquals(this, other))
                 return true;
 
-            return OdsCode.EqualsOrdinalIgnoreCase(other.OdsCode) 
+            return OdsCode.EqualsOrdinalIgnoreCase(other.OdsCode)
                 && OrderId.EqualsOrdinalIgnoreCase(other.OrderId);
         }
 
@@ -45,7 +45,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(OdsCode, OrderId);
+            return HashCode.Combine(
+                OdsCode?.ToUpperInvariant(),
+                OrderId?.ToUpperInvariant());
         }
     }
 }
