@@ -8,11 +8,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
     public class CreateOrderItemModel : CreateOrderItemBaseModel
     {
-        public override CreateOrderItemRequest ToRequest(Order order)
-        {
-            throw new NotImplementedException();
-        }
-
         [Required(ErrorMessage = "CatalogueItemIdRequired")]
         [MaxLength(14, ErrorMessage = "CatalogueItemIdTooLong")]
         public string CatalogueItemId { get; set; }
@@ -44,5 +39,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
         [Limit(typeof(decimal), "0", LimitType.Minimum, ErrorMessage = "PriceGreaterThanOrEqualToZero")]
         [Limit(typeof(decimal), "999999999999999.999", LimitType.Maximum, ErrorMessage = "PriceLessThanMax")]
         public decimal? Price { get; set; }
+
+        public override CreateOrderItemRequest ToRequest(Order order)
+        {
+            if (order is null)
+                throw new ArgumentNullException(nameof(order));
+
+            if (Quantity is null)
+                throw new InvalidOperationException($"Model {nameof(Quantity)} should never be null at this point");
+
+            return new CreateOrderItemRequest(
+                order,
+                GetOdsCode(order),
+                CatalogueItemId,
+                GetItemType(),
+                CatalogueItemName,
+                GetAssociatedCatalogueItemId(),
+                ProvisioningType,
+                Type,
+                ItemUnit?.Name,
+                ItemUnit?.Description,
+                TimeUnitModelToTimeUnit(),
+                CurrencyCode,
+                Quantity.Value,
+                EstimationPeriod,
+                GetItemDeliveryDate(),
+                Price);
+        }
     }
 }

@@ -1,8 +1,15 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+using AutoFixture;
+using AutoFixture.AutoMoq;
+using AutoFixture.Idioms;
+using AutoFixture.NUnit3;
 using FluentAssertions;
 using Moq;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
+using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
@@ -16,52 +23,56 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class UpdateOrderItemServiceTests
+    [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
+    internal static class UpdateOrderItemServiceTests
     {
         [Test]
-        public void Constructor_NullOrderRepository_ThrowsArgumentNullException()
+        public static void Contructors_VerifyGuardClauses()
         {
-            static void Test()
-            {
-                UpdateOrderItemServiceBuilder
-                    .Create()
-                    .WithOrderRepository(null)
-                    .WithIdentityService(Mock.Of<IIdentityService>())
-                    .Build();
-            }
+            var fixture = new Fixture().Customize(new AutoMoqCustomization());
+            var assertion = new GuardClauseAssertion(fixture);
+            var constructors = typeof(UpdateOrderItemService).GetConstructors();
 
-            Assert.Throws<ArgumentNullException>(Test);
+            assertion.Verify(constructors);
         }
 
         [Test]
-        public void Constructor_NullIdentityService_ThrowsArgumentNullException()
+        [OrderingAutoData]
+        public static void UpdateAsync_NullUpdateOrderItemRequest_ThrowsArgumentNullException(
+            CatalogueItemType catalogueItemType,
+            ProvisioningType provisioningType,
+            UpdateOrderItemService service)
         {
-            static void Test()
-            {
-                UpdateOrderItemServiceBuilder
-                    .Create()
-                    .WithOrderRepository(Mock.Of<IOrderRepository>())
-                    .WithIdentityService(null)
-                    .Build();
-            }
-
-            Assert.Throws<ArgumentNullException>(Test);
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await service.UpdateAsync(
+                null,
+                catalogueItemType,
+                provisioningType));
         }
 
         [Test]
-        public void UpdateAsync_NullUpdateOrderItemRequest_ThrowsArgumentNullException()
+        [OrderingAutoData]
+        public static async Task UpdateAsync_ValidationFailure_ReturnsFailure(
+            CatalogueItemType catalogueItemType,
+            ProvisioningType provisioningType,
+            [Frozen] Mock<IUpdateOrderItemValidator> validator,
+            UpdateOrderItemRequest request,
+            UpdateOrderItemService service)
         {
-            static async Task Test()
-            {
-                var sut = UpdateOrderItemServiceBuilder.Create().Build();
-                await sut.UpdateAsync(null, CatalogueItemType.Solution, ProvisioningType.OnDemand);
-            }
+            var errors = new[] { new ErrorDetails("ErrorId") };
 
-            Assert.ThrowsAsync<ArgumentNullException>(Test);
+            validator.Setup(v => v.Validate(request, catalogueItemType, provisioningType))
+                .Returns(errors);
+
+            var result = await service.UpdateAsync(
+                request,
+                catalogueItemType,
+                provisioningType);
+
+            result.Should().BeEquivalentTo(Result.Failure(errors));
         }
 
         [Test]
-        public async Task UpdateAsync_UpdateOrderItemRequest_ReturnsSuccess()
+        public static async Task UpdateAsync_UpdateOrderItemRequest_ReturnsSuccess()
         {
             var context = UpdateOrderItemServiceTestContext.Setup();
 
@@ -75,7 +86,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public async Task UpdateAsync_MapUpdateOrderItemRequestToOrderItem_AreEqual()
+        public static async Task UpdateAsync_MapUpdateOrderItemRequestToOrderItem_AreEqual()
         {
             var context = UpdateOrderItemServiceTestContext.Setup();
 
@@ -90,7 +101,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             context.OrderItem.Should().BeEquivalentTo(new
             {
                 updateOrderItemRequest.DeliveryDate,
-                EstimationPeriod = TimeUnit.FromName(updateOrderItemRequest.EstimationPeriodName),
+                updateOrderItemRequest.EstimationPeriod,
                 updateOrderItemRequest.OrderItemId,
                 updateOrderItemRequest.Price,
                 updateOrderItemRequest.Quantity
@@ -98,7 +109,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public async Task UpdateAsync_OrderRepository_CalledOnce()
+        public static async Task UpdateAsync_OrderRepository_CalledOnce()
         {
             var context = UpdateOrderItemServiceTestContext.Setup();
 
@@ -108,12 +119,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             await context.UpdateOrderItemService.UpdateAsync(updateOrderItemRequest, CatalogueItemType.Solution, ProvisioningType.OnDemand);
 
-            context.OrderRepositoryMock.Verify(orderRepository => 
+            context.OrderRepositoryMock.Verify(orderRepository =>
                 orderRepository.UpdateOrderAsync(updateOrderItemRequest.Order), Times.Once);
         }
 
         [Test]
-        public async Task UpdateAsync_IdentityService_CalledTwice()
+        public static async Task UpdateAsync_IdentityService_CalledTwice()
         {
             var context = UpdateOrderItemServiceTestContext.Setup();
 
@@ -123,10 +134,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             await context.UpdateOrderItemService.UpdateAsync(updateOrderItemRequest, CatalogueItemType.Solution, ProvisioningType.OnDemand);
 
-            context.IdentityServiceMock.Verify(identityService => 
+            context.IdentityServiceMock.Verify(identityService =>
                 identityService.GetUserName(), Times.Once);
 
-            context.IdentityServiceMock.Verify(identityService => 
+            context.IdentityServiceMock.Verify(identityService =>
                 identityService.GetUserIdentity(), Times.Once);
         }
 
@@ -175,7 +186,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             private Guid UserId { get; }
 
-            internal static UpdateOrderItemServiceTestContext Setup() => 
+            internal static UpdateOrderItemServiceTestContext Setup() =>
                 new UpdateOrderItemServiceTestContext();
         }
     }

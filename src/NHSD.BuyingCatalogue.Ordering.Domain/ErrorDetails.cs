@@ -2,13 +2,10 @@
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
-    public sealed class ErrorDetails
+    public sealed class ErrorDetails : IEquatable<ErrorDetails>
     {
-        public string Id { get; }
-
-        public string Field { get; }
-
-        public ErrorDetails(string id) : this(id, null)
+        public ErrorDetails(string id)
+            : this(id, null)
         {
         }
 
@@ -18,15 +15,25 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             Field = field;
         }
 
-        private bool Equals(ErrorDetails other)
+        public string Id { get; }
+
+        public string Field { get; }
+
+        public bool Equals(ErrorDetails other)
         {
+            if (other is null)
+                return false;
+
+            if (ReferenceEquals(this, other))
+                return true;
+
             return string.Equals(Id, other.Id, StringComparison.Ordinal)
-                   && string.Equals(Field, other.Field, StringComparison.Ordinal);
+                && string.Equals(Field, other.Field, StringComparison.Ordinal);
         }
 
         public override bool Equals(object obj)
         {
-            return ReferenceEquals(this, obj) || obj is ErrorDetails other && Equals(other);
+            return Equals(obj as ErrorDetails);
         }
 
         public override int GetHashCode()

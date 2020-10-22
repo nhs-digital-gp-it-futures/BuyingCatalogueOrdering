@@ -5,9 +5,56 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
     public sealed class OrderItem : IEquatable<OrderItem>
     {
 #pragma warning disable 649
-        private int _orderItemId;
         private readonly DateTime _created;
+        private int _orderItemId;
 #pragma warning restore 649
+
+        public OrderItem(
+            string odsCode,
+            string catalogueItemId,
+            CatalogueItemType catalogueItemType,
+            string catalogueItemName,
+            string parentCatalogueItemId,
+            ProvisioningType provisioningType,
+            CataloguePriceType cataloguePriceType,
+            CataloguePriceUnit cataloguePriceUnit,
+            TimeUnit? priceTimeUnit,
+            string currencyCode,
+            int quantity,
+            TimeUnit? estimationPeriod,
+            DateTime? deliveryDate,
+            decimal? price)
+            : this()
+        {
+            if (string.IsNullOrWhiteSpace(catalogueItemId))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(catalogueItemId));
+
+            if (string.IsNullOrWhiteSpace(currencyCode))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(currencyCode));
+
+            if (string.IsNullOrWhiteSpace(catalogueItemName))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(catalogueItemName));
+
+            OdsCode = odsCode;
+            CatalogueItemId = catalogueItemId;
+            CatalogueItemType = catalogueItemType ?? throw new ArgumentNullException(nameof(catalogueItemType));
+            CatalogueItemName = catalogueItemName;
+            ParentCatalogueItemId = parentCatalogueItemId;
+            ProvisioningType = provisioningType;
+            CataloguePriceType = cataloguePriceType;
+            CataloguePriceUnit = cataloguePriceUnit ?? throw new ArgumentNullException(nameof(cataloguePriceUnit));
+            PriceTimeUnit = priceTimeUnit;
+            CurrencyCode = currencyCode;
+            Quantity = quantity;
+            EstimationPeriod = estimationPeriod;
+            DeliveryDate = deliveryDate;
+            Price = price;
+            _created = DateTime.UtcNow;
+        }
+
+        private OrderItem()
+        {
+        }
 
         /// <summary>
         /// Gets the unique ID for this instance.
@@ -43,13 +90,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public CataloguePriceUnit CataloguePriceUnit { get; }
 
-        public TimeUnit PriceTimeUnit { get; }
+        public TimeUnit? PriceTimeUnit { get; }
 
         public string CurrencyCode { get; }
 
         public int Quantity { get; private set; }
 
-        public TimeUnit EstimationPeriod { get; private set; }
+        public TimeUnit? EstimationPeriod { get; private set; }
 
         public DateTime? DeliveryDate { get; private set; }
 
@@ -62,63 +109,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         /// Do not need to convert this to an auto property as recommended by ReSharper.
         /// ReSharper disable once ConvertToAutoProperty
         /// </remarks>
-        public DateTime Created 
+        public DateTime Created
         {
             get
             {
                 return _created;
             }
-        }
-
-        private OrderItem()
-        {
-        }
-
-        public OrderItem(
-            string odsCode,
-            string catalogueItemId,
-            CatalogueItemType catalogueItemType,
-            string catalogueItemName,
-            string parentCatalogueItemId,
-            ProvisioningType provisioningType,
-            CataloguePriceType cataloguePriceType,
-            CataloguePriceUnit cataloguePriceUnit,
-            TimeUnit priceTimeUnit,
-            string currencyCode,
-            int quantity,
-            TimeUnit estimationPeriod,
-            DateTime? deliveryDate,
-            decimal? price) : this()
-        {
-            if (string.IsNullOrWhiteSpace(catalogueItemId))
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(catalogueItemId));
-
-            if (string.IsNullOrWhiteSpace(currencyCode))
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(currencyCode));
-
-            if (string.IsNullOrWhiteSpace(catalogueItemName))
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(catalogueItemName));
-
-            OdsCode = odsCode;
-            CatalogueItemId = catalogueItemId;
-            CatalogueItemType = catalogueItemType ?? throw new ArgumentNullException(nameof(catalogueItemType));
-            CatalogueItemName = catalogueItemName;
-            ParentCatalogueItemId = parentCatalogueItemId;
-            ProvisioningType = provisioningType ?? throw new ArgumentNullException(nameof(provisioningType));
-            CataloguePriceType = cataloguePriceType ?? throw new ArgumentNullException(nameof(cataloguePriceType));
-            CataloguePriceUnit = cataloguePriceUnit ?? throw new ArgumentNullException(nameof(cataloguePriceUnit));
-            PriceTimeUnit = priceTimeUnit;
-            CurrencyCode = currencyCode;
-            Quantity = quantity;
-            EstimationPeriod = estimationPeriod;
-            DeliveryDate = deliveryDate;
-            Price = price;
-            _created = DateTime.UtcNow;
-        }
-
-        public decimal CalculateTotalCostPerYear()
-        {
-            return Price.GetValueOrDefault() * Quantity * (PriceTimeUnit?.AmountInYear ?? EstimationPeriod?.AmountInYear ?? 1 );
         }
 
         public CostType CostType =>
@@ -127,17 +123,45 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 ? CostType.OneOff
                 : CostType.Recurring;
 
+        public decimal CalculateTotalCostPerYear()
+        {
+            return Price.GetValueOrDefault() * Quantity * (PriceTimeUnit?.AmountInYear() ?? EstimationPeriod?.AmountInYear() ?? 1);
+        }
+
+        public bool Equals(OrderItem other)
+        {
+            if (other is null)
+                return false;
+
+            if (ReferenceEquals(this, other))
+                return true;
+
+            if (IsTransient() || other.IsTransient())
+                return false;
+
+            return OrderItemId == other.OrderItemId;
+        }
+
+        public override bool Equals(object obj) => Equals(obj as OrderItem);
+
+        public override int GetHashCode()
+        {
+            if (!IsTransient())
+                return OrderItemId;
+
+            return base.GetHashCode();
+        }
+
         internal void ChangePrice(
-            DateTime? deliveryDate, 
-            int quantity, 
-            TimeUnit estimationPeriod, 
+            DateTime? deliveryDate,
+            int quantity,
+            TimeUnit? estimationPeriod,
             decimal? price,
             Action onPropertyChangedCallback)
         {
             bool changed = !Equals(DeliveryDate, deliveryDate);
             changed = changed || !Equals(Quantity, quantity);
-            changed = changed || (estimationPeriod != null 
-                                  && !Equals(EstimationPeriod, estimationPeriod));
+            changed = changed || (estimationPeriod != null && !Equals(EstimationPeriod, estimationPeriod));
             changed = changed || !Equals(Price, price);
 
             DeliveryDate = deliveryDate;
@@ -163,29 +187,5 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         }
 
         private bool IsTransient() => OrderItemId == default;
-
-        public bool Equals(OrderItem other)
-        {
-            if (other is null)
-                return false;
-
-            if (ReferenceEquals(this, other))
-                return true;
-
-            if (IsTransient() || other.IsTransient())
-                return false;
-
-            return OrderItemId == other.OrderItemId;
-        }
-
-        public override bool Equals(object obj) => Equals(obj as OrderItem);
-
-        public override int GetHashCode()
-        {
-            if (!IsTransient())
-                return OrderItemId;
-
-            return base.GetHashCode();
-        }
     }
 }

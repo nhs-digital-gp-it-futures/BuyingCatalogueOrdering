@@ -7,14 +7,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using NHSD.BuyingCatalogue.Ordering.Api.Models.Errors;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Domain;
-using NHSD.BuyingCatalogue.Ordering.Api.Models.Errors;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder;
 using NHSD.BuyingCatalogue.Ordering.Domain.Results;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
@@ -25,10 +25,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class OrdersController : ControllerBase
     {
-        private readonly IOrderRepository _orderRepository;
-        private readonly ICreateOrderService _createOrderService;
-        private readonly IServiceRecipientRepository _serviceRecipientRepository;
-        private readonly IDictionary<OrderStatus, Func<Order, Task<Result>>> _updateOrderStatusActionFactory 
+        private readonly IOrderRepository orderRepository;
+        private readonly ICreateOrderService createOrderService;
+        private readonly IServiceRecipientRepository serviceRecipientRepository;
+
+        private readonly IDictionary<OrderStatus, Func<Order, Task<Result>>> updateOrderStatusActionFactory
             = new Dictionary<OrderStatus, Func<Order, Task<Result>>>();
 
         public OrdersController(
@@ -37,21 +38,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             IServiceRecipientRepository serviceRecipientRepository,
             ICompleteOrderService completeOrderService)
         {
-            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
-            _createOrderService = createOrderService ?? throw new ArgumentNullException(nameof(createOrderService));
-            _serviceRecipientRepository = serviceRecipientRepository ?? throw new ArgumentNullException(nameof(serviceRecipientRepository));
+            this.orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            this.createOrderService = createOrderService ?? throw new ArgumentNullException(nameof(createOrderService));
+            this.serviceRecipientRepository = serviceRecipientRepository ?? throw new ArgumentNullException(nameof(serviceRecipientRepository));
 
             if (completeOrderService is null)
                 throw new ArgumentNullException(nameof(completeOrderService));
 
-            _updateOrderStatusActionFactory.Add(OrderStatus.Complete, order => completeOrderService.CompleteAsync(new CompleteOrderRequest(order)));
+            updateOrderStatusActionFactory.Add(OrderStatus.Complete, order => completeOrderService.CompleteAsync(new CompleteOrderRequest(order)));
         }
 
         [HttpGet]
         [Route("{orderId}")]
         public async Task<ActionResult<OrderModel>> GetAsync(string orderId)
         {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            var order = await orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
             {
                 return NotFound();
@@ -112,13 +113,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     {
                         ItemId = $"{order.OrderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
                         ServiceRecipientsOdsCode = orderItem.OdsCode,
-                        CataloguePriceType = orderItem.CataloguePriceType.Name,
+                        CataloguePriceType = orderItem.CataloguePriceType.ToString(),
                         CatalogueItemType = orderItem.CatalogueItemType.Name,
                         CatalogueItemName = orderItem.CatalogueItemName,
-                        ProvisioningType = orderItem.ProvisioningType.Name,
+                        ProvisioningType = orderItem.ProvisioningType.ToString(),
                         ItemUnitDescription = orderItem.CataloguePriceUnit.Description,
-                        TimeUnitDescription = orderItem.PriceTimeUnit?.Description,
-                        QuantityPeriodDescription = orderItem.EstimationPeriod?.Description,
+                        TimeUnitDescription = orderItem.PriceTimeUnit?.Description(),
+                        QuantityPeriodDescription = orderItem.EstimationPeriod?.Description(),
                         DeliveryDate = orderItem.DeliveryDate,
                         Price = orderItem.Price,
                         Quantity = orderItem.Quantity,
@@ -137,7 +138,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            var orders = await _orderRepository.ListOrdersByOrganisationIdAsync(organisationId);
+            var orders = await orderRepository.ListOrdersByOrganisationIdAsync(organisationId);
             var orderModelResult = orders.Select(order => new OrderListItemModel
             {
                 OrderId = order.OrderId,
@@ -157,7 +158,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [Route("{orderId}/summary")]
         public async Task<ActionResult<OrderSummaryModel>> GetOrderSummaryAsync(string orderId)
         {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            var order = await orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
             {
                 return NotFound();
@@ -169,7 +170,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            int serviceRecipientsCount = await _serviceRecipientRepository.GetCountByOrderIdAsync(orderId);
+            int serviceRecipientsCount = await serviceRecipientRepository.GetCountByOrderIdAsync(orderId);
             int catalogueSolutionsCount = order.OrderItems.Count(y => y.CatalogueItemType.Equals(CatalogueItemType.Solution));
             int associatedServicesCount = order.OrderItems.Count(y => y.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
             int additionalServicesCount = order.OrderItems.Count(y => y.CatalogueItemType.Equals(CatalogueItemType.AdditionalService));
@@ -222,7 +223,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            var result = await _createOrderService.CreateAsync(new CreateOrderRequest
+            var result = await createOrderService.CreateAsync(new CreateOrderRequest
             {
                 LastUpdatedByName = User.GetUserName(),
                 LastUpdatedById = User.GetUserId(),
@@ -247,7 +248,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult> DeleteOrderAsync(string orderId)
         {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            var order = await orderRepository.GetOrderByIdAsync(orderId);
 
             if (order is null || order.IsDeleted)
             {
@@ -264,7 +265,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             var name = User.Identity.Name;
             order.SetLastUpdatedBy(User.GetUserId(), name);
-            await _orderRepository.UpdateOrderAsync(order);
+            await orderRepository.UpdateOrderAsync(order);
             return NoContent();
         }
 
@@ -280,7 +281,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             var orderStatus = OrderStatus.FromName(model.Status);
             if (orderStatus is null ||
-                !_updateOrderStatusActionFactory.TryGetValue(orderStatus, out var updateOrderStatusAsync))
+                !updateOrderStatusActionFactory.TryGetValue(orderStatus, out var updateOrderStatusAsync))
             {
                 return BadRequest(new ErrorResponseModel
                 {
@@ -288,7 +289,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 });
             }
 
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            var order = await orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
             {
                 return NotFound();

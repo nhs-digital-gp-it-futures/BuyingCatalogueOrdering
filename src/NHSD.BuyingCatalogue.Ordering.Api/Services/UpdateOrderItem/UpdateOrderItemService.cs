@@ -11,45 +11,48 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem
 {
     public sealed class UpdateOrderItemService : IUpdateOrderItemService
     {
-        private readonly IOrderRepository _orderRepository;
-        private readonly IIdentityService _identityService;
-        private readonly IUpdateOrderItemValidator _orderItemValidator;
+        private readonly IOrderRepository orderRepository;
+        private readonly IIdentityService identityService;
+        private readonly IUpdateOrderItemValidator orderItemValidator;
 
         public UpdateOrderItemService(
             IOrderRepository orderRepository,
             IIdentityService identityService,
             IUpdateOrderItemValidator orderItemValidator)
         {
-            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
-            _identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
-            _orderItemValidator = orderItemValidator ?? throw new ArgumentNullException(nameof(orderItemValidator));
+            this.orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            this.identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
+            this.orderItemValidator = orderItemValidator ?? throw new ArgumentNullException(nameof(orderItemValidator));
         }
 
-        public async Task<Result> UpdateAsync(UpdateOrderItemRequest request, CatalogueItemType catalogueItemType, ProvisioningType provisioningType)
+        public async Task<Result> UpdateAsync(
+            UpdateOrderItemRequest request,
+            CatalogueItemType catalogueItemType,
+            ProvisioningType provisioningType)
         {
             if (request is null)
                 throw new ArgumentNullException(nameof(request));
-            
-            var estimationPeriod = TimeUnit.FromName(request.EstimationPeriodName);
+
+            var estimationPeriod = request.EstimationPeriod;
 
             Order order = request.Order;
 
-            var validationErrors = _orderItemValidator.Validate(request, catalogueItemType, provisioningType).ToList();
+            var validationErrors = orderItemValidator.Validate(request, catalogueItemType, provisioningType).ToList();
             if (validationErrors.Any())
             {
                 return Result.Failure(validationErrors);
             }
 
             order.UpdateOrderItem(
-                request.OrderItemId, 
-                request.DeliveryDate, 
-                request.Quantity, 
+                request.OrderItemId,
+                request.DeliveryDate,
+                request.Quantity,
                 estimationPeriod,
                 request.Price,
-                _identityService.GetUserIdentity(),
-                _identityService.GetUserName());
-            
-            await _orderRepository.UpdateOrderAsync(order);
+                identityService.GetUserIdentity(),
+                identityService.GetUserName());
+
+            await orderRepository.UpdateOrderAsync(order);
 
             return Result.Success();
         }

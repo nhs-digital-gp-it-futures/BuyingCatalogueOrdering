@@ -62,7 +62,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
 
             Log.Logger.Information("Authority on ORDAPI is: {@authority}", authority);
             Log.Logger.Information("ORDAPI Require Https: {@requiredHttps}", requireHttps);
-            Log.Logger.Information($"ORDAPI Allow Invalid Certificates: {@allowInvalidCertificate}", allowInvalidCertificate);
+            Log.Logger.Information($"ORDAPI Allow Invalid Certificates: {allowInvalidCertificate}", allowInvalidCertificate);
             Log.Logger.Information("ORDAPI BypassIdentity: {@bypassIdentity}", bypassIdentity);
             Log.Logger.Information("SMTP settings: {@smtpSettings}", smtpSettings);
             Log.Logger.Information("Purchasing settings: {@purchasingSettings}", purchasingSettings);
@@ -74,7 +74,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 .AddScoped<IServiceRecipientRepository, ServiceRecipientRepository>()
                 .AddScoped<IOrderRepository, OrderRepository>()
                 .AddScoped<IDefaultDeliveryDateValidator, DefaultDeliveryDateValidator>()
-                .AddScoped<IDefaultDeliveryDateRepository, DefaultDeliveryDateRepository>();
+                .AddScoped<IDefaultDeliveryDateRepository, DefaultDeliveryDateRepository>()
+                .AddScoped<IOrderItemFactory, OrderItemFactory>();
 
             services
                 .AddSingleton(validationSettings)

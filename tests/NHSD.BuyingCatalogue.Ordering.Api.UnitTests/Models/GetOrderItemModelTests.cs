@@ -1,83 +1,167 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using AutoFixture.NUnit3;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
-using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
+using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class GetOrderItemModelTests
+    [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
+    internal static class GetOrderItemModelTests
     {
         [Test]
-        public void Constructor_NullOrderItem_ThrowsArgumentNullException()
+        [OrderingAutoData]
+        public static void Constructor_NullOrderItem_ThrowsArgumentNullException(
+            ServiceRecipient serviceRecipient)
         {
-            Assert.Throws<ArgumentNullException>(() =>
-                _ = new GetOrderItemModel(null, ServiceRecipientBuilder.Create().Build()));
+            Assert.Throws<ArgumentNullException>(() => _ = new GetOrderItemModel(null, serviceRecipient));
         }
 
         [Test]
-        public void Constructor_ReturnsExpected()
+        [OrderingAutoData]
+        public static void Constructor_InitializesOrderItemId(
+            [Frozen] OrderItem orderItem,
+            GetOrderItemModel model)
         {
-            var serviceRecipient = ServiceRecipientBuilder
-                .Create()
-                .WithOdsCode("ODS1")
-                .Build();
-
-            var orderItem = OrderItemBuilder
-                .Create()
-                .WithOrderItemId(123)
-                .WithOdsCode(serviceRecipient.OdsCode)
-                .Build();
-
-            var actual = new GetOrderItemModel(orderItem, serviceRecipient);
-
-            var expected = new
-            {
-                orderItem.OrderItemId,
-                orderItem.CatalogueItemId,
-                CatalogueItemType = orderItem.CatalogueItemType.Name,
-                orderItem.CatalogueItemName,
-                orderItem.CurrencyCode,
-                orderItem.DeliveryDate,
-                ItemUnit = new
-                {
-                    orderItem.CataloguePriceUnit.Name,
-                    orderItem.CataloguePriceUnit.Description,
-                },
-                orderItem.Price,
-                ProvisioningType = orderItem.ProvisioningType.Name,
-                orderItem.Quantity,
-                ServiceRecipient = new
-                {
-                    orderItem.OdsCode,
-                    serviceRecipient.Name
-                },
-                TimeUnit = orderItem.PriceTimeUnit is null ? null : new
-                {
-                    orderItem.PriceTimeUnit?.Name, 
-                    orderItem.PriceTimeUnit?.Description
-                },
-                Type = orderItem.CataloguePriceType.Name
-            };
-
-            actual.Should().BeEquivalentTo(expected);
+            model.OrderItemId.Should().Be(orderItem.OrderItemId);
         }
 
         [Test]
-        public void Constructor_NullServiceRecipient_ServiceRecipientIsNull()
+        [OrderingAutoData]
+        public static void Constructor_InitializesServiceRecipient(
+            [Frozen] ServiceRecipient serviceRecipient,
+            GetOrderItemModel model)
         {
-            var orderItem = OrderItemBuilder
-                .Create()
-                .WithOrderItemId(456)
-                .WithOdsCode("Some ods code")
-                .Build();
+            model.ServiceRecipient.Should().NotBeNull();
+            model.ServiceRecipient.Name.Should().Be(serviceRecipient.Name);
+            model.ServiceRecipient.OdsCode.Should().Be(serviceRecipient.OdsCode);
+        }
 
-            var actual = new GetOrderItemModel(orderItem, null);
+        [Test]
+        [OrderingAutoData]
+        public static void Constructor_InitializesCatalogueItemType(
+            [Frozen] OrderItem orderItem,
+            GetOrderItemModel model)
+        {
+            model.CatalogueItemType.Should().Be(orderItem.CatalogueItemType.Name);
+        }
 
-            actual.ServiceRecipient.Should().BeNull();
+        [Test]
+        [OrderingAutoData]
+        public static void Constructor_InitializesCatalogueItemName(
+            [Frozen] OrderItem orderItem,
+            GetOrderItemModel model)
+        {
+            model.CatalogueItemName.Should().Be(orderItem.CatalogueItemName);
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Constructor_InitializesCatalogueItemId(
+            [Frozen] OrderItem orderItem,
+            GetOrderItemModel model)
+        {
+            model.CatalogueItemId.Should().Be(orderItem.CatalogueItemId);
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Constructor_InitializesCurrencyCode(
+            [Frozen] OrderItem orderItem,
+            GetOrderItemModel model)
+        {
+            model.CurrencyCode.Should().Be(orderItem.CurrencyCode);
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Constructor_InitializesDeliveryDate(
+            [Frozen] OrderItem orderItem,
+            GetOrderItemModel model)
+        {
+            model.DeliveryDate.Should().Be(orderItem.DeliveryDate);
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Constructor_InitializesItemUnit(
+            [Frozen] CataloguePriceUnit priceUnit,
+            GetOrderItemModel model)
+        {
+            model.ItemUnit.Should().NotBeNull();
+            model.ItemUnit.Description.Should().Be(priceUnit.Description);
+            model.ItemUnit.Name.Should().Be(priceUnit.Name);
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Constructor_InitializesPrice(
+            [Frozen] OrderItem orderItem,
+            GetOrderItemModel model)
+        {
+            model.Price.Should().Be(orderItem.Price);
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Constructor_InitializesProvisioningType(
+            [Frozen] ProvisioningType provisioningType,
+            GetOrderItemModel model)
+        {
+            model.ProvisioningType.Should().Be(provisioningType.ToString());
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Constructor_InitializesQuantity(
+            [Frozen] OrderItem orderItem,
+            GetOrderItemModel model)
+        {
+            model.Quantity.Should().Be(orderItem.Quantity);
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Constructor_InitializesTimeUnit(
+            [Frozen] TimeUnit timeUnit,
+            GetOrderItemModel model)
+        {
+            model.TimeUnit.Should().NotBeNull();
+            model.TimeUnit.Description.Should().Be(timeUnit.Description());
+            model.TimeUnit.Name.Should().Be(timeUnit.Name());
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Constructor_InitializesType(
+            [Frozen] CataloguePriceType priceType,
+            GetOrderItemModel model)
+        {
+            model.Type.Should().Be(priceType.ToString());
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Constructor_InitializesEstimationPeriod(
+            [Frozen] TimeUnit estimationPeriod,
+            GetOrderItemModel model)
+        {
+            model.EstimationPeriod.Should().Be(estimationPeriod.Name());
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Constructor_NullServiceRecipient_ServiceRecipientIsNull(
+            OrderItem orderItem)
+        {
+            var model = new GetOrderItemModel(orderItem, null);
+
+            model.ServiceRecipient.Should().BeNull();
         }
     }
 }

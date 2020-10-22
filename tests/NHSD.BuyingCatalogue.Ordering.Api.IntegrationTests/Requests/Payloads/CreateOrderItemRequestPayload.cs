@@ -18,7 +18,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests.Payloads
         public string CatalogueItemName { get; set; }
 
         public string CatalogueSolutionId { get; set; }
-        
+
         public DateTime? DeliveryDate { get; set; }
 
         public int? Quantity { get; set; }
@@ -42,5 +42,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests.Payloads
         public string TimeUnitDescription { get; set; }
 
         public decimal? Price { get; set; }
+
+        public string ServiceRecipientName { get; set; }
     }
 }

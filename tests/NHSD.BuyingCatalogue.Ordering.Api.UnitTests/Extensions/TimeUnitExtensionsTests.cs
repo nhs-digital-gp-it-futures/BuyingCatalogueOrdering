@@ -1,6 +1,4 @@
-﻿using System;
-using FluentAssertions;
-using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
+﻿using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
@@ -9,24 +7,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class TimeUnitExtensionsTests
+    internal static class TimeUnitExtensionsTests
     {
         [Test]
-        public void ToModel_Null_ThrowsArgumentNullException()
+        public static void ToModel_Month_ReturnsExpected()
         {
-            Assert.Throws<ArgumentNullException>(() => TimeUnitExtensions.ToModel(null));
-        }
+            const TimeUnit unit = TimeUnit.PerMonth;
 
-        [Test]
-        public void ToModel_Month_ReturnsExpected()
-        {
-            TimeUnit sut = TimeUnit.PerMonth;
+            var actual = Api.Extensions.TimeUnitExtensions.ToModel(unit);
 
-            var actual = sut.ToModel();
             actual.Should().BeEquivalentTo(new TimeUnitModel
             {
-                Name = sut.Name,
-                Description = sut.Description
+                Name = "month",
+                Description = "per month"
             });
         }
     }

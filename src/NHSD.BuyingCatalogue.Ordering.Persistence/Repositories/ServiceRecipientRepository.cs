@@ -11,16 +11,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
 {
     public sealed class ServiceRecipientRepository : IServiceRecipientRepository
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext context;
 
         public ServiceRecipientRepository(ApplicationDbContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
         public async Task<IEnumerable<ServiceRecipient>> ListServiceRecipientsByOrderIdAsync(string orderId)
         {
-            return await _context.ServiceRecipient
+            return await context.ServiceRecipient
                 .Include(x => x.Order)
                 .Where(s => s.Order.OrderId == orderId).ToListAsync();
         }
@@ -32,13 +32,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
                 throw new ArgumentNullException(nameof(orderId));
             }
 
-            return await _context.ServiceRecipient
+            return await context.ServiceRecipient
                 .Where(x => x.Order.OrderId == orderId)
                 .CountAsync();
         }
-        
 
-        public async Task UpdateAsync(string orderId, IEnumerable<ServiceRecipient> recipientsUpdates)
+        public async Task UpdateWithoutSavingAsync(string orderId, IEnumerable<ServiceRecipient> recipientsUpdates)
         {
             if (recipientsUpdates == null)
             {
@@ -50,7 +49,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
 
             if (!updateServiceRecipients.Any())
             {
-                _context.ServiceRecipient.RemoveRange(existingServiceRecipients);
+                context.ServiceRecipient.RemoveRange(existingServiceRecipients);
             }
             else
             {
@@ -59,10 +58,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
                 var existingServiceRecipientsToRemove = existingServiceRecipients.Except(noChangeServiceRecipients);
                 var updateServiceRecipientsToAdd = updateServiceRecipients.Except(noChangeServiceRecipients);
 
-                _context.ServiceRecipient.RemoveRange(existingServiceRecipientsToRemove);
-                _context.ServiceRecipient.AddRange(updateServiceRecipientsToAdd);
+                context.ServiceRecipient.RemoveRange(existingServiceRecipientsToRemove);
+                context.ServiceRecipient.AddRange(updateServiceRecipientsToAdd);
             }
-            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(string orderId, IEnumerable<ServiceRecipient> recipientsUpdates)
+        {
+            await UpdateWithoutSavingAsync(orderId, recipientsUpdates);
+            await context.SaveChangesAsync();
         }
     }
 }

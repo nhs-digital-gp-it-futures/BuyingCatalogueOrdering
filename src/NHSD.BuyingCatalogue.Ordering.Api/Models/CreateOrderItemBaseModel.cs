@@ -14,6 +14,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
         [RegularExpression("Solution|AdditionalService|AssociatedService", ErrorMessage = "CatalogueItemTypeValidValue")]
         public string CatalogueItemType { get; set; }
 
+        protected virtual TimeUnitModel TimeUnitModel => null;
+
         public abstract CreateOrderItemRequest ToRequest(Order order);
+
+        internal virtual ServiceRecipientModel ServiceRecipientModel => null;
+
+        protected virtual string GetAssociatedCatalogueItemId() => null;
+
+        protected virtual CatalogueItemType GetItemType() => Domain.CatalogueItemType.Solution;
+
+        protected virtual string GetOdsCode(Order order) => null;
+
+        protected virtual TimeUnit? TimeUnitModelToTimeUnit() => TimeUnitModel?.ToTimeUnit();
+
+        protected virtual DateTime? GetItemDeliveryDate() => null;
     }
 }

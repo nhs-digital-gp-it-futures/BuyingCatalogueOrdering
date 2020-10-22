@@ -73,9 +73,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             OrderItem orderItem,
             string serviceRecipientName)
         {
-            var priceType = new OdooOrderItem(order, orderItem, serviceRecipientName);
+            var odooOrderItem = new OdooOrderItem(order, orderItem, serviceRecipientName);
 
-            priceType.ServiceRecipientName.Should().Be(serviceRecipientName);
+            odooOrderItem.ServiceRecipientName.Should().Be(serviceRecipientName);
         }
 
         [Test]
@@ -138,53 +138,56 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        [OrderingAutoData]
-        public static void Constructor_NullUnitTime_InitializesUnitTime(OdooOrderItem odooOrderItem)
+        public static void Constructor_NullUnitTime_InitializesUnitTime()
         {
+            var fixture = new Fixture();
+            fixture.Customize(new OrderingCustomization());
+            fixture.Register<TimeUnit?>(() => null);
+
+            var odooOrderItem = fixture.Create<OdooOrderItem>();
+
             odooOrderItem.UnitTime.Should().BeNull();
         }
 
         [Test]
-        public static void Constructor_InitializesUnitTime()
+        [OrderingAutoData]
+        public static void Constructor_InitializesUnitTime(
+            [Frozen] TimeUnit priceTimeUnit,
+            OdooOrderItem odooOrderItem)
         {
-            var fixture = new Fixture();
-            fixture.Customize(new OrderingCustomization(new OrderingCustomizationOptions(timeUnit: TimeUnit.PerMonth)));
-
-            var orderItem = fixture.Freeze<OrderItem>();
-            var priceType = fixture.Create<OdooOrderItem>();
-
-            priceType.UnitTime.Should().Be(orderItem.PriceTimeUnit.Description);
+            odooOrderItem.UnitTime.Should().Be(priceTimeUnit.Description());
         }
 
         [Test]
         public static void Constructor_DeclarativeProvisioningType_InitializesEstimationPeriod()
         {
             var fixture = new Fixture();
-            fixture.Customize(new OrderingCustomization(
-                new OrderingCustomizationOptions(ProvisioningType.Declarative, TimeUnit.PerMonth)));
+            fixture.Customize(new OrderingCustomization());
+            fixture.Register(() => ProvisioningType.Declarative);
 
-            var priceType = fixture.Create<OdooOrderItem>();
+            var odooOrderItem = fixture.Create<OdooOrderItem>();
 
-            priceType.EstimationPeriod.Should().BeNull();
-        }
-
-        [Test]
-        public static void Constructor_OnDemandProvisioningType_InitializesEstimationPeriod()
-        {
-            var fixture = new Fixture();
-            fixture.Customize(new OrderingCustomization(
-                new OrderingCustomizationOptions(timeUnit: TimeUnit.PerYear)));
-
-            var orderItem = fixture.Freeze<OrderItem>();
-            var priceType = fixture.Create<OdooOrderItem>();
-
-            priceType.EstimationPeriod.Should().Be(orderItem.EstimationPeriod.Description);
+            odooOrderItem.EstimationPeriod.Should().BeNull();
         }
 
         [Test]
         [OrderingAutoData]
-        public static void Constructor_NullEstimationPeriod_InitializesEstimationPeriod(OdooOrderItem odooOrderItem)
+        public static void Constructor_OnDemandProvisioningType_InitializesEstimationPeriod(
+            [Frozen] TimeUnit estimationPeriod,
+            OdooOrderItem odooOrderItem)
         {
+            odooOrderItem.EstimationPeriod.Should().Be(estimationPeriod.Description());
+        }
+
+        [Test]
+        public static void Constructor_NullEstimationPeriod_InitializesEstimationPeriod()
+        {
+            var fixture = new Fixture();
+            fixture.Customize(new OrderingCustomization());
+            fixture.Register(() => ProvisioningType.Declarative);
+
+            var odooOrderItem = fixture.Create<OdooOrderItem>();
+
             odooOrderItem.EstimationPeriod.Should().BeNull();
         }
 
@@ -202,16 +205,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             fixture.Customize(new OrderingCustomization());
             fixture.Register<decimal?>(() => null);
 
-            var priceType = fixture.Create<OdooOrderItem>();
+            var odooOrderItem = fixture.Create<OdooOrderItem>();
 
-            priceType.Price.Should().Be(0.00m);
+            odooOrderItem.Price.Should().Be(0.00m);
         }
 
         [Test]
         [OrderingAutoData]
         public static void Constructor_InitializesOrderType([Frozen] OrderItem orderItem, OdooOrderItem odooOrderItem)
         {
-            odooOrderItem.OrderType.Should().Be(orderItem.ProvisioningType.Id);
+            odooOrderItem.OrderType.Should().Be((int)orderItem.ProvisioningType);
         }
 
         [Test]

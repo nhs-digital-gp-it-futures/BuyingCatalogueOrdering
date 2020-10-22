@@ -28,11 +28,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
                 Description = orderItem.CataloguePriceUnit.Description
             };
             Price = orderItem.Price;
-            ProvisioningType = orderItem.ProvisioningType.Name;
+            ProvisioningType = orderItem.ProvisioningType.ToString();
             Quantity = orderItem.Quantity;
             TimeUnit = orderItem.PriceTimeUnit?.ToModel();
-            Type = orderItem.CataloguePriceType.Name;
-            EstimationPeriod = orderItem.EstimationPeriod?.Name;
+            Type = orderItem.CataloguePriceType.ToString();
+            EstimationPeriod = orderItem.EstimationPeriod?.Name();
         }
 
         public int OrderItemId { get; set; }
@@ -42,8 +42,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
         public string CatalogueItemType { get; set; }
 
         public string CatalogueItemName { get; set; }
-
-        public string CataloguePriceType { get; set; }
 
         public string CurrencyCode { get; set; }
 

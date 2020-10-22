@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
@@ -11,5 +12,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
         [Required(ErrorMessage = "TimeUnitDescriptionRequired")]
         [MaxLength(32, ErrorMessage = "TimeUnitDescriptionTooLong")]
         public string Description { get; set; }
+
+        internal TimeUnit? ToTimeUnit() => OrderingEnums.ParseTimeUnit(Name);
     }
 }
