@@ -159,7 +159,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             int orderItemId,
             DateTime? deliveryDate,
             int quantity,
-            TimeUnit estimationPeriod,
+            TimeUnit? estimationPeriod,
             decimal? price,
             Guid userId,
             string name)
@@ -174,16 +174,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 () => SetLastUpdatedBy(userId, name));
         }
 
-        public void SetServiceRecipients(IEnumerable<OdsOrganisation> serviceRecipients, Guid userId, string lastUpdatedName)
+        public void SetServiceRecipients(IEnumerable<OdsOrganisation> recipients, Guid userId, string lastUpdatedName)
         {
-            if (serviceRecipients is null)
-                throw new ArgumentNullException(nameof(serviceRecipients));
+            if (recipients is null)
+                throw new ArgumentNullException(nameof(recipients));
 
-            this.serviceRecipients.Clear();
+            serviceRecipients.Clear();
 
-            foreach ((string code, string name) in serviceRecipients)
+            foreach ((string code, string name) in recipients)
             {
-                this.serviceRecipients.Add(new ServiceRecipient
+                serviceRecipients.Add(new ServiceRecipient
                 {
                     Name = name,
                     OdsCode = code,

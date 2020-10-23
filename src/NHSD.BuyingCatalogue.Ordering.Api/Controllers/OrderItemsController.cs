@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Errors;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
@@ -23,25 +23,29 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class OrderItemsController : ControllerBase
     {
-        private readonly IOrderRepository _orderRepository;
-        private readonly IUpdateOrderItemService _updateOrderItemService;
-        private readonly ICreateOrderItemService _createOrderItemService;
+        private readonly IOrderRepository orderRepository;
+        private readonly IUpdateOrderItemService updateOrderItemService;
+        private readonly ICreateOrderItemService createOrderItemService;
+        private readonly IServiceRecipientRepository serviceRecipientRepository;
 
-        public OrderItemsController(IOrderRepository orderRepository,
+        public OrderItemsController(
+            IOrderRepository orderRepository,
             IUpdateOrderItemService updateOrderItemService,
-            ICreateOrderItemService createOrderItemService)
+            ICreateOrderItemService createOrderItemService,
+            IServiceRecipientRepository serviceRecipientRepository)
         {
-            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
-            _updateOrderItemService = updateOrderItemService ?? throw new ArgumentNullException(nameof(updateOrderItemService));
-            _createOrderItemService = createOrderItemService ?? throw new ArgumentNullException(nameof(createOrderItemService));
+            this.orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            this.updateOrderItemService = updateOrderItemService ?? throw new ArgumentNullException(nameof(updateOrderItemService));
+            this.createOrderItemService = createOrderItemService ?? throw new ArgumentNullException(nameof(createOrderItemService));
+            this.serviceRecipientRepository = serviceRecipientRepository ?? throw new ArgumentNullException(nameof(serviceRecipientRepository));
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GetOrderItemModel>>> ListAsync(
-            string orderId, 
+            string orderId,
             [FromQuery] string catalogueItemType)
         {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            var order = await orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
             {
                 return NotFound();
@@ -81,7 +85,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [Route("{orderItemId}")]
         public async Task<ActionResult<GetOrderItemModel>> GetAsync(string orderId, int orderItemId)
         {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            var order = await orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
             {
                 return NotFound();
@@ -116,7 +120,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (model == null)
                 throw new ArgumentNullException(nameof(model));
 
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            var order = await orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
             {
                 return NotFound();
@@ -130,7 +134,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             var createOrderItemResponse = new CreateOrderItemResponseModel();
 
-            var result = await _createOrderItemService.CreateAsync(model.ToRequest(order));
+            var result = await createOrderItemService.CreateAsync(model.ToRequest(order));
 
             if (result.IsSuccess)
             {
@@ -140,6 +144,35 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             createOrderItemResponse.Errors = result.Errors.Select(x => new ErrorModel(x.Id, x.Field));
             return BadRequest(createOrderItemResponse);
+        }
+
+        [HttpPost("batch")]
+        public async Task<IActionResult> CreateOrderItemsAsync(string orderId, IEnumerable<CreateOrderItemBaseModel> model)
+        {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
+
+            var order = await orderRepository.GetOrderByIdAsync(orderId);
+            if (order is null)
+                return NotFound();
+
+            var serviceRecipients = new HashSet<ServiceRecipient>();
+            var orderItemRequests = new List<CreateOrderItemRequest>();
+
+            foreach (var item in model)
+            {
+                var recipient = item.ServiceRecipientModel;
+
+                if (recipient != null)
+                    serviceRecipients.Add(new ServiceRecipient(orderId, recipient.OdsCode, recipient.Name));
+
+                orderItemRequests.Add(item.ToRequest(order));
+            }
+
+            await serviceRecipientRepository.UpdateWithoutSavingAsync(orderId, serviceRecipients);
+            await createOrderItemService.CreateAsync(order, orderItemRequests);
+
+            return CreatedAtAction(nameof(ListAsync).TrimAsync(), "OrderItems", new { orderId }, null);
         }
 
         [HttpPut]
@@ -153,7 +186,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (model is null)
                 throw new ArgumentNullException(nameof(model));
 
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            var order = await orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
                 return NotFound();
 
@@ -167,7 +200,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (orderItem is null)
                 return NotFound();
 
-            var result = await _updateOrderItemService.UpdateAsync(
+            var result = await updateOrderItemService.UpdateAsync(
                 new UpdateOrderItemRequest(
                     model.DeliveryDate,
                     model.EstimationPeriod,

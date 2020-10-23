@@ -14,7 +14,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem
             int? quantity)
         {
             DeliveryDate = deliveryDate;
-            EstimationPeriodName = estimationPeriodName;
+            EstimationPeriod = OrderingEnums.ParseTimeUnit(estimationPeriodName);
             Order = order ?? throw new ArgumentNullException(nameof(order));
             OrderItemId = orderItemId;
             Quantity = quantity.GetValueOrDefault();
@@ -23,7 +23,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem
 
         public DateTime? DeliveryDate { get; }
 
-        public string EstimationPeriodName { get; }
+        public TimeUnit? EstimationPeriod { get; }
 
         public Order Order { get; }
 

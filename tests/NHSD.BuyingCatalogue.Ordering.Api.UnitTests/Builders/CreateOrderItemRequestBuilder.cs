@@ -7,159 +7,158 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
     internal sealed class CreateOrderItemRequestBuilder
     {
-        private Order _order;
-        private string _odsCode;
-        private string _catalogueItemId;
-        private CatalogueItemType _catalogueItemType;
-        private string _catalogueItemName;
-        private string _catalogueSolutionId;
-        private string _cataloguePriceTypeName;
-        private string _provisioningTypeName;
-        private string _cataloguePriceUnitTierName;
-        private string _cataloguePriceUnitDescription;
-        private string _priceTimeUnitName;
-        private string _currencyCode;
-        private int _quantity;
-        private string _estimationPeriodName;
-        private DateTime? _deliveryDate;
-        private decimal? _price;
+        private Order order;
+        private string odsCode;
+        private string catalogueItemId;
+        private CatalogueItemType catalogueItemType;
+        private string catalogueItemName;
+        private string catalogueSolutionId;
+        private string cataloguePriceTypeName;
+        private string provisioningTypeName;
+        private string cataloguePriceUnitTierName;
+        private string cataloguePriceUnitDescription;
+        private TimeUnit? priceTimeUnit;
+        private string currencyCode;
+        private int quantity;
+        private string estimationPeriodName;
+        private DateTime? deliveryDate;
+        private decimal? price;
 
         private CreateOrderItemRequestBuilder()
         {
-            _order = OrderBuilder.Create().Build();
-            _odsCode = "ODS2";
-            _catalogueItemId = "10001-001";
-            _catalogueItemType = CatalogueItemType.AssociatedService;
-            _catalogueItemName = "Some catalogue item name";
-            _catalogueSolutionId = "10001-002";
-            _provisioningTypeName = "Declarative";
-            _cataloguePriceTypeName = "Flat";
-            _cataloguePriceUnitTierName = "sms";
-            _cataloguePriceUnitDescription = "per sms";
-            _priceTimeUnitName = "month";
-            _currencyCode = "GBP";
-            _quantity = 10;
-            _estimationPeriodName = "year";
-            _deliveryDate = DateTime.UtcNow;
-            _price = 2;
+            order = OrderBuilder.Create().Build();
+            odsCode = "ODS2";
+            catalogueItemId = "10001-001";
+            catalogueItemType = CatalogueItemType.AssociatedService;
+            catalogueItemName = "Some catalogue item name";
+            catalogueSolutionId = "10001-002";
+            provisioningTypeName = "Declarative";
+            cataloguePriceTypeName = "Flat";
+            cataloguePriceUnitTierName = "sms";
+            cataloguePriceUnitDescription = "per sms";
+            priceTimeUnit = TimeUnit.PerMonth;
+            currencyCode = "GBP";
+            quantity = 10;
+            estimationPeriodName = "year";
+            deliveryDate = DateTime.UtcNow;
+            price = 2;
         }
 
         public static CreateOrderItemRequestBuilder Create() => new CreateOrderItemRequestBuilder();
 
-        public CreateOrderItemRequestBuilder WithOrder(Order order)
+        public CreateOrderItemRequestBuilder WithOrder(Order o)
         {
-            _order = order;
+            order = o;
             return this;
         }
 
-        public CreateOrderItemRequestBuilder WithOdsCode(string odsCode)
+        public CreateOrderItemRequestBuilder WithOdsCode(string code)
         {
-            _odsCode = odsCode;
+            odsCode = code;
             return this;
         }
 
-        public CreateOrderItemRequestBuilder WithCatalogueItemId(string catalogueItemId)
+        public CreateOrderItemRequestBuilder WithCatalogueItemId(string id)
         {
-            _catalogueItemId = catalogueItemId;
+            catalogueItemId = id;
             return this;
         }
 
-        public CreateOrderItemRequestBuilder WithCatalogueItemType(CatalogueItemType catalogueItemType)
+        public CreateOrderItemRequestBuilder WithCatalogueItemType(CatalogueItemType type)
         {
-            _catalogueItemType = catalogueItemType;
+            catalogueItemType = type;
             return this;
         }
 
-        public CreateOrderItemRequestBuilder WithCatalogueItemName(string catalogueItemName)
+        public CreateOrderItemRequestBuilder WithCatalogueItemName(string name)
         {
-            _catalogueItemName = catalogueItemName;
+            catalogueItemName = name;
             return this;
         }
 
-        public CreateOrderItemRequestBuilder WithCatalogueSolutionId(string catalogueSolutionId)
+        public CreateOrderItemRequestBuilder WithCatalogueSolutionId(string id)
         {
-            _catalogueSolutionId = catalogueSolutionId;
+            catalogueSolutionId = id;
             return this;
         }
 
-        public CreateOrderItemRequestBuilder WithCataloguePriceTypeName(string cataloguePriceTypeName)
+        public CreateOrderItemRequestBuilder WithCataloguePriceTypeName(string priceTypeName)
         {
-            _cataloguePriceTypeName = cataloguePriceTypeName;
+            cataloguePriceTypeName = priceTypeName;
             return this;
         }
 
-        public CreateOrderItemRequestBuilder WithProvisioningTypeName(string provisioningTypeName)
+        public CreateOrderItemRequestBuilder WithProvisioningTypeName(string typeName)
         {
-            _provisioningTypeName = provisioningTypeName;
+            provisioningTypeName = typeName;
             return this;
         }
 
-        public CreateOrderItemRequestBuilder WithCataloguePriceUnitTierName(string cataloguePriceUnitTierName)
+        public CreateOrderItemRequestBuilder WithCataloguePriceUnitTierName(string tierName)
         {
-            _cataloguePriceUnitTierName = cataloguePriceUnitTierName;
+            cataloguePriceUnitTierName = tierName;
             return this;
         }
 
-        public CreateOrderItemRequestBuilder WithCataloguePriceUnitDescription(string cataloguePriceUnitDescription)
+        public CreateOrderItemRequestBuilder WithCataloguePriceUnitDescription(string description)
         {
-            _cataloguePriceUnitDescription = cataloguePriceUnitDescription;
+            cataloguePriceUnitDescription = description;
             return this;
         }
 
-        public CreateOrderItemRequestBuilder WithPriceTimeUnitName(string priceTimeUnitName)
+        public CreateOrderItemRequestBuilder WithPriceTimeUnitName(TimeUnit? unit)
         {
-            _priceTimeUnitName = priceTimeUnitName;
+            priceTimeUnit = unit;
             return this;
         }
 
-        public CreateOrderItemRequestBuilder WithCurrencyCode(string currencyCode)
+        public CreateOrderItemRequestBuilder WithCurrencyCode(string code)
         {
-            _currencyCode = currencyCode;
+            currencyCode = code;
             return this;
         }
 
-        public CreateOrderItemRequestBuilder WithQuantity(int quantity)
+        public CreateOrderItemRequestBuilder WithQuantity(int number)
         {
-            _quantity = quantity;
+            quantity = number;
             return this;
         }
 
-        public CreateOrderItemRequestBuilder WithEstimationPeriodName(string estimationPeriodName)
+        public CreateOrderItemRequestBuilder WithEstimationPeriodName(string periodName)
         {
-            _estimationPeriodName = estimationPeriodName;
+            estimationPeriodName = periodName;
             return this;
         }
 
-        public CreateOrderItemRequestBuilder WithDeliveryDate(DateTime? deliveryDate)
+        public CreateOrderItemRequestBuilder WithDeliveryDate(DateTime? date)
         {
-            _deliveryDate = deliveryDate;
+            deliveryDate = date;
             return this;
         }
 
-        public CreateOrderItemRequestBuilder WithPrice(decimal? price)
+        public CreateOrderItemRequestBuilder WithPrice(decimal? cost)
         {
-            _price = price;
+            price = cost;
             return this;
         }
 
         public CreateOrderItemRequest Build() =>
             new CreateOrderItemRequest(
-                _order,
-                _odsCode,
-                _catalogueItemId,
-                _catalogueItemType,
-                _catalogueItemName,
-                _catalogueSolutionId,
-                _provisioningTypeName,
-                _cataloguePriceTypeName,
-                _cataloguePriceUnitTierName,
-                _cataloguePriceUnitDescription,
-                _priceTimeUnitName,
-                _currencyCode,
-                _quantity,
-                _estimationPeriodName,
-                _deliveryDate,
-                _price
-            );
+                order,
+                odsCode,
+                catalogueItemId,
+                catalogueItemType,
+                catalogueItemName,
+                catalogueSolutionId,
+                provisioningTypeName,
+                cataloguePriceTypeName,
+                cataloguePriceUnitTierName,
+                cataloguePriceUnitDescription,
+                priceTimeUnit,
+                currencyCode,
+                quantity,
+                estimationPeriodName,
+                deliveryDate,
+                price);
     }
 }

@@ -43,12 +43,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 
             builder
                 .Property(orderItem => orderItem.ProvisioningType)
-                .HasConversion(input => input.Id, output => ProvisioningType.FromId(output))
+                .HasConversion<int>()
                 .HasColumnName("ProvisioningTypeId");
 
             builder
                 .Property(orderItem => orderItem.CataloguePriceType)
-                .HasConversion(input => input.Id, output => CataloguePriceType.FromId(output))
+                .HasConversion<int>()
                 .HasColumnName("CataloguePriceTypeId");
 
             builder.OwnsOne(orderItem => orderItem.CataloguePriceUnit, navigationBuilder =>
@@ -62,7 +62,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 
             builder
                 .Property(orderItem => orderItem.PriceTimeUnit)
-                .HasConversion(input => input.Id, output => TimeUnit.FromId(output))
+                .HasConversion<int>()
                 .HasColumnName("TimeUnitId");
 
             builder.Property(orderItem => orderItem.CurrencyCode)
@@ -75,7 +75,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 
             builder
                 .Property(orderItem => orderItem.EstimationPeriod)
-                .HasConversion(input => input.Id, output => TimeUnit.FromId(output))
+                .HasConversion<int>()
                 .HasColumnName("EstimationPeriodId");
 
             builder.Property(orderItem => orderItem.DeliveryDate)

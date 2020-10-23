@@ -9,8 +9,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
         public OrderingAutoDataAttribute()
             : base(() => new Fixture().Customize(new CompositeCustomization(
                 new AutoMoqCustomization(),
+                new ControllerBaseCustomization(),
                 new OrderingCustomization(),
-                new ControllerBaseCustomization())))
+                new EnumValueByNameCustomization())))
         {
         }
     }

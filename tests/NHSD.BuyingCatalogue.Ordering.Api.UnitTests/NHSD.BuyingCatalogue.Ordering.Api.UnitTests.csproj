@@ -14,6 +14,7 @@
     <PackageReference Include="AutoFixture.AutoMoq" Version="4.14.0" />
     <PackageReference Include="AutoFixture.Idioms" Version="4.14.0" />
     <PackageReference Include="AutoFixture.NUnit3" Version="4.14.0" />
+    <PackageReference Include="Enums.NET" Version="3.0.3" />
     <PackageReference Include="fluentassertions" Version="5.10.3" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.0">
       <PrivateAssets>all</PrivateAssets>

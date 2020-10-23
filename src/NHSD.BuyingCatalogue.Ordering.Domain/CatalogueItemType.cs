@@ -30,7 +30,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                     ? provisioningType.InferEstimationPeriod(estimationPeriod)
                     : null);
 
-        private readonly Func<ProvisioningType, TimeUnit, TimeUnit> _inferEstimationPeriodFunction;
+        private readonly Func<ProvisioningType, TimeUnit?, TimeUnit?> inferEstimationPeriodFunction;
+
+        private CatalogueItemType(
+            int id,
+            string name,
+            string displayName,
+            Action<Order> markOrderSectionAsViewed,
+            Func<ProvisioningType, TimeUnit?, TimeUnit?> inferEstimationPeriodFunction)
+        {
+            Id = id;
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            DisplayName = displayName ?? throw new ArgumentNullException(nameof(displayName));
+            MarkOrderSectionAsViewed = markOrderSectionAsViewed ?? throw new ArgumentNullException(nameof(markOrderSectionAsViewed));
+            this.inferEstimationPeriodFunction = inferEstimationPeriodFunction ?? throw new ArgumentNullException(nameof(inferEstimationPeriodFunction));
+        }
 
         public int Id { get; }
 
@@ -39,23 +53,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         public string DisplayName { get; }
 
         internal Action<Order> MarkOrderSectionAsViewed { get; }
-
-        private CatalogueItemType(
-            int id,
-            string name,
-            string displayName,
-            Action<Order> markOrderSectionAsViewed,
-            Func<ProvisioningType, TimeUnit, TimeUnit> inferEstimationPeriodFunction)
-        {
-            Id = id;
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            DisplayName = displayName ?? throw new ArgumentNullException(nameof(displayName));
-            MarkOrderSectionAsViewed = markOrderSectionAsViewed ?? throw new ArgumentNullException(nameof(markOrderSectionAsViewed));
-            _inferEstimationPeriodFunction = inferEstimationPeriodFunction ?? throw new ArgumentNullException(nameof(inferEstimationPeriodFunction));
-        }
-
-        internal static IEnumerable<CatalogueItemType> List() =>
-            new[] { Solution, AdditionalService, AssociatedService };
 
         public static CatalogueItemType FromId(int id)
         {
@@ -74,14 +71,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 name.Equals(catalogueItemType.Name, StringComparison.OrdinalIgnoreCase));
         }
 
-        public TimeUnit InferEstimationPeriod(ProvisioningType provisioningType, TimeUnit estimationPeriod)
+        public TimeUnit? InferEstimationPeriod(ProvisioningType provisioningType, TimeUnit? estimationPeriod)
         {
-            if (provisioningType is null)
-            {
-                throw new ArgumentNullException(nameof(provisioningType));
-            }
-
-            return _inferEstimationPeriodFunction(provisioningType, estimationPeriod);
+            return inferEstimationPeriodFunction(provisioningType, estimationPeriod);
         }
 
         public bool Equals(CatalogueItemType other)
@@ -98,5 +90,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         public override bool Equals(object obj) => Equals(obj as CatalogueItemType);
 
         public override int GetHashCode() => Id;
+
+        internal static IEnumerable<CatalogueItemType> List() =>
+            new[] { Solution, AdditionalService, AssociatedService };
     }
 }

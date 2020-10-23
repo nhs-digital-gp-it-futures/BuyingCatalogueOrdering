@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using AutoFixture;
+using AutoFixture.AutoMoq;
+using AutoFixture.Idioms;
+using AutoFixture.NUnit3;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +18,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Errors;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
+using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
@@ -24,39 +30,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
+    [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class OrderItemsControllerTests
     {
         [Test]
-        public static void Constructor_NullOrderRepository_NullException()
+        public static void Contructors_VerifyGuardClauses()
         {
-            var builder = OrderItemsControllerBuilder.Create()
-                .WithOrderRepository(null)
-                .WithCreateOrderItemService(Mock.Of<ICreateOrderItemService>())
-                .WithUpdateOrderItemService(Mock.Of<IUpdateOrderItemService>());
+            var fixture = new Fixture().Customize(new AutoMoqCustomization());
+            var assertion = new GuardClauseAssertion(fixture);
+            var constructors = typeof(OrderItemsController).GetConstructors();
 
-            Assert.Throws<ArgumentNullException>(() => builder.Build());
-        }
-
-        [Test]
-        public static void Constructor_UpdateOrderItemServiceNull_NullException()
-        {
-            var builder = OrderItemsControllerBuilder.Create()
-                .WithOrderRepository(Mock.Of<IOrderRepository>())
-                .WithCreateOrderItemService(Mock.Of<ICreateOrderItemService>())
-                .WithUpdateOrderItemService(null);
-
-            Assert.Throws<ArgumentNullException>(() => builder.Build());
-        }
-
-        [Test]
-        public static void Constructor_NullCreateOrderItemService_NullException()
-        {
-            var builder = OrderItemsControllerBuilder.Create()
-                .WithOrderRepository(Mock.Of<IOrderRepository>())
-                .WithCreateOrderItemService(null)
-                .WithUpdateOrderItemService(Mock.Of<IUpdateOrderItemService>());
-
-            Assert.Throws<ArgumentNullException>(() => builder.Build());
+            assertion.Verify(constructors);
         }
 
         [Test]
@@ -274,6 +258,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
+        [OrderingAutoData]
+        public static void CreateOrderItemAsync_NullModel_ThrowsException(
+            string orderId,
+            OrderItemsController controller)
+        {
+            Assert.ThrowsAsync<ArgumentNullException>(
+                async () => await controller.CreateOrderItemAsync(orderId, null));
+        }
+
+        [Test]
         public static async Task CreateOrderItemAsync_OrderIdDoesNotExist_ReturnsNotFound()
         {
             var createModel = CreateOrderItemModelBuilder.Create().BuildSolution();
@@ -434,6 +428,136 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             context.CreateOrderItemServiceMock.Verify(x =>
                     x.CreateAsync(It.IsNotNull<CreateOrderItemRequest>()), Times.Once);
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void CreateOrderItemsAsync_NullModel_ThrowsException(
+            string orderId,
+            OrderItemsController controller)
+        {
+            Assert.ThrowsAsync<ArgumentNullException>(
+                async () => await controller.CreateOrderItemsAsync(orderId, null));
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateOrderItemsAsync_OrderNotFound_ReturnsNotFound(
+            string orderId,
+            IEnumerable<CreateOrderItemBaseModel> model,
+            OrderItemsController controller)
+        {
+            var response = await controller.CreateOrderItemsAsync(orderId, model);
+
+            response.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateOrderItemsAsync_ConvertsModelToServiceRecipient(
+            string orderId,
+            CreateOrderItemSolutionModel model,
+            Order order,
+            [Frozen] Mock<IServiceRecipientRepository> service,
+            [Frozen] Mock<IOrderRepository> repository,
+            OrderItemsController controller)
+        {
+            repository.Setup(r => r.GetOrderByIdAsync(orderId)).ReturnsAsync(order);
+            var models = new[] { model };
+
+            IReadOnlyList<ServiceRecipient> recipients = null;
+
+            service.Setup(s => s.UpdateWithoutSavingAsync(orderId, It.IsNotNull<IEnumerable<ServiceRecipient>>()))
+                .Callback<string, IEnumerable<ServiceRecipient>>((o, r) => recipients = r.ToList());
+
+            await controller.CreateOrderItemsAsync(orderId, models);
+
+            var expectedServiceRecipient = new
+            {
+                model.ServiceRecipient.OdsCode,
+                model.ServiceRecipient.Name,
+                OrderId = orderId,
+            };
+
+            recipients.Should().NotBeNull();
+            recipients.Should().HaveCount(1);
+            recipients[0].Should().BeEquivalentTo(expectedServiceRecipient);
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateOrderItemsAsync_ConvertsModelToRequest(
+            string orderId,
+            CreateOrderItemAdditionalServiceModel model,
+            Order order,
+            [Frozen] Mock<ICreateOrderItemService> service,
+            [Frozen] Mock<IOrderRepository> repository,
+            OrderItemsController controller)
+        {
+            repository.Setup(r => r.GetOrderByIdAsync(orderId)).ReturnsAsync(order);
+            var models = new[] { model };
+
+            IReadOnlyList<CreateOrderItemRequest> requests = null;
+
+            service.Setup(s => s.CreateAsync(order, It.IsNotNull<IEnumerable<CreateOrderItemRequest>>()))
+                .Callback<Order, IEnumerable<CreateOrderItemRequest>>((o, r) => requests = r.ToList());
+
+            await controller.CreateOrderItemsAsync(orderId, models);
+
+            requests.Should().NotBeNull();
+            requests.Should().HaveCount(1);
+            requests[0].Should().BeEquivalentTo(model.ToRequest(order));
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateOrderItemsAsync_ServiceRecipientRepository_InvokesUpdatedWithoutSavingAsync(
+            string orderId,
+            IEnumerable<CreateOrderItemBaseModel> model,
+            Order order,
+            [Frozen] Mock<IServiceRecipientRepository> service,
+            [Frozen] Mock<IOrderRepository> repository,
+            OrderItemsController controller)
+        {
+            repository.Setup(r => r.GetOrderByIdAsync(orderId)).ReturnsAsync(order);
+            await controller.CreateOrderItemsAsync(orderId, model);
+
+            service.Verify(s => s.UpdateWithoutSavingAsync(
+                It.Is<string>(o => o == orderId),
+                It.IsNotNull<IEnumerable<ServiceRecipient>>()));
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateOrderItemsAsync_InvokesCreateOrderItemsAsync(
+            string orderId,
+            IEnumerable<CreateOrderItemBaseModel> model,
+            Order order,
+            [Frozen] Mock<ICreateOrderItemService> service,
+            [Frozen] Mock<IOrderRepository> repository,
+            OrderItemsController controller)
+        {
+            repository.Setup(r => r.GetOrderByIdAsync(orderId)).ReturnsAsync(order);
+            await controller.CreateOrderItemsAsync(orderId, model);
+
+            service.Verify(s => s.CreateAsync(
+                It.Is<Order>(o => o == order),
+                It.IsNotNull<IEnumerable<CreateOrderItemRequest>>()));
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateOrderItemsAsync_ReturnsExpectedResult(
+            string orderId,
+            IEnumerable<CreateOrderItemBaseModel> model,
+            Order order,
+            [Frozen] Mock<IOrderRepository> repository,
+            OrderItemsController controller)
+        {
+            repository.Setup(r => r.GetOrderByIdAsync(orderId)).ReturnsAsync(order);
+            var response = await controller.CreateOrderItemsAsync(orderId, model);
+
+            response.Should().BeOfType<CreatedAtActionResult>();
         }
 
         [Test]

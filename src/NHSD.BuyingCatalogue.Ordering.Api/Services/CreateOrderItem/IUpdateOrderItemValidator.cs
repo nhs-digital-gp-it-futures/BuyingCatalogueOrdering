@@ -6,6 +6,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 {
     public interface IUpdateOrderItemValidator
     {
-        IEnumerable<ErrorDetails> Validate(UpdateOrderItemRequest request, CatalogueItemType itemType, ProvisioningType provisioningType);
+        IEnumerable<ErrorDetails> Validate(UpdateOrderItemRequest request, CatalogueItemType itemType, ProvisioningType? provisioningType);
     }
 }

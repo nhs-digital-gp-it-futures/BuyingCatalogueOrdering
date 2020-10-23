@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoFixture;
+using AutoFixture.AutoMoq;
+using AutoFixture.Idioms;
+using AutoFixture.NUnit3;
 using FluentAssertions;
 using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
+using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
@@ -17,70 +23,29 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class CreateOrderItemServiceTests
+    [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
+    internal static class CreateOrderItemServiceTests
     {
         [Test]
-        public void Constructor_NullOrderRepository_ThrowsArgumentNullException()
+        public static void Contructors_VerifyGuardClauses()
         {
-            static void Test()
-            {
-                CreateOrderItemServiceBuilder
-                    .Create()
-                    .WithOrderRepository(null)
-                    .WithIdentityService(Mock.Of<IIdentityService>())
-                    .WithValidator(Mock.Of<ICreateOrderItemValidator>())
-                    .Build();
-            }
+            var fixture = new Fixture().Customize(new AutoMoqCustomization());
+            var assertion = new GuardClauseAssertion(fixture);
+            var constructors = typeof(CreateOrderItemService).GetConstructors();
 
-            Assert.Throws<ArgumentNullException>(Test);
+            assertion.Verify(constructors);
         }
 
         [Test]
-        public void Constructor_NullIdentityService_ThrowsArgumentNullException()
+        public static void CreateAsync_NullCreateOrderItemRequest_ThrowsArgumentNullException()
         {
-            static void Test()
-            {
-                CreateOrderItemServiceBuilder
-                    .Create()
-                    .WithOrderRepository(Mock.Of<IOrderRepository>())
-                    .WithIdentityService(null)
-                    .WithValidator(Mock.Of<ICreateOrderItemValidator>())
-                    .Build();
-            }
+            var sut = CreateOrderItemServiceBuilder.Create().Build();
 
-            Assert.Throws<ArgumentNullException>(Test);
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.CreateAsync(null));
         }
 
         [Test]
-        public void Constructor_NullValidator_ThrowsArgumentNullException()
-        {
-            static void Test()
-            {
-                CreateOrderItemServiceBuilder
-                    .Create()
-                    .WithOrderRepository(Mock.Of<IOrderRepository>())
-                    .WithIdentityService(Mock.Of<IIdentityService>())
-                    .WithValidator(null)
-                    .Build();
-            }
-
-            Assert.Throws<ArgumentNullException>(Test);
-        }
-
-        [Test]
-        public void CreateAsync_NullCreateOrderItemRequest_ThrowsArgumentNullException()
-        {
-            static async Task Test()
-            {
-                var sut = CreateOrderItemServiceBuilder.Create().Build();
-                await sut.CreateAsync(null);
-            }
-
-            Assert.ThrowsAsync<ArgumentNullException>(Test);
-        }
-
-        [Test]
-        public async Task CreateAsync_ValidatorReturnsErrors_ReturnsFailure()
+        public static async Task CreateAsync_ValidatorReturnsErrors_ReturnsFailure()
         {
             var context = CreateOrderItemServiceTestContext.Setup();
             var expectedErrors = new List<ErrorDetails>
@@ -100,7 +65,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public async Task CreateAsync_CreateOrderItemRequest_ReturnsSuccess()
+        public static async Task CreateAsync_CreateOrderItemRequest_ReturnsSuccess()
         {
             var context = CreateOrderItemServiceTestContext.Setup();
 
@@ -114,18 +79,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             actual.Should().Be(Result.Success(expected));
         }
 
-        [TestCase(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.OnDemand), "year")]
-        [TestCase(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.Patient), "month")]
-        [TestCase(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.Declarative), "year")]
-        [TestCase(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.OnDemand), "year")]
-        [TestCase(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.Patient), "month")]
-        [TestCase(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.Declarative), "year")]
-        [TestCase(nameof(CatalogueItemType.AssociatedService), nameof(ProvisioningType.OnDemand), "year")]
+        [TestCase(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.OnDemand), TimeUnit.PerYear)]
+        [TestCase(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.Patient), TimeUnit.PerMonth)]
+        [TestCase(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.Declarative), TimeUnit.PerYear)]
+        [TestCase(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.OnDemand), TimeUnit.PerYear)]
+        [TestCase(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.Patient), TimeUnit.PerMonth)]
+        [TestCase(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.Declarative), TimeUnit.PerYear)]
+        [TestCase(nameof(CatalogueItemType.AssociatedService), nameof(ProvisioningType.OnDemand), TimeUnit.PerYear)]
         [TestCase(nameof(CatalogueItemType.AssociatedService), nameof(ProvisioningType.Declarative), null)]
-        public async Task CreateAsync_MapCreateOrderItemRequestToOrderItem_AreEqual(
-            string catalogueItemTypeNameInput, 
+        public static async Task CreateAsync_MapCreateOrderItemRequestToOrderItem_AreEqual(
+            string catalogueItemTypeNameInput,
             string provisioningTypeNameInput,
-            string expectedEstimationPeriodNameInput)
+            TimeUnit? expectedEstimationPeriodNameInput)
         {
             var context = CreateOrderItemServiceTestContext.Setup();
 
@@ -144,22 +109,22 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 createOrderItemRequest.CatalogueItemId,
                 createOrderItemRequest.CatalogueItemName,
                 ParentCatalogueItemId = createOrderItemRequest.CatalogueSolutionId,
-                ProvisioningType = ProvisioningType.FromName(createOrderItemRequest.ProvisioningTypeName),
-                CataloguePriceType = CataloguePriceType.FromName(createOrderItemRequest.CataloguePriceTypeName),
+                ProvisioningType = createOrderItemRequest.ProvisioningType.Value,
+                createOrderItemRequest.CataloguePriceType,
                 CataloguePriceUnit = CataloguePriceUnit.Create(
-                    createOrderItemRequest.CataloguePriceUnitTierName, 
+                    createOrderItemRequest.CataloguePriceUnitTierName,
                     createOrderItemRequest.CataloguePriceUnitDescription),
-                PriceTimeUnit = TimeUnit.FromName(createOrderItemRequest.PriceTimeUnitName),
+                createOrderItemRequest.PriceTimeUnit,
                 createOrderItemRequest.CurrencyCode,
                 createOrderItemRequest.Quantity,
-                EstimationPeriod = TimeUnit.FromName(expectedEstimationPeriodNameInput),
+                EstimationPeriod = expectedEstimationPeriodNameInput,
                 createOrderItemRequest.DeliveryDate,
                 createOrderItemRequest.Price
             });
         }
 
         [Test]
-        public async Task CreateAsync_OrderRepository_CalledOnce()
+        public static async Task CreateAsync_OrderRepository_CalledOnce()
         {
             var context = CreateOrderItemServiceTestContext.Setup();
 
@@ -169,12 +134,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             await context.CreateOrderItemService.CreateAsync(createOrderItemRequest);
 
-            context.OrderRepositoryMock.Verify(orderRepository => 
+            context.OrderRepositoryMock.Verify(orderRepository =>
                 orderRepository.UpdateOrderAsync(createOrderItemRequest.Order), Times.Once);
         }
 
         [Test]
-        public async Task CreateAsync_OrderItemValidator_CalledOnce()
+        public static async Task CreateAsync_OrderItemValidator_CalledOnce()
         {
             var context = CreateOrderItemServiceTestContext.Setup();
 
@@ -189,7 +154,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public async Task CreateAsync_IdentityService_CalledTwice()
+        public static async Task CreateAsync_IdentityService_CalledTwice()
         {
             var context = CreateOrderItemServiceTestContext.Setup();
 
@@ -199,32 +164,33 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             await context.CreateOrderItemService.CreateAsync(createOrderItemRequest);
 
-            context.IdentityServiceMock.Verify(identityService => 
+            context.IdentityServiceMock.Verify(identityService =>
                 identityService.GetUserName(), Times.Once);
 
-            context.IdentityServiceMock.Verify(identityService => 
+            context.IdentityServiceMock.Verify(identityService =>
                 identityService.GetUserIdentity(), Times.Once);
         }
 
-        [TestCase(nameof(CatalogueItemType.Solution), null)]
-        [TestCase(nameof(CatalogueItemType.Solution), "month")]
-        [TestCase(nameof(CatalogueItemType.Solution), "year")]
-        [TestCase(nameof(CatalogueItemType.AdditionalService), null)]
-        [TestCase(nameof(CatalogueItemType.AdditionalService), "month")]
-        [TestCase(nameof(CatalogueItemType.AdditionalService), "year")]
-        [TestCase(nameof(CatalogueItemType.AssociatedService), null)]
-        [TestCase(nameof(CatalogueItemType.AssociatedService), "month")]
-        [TestCase(nameof(CatalogueItemType.AssociatedService), "year")]
-        public async Task CreateAsync_ProvisioningType_OnDemand_OrderItemAddedWithExpectedEstimationPeriod(
+        [TestCase(nameof(CatalogueItemType.Solution), null, null)]
+        [TestCase(nameof(CatalogueItemType.Solution), "month", TimeUnit.PerMonth)]
+        [TestCase(nameof(CatalogueItemType.Solution), "year", TimeUnit.PerYear)]
+        [TestCase(nameof(CatalogueItemType.AdditionalService), null, null)]
+        [TestCase(nameof(CatalogueItemType.AdditionalService), "month", TimeUnit.PerMonth)]
+        [TestCase(nameof(CatalogueItemType.AdditionalService), "year", TimeUnit.PerYear)]
+        [TestCase(nameof(CatalogueItemType.AssociatedService), null, null)]
+        [TestCase(nameof(CatalogueItemType.AssociatedService), "month", TimeUnit.PerMonth)]
+        [TestCase(nameof(CatalogueItemType.AssociatedService), "year", TimeUnit.PerYear)]
+        public static async Task CreateAsync_ProvisioningType_OnDemand_OrderItemAddedWithExpectedEstimationPeriod(
             string catalogueItemTypeNameInput,
-            string inputEstimationPeriod)
+            string inputEstimationPeriod,
+            TimeUnit? expectedEstimationPeriod)
         {
             var context = CreateOrderItemServiceTestContext.Setup();
 
             var createOrderItemRequest = CreateOrderItemRequestBuilder
                 .Create()
                 .WithCatalogueItemType(CatalogueItemType.FromName(catalogueItemTypeNameInput))
-                .WithProvisioningTypeName(ProvisioningType.OnDemand.Name)
+                .WithProvisioningTypeName(ProvisioningType.OnDemand.ToString())
                 .WithEstimationPeriodName(inputEstimationPeriod)
                 .Build();
 
@@ -232,13 +198,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             var orderItem = createOrderItemRequest.Order.OrderItems.First();
 
-            var expectedEstimationPeriod = TimeUnit.FromName(inputEstimationPeriod);
             orderItem.EstimationPeriod.Should().Be(expectedEstimationPeriod);
         }
 
         [TestCase(nameof(CatalogueItemType.Solution))]
         [TestCase(nameof(CatalogueItemType.AdditionalService))]
-        public async Task CreateAsync_ProvisioningType_Patient_OrderItemAddedWithEstimationPeriod_PerMonth(
+        public static async Task CreateAsync_ProvisioningType_Patient_OrderItemAddedWithEstimationPeriod_PerMonth(
             string catalogueItemTypeNameInput)
         {
             var context = CreateOrderItemServiceTestContext.Setup();
@@ -246,7 +211,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             var createOrderItemRequest = CreateOrderItemRequestBuilder
                 .Create()
                 .WithCatalogueItemType(CatalogueItemType.FromName(catalogueItemTypeNameInput))
-                .WithProvisioningTypeName(ProvisioningType.Patient.Name)
+                .WithProvisioningTypeName(ProvisioningType.Patient.ToString())
                 .WithEstimationPeriodName(null)
                 .Build();
 
@@ -256,26 +221,124 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             orderItem.EstimationPeriod.Should().Be(TimeUnit.PerMonth);
         }
 
-        [TestCase(nameof(CatalogueItemType.Solution), "year")]
-        [TestCase(nameof(CatalogueItemType.AdditionalService), "year")]
+        [TestCase(nameof(CatalogueItemType.Solution), TimeUnit.PerYear)]
+        [TestCase(nameof(CatalogueItemType.AdditionalService), TimeUnit.PerYear)]
         [TestCase(nameof(CatalogueItemType.AssociatedService), null)]
-        public async Task CreateAsync_ProvisioningType_Declarative_OrderItemAddedWithEstimationPeriod_PerYear(
+        public static async Task CreateAsync_ProvisioningType_Declarative_OrderItemAddedWithEstimationPeriod_PerYear(
             string catalogueItemTypeNameInput,
-            string expectedEstimationPeriodNameInput)
+            TimeUnit? expectedEstimationPeriodNameInput)
         {
             var context = CreateOrderItemServiceTestContext.Setup();
 
             var createOrderItemRequest = CreateOrderItemRequestBuilder
                 .Create()
                 .WithCatalogueItemType(CatalogueItemType.FromName(catalogueItemTypeNameInput))
-                .WithProvisioningTypeName(ProvisioningType.Declarative.Name)
+                .WithProvisioningTypeName(ProvisioningType.Declarative.ToString())
                 .WithEstimationPeriodName(null)
                 .Build();
 
             await context.CreateOrderItemService.CreateAsync(createOrderItemRequest);
 
             var orderItem = createOrderItemRequest.Order.OrderItems.First();
-            orderItem.EstimationPeriod.Should().Be(TimeUnit.FromName(expectedEstimationPeriodNameInput));
+            orderItem.EstimationPeriod.Should().Be(expectedEstimationPeriodNameInput);
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void CreateAsync_IEnumerable_CreateOrderItemRequest_NullOrder_ThrowsException(
+            IEnumerable<CreateOrderItemRequest> requests,
+            CreateOrderItemService service)
+        {
+            Assert.ThrowsAsync<ArgumentNullException>(() => service.CreateAsync(null, requests));
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void CreateAsync_IEnumerable_CreateOrderItemRequest_NullRequests_ThrowsException(
+            Order order,
+            CreateOrderItemService service)
+        {
+            Assert.ThrowsAsync<ArgumentNullException>(() => service.CreateAsync(order, null));
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateAsync_Order_IEnumerable_CreateOrderItemRequest_AddsExpectedOrderItemToOrder(
+            [Frozen] Mock<IOrderItemFactory> orderItemFactory,
+            [Frozen] Mock<IIdentityService> identityService,
+            string userName,
+            Order order,
+            OrderItem item,
+            CreateOrderItemRequest request,
+            CreateOrderItemService service)
+        {
+            identityService.Setup(i => i.GetUserName()).Returns(userName);
+            orderItemFactory.Setup(f => f.Create(request)).Returns(item);
+
+            await service.CreateAsync(order, new[] { request });
+
+            order.OrderItems.Should().HaveCount(1);
+            order.OrderItems.Should().Contain(item);
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateAsync_Order_IEnumerable_CreateOrderItemRequest_UsesExpectedUserId(
+            [Frozen] Mock<IOrderItemFactory> orderItemFactory,
+            [Frozen] Mock<IIdentityService> identityService,
+            Guid userId,
+            string userName,
+            Order order,
+            OrderItem item,
+            CreateOrderItemRequest request,
+            CreateOrderItemService service)
+        {
+            identityService.Setup(i => i.GetUserIdentity()).Returns(userId);
+            identityService.Setup(i => i.GetUserName()).Returns(userName);
+            orderItemFactory.Setup(f => f.Create(request)).Returns(item);
+
+            await service.CreateAsync(order, new[] { request });
+
+            order.LastUpdatedBy.Should().Be(userId);
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateAsync_Order_IEnumerable_CreateOrderItemRequest_UsesExpectedUserName(
+            [Frozen] Mock<IOrderItemFactory> orderItemFactory,
+            [Frozen] Mock<IIdentityService> identityService,
+            string userName,
+            Order order,
+            OrderItem item,
+            CreateOrderItemRequest request,
+            CreateOrderItemService service)
+        {
+            identityService.Setup(i => i.GetUserName()).Returns(userName);
+            orderItemFactory.Setup(f => f.Create(request)).Returns(item);
+
+            await service.CreateAsync(order, new[] { request });
+
+            order.LastUpdatedByName.Should().Be(userName);
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateAsync_Order_IEnumerable_CreateOrderItemRequest_InvokesUpdateOrderAsync(
+            [Frozen] Mock<IOrderItemFactory> orderItemFactory,
+            [Frozen] Mock<IIdentityService> identityService,
+            [Frozen] Mock<IOrderRepository> repository,
+            string userName,
+            Order order,
+            OrderItem item,
+            CreateOrderItemRequest request,
+            CreateOrderItemService service)
+        {
+            identityService.Setup(i => i.GetUserName()).Returns(userName);
+            orderItemFactory.Setup(f => f.Create(request)).Returns(item);
+
+            await service.CreateAsync(order, new[] { request });
+
+            repository.Verify(r => r.UpdateOrderAsync(order));
         }
 
         private sealed class CreateOrderItemServiceTestContext
@@ -302,7 +365,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                     .Build();
             }
 
-
             internal ICreateOrderItemService CreateOrderItemService { get; }
 
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
@@ -317,7 +379,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             private Guid UserId { get; }
 
-            internal static CreateOrderItemServiceTestContext Setup() => 
+            internal static CreateOrderItemServiceTestContext Setup() =>
                 new CreateOrderItemServiceTestContext();
         }
     }

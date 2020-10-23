@@ -204,6 +204,33 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
+        public static void SetDescription_NullDescription_ThrowsException()
+        {
+            var order = OrderBuilder.Create().Build();
+
+            Assert.Throws<ArgumentNullException>(() => order.SetDescription(null));
+        }
+
+        [Test]
+        public static void SetDescription_SetsExpectedDescription()
+        {
+            var order = OrderBuilder.Create().Build();
+            var description = OrderDescription.Create("Description").Value;
+
+            order.SetDescription(description);
+
+            order.Description.Should().Be(description);
+        }
+
+        [Test]
+        public static void SetServiceRecipient_NullRecipients_ThrowsException()
+        {
+            var order = OrderBuilder.Create().Build();
+
+            Assert.Throws<ArgumentNullException>(() => order.SetServiceRecipients(null, Guid.Empty, "name"));
+        }
+
+        [Test]
         public static void UpdateOrderItem_OrderItemNotFound_NoOrderItemChange()
         {
             const int orderItemId = 1;
@@ -378,9 +405,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             order.CalculateCostPerYear(CostType.OneOff).Should().Be(0);
         }
 
-        [TestCase(nameof(CatalogueItemType.AssociatedService), nameof(ProvisioningType.OnDemand), 10, 2, 720)]
-        [TestCase(nameof(CatalogueItemType.AssociatedService), nameof(ProvisioningType.Declarative), 20, 4, 960)]
-        public static void CalculateTotalOwnershipCost_SingleOneOffOrRecurringOrderItem_ReturnsTotalOwnershipCost(string catalogueItemTypeName, string provisioningTypeName, decimal price, int quantity, decimal totalOwnershipCost)
+        [TestCase(nameof(CatalogueItemType.AssociatedService), ProvisioningType.OnDemand, 10, 2, 720)]
+        [TestCase(nameof(CatalogueItemType.AssociatedService), ProvisioningType.Declarative, 20, 4, 960)]
+        public static void CalculateTotalOwnershipCost_SingleOneOffOrRecurringOrderItem_ReturnsTotalOwnershipCost(
+            string catalogueItemTypeName,
+            ProvisioningType provisioningType,
+            decimal price,
+            int quantity,
+            decimal totalOwnershipCost)
         {
             const int orderItemId = 1;
 
@@ -388,7 +420,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
                 .Create()
                 .WithOrderItemId(orderItemId)
                 .WithCatalogueItemType(CatalogueItemType.FromName(catalogueItemTypeName))
-                .WithProvisioningType(ProvisioningType.FromName(provisioningTypeName))
+                .WithProvisioningType(provisioningType)
                 .WithPrice(price)
                 .WithQuantity(quantity)
                 .Build();

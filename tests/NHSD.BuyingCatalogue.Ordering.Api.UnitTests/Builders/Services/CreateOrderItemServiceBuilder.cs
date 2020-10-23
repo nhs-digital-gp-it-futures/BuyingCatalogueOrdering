@@ -7,43 +7,44 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
 {
     internal sealed class CreateOrderItemServiceBuilder
     {
-        private IOrderRepository _orderRepository;
-        private IIdentityService _identityService;
-        private ICreateOrderItemValidator _createOrderItemValidator;
+        private IOrderRepository orderRepository;
+        private IIdentityService identityService;
+        private ICreateOrderItemValidator createOrderItemValidator;
 
         private CreateOrderItemServiceBuilder()
         {
-            _orderRepository = Mock.Of<IOrderRepository>();
-            _identityService = Mock.Of<IIdentityService>();
-            _createOrderItemValidator = Mock.Of<ICreateOrderItemValidator>();
+            orderRepository = Mock.Of<IOrderRepository>();
+            identityService = Mock.Of<IIdentityService>();
+            createOrderItemValidator = Mock.Of<ICreateOrderItemValidator>();
         }
 
         public static CreateOrderItemServiceBuilder Create() => new CreateOrderItemServiceBuilder();
 
-        public CreateOrderItemServiceBuilder WithOrderRepository(IOrderRepository orderRepository)
+        public CreateOrderItemServiceBuilder WithOrderRepository(IOrderRepository repository)
         {
-            _orderRepository = orderRepository;
+            this.orderRepository = repository;
             return this;
         }
 
-        public CreateOrderItemServiceBuilder WithIdentityService(IIdentityService identityService)
+        public CreateOrderItemServiceBuilder WithIdentityService(IIdentityService service)
         {
-            _identityService = identityService;
+            this.identityService = service;
             return this;
         }
 
-        public CreateOrderItemServiceBuilder WithValidator(ICreateOrderItemValidator createOrderItemValidator)
+        public CreateOrderItemServiceBuilder WithValidator(ICreateOrderItemValidator validator)
         {
-            _createOrderItemValidator = createOrderItemValidator;
+            this.createOrderItemValidator = validator;
             return this;
         }
 
         public CreateOrderItemService Build()
         {
             return new CreateOrderItemService(
-                _orderRepository, 
-                _identityService,
-                _createOrderItemValidator);
+                orderRepository,
+                identityService,
+                Mock.Of<IOrderItemFactory>(),
+                createOrderItemValidator);
         }
     }
 }

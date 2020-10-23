@@ -1,37 +1,13 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using NHSD.BuyingCatalogue.Ordering.Api.Attributes;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
-using NHSD.BuyingCatalogue.Ordering.Domain;
+﻿using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
     public sealed class CreateOrderItemAssociatedServiceModel : CreateOrderItemModel
     {
-        public override CreateOrderItemRequest ToRequest(Order order)
-        {
-            if (order is null)
-                throw new ArgumentNullException(nameof(order));
-            if (Quantity == null)
-                throw new InvalidOperationException($"Model {nameof(Quantity)} should never be null at this point");
+        protected override CatalogueItemType GetItemType() => Domain.CatalogueItemType.AssociatedService;
 
-            return new CreateOrderItemRequest(
-                order,
-                order.OrganisationOdsCode,
-                CatalogueItemId,
-                Domain.CatalogueItemType.AssociatedService,
-                CatalogueItemName,
-                null,
-                ProvisioningType,
-                Type,
-                ItemUnit?.Name,
-                ItemUnit?.Description,
-                null,
-                CurrencyCode,
-                Quantity.Value,
-                EstimationPeriod,
-                null,
-                Price);
-        }
+        protected override string GetOdsCode(Order order) => order.OrganisationOdsCode;
+
+        protected override TimeUnit? TimeUnitModelToTimeUnit() => null;
     }
 }

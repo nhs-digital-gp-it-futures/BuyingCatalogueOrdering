@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using AutoFixture;
+using AutoFixture.AutoMoq;
+using AutoFixture.Idioms;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +18,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Models.Errors;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
+using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
@@ -26,27 +31,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
+    [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class OrdersControllerTests
     {
-        [TestCase(true, false, false)]
-        [TestCase(false, true, false)]
-        [TestCase(false, false, true)]
-        public static void Constructor_NullParameter_ThrowsArgumentNullException(
-            bool isOrderRepositoryNull,
-            bool isCreateOrderServiceNull,
-            bool isServiceRecipientRepositoryNull)
+        [Test]
+        public static void Contructors_VerifyGuardClauses()
         {
-            void Test()
-            {
-                var _ = OrdersControllerBuilder
-                    .Create()
-                    .WithOrderRepository(isOrderRepositoryNull ? null : Mock.Of<IOrderRepository>())
-                    .WithCreateOrderService(isCreateOrderServiceNull ? null : Mock.Of<ICreateOrderService>())
-                    .WithServiceRecipientRepository(isServiceRecipientRepositoryNull ? null : Mock.Of<IServiceRecipientRepository>())
-                    .Build();
-            }
+            var fixture = new Fixture().Customize(new AutoMoqCustomization());
+            var assertion = new GuardClauseAssertion(fixture);
+            var constructors = typeof(OrdersController).GetConstructors();
 
-            Assert.Throws<ArgumentNullException>(Test);
+            assertion.Verify(constructors);
         }
 
         [Test]
@@ -172,14 +167,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public static async Task GetOrderSummaryAsync_OrderIdDoesNotExist_ReturnsNotFound()
+        [OrderingAutoData]
+        public static async Task GetOrderSummaryAsync_OrderNotFound_ReturnsNotFound(
+            string orderId,
+            OrdersController controller)
         {
-            var context = OrdersControllerTestContext.Setup();
+            var response = await controller.GetOrderSummaryAsync(orderId);
 
-            var controller = context.OrdersController;
-
-            var response = await controller.GetOrderSummaryAsync("INVALID");
-            response.Should().BeEquivalentTo(new ActionResult<OrderSummaryModel>(new NotFoundResult()));
+            response.Should().BeOfType<ActionResult<OrderSummaryModel>>();
+            response.As<ActionResult<OrderSummaryModel>>().Result.Should().BeOfType<NotFoundResult>();
         }
 
         [Test]
@@ -455,6 +451,34 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
+        public static async Task CreateOrderAsync_IncludesOrganisationAsServiceRecipient()
+        {
+            const string odsCode = "Ods Code";
+            var orgId = Guid.NewGuid();
+
+            var orderItem = OrderItemBuilder.Create()
+                .WithOdsCode(odsCode)
+                .Build();
+
+            var order = OrderBuilder.Create()
+                .WithOrderItem(orderItem)
+                .WithOrganisationId(orgId)
+                .Build();
+
+            var context = OrdersControllerTestContext.Setup(orgId);
+            context.Order = order;
+
+            var controller = context.OrdersController;
+
+            var response = await controller.GetAsync("order-id");
+            var serviceRecipients = response.Value.ServiceRecipients.ToList();
+
+            serviceRecipients.Should().HaveCount(1);
+            serviceRecipients[0].Name.Should().Be(context.Order.OrganisationName);
+            serviceRecipients[0].OdsCode.Should().Be(odsCode);
+        }
+
+        [Test]
         public static void CreateOrderAsync_NullApplicationUser_ThrowsException()
         {
             var context = OrdersControllerTestContext.Setup();
@@ -466,6 +490,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             }
 
             Assert.ThrowsAsync<ArgumentNullException>(CreateOrder);
+        }
+
+        [Test]
+        public static async Task CreateOrderAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
+        {
+            var context = OrdersControllerTestContext.Setup();
+            context.Order = OrderBuilder
+                .Create()
+                .WithOrganisationId(Guid.NewGuid())
+                .Build();
+
+            var result = await context.OrdersController.CreateOrderAsync(new CreateOrderModel());
+
+            result.Result.Should().BeOfType<ForbidResult>();
         }
 
         [Test]
@@ -775,13 +813,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     {
                         ItemId = $"{repositoryOrder.OrderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
                         ServiceRecipientsOdsCode = orderItem.OdsCode,
-                        CataloguePriceType = orderItem.CataloguePriceType.Name,
+                        CataloguePriceType = orderItem.CataloguePriceType.ToString(),
                         CatalogueItemType = orderItem.CatalogueItemType.Name,
                         CatalogueItemName = orderItem.CatalogueItemName,
-                        ProvisioningType = orderItem.ProvisioningType.Name,
+                        ProvisioningType = orderItem.ProvisioningType.ToString(),
                         ItemUnitDescription = orderItem.CataloguePriceUnit.Description,
-                        TimeUnitDescription = orderItem.PriceTimeUnit?.Description,
-                        QuantityPeriodDescription = orderItem.EstimationPeriod?.Description,
+                        TimeUnitDescription = orderItem.PriceTimeUnit?.Description(),
+                        QuantityPeriodDescription = orderItem.EstimationPeriod?.Description(),
                         Price = orderItem.Price,
                         Quantity = orderItem.Quantity,
                         CostPerYear = orderItem.CalculateTotalCostPerYear(),
@@ -1218,7 +1256,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         OrderBuilder
                             .Create()
                             .WithOrganisationId(organisationId)
-                            .WithFundingSourceOnlyGms((bool?)true)
+                            .WithFundingSourceOnlyGms(true)
                             .Build(),
                         OrderSummaryModelBuilder
                             .Create()
@@ -1233,7 +1271,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         OrderBuilder
                             .Create()
                             .WithOrganisationId(organisationId)
-                            .WithFundingSourceOnlyGms((bool?)false)
+                            .WithFundingSourceOnlyGms(false)
                             .Build(),
                         OrderSummaryModelBuilder
                             .Create()

@@ -1,83 +1,37 @@
-﻿using System.Collections.Generic;
-using FluentAssertions;
+﻿using FluentAssertions;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class TimeUnitTests
+    internal static class TimeUnitTests
     {
-        [Test]
-        public void List_ReturnsExpectedList()
+        [TestCase(TimeUnit.PerMonth, 12)]
+        [TestCase(TimeUnit.PerYear, 1)]
+        public static void EachTimeUnit_HasExpectedAmountInYear(TimeUnit timeUnit, int expectedAmountInYear)
         {
-            var actual = TimeUnit.List();
+            var actualAmountInYear = timeUnit.AmountInYear();
 
-            var expected = new List<TimeUnit>
-            {
-                TimeUnit.PerYear, 
-                TimeUnit.PerMonth
-            };
-
-            actual.Should().BeEquivalentTo(expected);
+            actualAmountInYear.Should().Be(expectedAmountInYear);
         }
 
-        [Test]
-        public void FromId_TimeUnitId_ReturnsExpectedType()
+        [TestCase(TimeUnit.PerMonth, "per month")]
+        [TestCase(TimeUnit.PerYear, "per year")]
+        public static void EachTimeUnit_HasExpectedDescription(TimeUnit timeUnit, string expectedDescription)
         {
-            var actual = TimeUnit.FromId(1);
+            var actualDescription = timeUnit.Description();
 
-            actual.Should().Be(TimeUnit.PerMonth);
+            actualDescription.Should().Be(expectedDescription);
         }
 
-        [Test]
-        public void FromId_UnknownTimeUnitId_ReturnsNull()
+        [TestCase(TimeUnit.PerMonth, "month")]
+        [TestCase(TimeUnit.PerYear, "year")]
+        public static void EachTimeUnit_HasExpectedDisplayName(TimeUnit timeUnit, string expectedDisplayName)
         {
-            var actual = TimeUnit.FromId(10);
-            actual.Should().BeNull();
-        }
+            var actualDisplayName = timeUnit.Name();
 
-        [TestCase("Month")]
-        [TestCase("month")]
-        [TestCase("mONTh")]
-        public void FromName_TimeUnitName_ReturnsExpectedType(string timeUnitName)
-        {
-            var actual = TimeUnit.FromName(timeUnitName);
-
-            actual.Should().Be(TimeUnit.PerMonth);
-        }
-
-        [TestCase("Unknown")]
-        [TestCase(null)]
-        [TestCase("")]
-        [TestCase("   ")]
-        public void FromName_UnknownTimeUnitName_ReturnsNull(string name)
-        {
-            var actual = TimeUnit.FromName(name);
-            actual.Should().BeNull();
-        }
-
-        [TestCase(null)]
-        [TestCase("InvalidType")]
-        public void Equals_ComparisonObject_AreNotEqual(object comparisonObject)
-        {
-            TimeUnit.PerYear.Equals(comparisonObject).Should().BeFalse();
-        }
-
-        [Test]
-        public void Equals_Same_AreEqual()
-        {
-            var instance = TimeUnit.PerYear;
-            instance.Equals(instance).Should().BeTrue();
-        }
-
-        [Test]
-        public void Equals_Different_AreNotEqual()
-        {
-            var instance = TimeUnit.PerYear;
-            var comparisonObject = TimeUnit.PerMonth;
-
-            instance.Equals(comparisonObject).Should().BeFalse();
+            actualDisplayName.Should().Be(expectedDisplayName);
         }
     }
 }

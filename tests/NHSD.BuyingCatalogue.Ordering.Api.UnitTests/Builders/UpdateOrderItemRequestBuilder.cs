@@ -7,69 +7,69 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
     internal sealed class UpdateOrderItemRequestBuilder
     {
-        private DateTime? _deliveryDate;
-        private Order _order;
-        private string _estimationPeriodName;
-        private int _orderItemId;
-        private decimal? _price;
-        private int _quantity;
+        private DateTime? deliveryDate;
+        private Order order;
+        private string estimationPeriodName;
+        private int orderItemId;
+        private decimal? price;
+        private int quantity;
 
         private UpdateOrderItemRequestBuilder()
         {
-            _deliveryDate = DateTime.UtcNow;
-            _estimationPeriodName = "year";
-            _order = OrderBuilder.Create().Build();
-            _orderItemId = 1;
-            _price = 2;
-            _quantity = 10;
+            deliveryDate = DateTime.UtcNow;
+            estimationPeriodName = "year";
+            order = OrderBuilder.Create().Build();
+            orderItemId = 1;
+            price = 2;
+            quantity = 10;
         }
 
         public static UpdateOrderItemRequestBuilder Create() => new UpdateOrderItemRequestBuilder();
 
-        public UpdateOrderItemRequestBuilder WithOrder(Order order)
+        public UpdateOrderItemRequestBuilder WithOrder(Order o)
         {
-            _order = order;
+            order = o;
             return this;
         }
 
-        public UpdateOrderItemRequestBuilder WithOrderItemId(int orderItemId)
+        public UpdateOrderItemRequestBuilder WithOrderItemId(int itemId)
         {
-            _orderItemId = orderItemId;
+            orderItemId = itemId;
             return this;
         }
 
-        public UpdateOrderItemRequestBuilder WithQuantity(int quantity)
+        public UpdateOrderItemRequestBuilder WithQuantity(int number)
         {
-            _quantity = quantity;
+            quantity = number;
             return this;
         }
 
-        public UpdateOrderItemRequestBuilder WithEstimationPeriodName(string estimationPeriodName)
+        public UpdateOrderItemRequestBuilder WithEstimationPeriodName(string name)
         {
-            _estimationPeriodName = estimationPeriodName;
+            estimationPeriodName = name;
             return this;
         }
 
-        public UpdateOrderItemRequestBuilder WithDeliveryDate(DateTime? deliveryDate)
+        public UpdateOrderItemRequestBuilder WithDeliveryDate(DateTime? date)
         {
-            _deliveryDate = deliveryDate;
+            this.deliveryDate = date;
             return this;
         }
 
-        public UpdateOrderItemRequestBuilder WithPrice(decimal? price)
+        public UpdateOrderItemRequestBuilder WithPrice(decimal? cost)
         {
-            _price = price;
+            price = cost;
             return this;
         }
 
         public UpdateOrderItemRequest Build() =>
             new UpdateOrderItemRequest(
-                _deliveryDate,
-                _estimationPeriodName,
-                _order,
-                _orderItemId,
-                _price,
-                _quantity
+                deliveryDate,
+                estimationPeriodName,
+                order,
+                orderItemId,
+                price,
+                quantity
             );
     }
 }

@@ -1,30 +1,30 @@
 ﻿using AutoFixture;
+using AutoFixture.Kernel;
+using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
 {
     internal class OrderingCustomization : ICustomization
     {
-        private readonly OrderingCustomizationOptions options;
-
-        internal OrderingCustomization()
-            : this(new OrderingCustomizationOptions())
-        {
-        }
-
-        internal OrderingCustomization(OrderingCustomizationOptions options)
-        {
-            this.options = options;
-        }
-
         public virtual void Customize(IFixture fixture)
         {
             fixture.Register<string, OrderDescription>(s => OrderDescription.Create(s).Value);
             fixture.Register(() => CatalogueItemType.Solution);
-            fixture.Register(() => CataloguePriceType.Flat);
 
-            fixture.Register(() => options.ProvisioningType ?? ProvisioningType.OnDemand);
-            fixture.Register(() => options.TimeUnit);
+            fixture.Customize<TimeUnitModel>(c => c.FromFactory(() => CreateTimeUnitModel(fixture)).OmitAutoProperties());
+            fixture.Customize<GetOrderItemModel>(c => c.OmitAutoProperties());
+        }
+
+        private static TimeUnitModel CreateTimeUnitModel(ISpecimenBuilder fixture)
+        {
+            var timeUnit = fixture.Create<TimeUnit>();
+
+            return new TimeUnitModel
+            {
+                Description = timeUnit.Description(),
+                Name = timeUnit.Name(),
+            };
         }
     }
 }

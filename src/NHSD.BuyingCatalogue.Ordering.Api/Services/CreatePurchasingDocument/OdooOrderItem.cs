@@ -27,14 +27,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
             ProductType = orderItem.CatalogueItemType.DisplayName;
             QuantityOrdered = orderItem.Quantity;
             UnitOfOrder = orderItem.CataloguePriceUnit.Description;
-            UnitTime = orderItem.PriceTimeUnit?.Description;
+            UnitTime = orderItem.PriceTimeUnit?.Description();
 
             EstimationPeriod = orderItem.ProvisioningType.Equals(ProvisioningType.Declarative)
                 ? null
-                : orderItem.EstimationPeriod?.Description;
+                : orderItem.EstimationPeriod?.Description();
 
             Price = orderItem.Price.GetValueOrDefault();
-            OrderType = orderItem.ProvisioningType.Id;
+            OrderType = (int)orderItem.ProvisioningType;
             M1Planned = orderItem.DeliveryDate;
         }
 

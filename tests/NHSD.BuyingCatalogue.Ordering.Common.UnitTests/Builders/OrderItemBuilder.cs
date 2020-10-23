@@ -6,159 +6,159 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
 {
     public sealed class OrderItemBuilder
     {
-        private int? _orderItemId;
-        private string _odsCode;
-        private string _catalogueItemId; 
-        private CatalogueItemType _catalogueItemType; 
-        private string _catalogueItemName;
-        private ProvisioningType _provisioningType; 
-        private CataloguePriceType _cataloguePriceType;
-        private CataloguePriceUnit _cataloguePriceUnit;
-        private TimeUnit _priceTimeUnit;
-        private string _currencyCode; 
-        private int _quantity;
-        private TimeUnit _estimationPeriod;
-        private DateTime? _deliveryDate;
-        private decimal? _price;
-        private DateTime _created;
+        private int? orderItemId;
+        private string odsCode;
+        private string catalogueItemId;
+        private CatalogueItemType catalogueItemType;
+        private string catalogueItemName;
+        private ProvisioningType provisioningType;
+        private CataloguePriceType cataloguePriceType;
+        private CataloguePriceUnit cataloguePriceUnit;
+        private TimeUnit? priceTimeUnit;
+        private string currencyCode;
+        private int quantity;
+        private TimeUnit? estimationPeriod;
+        private DateTime? deliveryDate;
+        private decimal? price;
+        private DateTime created;
 
         private OrderItemBuilder()
         {
-            _odsCode = "ODS1";
-            _catalogueItemId = "1000-001"; 
-            _catalogueItemType = CatalogueItemType.Solution;
-            _catalogueItemName = Guid.NewGuid().ToString();
-            _provisioningType = ProvisioningType.Patient; 
-            _cataloguePriceType = CataloguePriceType.Flat;
-            _cataloguePriceUnit = CataloguePriceUnit.Create("patients", "per patient");
-            _priceTimeUnit = TimeUnit.PerMonth;
-            _currencyCode = "GBP"; 
-            _quantity = 10;
-            _estimationPeriod = TimeUnit.PerYear;
-            _deliveryDate = DateTime.UtcNow;
-            _price = 2.000m;
-            _created = DateTime.UtcNow;
+            odsCode = "ODS1";
+            catalogueItemId = "1000-001";
+            catalogueItemType = CatalogueItemType.Solution;
+            catalogueItemName = Guid.NewGuid().ToString();
+            provisioningType = ProvisioningType.Patient;
+            cataloguePriceType = CataloguePriceType.Flat;
+            cataloguePriceUnit = CataloguePriceUnit.Create("patients", "per patient");
+            priceTimeUnit = TimeUnit.PerMonth;
+            currencyCode = "GBP";
+            quantity = 10;
+            estimationPeriod = TimeUnit.PerYear;
+            deliveryDate = DateTime.UtcNow;
+            price = 2.000m;
+            created = DateTime.UtcNow;
         }
 
-        public static OrderItemBuilder Create() => 
+        public static OrderItemBuilder Create() =>
             new OrderItemBuilder();
 
-        public OrderItemBuilder WithOrderItemId(int orderItemId)
+        public OrderItemBuilder WithOrderItemId(int id)
         {
-            _orderItemId = orderItemId;
+            orderItemId = id;
             return this;
         }
 
-        public OrderItemBuilder WithOdsCode(string odsCode)
+        public OrderItemBuilder WithOdsCode(string code)
         {
-            _odsCode = odsCode;
+            odsCode = code;
             return this;
         }
 
-        public OrderItemBuilder WithCatalogueItemId(string catalogueItemId)
+        public OrderItemBuilder WithCatalogueItemId(string id)
         {
-            _catalogueItemId = catalogueItemId;
+            catalogueItemId = id;
             return this;
         }
 
-        public OrderItemBuilder WithCatalogueItemType(CatalogueItemType catalogueItemType)
+        public OrderItemBuilder WithCatalogueItemType(CatalogueItemType itemType)
         {
-            _catalogueItemType = catalogueItemType;
+            catalogueItemType = itemType;
             return this;
         }
 
-        public OrderItemBuilder WithCatalogueItemName(string catalogueItemName)
+        public OrderItemBuilder WithCatalogueItemName(string name)
         {
-            _catalogueItemName = catalogueItemName;
+            catalogueItemName = name;
             return this;
         }
 
-        public OrderItemBuilder WithProvisioningType(ProvisioningType provisioningType)
+        public OrderItemBuilder WithProvisioningType(ProvisioningType type)
         {
-            _provisioningType = provisioningType;
+            provisioningType = type;
             return this;
         }
 
-        public OrderItemBuilder WithCataloguePriceType(CataloguePriceType cataloguePriceType)
+        public OrderItemBuilder WithCataloguePriceType(CataloguePriceType priceType)
         {
-            _cataloguePriceType = cataloguePriceType;
+            cataloguePriceType = priceType;
             return this;
         }
 
-        public OrderItemBuilder WithCataloguePriceUnit(CataloguePriceUnit cataloguePriceUnit)
+        public OrderItemBuilder WithCataloguePriceUnit(CataloguePriceUnit priceUnit)
         {
-            _cataloguePriceUnit = cataloguePriceUnit;
+            cataloguePriceUnit = priceUnit;
             return this;
         }
 
-        public OrderItemBuilder WithPriceTimeUnit(TimeUnit priceTimeUnit)
+        public OrderItemBuilder WithPriceTimeUnit(TimeUnit? timeUnit)
         {
-            _priceTimeUnit = priceTimeUnit;
+            priceTimeUnit = timeUnit;
             return this;
         }
 
-        public OrderItemBuilder WithCurrencyCode(string currencyCode)
+        public OrderItemBuilder WithCurrencyCode(string code)
         {
-            _currencyCode = currencyCode;
+            currencyCode = code;
             return this;
         }
 
-        public OrderItemBuilder WithQuantity(int quantity)
+        public OrderItemBuilder WithQuantity(int number)
         {
-            _quantity = quantity;
+            quantity = number;
             return this;
         }
 
-        public OrderItemBuilder WithEstimationPeriod(TimeUnit estimationPeriod)
+        public OrderItemBuilder WithEstimationPeriod(TimeUnit? period)
         {
-            _estimationPeriod = estimationPeriod;
+            estimationPeriod = period;
             return this;
         }
 
-        public OrderItemBuilder WithDeliveryDate(DateTime? deliveryDate)
+        public OrderItemBuilder WithDeliveryDate(DateTime? date)
         {
-            _deliveryDate = deliveryDate;
+            deliveryDate = date;
             return this;
         }
 
-        public OrderItemBuilder WithPrice(decimal? price)
+        public OrderItemBuilder WithPrice(decimal? cost)
         {
-            _price = price;
+            price = cost;
             return this;
         }
 
-        public OrderItemBuilder WithCreated(DateTime created)
+        public OrderItemBuilder WithCreated(DateTime dateCreated)
         {
-            _created = created;
+            created = dateCreated;
             return this;
         }
 
         public OrderItem Build()
         {
             var orderItem = new OrderItem(
-                _odsCode,
-                _catalogueItemId,
-                _catalogueItemType,
-                _catalogueItemName,
+                odsCode,
+                catalogueItemId,
+                catalogueItemType,
+                catalogueItemName,
                 null,
-                _provisioningType,
-                _cataloguePriceType,
-                _cataloguePriceUnit,
-                _priceTimeUnit,
-                _currencyCode,
-                _quantity,
-                _estimationPeriod,
-                _deliveryDate,
-                _price);
+                provisioningType,
+                cataloguePriceType,
+                cataloguePriceUnit,
+                priceTimeUnit,
+                currencyCode,
+                quantity,
+                estimationPeriod,
+                deliveryDate,
+                price);
 
-            if (_orderItemId.HasValue)
+            if (orderItemId.HasValue)
             {
-                var fieldInfo = orderItem.GetType().GetField("_orderItemId", BindingFlags.Instance|BindingFlags.NonPublic);
-                fieldInfo?.SetValue(orderItem, _orderItemId.Value);
+                var fieldInfo = orderItem.GetType().GetField("_orderItemId", BindingFlags.Instance | BindingFlags.NonPublic);
+                fieldInfo?.SetValue(orderItem, orderItemId.Value);
             }
 
             var createdFieldInfo = orderItem.GetType().GetField("_created", BindingFlags.Instance | BindingFlags.NonPublic);
-            createdFieldInfo?.SetValue(orderItem, _created);
+            createdFieldInfo?.SetValue(orderItem, created);
 
             return orderItem;
         }

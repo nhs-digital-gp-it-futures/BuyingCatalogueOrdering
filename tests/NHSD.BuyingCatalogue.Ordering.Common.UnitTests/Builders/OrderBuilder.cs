@@ -72,99 +72,99 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             return this;
         }
 
-        public OrderBuilder WithOrganisationId(Guid organisationId)
+        public OrderBuilder WithOrganisationId(Guid id)
         {
-            this.organisationId = organisationId;
+            this.organisationId = id;
             return this;
         }
 
-        public OrderBuilder WithOrganisationContact(Contact organisationContact)
+        public OrderBuilder WithOrganisationContact(Contact contact)
         {
-            this.organisationContact = organisationContact;
+            this.organisationContact = contact;
             return this;
         }
 
-        public OrderBuilder WithSupplierId(string supplierId)
+        public OrderBuilder WithSupplierId(string id)
         {
-            this.supplierId = supplierId;
+            this.supplierId = id;
             return this;
         }
 
-        public OrderBuilder WithSupplierName(string supplierName)
+        public OrderBuilder WithSupplierName(string name)
         {
-            this.supplierName = supplierName;
+            this.supplierName = name;
             return this;
         }
 
-        public OrderBuilder WithSupplierAddress(Address supplierAddress)
+        public OrderBuilder WithSupplierAddress(Address address)
         {
-            this.supplierAddress = supplierAddress;
+            this.supplierAddress = address;
             return this;
         }
 
-        public OrderBuilder WithSupplierContact(Contact supplierContact)
+        public OrderBuilder WithSupplierContact(Contact contact)
         {
-            this.supplierContact = supplierContact;
+            this.supplierContact = contact;
             return this;
         }
 
-        public OrderBuilder WithCommencementDate(DateTime? commencementDate)
+        public OrderBuilder WithCommencementDate(DateTime? date)
         {
-            this.commencementDate = commencementDate;
+            this.commencementDate = date;
             return this;
         }
 
-        public OrderBuilder WithServiceRecipientsViewed(bool serviceRecipientsViewed)
+        public OrderBuilder WithServiceRecipientsViewed(bool viewed)
         {
-            this.serviceRecipientsViewed = serviceRecipientsViewed;
+            this.serviceRecipientsViewed = viewed;
             return this;
         }
 
-        public OrderBuilder WithCatalogueSolutionsViewed(bool catalogueSolutionsViewed)
+        public OrderBuilder WithCatalogueSolutionsViewed(bool viewed)
         {
-            this.catalogueSolutionsViewed = catalogueSolutionsViewed;
+            this.catalogueSolutionsViewed = viewed;
             return this;
         }
 
-        public OrderBuilder WithAdditionalServicesViewed(bool additionalServicesViewed)
+        public OrderBuilder WithAdditionalServicesViewed(bool viewed)
         {
-            this.additionalServicesViewed = additionalServicesViewed;
+            this.additionalServicesViewed = viewed;
             return this;
         }
 
-        public OrderBuilder WithAssociatedServicesViewed(bool associatedServicesViewed)
+        public OrderBuilder WithAssociatedServicesViewed(bool viewed)
         {
-            this.associatedServicesViewed = associatedServicesViewed;
+            this.associatedServicesViewed = viewed;
             return this;
         }
 
-        public OrderBuilder WithFundingSourceOnlyGms(bool? fundingSourceOnlyGms)
+        public OrderBuilder WithFundingSourceOnlyGms(bool? onlyGms)
         {
-            this.fundingSourceOnlyGms = fundingSourceOnlyGms;
+            this.fundingSourceOnlyGms = onlyGms;
             return this;
         }
 
-        public OrderBuilder WithLastUpdatedBy(Guid lastUpdatedBy)
+        public OrderBuilder WithLastUpdatedBy(Guid updatedBy)
         {
-            this.lastUpdatedBy = lastUpdatedBy;
+            this.lastUpdatedBy = updatedBy;
             return this;
         }
 
-        public OrderBuilder WithLastUpdatedByName(string lastUpdatedByName)
+        public OrderBuilder WithLastUpdatedByName(string name)
         {
-            this.lastUpdatedByName = lastUpdatedByName;
+            this.lastUpdatedByName = name;
             return this;
         }
 
-        public OrderBuilder WithLastUpdated(DateTime lastUpdated)
+        public OrderBuilder WithLastUpdated(DateTime updated)
         {
-            this.lastUpdated = lastUpdated;
+            this.lastUpdated = updated;
             return this;
         }
 
-        public OrderBuilder WithCompleted(DateTime? completed)
+        public OrderBuilder WithCompleted(DateTime? dateCompleted)
         {
-            this.completed = completed;
+            this.completed = dateCompleted;
             return this;
         }
 
@@ -221,7 +221,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             if (completed != null)
             {
                 var completedFieldInfo =
-                    order.GetType().GetField("completed", BindingFlags.Instance | BindingFlags.NonPublic);
+                    order.GetType().GetField("_completed", BindingFlags.Instance | BindingFlags.NonPublic);
                 completedFieldInfo?.SetValue(order, completed);
             }
 
