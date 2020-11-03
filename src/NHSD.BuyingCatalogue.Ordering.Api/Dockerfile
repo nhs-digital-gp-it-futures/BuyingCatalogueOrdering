@@ -22,4 +22,4 @@ RUN dotnet publish "NHSD.BuyingCatalogue.Ordering.Api.csproj" -c Release -o /app
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "NHSD.BuyingCatalogue.Ordering.Api.dll"]
+ENTRYPOINT ["/bin/bash", "-c", "./start.sh"]
