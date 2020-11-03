@@ -112,6 +112,10 @@ jobs:
       projects: '**/*IntegrationTests.csproj'
       arguments: '-v n --no-build'
 
+  - script: docker-compose logs
+    displayName: 'Docker Logs'
+    condition: failed()
+
   - script: docker-compose down -v
     displayName: 'Docker down'
 
