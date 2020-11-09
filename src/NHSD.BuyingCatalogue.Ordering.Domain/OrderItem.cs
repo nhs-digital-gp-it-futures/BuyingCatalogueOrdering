@@ -37,7 +37,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
             OdsCode = odsCode;
             CatalogueItemId = catalogueItemId;
-            CatalogueItemType = catalogueItemType ?? throw new ArgumentNullException(nameof(catalogueItemType));
+            CatalogueItemType = catalogueItemType;
             CatalogueItemName = catalogueItemName;
             ParentCatalogueItemId = parentCatalogueItemId;
             ProvisioningType = provisioningType;

@@ -60,9 +60,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
 
         public static OrderBuilder Create() => new OrderBuilder();
 
-        public OrderBuilder WithOrderId(string orderId)
+        public OrderBuilder WithOrderId(string id)
         {
-            this.orderId = orderId;
+            orderId = id;
             return this;
         }
 

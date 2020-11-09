@@ -5,11 +5,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public static class OrderingEnums
     {
+        public const int UndefinedTimeUnit = 0;
+
         public static TimeUnit? ParseTimeUnit(string value)
         {
-            const int undefinedTimeUnit = 0;
+            return Parse<TimeUnit>(value, UndefinedTimeUnit, EnumFormat.DisplayName, EnumFormat.Name);
+        }
 
-            return Parse<TimeUnit>(value, undefinedTimeUnit, EnumFormat.DisplayName, EnumFormat.Name);
+        public static T ParseStrictIgnoreCase<T>(string value)
+            where T : struct, Enum
+        {
+            return Enums.Parse<T>(value, true);
         }
 
         public static T? Parse<T>(string value)

@@ -19,7 +19,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
             actual.Should().BeEquivalentTo(new TimeUnitModel
             {
                 Name = "month",
-                Description = "per month"
+                Description = "per month",
             });
         }
     }

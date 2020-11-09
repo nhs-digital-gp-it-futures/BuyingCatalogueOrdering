@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
@@ -14,15 +18,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     internal sealed class CreateOrderItemBulkSteps
     {
         private readonly Request request;
+        private readonly Response response;
         private readonly Settings settings;
 
         private BulkRequest bulkRequest;
 
         public CreateOrderItemBulkSteps(
             Request request,
+            Response response,
             Settings settings)
         {
             this.request = request;
+            this.response = response;
             this.settings = settings;
         }
 
@@ -50,10 +57,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await bulkRequest.OrderItemsCreatedAsExpected();
         }
 
+        [Then(@"the response contains the following error details")]
+        public async Task ThenTheResponseContainsTheFollowingErrorDetails(Table table)
+        {
+            IReadOnlyList<dynamic> expectedErrorDetails = table.CreateDynamicSet().ToList();
+
+            var expectedErrors = new Dictionary<string, string[]>();
+            for (var i = 0; i < expectedErrorDetails.Count; i++)
+            {
+                var expectedErrorDetail = expectedErrorDetails[i];
+                expectedErrors.Add($"[{i}].{expectedErrorDetail.Field}", new string[] { expectedErrorDetail.Id });
+            }
+
+            var responseBody = await response.ReadBodyAsStringAsync();
+            var problemDetails = JsonConvert.DeserializeObject<ValidationProblemDetails>(responseBody);
+
+            problemDetails.Errors.Should().BeEquivalentTo(expectedErrors);
+        }
+
         private CreateOrderItemBaseRequest CreateItemRequest(RequestInfo info, string orderId)
         {
             var itemRequest = CreateOrderItemBaseRequest.Create(info.ItemType, request, settings.OrderingApiBaseUrl, orderId);
             itemRequest.SetPayload(info.PayloadType);
+
+            var serviceRecipientName = info.ServiceRecipientName;
+            if (string.IsNullOrWhiteSpace(serviceRecipientName))
+                return itemRequest;
 
             var payload = itemRequest.Payload;
             payload.CatalogueItemName = info.CatalogueItemName;

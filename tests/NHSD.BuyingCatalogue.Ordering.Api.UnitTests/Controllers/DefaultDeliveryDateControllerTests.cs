@@ -26,7 +26,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
     internal static class DefaultDeliveryDateControllerTests
     {
         [Test]
-        public static void Contructor_VerifyGuardClauses()
+        public static void Constructor_VerifyGuardClauses()
         {
             var fixture = new Fixture().Customize(new AutoMoqCustomization());
             var assertion = new GuardClauseAssertion(fixture);
@@ -63,7 +63,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [Test]
         [OrderingAutoData]
-        public static async Task AddOrUpdateAsync_NotValid_ReturnsExpectedReponse(
+        public static async Task AddOrUpdateAsync_NotValid_ReturnsExpectedResponse(
             string orderId,
             string catalogueItemId,
             int priceId,

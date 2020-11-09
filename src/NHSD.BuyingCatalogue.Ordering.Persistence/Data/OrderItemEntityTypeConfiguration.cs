@@ -28,7 +28,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 
             builder
                 .Property(orderItem => orderItem.CatalogueItemType)
-                .HasConversion(input => input.Id, output => CatalogueItemType.FromId(output))
+                .HasConversion<int>()
                 .HasColumnName("CatalogueItemTypeId");
 
             builder.Property(orderItem => orderItem.CatalogueItemName)

@@ -48,7 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
             [Frozen] OrderItem orderItem,
             GetOrderItemModel model)
         {
-            model.CatalogueItemType.Should().Be(orderItem.CatalogueItemType.Name);
+            model.CatalogueItemType.Should().Be(orderItem.CatalogueItemType.ToString());
         }
 
         [Test]

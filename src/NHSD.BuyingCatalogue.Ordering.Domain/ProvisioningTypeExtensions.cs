@@ -11,7 +11,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 ProvisioningType.Patient => TimeUnit.PerMonth,
                 ProvisioningType.Declarative => TimeUnit.PerYear,
                 ProvisioningType.OnDemand => estimationPeriod,
-                _ => throw new InvalidOperationException()
+                _ => throw new InvalidOperationException(),
             };
         }
     }

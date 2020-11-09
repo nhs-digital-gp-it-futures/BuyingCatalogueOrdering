@@ -1,16 +1,15 @@
-﻿using Moq;
-using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
+﻿using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
     internal sealed class OrderItemsControllerBuilder
     {
-        private IOrderRepository _orderRepository;
-        private IUpdateOrderItemService _updateOrderItemRepository;
-        private ICreateOrderItemService _createOrderItemService;
+        private IOrderRepository orderRepository;
+        private IUpdateOrderItemService updateOrderItemRepository;
+        private ICreateOrderItemService createOrderItemService;
 
         private OrderItemsControllerBuilder()
         {
@@ -21,29 +20,27 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return new OrderItemsControllerBuilder();
         }
 
-        internal OrderItemsControllerBuilder WithOrderRepository(IOrderRepository orderRepository)
+        internal OrderItemsControllerBuilder WithOrderRepository(IOrderRepository repository)
         {
-            _orderRepository = orderRepository;
+            orderRepository = repository;
             return this;
         }
 
-        internal OrderItemsControllerBuilder WithUpdateOrderItemService(IUpdateOrderItemService updateOrderItemService)
+        internal OrderItemsControllerBuilder WithUpdateOrderItemService(IUpdateOrderItemService service)
         {
-            _updateOrderItemRepository = updateOrderItemService;
+            updateOrderItemRepository = service;
             return this;
         }
 
-
-        internal OrderItemsControllerBuilder WithCreateOrderItemService(ICreateOrderItemService createOrderItemService)
+        internal OrderItemsControllerBuilder WithCreateOrderItemService(ICreateOrderItemService service)
         {
-            _createOrderItemService = createOrderItemService;
+            createOrderItemService = service;
             return this;
         }
 
         internal OrderItemsController Build() => new OrderItemsController(
-            _orderRepository,
-            _updateOrderItemRepository,
-            _createOrderItemService,
-            Mock.Of<IServiceRecipientRepository>());
+            orderRepository,
+            updateOrderItemRepository,
+            createOrderItemService);
     }
 }

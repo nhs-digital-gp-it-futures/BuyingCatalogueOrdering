@@ -120,7 +120,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [OrderingAutoData]
         public static void Constructor_InitializesProductType([Frozen] OrderItem orderItem, OdooOrderItem odooOrderItem)
         {
-            odooOrderItem.ProductType.Should().Be(orderItem.CatalogueItemType.DisplayName);
+            odooOrderItem.ProductType.Should().Be(orderItem.CatalogueItemType.DisplayName());
         }
 
         [Test]

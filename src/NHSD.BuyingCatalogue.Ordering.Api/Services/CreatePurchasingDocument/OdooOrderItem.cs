@@ -24,7 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
             SupplierName = order.SupplierName;
             ProductId = orderItem.CatalogueItemId;
             ProductName = orderItem.CatalogueItemName;
-            ProductType = orderItem.CatalogueItemType.DisplayName;
+            ProductType = orderItem.CatalogueItemType.DisplayName();
             QuantityOrdered = orderItem.Quantity;
             UnitOfOrder = orderItem.CataloguePriceUnit.Description;
             UnitTime = orderItem.PriceTimeUnit?.Description();

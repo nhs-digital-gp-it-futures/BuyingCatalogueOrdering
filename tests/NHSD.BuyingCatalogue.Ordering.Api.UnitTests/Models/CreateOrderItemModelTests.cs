@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using AutoFixture;
 using AutoFixture.Idioms;
-using AutoFixture.NUnit3;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
@@ -21,7 +22,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         {
             var fixture = new Fixture().Customize(new OrderCustomization());
             var assertion = new GuardClauseAssertion(fixture);
-            var method = typeof(CreateOrderItemModel).GetMethod(nameof(CreateOrderItemModel.ToRequest));
+            var method = typeof(CreateOrderItemModel).GetMethod(
+                nameof(CreateOrderItemModel.ToRequest),
+                BindingFlags.NonPublic | BindingFlags.Instance);
 
             assertion.Verify(method);
         }
@@ -39,134 +42,52 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
 
         [Test]
         [OrderingAutoData]
-        public static void ToRequest_ReturnedCreateOrderItemRequest_HasExpectedCatalogueItemId(
+        public static void ToRequest_AdditionalService_ReturnsExpectedType(
             Order order,
             CreateOrderItemModel model)
         {
+            model.CatalogueItemType = CatalogueItemType.AdditionalService.ToString();
+
             var request = model.ToRequest(order);
 
-            request.CatalogueItemId.Should().Be(model.CatalogueItemId);
+            request.Should().BeOfType<CreateOrderItemAdditionalServiceRequest>();
         }
 
         [Test]
         [OrderingAutoData]
-        public static void ToRequest_ReturnedCreateOrderItemRequest_HasExpectedCatalogueItemName(
+        public static void ToRequest_AssociatedService_ReturnsExpectedType(
             Order order,
             CreateOrderItemModel model)
         {
+            model.CatalogueItemType = CatalogueItemType.AssociatedService.ToString();
+
             var request = model.ToRequest(order);
 
-            request.CatalogueItemName.Should().Be(model.CatalogueItemName);
+            request.Should().BeOfType<CreateOrderItemAssociatedServiceRequest>();
         }
 
         [Test]
         [OrderingAutoData]
-        public static void ToRequest_ReturnedCreateOrderItemRequest_HasExpectedProvisioningType(
-            ProvisioningType provisioningType,
+        public static void ToRequest_Solution_ReturnsExpectedType(
             Order order,
             CreateOrderItemModel model)
         {
-            model.ProvisioningType = provisioningType.ToString();
+            model.CatalogueItemType = CatalogueItemType.Solution.ToString();
 
             var request = model.ToRequest(order);
 
-            request.ProvisioningType.Should().Be(provisioningType);
+            request.Should().BeOfType<CreateOrderItemSolutionRequest>();
         }
 
         [Test]
         [OrderingAutoData]
-        public static void ToRequest_ReturnedCreateOrderItemRequest_HasExpectedCataloguePriceType(
-            CataloguePriceType cataloguePriceType,
+        public static void ToRequest_InvalidCatalogueItemType_ThrowsException(
             Order order,
             CreateOrderItemModel model)
         {
-            model.Type = cataloguePriceType.ToString();
+            model.CatalogueItemType = "InvalidType";
 
-            var request = model.ToRequest(order);
-
-            request.CataloguePriceType.Should().Be(cataloguePriceType);
-        }
-
-        [Test]
-        [OrderingAutoData]
-        public static void ToRequest_ReturnedCreateOrderItemRequest_HasExpectedCataloguePriceUnitDescription(
-            [Frozen] ItemUnitModel itemUnit,
-            Order order,
-            CreateOrderItemModel model)
-        {
-            var request = model.ToRequest(order);
-
-            request.CataloguePriceUnitDescription.Should().Be(itemUnit.Description);
-        }
-
-        [Test]
-        [OrderingAutoData]
-        public static void ToRequest_ReturnedCreateOrderItemRequest_HasExpectedCataloguePriceUnitTierName(
-            [Frozen] ItemUnitModel itemUnit,
-            Order order,
-            CreateOrderItemModel model)
-        {
-            var request = model.ToRequest(order);
-
-            request.CataloguePriceUnitTierName.Should().Be(itemUnit.Name);
-        }
-
-        [Test]
-        [OrderingAutoData]
-        public static void ToRequest_ReturnedCreateOrderItemRequest_HasExpectedCurrencyCode(
-            Order order,
-            CreateOrderItemModel model)
-        {
-            var request = model.ToRequest(order);
-
-            request.CurrencyCode.Should().Be(model.CurrencyCode);
-        }
-
-        [Test]
-        [OrderingAutoData]
-        public static void ToRequest_ReturnedCreateOrderItemRequest_HasExpectedQuantity(
-            Order order,
-            CreateOrderItemModel model)
-        {
-            var request = model.ToRequest(order);
-
-            request.Quantity.Should().Be(model.Quantity);
-        }
-
-        [Test]
-        [OrderingAutoData]
-        public static void ToRequest_ReturnedCreateOrderItemRequest_HasExpectedEstimationPeriod(
-            TimeUnit estimationPeriod,
-            Order order,
-            CreateOrderItemModel model)
-        {
-            model.EstimationPeriod = estimationPeriod.Name();
-
-            var request = model.ToRequest(order);
-
-            request.EstimationPeriod.Should().Be(estimationPeriod);
-        }
-
-        [Test]
-        [OrderingAutoData]
-        public static void ToRequest_ReturnedCreateOrderItemRequest_HasExpectedOrder(
-            Order order,
-            CreateOrderItemModel model)
-        {
-            var request = model.ToRequest(order);
-
-            request.Order.Should().Be(order);
-        }
-
-        [Test]
-        [OrderingAutoData]
-        public static void ToRequest_ReturnedCreateOrderItemRequest_HasExpectedPrice(
-            Order order,
-            CreateOrderItemModel model)
-        {
-            var request = model.ToRequest(order);
-
-            request.Price.Should().Be(model.Price);
+            Assert.Throws<InvalidOperationException>(() => model.ToRequest(order));
         }
     }
 }

@@ -58,20 +58,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public static void Constructor_NullCatalogueItemType_ThrowsArgumentNullException()
-        {
-            static void Test()
-            {
-                OrderItemBuilder
-                    .Create()
-                    .WithCatalogueItemType(null)
-                    .Build();
-            }
-
-            Assert.Throws<ArgumentNullException>(Test);
-        }
-
-        [Test]
         public static void Constructor_NullCataloguePriceUnit_ThrowsArgumentNullException()
         {
             static void Test()
@@ -395,19 +381,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             orderItem.CostType.Should().Be(CostType.OneOff);
         }
 
-        [TestCase(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.Declarative), CostType.Recurring)]
-        [TestCase(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.OnDemand), CostType.Recurring)]
-        [TestCase(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.Patient), CostType.Recurring)]
-        [TestCase(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.Declarative), CostType.Recurring)]
-        [TestCase(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.OnDemand), CostType.Recurring)]
-        [TestCase(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.Patient), CostType.Recurring)]
-        [TestCase(nameof(CatalogueItemType.AssociatedService), nameof(ProvisioningType.OnDemand), CostType.Recurring)]
-        [TestCase(nameof(CatalogueItemType.AssociatedService), nameof(ProvisioningType.Patient), CostType.Recurring)]
-        [TestCase(nameof(CatalogueItemType.AssociatedService), nameof(ProvisioningType.Declarative), CostType.OneOff)]
-        public static void CostType_DeterminesTheCostType_ReturnsCorrectCostType(string catalogueItemTypeName, string provisioningTypeName, CostType costType)
+        [TestCase(CatalogueItemType.Solution, ProvisioningType.Declarative, CostType.Recurring)]
+        [TestCase(CatalogueItemType.Solution, ProvisioningType.OnDemand, CostType.Recurring)]
+        [TestCase(CatalogueItemType.Solution, ProvisioningType.Patient, CostType.Recurring)]
+        [TestCase(CatalogueItemType.AdditionalService, ProvisioningType.Declarative, CostType.Recurring)]
+        [TestCase(CatalogueItemType.AdditionalService, ProvisioningType.OnDemand, CostType.Recurring)]
+        [TestCase(CatalogueItemType.AdditionalService, ProvisioningType.Patient, CostType.Recurring)]
+        [TestCase(CatalogueItemType.AssociatedService, ProvisioningType.OnDemand, CostType.Recurring)]
+        [TestCase(CatalogueItemType.AssociatedService, ProvisioningType.Patient, CostType.Recurring)]
+        [TestCase(CatalogueItemType.AssociatedService, ProvisioningType.Declarative, CostType.OneOff)]
+        public static void CostType_DeterminesTheCostType_ReturnsCorrectCostType(CatalogueItemType catalogueItemType, ProvisioningType provisioningType, CostType costType)
         {
-            var catalogueItemType = CatalogueItemType.FromName(catalogueItemTypeName);
-            var provisioningType = Enum.Parse<ProvisioningType>(provisioningTypeName);
             var orderItem = CreateOrderItem(catalogueItemType, provisioningType);
 
             orderItem.CostType.Should().Be(costType);

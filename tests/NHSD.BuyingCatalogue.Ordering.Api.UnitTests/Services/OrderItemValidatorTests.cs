@@ -5,8 +5,8 @@ using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.Idioms;
 using AutoFixture.NUnit3;
-using EnumsNET;
 using FluentAssertions;
+using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Settings;
@@ -24,7 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
     internal static class OrderItemValidatorTests
     {
         [Test]
-        public static void Contructors_VerifyGuardClauses()
+        public static void Constructors_VerifyGuardClauses()
         {
             var fixture = new Fixture().Customize(new AutoMoqCustomization());
             var assertion = new GuardClauseAssertion(fixture);
@@ -34,209 +34,132 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public static void Validate_Create_AllValid_ReturnsNoErrors()
+        [OrderingAutoData]
+        public static void Validate_Create_AdditionalService_NullDeliveryDate_ReturnsNoErrors(
+            [Frozen] Order order,
+            [Frozen] CreateOrderItemModel model,
+            OrderItemValidator validator)
         {
-            var context = new OrderItemValidatorTestContext();
+            model.DeliveryDate = null;
+            var request = new CreateOrderItemAdditionalServiceRequest(order, model);
 
-            var result = context.Validator.Validate(context.CreateRequestBuilder.Build()).ToList();
+            var result = validator.Validate(request);
 
             result.Should().NotBeNull();
-            result.Should().BeEmpty();
+            result.Success.Should().BeTrue();
+            result.Errors.Should().BeEmpty();
         }
 
         [Test]
-        public static void Validate_Create_NullRequest_ThrowsException()
+        [OrderingAutoData]
+        public static void Validate_Create_AssociatedService_NullDeliveryDate_ReturnsNoErrors(
+            [Frozen] Order order,
+            [Frozen] CreateOrderItemModel model,
+            OrderItemValidator validator)
         {
-            var context = new OrderItemValidatorTestContext();
-            Assert.Throws<ArgumentNullException>(() => _ = context.Validator.Validate(null).ToList());
+            model.DeliveryDate = null;
+            var request = new CreateOrderItemAdditionalServiceRequest(order, model);
+
+            var result = validator.Validate(request);
+
+            result.Should().NotBeNull();
+            result.Success.Should().BeTrue();
+            result.Errors.Should().BeEmpty();
         }
 
         [Test]
-        public static void Validate_Create_NullCommencementDateOnOrder_ThrowsException()
+        [OrderingAutoData]
+        [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Frozen date required for successful validation")]
+        public static void Validate_Create_Solution_AllValid_ReturnsNoErrors(
+            [Frozen] DateTime date,
+            CreateOrderItemSolutionRequest request,
+            OrderItemValidator validator)
         {
-            var context = new OrderItemValidatorTestContext();
-            var order = context.OrderBuilder.WithCommencementDate(null).Build();
-            var request = context.CreateRequestBuilder.WithOrder(order).Build();
+            var result = validator.Validate(request);
 
-            Assert.Throws<ArgumentException>(() => _ = context.Validator.Validate(request).ToList());
+            result.Should().NotBeNull();
+            result.Success.Should().BeTrue();
+            result.Errors.Should().BeEmpty();
         }
 
         [Test]
-        public static void Validate_Create_InvalidProvisioningType_AddsErrorDetail()
+        [OrderingAutoData]
+        public static void Validate_Create_NullRequest_ThrowsException(OrderItemValidator validator)
         {
-            var context = new OrderItemValidatorTestContext();
-            var expected = new ErrorDetails("ProvisioningTypeValidValue", "ProvisioningType");
-
-            var result = context.Validator.Validate(
-                context.CreateRequestBuilder.WithProvisioningTypeName("Moose").Build()).ToList();
-
-            result.Should().NotBeNull();
-            result.Should().HaveCount(1);
-            result.First().Should().Be(expected);
+            Assert.Throws<ArgumentNullException>(() => _ = validator.Validate(null));
         }
 
         [Test]
-        public static void Validate_Create_InvalidCataloguePriceType_AddsErrorDetail()
+        [OrderingAutoData]
+        public static void Validate_Create_NullCommencementDateOnOrder_ThrowsException(
+            [Frozen] Order order,
+            CreateOrderItemSolutionRequest request,
+            OrderItemValidator validator)
         {
-            var context = new OrderItemValidatorTestContext();
-            var expected = new ErrorDetails("TypeValidValue", "Type");
+            order.CommencementDate = null;
 
-            var result = context.Validator.Validate(
-                context.CreateRequestBuilder.WithCataloguePriceTypeName("Moose").Build()).ToList();
-
-            result.Should().NotBeNull();
-            result.Should().HaveCount(1);
-            result.First().Should().Be(expected);
-        }
-
-        [TestCase]
-        public static void Validate_Create_NullEstimationPeriodOnProvisioningTypeDeclarative_HasNoErrors()
-        {
-            var context = new OrderItemValidatorTestContext();
-            var request = context.CreateRequestBuilder
-                .WithCatalogueItemType(CatalogueItemType.Solution)
-                .WithEstimationPeriodName(null)
-                .WithProvisioningTypeName(ProvisioningType.Declarative.GetName())
-                .Build();
-
-            var result = context.Validator.Validate(request).ToList();
-
-            result.Should().NotBeNull();
-            result.Should().HaveCount(0);
-        }
-
-        [TestCase]
-        public static void Validate_Create_NullEstimationPeriodOnProvisioningTypePatient_HasNoErrors()
-        {
-            var context = new OrderItemValidatorTestContext();
-            var request = context.CreateRequestBuilder
-                .WithCatalogueItemType(CatalogueItemType.Solution)
-                .WithEstimationPeriodName(null)
-                .WithProvisioningTypeName(ProvisioningType.Patient.GetName())
-                .Build();
-
-            var result = context.Validator.Validate(request).ToList();
-
-            result.Should().NotBeNull();
-            result.Should().HaveCount(0);
+            Assert.Throws<ArgumentException>(() => _ = validator.Validate(request));
         }
 
         [Test]
-        public static void Validate_Create_NullPriceOnFlat_AddsErrorDetail()
+        [OrderingAutoData]
+        public static void Validate_Create_NullDeliveryDate_AddsErrorDetail(
+            [Frozen] Order order,
+            [Frozen] CreateOrderItemModel model,
+            OrderItemValidator validator)
         {
-            var context = new OrderItemValidatorTestContext();
-            var expected = new ErrorDetails("PriceRequired", "Price");
-
-            var result = context.Validator.Validate(
-                context.CreateRequestBuilder.WithPrice(null).Build()).ToList();
-
-            result.Should().NotBeNull();
-            result.Should().HaveCount(1);
-            result.First().Should().Be(expected);
-        }
-
-        [Test]
-        public static void Validate_Create_NullPriceOnTiered_HasNoErrors()
-        {
-            var context = new OrderItemValidatorTestContext();
-
-            var result = context.Validator.Validate(
-                context.CreateRequestBuilder.WithCataloguePriceTypeName("Tiered").WithPrice(null).Build()).ToList();
-
-            result.Should().NotBeNull();
-            result.Should().HaveCount(0);
-        }
-
-        [Test]
-        public static void Validate_Create_InvalidCurrencyCode_AddsErrorDetail()
-        {
-            var context = new OrderItemValidatorTestContext();
-            var expected = new ErrorDetails("CurrencyCodeValidValue", "CurrencyCode");
-
-            var result = context.Validator.Validate(
-                context.CreateRequestBuilder.WithCurrencyCode("Moose").Build()).ToList();
-
-            result.Should().NotBeNull();
-            result.Should().HaveCount(1);
-            result.First().Should().Be(expected);
-        }
-
-        [Test]
-        public static void Validate_Create_NullEstimationPeriod_AddsErrorDetail()
-        {
-            var context = new OrderItemValidatorTestContext();
-            var expected = new ErrorDetails("EstimationPeriodRequiredIfVariableOnDemand", "EstimationPeriod");
-
-            var result = context.Validator.Validate(
-                context.CreateRequestBuilder.WithEstimationPeriodName(null).Build()).ToList();
-
-            result.Should().NotBeNull();
-            result.Should().HaveCount(1);
-            result.First().Should().Be(expected);
-        }
-
-        [Test]
-        public static void Validate_Create_InvalidEstimationPeriod_AddsErrorDetail()
-        {
-            var context = new OrderItemValidatorTestContext();
-            var expected = new ErrorDetails("EstimationPeriodValidValue", "EstimationPeriod");
-
-            var result = context.Validator.Validate(
-                context.CreateRequestBuilder.WithEstimationPeriodName("Moose").Build()).ToList();
-
-            result.Should().NotBeNull();
-            result.Should().HaveCount(1);
-            result.First().Should().Be(expected);
-        }
-
-        [Test]
-        public static void Validate_Create_NullDeliveryDateForSolution_AddsErrorDetail()
-        {
-            var context = new OrderItemValidatorTestContext();
             var expected = new ErrorDetails("DeliveryDateRequired", "DeliveryDate");
+            model.DeliveryDate = null;
 
-            var result = context.Validator.Validate(
-                context.CreateRequestBuilder.WithDeliveryDate(null).Build()).ToList();
+            var request = new CreateOrderItemSolutionRequest(order, model);
+
+            var result = validator.Validate(request);
 
             result.Should().NotBeNull();
-            result.Should().HaveCount(1);
-            result.First().Should().Be(expected);
+            result.Success.Should().BeFalse();
+            result.Errors.Should().HaveCount(1);
+            result.Errors.First().Should().Be(expected);
         }
 
         [Test]
-        public static void Validate_Create_TooLateDeliveryDateForSolution_AddsErrorDetail()
+        [OrderingAutoData]
+        public static void Validate_Create_TooLateDeliveryDateForSolution_AddsErrorDetail(
+            [Frozen] Order order,
+            [Frozen] CreateOrderItemModel model,
+            [Frozen] ValidationSettings settings,
+            OrderItemValidator validator)
         {
-            var context = new OrderItemValidatorTestContext();
             var expected = new ErrorDetails("DeliveryDateOutsideDeliveryWindow", "DeliveryDate");
+            model.DeliveryDate = order.CommencementDate.Value.AddDays(settings.MaxDeliveryDateOffsetInDays + 1);
 
-            var commencementDate = DateTime.Now;
-            var deliveryDate = commencementDate.AddDays((context.Settings.MaxDeliveryDateWeekOffset * 7) + 1);
+            var request = new CreateOrderItemSolutionRequest(order, model);
 
-            var result = context.Validator.Validate(
-                context.CreateRequestBuilder.WithOrder(
-                    context.OrderBuilder.WithCommencementDate(commencementDate).Build()
-                    ).WithDeliveryDate(deliveryDate).Build()).ToList();
+            var result = validator.Validate(request);
 
             result.Should().NotBeNull();
-            result.Should().HaveCount(1);
-            result.First().Should().Be(expected);
+            result.Success.Should().BeFalse();
+            result.Errors.Should().HaveCount(1);
+            result.Errors.First().Should().Be(expected);
         }
 
         [Test]
-        public static void Validate_Create_TooEarlyDeliveryDateForSolution_AddsErrorDetail()
+        [OrderingAutoData]
+        public static void Validate_Create_TooEarlyDeliveryDateForSolution_AddsErrorDetail(
+            [Frozen] Order order,
+            [Frozen] CreateOrderItemModel model,
+            OrderItemValidator validator)
         {
-            var context = new OrderItemValidatorTestContext();
             var expected = new ErrorDetails("DeliveryDateOutsideDeliveryWindow", "DeliveryDate");
+            model.DeliveryDate = order.CommencementDate.Value.AddDays(-1);
 
-            var commencementDate = DateTime.Now;
-            var deliveryDate = commencementDate.AddDays(-1);
+            var request = new CreateOrderItemSolutionRequest(order, model);
 
-            var result = context.Validator.Validate(
-                context.CreateRequestBuilder.WithDeliveryDate(deliveryDate).Build()).ToList();
+            var result = validator.Validate(request);
 
             result.Should().NotBeNull();
-            result.Should().HaveCount(1);
-            result.First().Should().Be(expected);
+            result.Success.Should().BeFalse();
+            result.Errors.Should().HaveCount(1);
+            result.Errors.First().Should().Be(expected);
         }
 
         [Test]
@@ -244,14 +167,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         {
             var context = new OrderItemValidatorTestContext();
             Assert.Throws<ArgumentNullException>(() => context.Validator.Validate(null, CatalogueItemType.Solution, ProvisioningType.OnDemand));
-        }
-
-        [Test]
-        public static void Validate_Update_NullCatalogueItemType_ThrowsException()
-        {
-            var context = new OrderItemValidatorTestContext();
-            Assert.Throws<ArgumentNullException>(() => context.Validator.Validate(
-                context.UpdateRequestBuilder.Build(), null, ProvisioningType.OnDemand));
         }
 
         [Test]
@@ -366,11 +281,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 Settings = new ValidationSettings { MaxDeliveryDateWeekOffset = 1 };
                 Validator = new OrderItemValidator(Settings);
                 OrderBuilder = OrderBuilder.Create().WithCommencementDate(DateTime.UtcNow);
-                CreateRequestBuilder = CreateOrderItemRequestBuilder.Create()
-                    .WithCatalogueItemType(CatalogueItemType.Solution)
-                    .WithCataloguePriceTypeName("Flat")
-                    .WithProvisioningTypeName("OnDemand")
-                    .WithOrder(OrderBuilder.Build());
                 UpdateRequestBuilder = UpdateOrderItemRequestBuilder.Create()
                     .WithOrder(OrderBuilder.Build());
             }
@@ -378,8 +288,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             public OrderItemValidator Validator { get; }
 
             public ValidationSettings Settings { get; }
-
-            public CreateOrderItemRequestBuilder CreateRequestBuilder { get; }
 
             public UpdateOrderItemRequestBuilder UpdateRequestBuilder { get; }
 

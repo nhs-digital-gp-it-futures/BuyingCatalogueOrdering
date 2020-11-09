@@ -38,11 +38,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             order.OrderItems.Should().BeEquivalentTo(expected);
         }
 
-        [TestCase(nameof(CatalogueItemType.Solution), true)]
-        [TestCase(nameof(CatalogueItemType.AdditionalService), false)]
-        [TestCase(nameof(CatalogueItemType.AssociatedService), false)]
+        [TestCase(CatalogueItemType.Solution, true)]
+        [TestCase(CatalogueItemType.AdditionalService, false)]
+        [TestCase(CatalogueItemType.AssociatedService, false)]
         public static void AddOrderItem_OrderItem_CatalogueItemType_CatalogueSolutionsViewedMatchExpectedValue(
-            string catalogueItemTypeNameInput,
+            CatalogueItemType catalogueItemType,
             bool expectedInput)
         {
             var order = OrderBuilder
@@ -52,7 +52,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
             var orderItem = OrderItemBuilder
                 .Create()
-                .WithCatalogueItemType(CatalogueItemType.FromName(catalogueItemTypeNameInput))
+                .WithCatalogueItemType(catalogueItemType)
                 .Build();
 
             order.AddOrderItem(orderItem, Guid.Empty, String.Empty);
@@ -60,11 +60,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             order.CatalogueSolutionsViewed.Should().Be(expectedInput);
         }
 
-        [TestCase(nameof(CatalogueItemType.Solution), false)]
-        [TestCase(nameof(CatalogueItemType.AdditionalService), true)]
-        [TestCase(nameof(CatalogueItemType.AssociatedService), false)]
+        [TestCase(CatalogueItemType.Solution, false)]
+        [TestCase(CatalogueItemType.AdditionalService, true)]
+        [TestCase(CatalogueItemType.AssociatedService, false)]
         public static void AddOrderItem_OrderItem_CatalogueItemType_AdditionalServicesViewedMatchExpectedValue(
-            string catalogueItemTypeNameInput,
+            CatalogueItemType catalogueItemType,
             bool expectedInput)
         {
             var order = OrderBuilder
@@ -74,7 +74,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
             var orderItem = OrderItemBuilder
                 .Create()
-                .WithCatalogueItemType(CatalogueItemType.FromName(catalogueItemTypeNameInput))
+                .WithCatalogueItemType(catalogueItemType)
                 .Build();
 
             order.AddOrderItem(orderItem, Guid.Empty, String.Empty);
@@ -82,11 +82,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             order.AdditionalServicesViewed.Should().Be(expectedInput);
         }
 
-        [TestCase(nameof(CatalogueItemType.Solution), false)]
-        [TestCase(nameof(CatalogueItemType.AdditionalService), true)]
-        [TestCase(nameof(CatalogueItemType.AssociatedService), false)]
+        [TestCase(CatalogueItemType.Solution, false)]
+        [TestCase(CatalogueItemType.AdditionalService, true)]
+        [TestCase(CatalogueItemType.AssociatedService, false)]
         public static void AddOrderItem_OrderItem_CatalogueItemType_AssociatedServicesViewedMatchExpectedValue(
-            string catalogueItemTypeNameInput,
+            CatalogueItemType catalogueItemType,
             bool expectedInput)
         {
             var order = OrderBuilder
@@ -96,7 +96,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
             var orderItem = OrderItemBuilder
                 .Create()
-                .WithCatalogueItemType(CatalogueItemType.FromName(catalogueItemTypeNameInput))
+                .WithCatalogueItemType(catalogueItemType)
                 .Build();
 
             order.AddOrderItem(orderItem, Guid.Empty, String.Empty);
@@ -405,10 +405,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             order.CalculateCostPerYear(CostType.OneOff).Should().Be(0);
         }
 
-        [TestCase(nameof(CatalogueItemType.AssociatedService), ProvisioningType.OnDemand, 10, 2, 720)]
-        [TestCase(nameof(CatalogueItemType.AssociatedService), ProvisioningType.Declarative, 20, 4, 960)]
+        [TestCase(CatalogueItemType.AssociatedService, ProvisioningType.OnDemand, 10, 2, 720)]
+        [TestCase(CatalogueItemType.AssociatedService, ProvisioningType.Declarative, 20, 4, 960)]
         public static void CalculateTotalOwnershipCost_SingleOneOffOrRecurringOrderItem_ReturnsTotalOwnershipCost(
-            string catalogueItemTypeName,
+            CatalogueItemType catalogueItemType,
             ProvisioningType provisioningType,
             decimal price,
             int quantity,
@@ -419,7 +419,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             var orderItem = OrderItemBuilder
                 .Create()
                 .WithOrderItemId(orderItemId)
-                .WithCatalogueItemType(CatalogueItemType.FromName(catalogueItemTypeName))
+                .WithCatalogueItemType(catalogueItemType)
                 .WithProvisioningType(provisioningType)
                 .WithPrice(price)
                 .WithQuantity(quantity)
