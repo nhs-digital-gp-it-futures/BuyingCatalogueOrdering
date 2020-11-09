@@ -4,6 +4,7 @@ using EnumsNET;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Settings;
+using NHSD.BuyingCatalogue.Ordering.Api.Validation;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
@@ -17,62 +18,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             this.validationSettings = validationSettings ?? throw new ArgumentNullException(nameof(validationSettings));
         }
 
-        public IEnumerable<ErrorDetails> Validate(CreateOrderItemRequest request)
+        public ValidationResult Validate(CreateOrderItemRequest request)
         {
             if (request is null)
                 throw new ArgumentNullException(nameof(request));
 
-            if (request.Order is null)
-                throw new ArgumentException("Request Order should not be null", nameof(request));
+            var commencementDate = request.Order.CommencementDate;
 
-            if (request.Order.CommencementDate is null)
-                throw new ArgumentException("Request Order Commencement Date should not be null");
+            if (commencementDate is null)
+                throw OrderCommencementDateArgumentException(nameof(request));
 
-            if (request.CatalogueItemType is null)
-            {
-                yield return new ErrorDetails("CatalogueItemTypeValidValue", "CatalogueItemType");
-            }
-            else if (request.CatalogueItemType.Equals(CatalogueItemType.Solution))
-            {
-                var errors = ValidateDeliveryDate(request.DeliveryDate, request.Order.CommencementDate.Value, request.CatalogueItemType);
-                foreach (var error in errors)
-                {
-                    yield return error;
-                }
-            }
-
-            var provisioningType = request.ProvisioningType;
-            if (provisioningType is null)
-            {
-                yield return new ErrorDetails("ProvisioningTypeValidValue", nameof(CreateOrderItemSolutionModel.ProvisioningType));
-            }
-            else
-            {
-                var errors = ValidateEstimationPeriod(request.EstimationPeriod, provisioningType);
-                foreach (var error in errors)
-                {
-                    yield return error;
-                }
-            }
-
-            var cataloguePriceType = request.CataloguePriceType;
-
-            if (cataloguePriceType is null)
-            {
-                yield return new ErrorDetails("TypeValidValue", nameof(CreateOrderItemSolutionModel.Type));
-            }
-            else if (cataloguePriceType.Equals(CataloguePriceType.Flat))
-            {
-                if (request.Price is null)
-                {
-                    yield return new ErrorDetails("PriceRequired", nameof(CreateOrderItemSolutionModel.Price));
-                }
-            }
-
-            if (request.CurrencyCode != "GBP")
-            {
-                yield return new ErrorDetails("CurrencyCodeValidValue", nameof(CreateOrderItemSolutionModel.CurrencyCode));
-            }
+            return new ValidationResult(ValidateDeliveryDate(request.DeliveryDate, commencementDate.Value, request.CatalogueItemType));
         }
 
         public IEnumerable<ErrorDetails> Validate(UpdateOrderItemRequest request, CatalogueItemType itemType, ProvisioningType? provisioningType)
@@ -80,17 +36,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             if (request is null)
                 throw new ArgumentNullException(nameof(request));
 
-            if (itemType is null)
-                throw new ArgumentNullException(nameof(itemType));
-
             if (provisioningType is null)
                 throw new ArgumentNullException(nameof(provisioningType));
 
-            if (request.Order is null)
-                throw new ArgumentException("Request Order should not be null", nameof(request));
-
             if (request.Order.CommencementDate is null)
-                throw new ArgumentException("Request Order Commencement Date should not be null");
+                throw OrderCommencementDateArgumentException(nameof(request));
 
             var errors = new List<ErrorDetails>();
 
@@ -109,38 +59,57 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 
             if (estimationPeriod is null)
             {
-                yield return new ErrorDetails("EstimationPeriodRequiredIfVariableOnDemand", nameof(CreateOrderItemSolutionModel.EstimationPeriod));
+                yield return EstimationPeriodError("RequiredIfVariableOnDemand");
             }
-            else
+            else if (!estimationPeriod.Value.IsDefined())
             {
-                if (!estimationPeriod.Value.IsDefined())
-                {
-                    yield return new ErrorDetails("EstimationPeriodValidValue", nameof(CreateOrderItemSolutionModel.EstimationPeriod));
-                }
+                yield return EstimationPeriodError("ValidValue");
             }
         }
 
-        private IEnumerable<ErrorDetails> ValidateDeliveryDate(DateTime? deliveryDate, DateTime commencementDate, CatalogueItemType itemType)
+        private static ErrorDetails DeliveryDateError(string error)
+        {
+            return ErrorDetails(nameof(CreateOrderItemModel.DeliveryDate), error);
+        }
+
+        private static ErrorDetails EstimationPeriodError(string error)
+        {
+            return ErrorDetails(nameof(UpdateOrderItemModel.EstimationPeriod), error);
+        }
+
+        private static ErrorDetails ErrorDetails(string propertyName, string error)
+        {
+            return new ErrorDetails(propertyName + error, propertyName);
+        }
+
+        private static IReadOnlyList<ErrorDetails> NoErrors() => Array.Empty<ErrorDetails>();
+
+        private static Exception OrderCommencementDateArgumentException(string paramName)
+        {
+            return new ArgumentException($"{OrderProperty(paramName)}.{nameof(Order.CommencementDate)} should not be null.", paramName);
+        }
+
+        private static string OrderProperty(string paramName) => $"{paramName}.{nameof(CreateOrderItemRequest.Order)}";
+
+        private static IReadOnlyList<ErrorDetails> Errors(params ErrorDetails[] details) => details;
+
+        private IReadOnlyList<ErrorDetails> ValidateDeliveryDate(DateTime? deliveryDate, DateTime commencementDate, CatalogueItemType itemType)
         {
             if (!itemType.Equals(CatalogueItemType.Solution))
-            {
-                yield break;
-            }
+                return NoErrors();
 
             if (deliveryDate is null)
-            {
-                yield return new ErrorDetails("DeliveryDateRequired", nameof(CreateOrderItemSolutionModel.DeliveryDate));
-            }
-            else if (!IsDeliveryDateWithinWindow(deliveryDate.Value, commencementDate))
-            {
-                yield return new ErrorDetails("DeliveryDateOutsideDeliveryWindow", nameof(CreateOrderItemSolutionModel.DeliveryDate));
-            }
+                return Errors(DeliveryDateError("Required"));
+
+            return IsDeliveryDateWithinWindow(deliveryDate.Value, commencementDate)
+                ? NoErrors()
+                : Errors(DeliveryDateError("OutsideDeliveryWindow"));
         }
 
         private bool IsDeliveryDateWithinWindow(DateTime deliveryDate, DateTime commencementDate)
         {
             return deliveryDate >= commencementDate
-                   && deliveryDate <= commencementDate.AddDays(validationSettings.MaxDeliveryDateWeekOffset * 7);
+                   && deliveryDate <= commencementDate.AddDays(validationSettings.MaxDeliveryDateOffsetInDays);
         }
     }
 }

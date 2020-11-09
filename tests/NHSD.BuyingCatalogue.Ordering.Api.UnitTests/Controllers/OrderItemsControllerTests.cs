@@ -11,6 +11,8 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
@@ -20,6 +22,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
+using NHSD.BuyingCatalogue.Ordering.Api.Validation;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Domain;
@@ -34,7 +37,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
     internal static class OrderItemsControllerTests
     {
         [Test]
-        public static void Contructors_VerifyGuardClauses()
+        public static void Constructors_VerifyGuardClauses()
         {
             var fixture = new Fixture().Customize(new AutoMoqCustomization());
             var assertion = new GuardClauseAssertion(fixture);
@@ -79,10 +82,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [TestCase(null)]
         [TestCase("Solution")]
         [TestCase("AdditionalService")]
-        [TestCase("AssociatedService")]
+        [TestCase("AssociatedService")] // ReSharper disable StringLiteralTypo
         [TestCase("SOLutiON")]
         [TestCase("ADDitIONalServiCE")]
-        [TestCase("associatedSERVICe")]
+        [TestCase("associatedSERVICe")] // ReSharper restore StringLiteralTypo
         public static async Task ListAsync_OrderExistsWithFilter_ReturnsListOfOrderItems(string catalogueItemTypeFilter)
         {
             var context = OrderItemsControllerTestContext.Setup();
@@ -90,7 +93,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var serviceRecipients = new List<OdsOrganisation>
             {
                 new OdsOrganisation("eu", "EU test"),
-                new OdsOrganisation("auz", null)
+                new OdsOrganisation("auz", null),
             };
 
             context.Order.SetServiceRecipients(serviceRecipients, Guid.Empty, String.Empty);
@@ -116,7 +119,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         solutionOrderItem1,
                         solutionOrderItem2,
                         additionalServiceOrderItem1,
-                        associatedServiceOrderItem1
+                        associatedServiceOrderItem1,
                     },
                     catalogueItemTypeFilter,
                     context.Order.ServiceRecipients);
@@ -268,10 +271,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public static async Task CreateOrderItemAsync_OrderIdDoesNotExist_ReturnsNotFound()
+        [OrderingAutoData]
+        public static async Task CreateOrderItemAsync_OrderIdDoesNotExist_ReturnsNotFound(CreateOrderItemModel createModel)
         {
-            var createModel = CreateOrderItemModelBuilder.Create().BuildSolution();
-
             var context = OrderItemsControllerTestContext.Setup();
             context.Order = null;
 
@@ -281,10 +283,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public static async Task CreateOrderItemAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
+        [OrderingAutoData]
+        public static async Task CreateOrderItemAsync_InvalidPrimaryOrganisationId_ReturnsForbid(CreateOrderItemModel createModel)
         {
-            var createModel = CreateOrderItemModelBuilder.Create().BuildSolution();
-
             var context = OrderItemsControllerTestContext.Setup();
             context.Order = OrderBuilder
                 .Create()
@@ -297,10 +298,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public static async Task CreateOrderItemAsync_OrderExists_ReturnsCreatedAtActionResult()
+        [OrderingAutoData]
+        public static async Task CreateOrderItemAsync_OrderExists_ReturnsCreatedAtActionResult(CreateOrderItemModel createModel)
         {
             const string orderId = "C10000-01";
-            var createModel = CreateOrderItemModelBuilder.Create().BuildSolution();
             const int newOrderItemId = 456;
 
             var context = OrderItemsControllerTestContext.Setup();
@@ -319,16 +320,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 RouteValues = new RouteValueDictionary
                 {
                     { "orderId", orderId },
-                    { "orderItemId", newOrderItemId }
-                }
+                    { "orderItemId", newOrderItemId },
+                },
             });
         }
 
         [Test]
-        public static async Task CreateOrderItemAsync_OrderExists_ReturnsNewOrderItemId()
+        [OrderingAutoData]
+        public static async Task CreateOrderItemAsync_OrderExists_ReturnsNewOrderItemId(CreateOrderItemModel createModel)
         {
             const string orderId = "C10000-01";
-            var createModel = CreateOrderItemModelBuilder.Create().BuildSolution();
             const int newOrderItemId = 456;
 
             var context = OrderItemsControllerTestContext.Setup();
@@ -343,17 +344,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var expected = new CreateOrderItemResponseModel
             {
-                OrderItemId = newOrderItemId
+                OrderItemId = newOrderItemId,
             };
 
             result.Result.As<ObjectResult>().Value.Should().BeEquivalentTo(expected);
         }
 
         [Test]
-        public static async Task CreateOrderItemAsync_Error_ReturnsBadRequest()
+        [OrderingAutoData]
+        public static async Task CreateOrderItemAsync_Error_ReturnsBadRequest(CreateOrderItemModel createModel)
         {
             const string orderId = "C10000-01";
-            var createModel = CreateOrderItemModelBuilder.Create().BuildSolution();
             var error = new ErrorDetails("TestError", "TestField");
 
             var context = OrderItemsControllerTestContext.Setup();
@@ -370,10 +371,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public static async Task CreateOrderItemAsync_Error_ReturnsErrors()
+        [OrderingAutoData]
+        public static async Task CreateOrderItemAsync_Error_ReturnsErrors(CreateOrderItemModel createModel)
         {
             const string orderId = "C10000-01";
-            var createModel = CreateOrderItemModelBuilder.Create().BuildSolution();
 
             var error = new ErrorDetails("TestError", "TestField");
 
@@ -391,18 +392,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             {
                 Errors = new[]
                 {
-                    new ErrorModel(error.Id, error.Field)
-                }
+                    new ErrorModel(error.Id, error.Field),
+                },
             };
 
             result.Result.As<ObjectResult>().Value.Should().BeEquivalentTo(expected);
         }
 
         [Test]
-        public static async Task CreateOrderItemAsync_OrderRepository_CalledOnce()
+        [OrderingAutoData]
+        public static async Task CreateOrderItemAsync_OrderRepository_CalledOnce(CreateOrderItemModel createModel)
         {
             const string orderId = "C10000-01";
-            var createModel = CreateOrderItemModelBuilder.Create().BuildSolution();
 
             var context = OrderItemsControllerTestContext.Setup();
             context.Order = OrderBuilder
@@ -417,17 +418,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public static async Task CreateOrderItemAsync_CreateOrderItemService_CalledOnce()
+        [OrderingAutoData]
+        public static async Task CreateOrderItemAsync_CreateOrderItemService_CalledOnce(CreateOrderItemModel createModel)
         {
             const string orderId = "C10000-01";
-            var createModel = CreateOrderItemModelBuilder.Create().BuildSolution();
 
             var context = OrderItemsControllerTestContext.Setup();
 
             await context.OrderItemsController.CreateOrderItemAsync(orderId, createModel);
 
             context.CreateOrderItemServiceMock.Verify(x =>
-                    x.CreateAsync(It.IsNotNull<CreateOrderItemRequest>()), Times.Once);
+                x.CreateAsync(It.IsNotNull<CreateOrderItemRequest>()), Times.Once);
         }
 
         [Test]
@@ -444,7 +445,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [OrderingAutoData]
         public static async Task CreateOrderItemsAsync_OrderNotFound_ReturnsNotFound(
             string orderId,
-            IEnumerable<CreateOrderItemBaseModel> model,
+            IEnumerable<CreateOrderItemModel> model,
             OrderItemsController controller)
         {
             var response = await controller.CreateOrderItemsAsync(orderId, model);
@@ -454,41 +455,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [Test]
         [OrderingAutoData]
-        public static async Task CreateOrderItemsAsync_ConvertsModelToServiceRecipient(
-            string orderId,
-            CreateOrderItemSolutionModel model,
-            Order order,
-            [Frozen] Mock<IServiceRecipientRepository> service,
-            [Frozen] Mock<IOrderRepository> repository,
-            OrderItemsController controller)
-        {
-            repository.Setup(r => r.GetOrderByIdAsync(orderId)).ReturnsAsync(order);
-            var models = new[] { model };
-
-            IReadOnlyList<ServiceRecipient> recipients = null;
-
-            service.Setup(s => s.UpdateWithoutSavingAsync(orderId, It.IsNotNull<IEnumerable<ServiceRecipient>>()))
-                .Callback<string, IEnumerable<ServiceRecipient>>((o, r) => recipients = r.ToList());
-
-            await controller.CreateOrderItemsAsync(orderId, models);
-
-            var expectedServiceRecipient = new
-            {
-                model.ServiceRecipient.OdsCode,
-                model.ServiceRecipient.Name,
-                OrderId = orderId,
-            };
-
-            recipients.Should().NotBeNull();
-            recipients.Should().HaveCount(1);
-            recipients[0].Should().BeEquivalentTo(expectedServiceRecipient);
-        }
-
-        [Test]
-        [OrderingAutoData]
         public static async Task CreateOrderItemsAsync_ConvertsModelToRequest(
             string orderId,
-            CreateOrderItemAdditionalServiceModel model,
+            CreateOrderItemModel model,
             Order order,
             [Frozen] Mock<ICreateOrderItemService> service,
             [Frozen] Mock<IOrderRepository> repository,
@@ -500,7 +469,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             IReadOnlyList<CreateOrderItemRequest> requests = null;
 
             service.Setup(s => s.CreateAsync(order, It.IsNotNull<IEnumerable<CreateOrderItemRequest>>()))
-                .Callback<Order, IEnumerable<CreateOrderItemRequest>>((o, r) => requests = r.ToList());
+                .Callback<Order, IEnumerable<CreateOrderItemRequest>>((o, r) => requests = r.ToList())
+                .ReturnsAsync(new AggregateValidationResult());
 
             await controller.CreateOrderItemsAsync(orderId, models);
 
@@ -511,32 +481,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [Test]
         [OrderingAutoData]
-        public static async Task CreateOrderItemsAsync_ServiceRecipientRepository_InvokesUpdatedWithoutSavingAsync(
+        public static async Task CreateOrderItemsAsync_InvokesCreateAsync(
             string orderId,
-            IEnumerable<CreateOrderItemBaseModel> model,
-            Order order,
-            [Frozen] Mock<IServiceRecipientRepository> service,
-            [Frozen] Mock<IOrderRepository> repository,
-            OrderItemsController controller)
-        {
-            repository.Setup(r => r.GetOrderByIdAsync(orderId)).ReturnsAsync(order);
-            await controller.CreateOrderItemsAsync(orderId, model);
-
-            service.Verify(s => s.UpdateWithoutSavingAsync(
-                It.Is<string>(o => o == orderId),
-                It.IsNotNull<IEnumerable<ServiceRecipient>>()));
-        }
-
-        [Test]
-        [OrderingAutoData]
-        public static async Task CreateOrderItemsAsync_InvokesCreateOrderItemsAsync(
-            string orderId,
-            IEnumerable<CreateOrderItemBaseModel> model,
+            IEnumerable<CreateOrderItemModel> model,
             Order order,
             [Frozen] Mock<ICreateOrderItemService> service,
             [Frozen] Mock<IOrderRepository> repository,
             OrderItemsController controller)
         {
+            service.Setup(s => s.CreateAsync(order, It.IsNotNull<IEnumerable<CreateOrderItemRequest>>()))
+                .ReturnsAsync(new AggregateValidationResult());
+
             repository.Setup(r => r.GetOrderByIdAsync(orderId)).ReturnsAsync(order);
             await controller.CreateOrderItemsAsync(orderId, model);
 
@@ -549,15 +504,74 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [OrderingAutoData]
         public static async Task CreateOrderItemsAsync_ReturnsExpectedResult(
             string orderId,
-            IEnumerable<CreateOrderItemBaseModel> model,
+            IEnumerable<CreateOrderItemModel> model,
             Order order,
+            [Frozen] Mock<ICreateOrderItemService> service,
             [Frozen] Mock<IOrderRepository> repository,
             OrderItemsController controller)
         {
+            service.Setup(s => s.CreateAsync(order, It.IsNotNull<IEnumerable<CreateOrderItemRequest>>()))
+                .ReturnsAsync(new AggregateValidationResult());
+
             repository.Setup(r => r.GetOrderByIdAsync(orderId)).ReturnsAsync(order);
             var response = await controller.CreateOrderItemsAsync(orderId, model);
 
             response.Should().BeOfType<CreatedAtActionResult>();
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateOrderItemsAsync_ValidationFailure_AddsModelErrors(
+            string orderId,
+            IEnumerable<CreateOrderItemModel> model,
+            Order order,
+            [Frozen] IReadOnlyList<ErrorDetails> errorDetails,
+            ValidationResult validationResult,
+            AggregateValidationResult aggregateValidationResult,
+            [Frozen] Mock<ICreateOrderItemService> service,
+            [Frozen] Mock<IOrderRepository> repository,
+            OrderItemsController controller)
+        {
+            controller.ProblemDetailsFactory = new TestProblemDetailsFactory();
+            aggregateValidationResult.AddValidationResult(validationResult, 0);
+
+            service.Setup(s => s.CreateAsync(order, It.IsNotNull<IEnumerable<CreateOrderItemRequest>>()))
+                .ReturnsAsync(aggregateValidationResult);
+
+            repository.Setup(r => r.GetOrderByIdAsync(orderId)).ReturnsAsync(order);
+            await controller.CreateOrderItemsAsync(orderId, model);
+
+            var modelState = controller.ModelState;
+            modelState.ErrorCount.Should().Be(errorDetails.Count);
+            modelState.Keys.Should().BeEquivalentTo(errorDetails.Select(e => "[0]." + e.Field));
+
+            var modelStateErrors = modelState.Values.Select(v => v.Errors[0].ErrorMessage);
+            modelStateErrors.Should().BeEquivalentTo(errorDetails.Select(e => e.Id));
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateOrderItemsAsync_ValidationFailure_ReturnsExpectedResponse(
+            string orderId,
+            IEnumerable<CreateOrderItemModel> model,
+            Order order,
+            ValidationResult validationResult,
+            AggregateValidationResult aggregateValidationResult,
+            [Frozen] Mock<ICreateOrderItemService> service,
+            [Frozen] Mock<IOrderRepository> repository,
+            OrderItemsController controller)
+        {
+            controller.ProblemDetailsFactory = new TestProblemDetailsFactory();
+            aggregateValidationResult.AddValidationResult(validationResult, 0);
+
+            service.Setup(s => s.CreateAsync(order, It.IsNotNull<IEnumerable<CreateOrderItemRequest>>()))
+                .ReturnsAsync(aggregateValidationResult);
+
+            repository.Setup(r => r.GetOrderByIdAsync(orderId)).ReturnsAsync(order);
+            var response = await controller.CreateOrderItemsAsync(orderId, model);
+
+            response.Should().BeOfType<BadRequestObjectResult>();
+            response.As<BadRequestObjectResult>().Value.Should().BeOfType<ValidationProblemDetails>();
         }
 
         [Test]
@@ -749,8 +763,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             {
                 Errors = new[]
                 {
-                    new ErrorModel(error.Id, error.Field)
-                }
+                    new ErrorModel(error.Id, error.Field),
+                },
             };
 
             result.Result.As<ObjectResult>().Value.Should().BeEquivalentTo(expected);
@@ -789,6 +803,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             return items;
         }
+
+        private sealed class TestProblemDetailsFactory : ProblemDetailsFactory
+        {
+            public override ProblemDetails CreateProblemDetails(
+                HttpContext httpContext,
+                int? statusCode = null,
+                string title = null,
+                string type = null,
+                string detail = null,
+                string instance = null)
+            {
+                throw new InvalidOperationException($"{nameof(CreateProblemDetails)} should not be invoked.");
+            }
+
+            public override ValidationProblemDetails CreateValidationProblemDetails(
+                HttpContext httpContext,
+                ModelStateDictionary modelStateDictionary,
+                int? statusCode = null,
+                string title = null,
+                string type = null,
+                string detail = null,
+                string instance = null)
+            {
+                return new ValidationProblemDetails(modelStateDictionary) { Status = 400 };
+            }
+        }
     }
 
     internal sealed class OrderItemsControllerTestContext
@@ -823,7 +863,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     new Claim("Ordering", "Manage"),
                     new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
                     new Claim(ClaimTypes.Name, "Test User"),
-                    new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
+                    new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
                 }, "mock"));
 
             OrderItemsController = OrderItemsControllerBuilder.Create()
@@ -834,7 +874,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             OrderItemsController.ControllerContext = new ControllerContext
             {
-                HttpContext = new DefaultHttpContext { User = ClaimsPrincipal }
+                HttpContext = new DefaultHttpContext { User = ClaimsPrincipal },
             };
         }
 

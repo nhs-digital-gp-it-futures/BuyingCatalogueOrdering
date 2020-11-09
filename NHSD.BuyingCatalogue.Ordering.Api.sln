@@ -37,6 +37,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E1A361EF-8081-43E7-B169-6A31A7C034C9}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		NHSD.BuyingCatalogue.Ordering.Api.sln.DotSettings = NHSD.BuyingCatalogue.Ordering.Api.sln.DotSettings
 		NuGet.config = NuGet.config
 	EndProjectSection
 EndProject
@@ -45,6 +46,13 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHSD.BuyingCatalogue.Ordering.Common.UnitTests", "tests\NHSD.BuyingCatalogue.Ordering.Common.UnitTests\NHSD.BuyingCatalogue.Ordering.Common.UnitTests.csproj", "{7DE7169A-3890-42DD-9FB7-D774BE912241}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHSD.BuyingCatalogue.Ordering.Api.Testing.Data", "tests\NHSD.BuyingCatalogue.Ordering.Api.Testing.Data\NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.csproj", "{013413CD-2EC2-4921-A960-A3FC871968BC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dictionaries", "Dictionaries", "{52CEA56B-F40A-4554-8C90-31E104BD0BA1}"
+	ProjectSection(SolutionItems) = preProject
+		Dictionaries\en_GB-large.aff = Dictionaries\en_GB-large.aff
+		Dictionaries\en_GB-large.dic = Dictionaries\en_GB-large.dic
+		Dictionaries\README_en_GB-large.txt = Dictionaries\README_en_GB-large.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

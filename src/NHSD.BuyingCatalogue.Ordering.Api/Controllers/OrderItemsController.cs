@@ -5,6 +5,7 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NHSD.BuyingCatalogue.Ordering.Api.Attributes;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Errors;
@@ -26,18 +27,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         private readonly IOrderRepository orderRepository;
         private readonly IUpdateOrderItemService updateOrderItemService;
         private readonly ICreateOrderItemService createOrderItemService;
-        private readonly IServiceRecipientRepository serviceRecipientRepository;
 
         public OrderItemsController(
             IOrderRepository orderRepository,
             IUpdateOrderItemService updateOrderItemService,
-            ICreateOrderItemService createOrderItemService,
-            IServiceRecipientRepository serviceRecipientRepository)
+            ICreateOrderItemService createOrderItemService)
         {
             this.orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
             this.updateOrderItemService = updateOrderItemService ?? throw new ArgumentNullException(nameof(updateOrderItemService));
             this.createOrderItemService = createOrderItemService ?? throw new ArgumentNullException(nameof(createOrderItemService));
-            this.serviceRecipientRepository = serviceRecipientRepository ?? throw new ArgumentNullException(nameof(serviceRecipientRepository));
         }
 
         [HttpGet]
@@ -61,7 +59,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             if (!string.IsNullOrWhiteSpace(catalogueItemType))
             {
-                var catalogueItemTypeFromName = CatalogueItemType.FromName(catalogueItemType);
+                var catalogueItemTypeFromName = OrderingEnums.Parse<CatalogueItemType>(catalogueItemType);
                 if (catalogueItemTypeFromName is null)
                 {
                     return new List<GetOrderItemModel>();
@@ -115,9 +113,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult<CreateOrderItemResponseModel>> CreateOrderItemAsync(
             string orderId,
-            CreateOrderItemBaseModel model)
+            CreateOrderItemModel model)
         {
-            if (model == null)
+            if (model is null)
                 throw new ArgumentNullException(nameof(model));
 
             var order = await orderRepository.GetOrderByIdAsync(orderId);
@@ -147,32 +145,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         }
 
         [HttpPost("batch")]
-        public async Task<IActionResult> CreateOrderItemsAsync(string orderId, IEnumerable<CreateOrderItemBaseModel> model)
+        [Authorize(Policy = PolicyName.CanManageOrders)]
+        [UseValidationProblemDetails]
+        public async Task<IActionResult> CreateOrderItemsAsync(
+            string orderId,
+            IEnumerable<CreateOrderItemModel> model)
         {
-            if (model == null)
+            if (model is null)
                 throw new ArgumentNullException(nameof(model));
 
             var order = await orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
                 return NotFound();
 
-            var serviceRecipients = new HashSet<ServiceRecipient>();
-            var orderItemRequests = new List<CreateOrderItemRequest>();
+            var validationResult = await createOrderItemService.CreateAsync(
+                order,
+                model.Select(item => item.ToRequest(order)));
 
-            foreach (var item in model)
+            if (validationResult.Success)
+                return CreatedAtAction(nameof(ListAsync).TrimAsync(), "OrderItems", new { orderId }, null);
+
+            foreach ((string key, string errorMessage) in validationResult.ToModelErrors())
             {
-                var recipient = item.ServiceRecipientModel;
-
-                if (recipient != null)
-                    serviceRecipients.Add(new ServiceRecipient(orderId, recipient.OdsCode, recipient.Name));
-
-                orderItemRequests.Add(item.ToRequest(order));
+                ModelState.AddModelError(key, errorMessage);
             }
 
-            await serviceRecipientRepository.UpdateWithoutSavingAsync(orderId, serviceRecipients);
-            await createOrderItemService.CreateAsync(order, orderItemRequests);
-
-            return CreatedAtAction(nameof(ListAsync).TrimAsync(), "OrderItems", new { orderId }, null);
+            return ValidationProblem(ModelState);
         }
 
         [HttpPut]

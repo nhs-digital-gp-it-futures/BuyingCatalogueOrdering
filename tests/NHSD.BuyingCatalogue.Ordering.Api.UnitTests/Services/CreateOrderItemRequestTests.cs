@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using EnumsNET;
+using AutoFixture.Idioms;
+using AutoFixture.NUnit3;
 using FluentAssertions;
-using Microsoft.OpenApi.Extensions;
+using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Domain;
@@ -16,497 +17,153 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
     internal static class CreateOrderItemRequestTests
     {
         [Test]
-        [OrderingAutoData]
-        public static void Constructor_NullOrder_ThrowsException(
-            CatalogueItemType catalogueItemType)
+        public static void Constructor_VerifyGuardClauses()
         {
-            Assert.Throws<ArgumentNullException>(() => _ = new CreateOrderItemRequest(
-                null,
-                null,
-                null,
-                catalogueItemType,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                0,
-                null,
-                null,
-                0));
+            var fixture = OrderingFixtureFactory.Create();
+            var assertion = new GuardClauseAssertion(fixture);
+            var constructors = typeof(CreateOrderItemAssociatedServiceRequest).GetConstructors();
+
+            assertion.Verify(constructors);
         }
 
         [Test]
         [OrderingAutoData]
-        public static void Constructor_NullCatalogueItemType_ThrowsException(
-            Order order)
+        public static void Constructor_NullModelQuantity_ThrowsException(
+            Order order,
+            CatalogueItemType itemType,
+            CreateOrderItemModel model)
         {
-            Assert.Throws<ArgumentNullException>(() => _ = new CreateOrderItemRequest(
-                order,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                0,
-                null,
-                null,
-                0));
+            model.Quantity = null;
+
+            Assert.Throws<ArgumentException>(() => _ = new TestOrderItemRequest(order, model, itemType));
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Constructor_NullModelPrice_ThrowsException(
+            Order order,
+            CatalogueItemType itemType,
+            CreateOrderItemModel model)
+        {
+            model.Price = null;
+
+            Assert.Throws<ArgumentException>(() => _ = new TestOrderItemRequest(order, model, itemType));
         }
 
         [Test]
         [OrderingAutoData]
         public static void Constructor_Initializes_Order(
-            Order order,
-            CatalogueItemType catalogueItemType)
+            [Frozen] Order order,
+            TestOrderItemRequest request)
         {
-            var request = new CreateOrderItemRequest(
-                order,
-                null,
-                null,
-                catalogueItemType,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                0,
-                null,
-                null,
-                null);
-
             request.Order.Should().Be(order);
         }
 
         [Test]
         [OrderingAutoData]
-        public static void Constructor_Initializes_OdsCode(
-            string odsCode,
-            Order order,
-            CatalogueItemType catalogueItemType)
-        {
-            var request = new CreateOrderItemRequest(
-                order,
-                odsCode,
-                null,
-                catalogueItemType,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                0,
-                null,
-                null,
-                null);
-
-            request.OdsCode.Should().Be(odsCode);
-        }
-
-        [Test]
-        [OrderingAutoData]
         public static void Constructor_Initializes_CatalogueItemId(
-            string catalogueItemId,
-            Order order,
-            CatalogueItemType catalogueItemType)
+            [Frozen] CreateOrderItemModel model,
+            TestOrderItemRequest request)
         {
-            var request = new CreateOrderItemRequest(
-                order,
-                null,
-                catalogueItemId,
-                catalogueItemType,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                0,
-                null,
-                null,
-                null);
-
-            request.CatalogueItemId.Should().Be(catalogueItemId);
+            request.CatalogueItemId.Should().Be(model.CatalogueItemId);
         }
 
         [Test]
         [OrderingAutoData]
         public static void Constructor_Initializes_CatalogueItemType(
-            Order order,
-            CatalogueItemType catalogueItemType)
+            [Frozen] CatalogueItemType itemType,
+            TestOrderItemRequest request)
         {
-            var request = new CreateOrderItemRequest(
-                order,
-                null,
-                null,
-                catalogueItemType,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                0,
-                null,
-                null,
-                null);
-
-            request.CatalogueItemType.Should().Be(catalogueItemType);
+            request.CatalogueItemType.Should().Be(itemType);
         }
 
         [Test]
         [OrderingAutoData]
         public static void Constructor_Initializes_CatalogueItemName(
-            string catalogueItemName,
-            Order order,
-            CatalogueItemType catalogueItemType)
+            [Frozen] CreateOrderItemModel model,
+            TestOrderItemRequest request)
         {
-            var request = new CreateOrderItemRequest(
-                order,
-                null,
-                null,
-                catalogueItemType,
-                catalogueItemName,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                0,
-                null,
-                null,
-                null);
-
-            request.CatalogueItemName.Should().Be(catalogueItemName);
-        }
-
-        [Test]
-        [OrderingAutoData]
-        public static void Constructor_Initializes_CatalogueSolutionId(
-            string catalogueSolutionId,
-            Order order,
-            CatalogueItemType catalogueItemType)
-        {
-            var request = new CreateOrderItemRequest(
-                order,
-                null,
-                null,
-                catalogueItemType,
-                null,
-                catalogueSolutionId,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                0,
-                null,
-                null,
-                null);
-
-            request.CatalogueSolutionId.Should().Be(catalogueSolutionId);
+            request.CatalogueItemName.Should().Be(model.CatalogueItemName);
         }
 
         [Test]
         [OrderingAutoData]
         public static void Constructor_Initializes_ProvisioningType(
-            ProvisioningType provisioningType,
-            Order order,
-            CatalogueItemType catalogueItemType)
+            [Frozen] ProvisioningType provisioningType,
+            TestOrderItemRequest request)
         {
-            var request = new CreateOrderItemRequest(
-                order,
-                null,
-                null,
-                catalogueItemType,
-                null,
-                null,
-                provisioningType.GetName(),
-                null,
-                null,
-                null,
-                null,
-                null,
-                0,
-                null,
-                null,
-                null);
-
             request.ProvisioningType.Should().Be(provisioningType);
         }
 
         [Test]
         [OrderingAutoData]
         public static void Constructor_Initializes_CataloguePriceType(
-            CataloguePriceType cataloguePriceType,
-            Order order,
-            CatalogueItemType catalogueItemType)
+            [Frozen] CataloguePriceType priceType,
+            TestOrderItemRequest request)
         {
-            var request = new CreateOrderItemRequest(
-                order,
-                null,
-                null,
-                catalogueItemType,
-                null,
-                null,
-                null,
-                cataloguePriceType.GetName(),
-                null,
-                null,
-                null,
-                null,
-                0,
-                null,
-                null,
-                null);
-
-            request.CataloguePriceType.Should().Be(cataloguePriceType);
+            request.CataloguePriceType.Should().Be(priceType);
         }
 
         [Test]
         [OrderingAutoData]
         public static void Constructor_Initializes_CataloguePriceUnitTierName(
-            string cataloguePriceUnitTierName,
-            Order order,
-            CatalogueItemType catalogueItemType)
+            [Frozen] ItemUnitModel model,
+            TestOrderItemRequest request)
         {
-            var request = new CreateOrderItemRequest(
-                order,
-                null,
-                null,
-                catalogueItemType,
-                null,
-                null,
-                null,
-                null,
-                cataloguePriceUnitTierName,
-                null,
-                null,
-                null,
-                0,
-                null,
-                null,
-                null);
-
-            request.CataloguePriceUnitTierName.Should().Be(cataloguePriceUnitTierName);
+            request.CataloguePriceUnitTierName.Should().Be(model.Name);
         }
 
         [Test]
         [OrderingAutoData]
         public static void Constructor_Initializes_CataloguePriceUnitDescription(
-            string cataloguePriceUnitDescription,
-            Order order,
-            CatalogueItemType catalogueItemType)
+            [Frozen] ItemUnitModel model,
+            TestOrderItemRequest request)
         {
-            var request = new CreateOrderItemRequest(
-                order,
-                null,
-                null,
-                catalogueItemType,
-                null,
-                null,
-                null,
-                null,
-                null,
-                cataloguePriceUnitDescription,
-                null,
-                null,
-                0,
-                null,
-                null,
-                null);
-
-            request.CataloguePriceUnitDescription.Should().Be(cataloguePriceUnitDescription);
-        }
-
-        [Test]
-        [OrderingAutoData]
-        public static void Constructor_Initializes_CataloguePriceTimeUnit(
-            TimeUnit timeUnit,
-            Order order,
-            CatalogueItemType catalogueItemType)
-        {
-            var request = new CreateOrderItemRequest(
-                order,
-                null,
-                null,
-                catalogueItemType,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                timeUnit,
-                null,
-                0,
-                null,
-                null,
-                null);
-
-            request.PriceTimeUnit.Should().Be(timeUnit);
+            request.CataloguePriceUnitDescription.Should().Be(model.Description);
         }
 
         [Test]
         [OrderingAutoData]
         public static void Constructor_Initializes_CurrencyCode(
-            string currencyCode,
-            Order order,
-            CatalogueItemType catalogueItemType)
+            [Frozen] CreateOrderItemModel model,
+            TestOrderItemRequest request)
         {
-            var request = new CreateOrderItemRequest(
-                order,
-                null,
-                null,
-                catalogueItemType,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                currencyCode,
-                0,
-                null,
-                null,
-                null);
-
-            request.CurrencyCode.Should().Be(currencyCode);
+            request.CurrencyCode.Should().Be(model.CurrencyCode);
         }
 
         [Test]
         [OrderingAutoData]
         public static void Constructor_Initializes_Quantity(
-            int quantity,
-            Order order,
-            CatalogueItemType catalogueItemType)
+            [Frozen] CreateOrderItemModel model,
+            TestOrderItemRequest request)
         {
-            var request = new CreateOrderItemRequest(
-                order,
-                null,
-                null,
-                catalogueItemType,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                quantity,
-                null,
-                null,
-                null);
-
-            request.Quantity.Should().Be(quantity);
+            request.Quantity.Should().Be(model.Quantity);
         }
 
         [Test]
         [OrderingAutoData]
         public static void Constructor_Initializes_EstimationPeriod(
-            TimeUnit estimationPeriod,
-            Order order,
-            CatalogueItemType catalogueItemType)
+            [Frozen] TimeUnit timeUnit,
+            TestOrderItemRequest request)
         {
-            var request = new CreateOrderItemRequest(
-                order,
-                null,
-                null,
-                catalogueItemType,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                0,
-                estimationPeriod.GetDisplayName(),
-                null,
-                null);
-
-            request.EstimationPeriod.Should().Be(estimationPeriod);
-        }
-
-        [Test]
-        [OrderingAutoData]
-        public static void Constructor_Initializes_EstimationPeriod(
-            DateTime deliveryDate,
-            Order order,
-            CatalogueItemType catalogueItemType)
-        {
-            var request = new CreateOrderItemRequest(
-                order,
-                null,
-                null,
-                catalogueItemType,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                0,
-                null,
-                deliveryDate,
-                null);
-
-            request.DeliveryDate.Should().Be(deliveryDate);
+            request.EstimationPeriod.Should().Be(timeUnit);
         }
 
         [Test]
         [OrderingAutoData]
         public static void Constructor_Initializes_Price(
-            decimal price,
-            Order order,
-            CatalogueItemType catalogueItemType)
+            [Frozen] decimal price,
+            TestOrderItemRequest request)
         {
-            var request = new CreateOrderItemRequest(
-                order,
-                null,
-                null,
-                catalogueItemType,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                0,
-                null,
-                null,
-                price);
-
             request.Price.Should().Be(price);
+        }
+
+        public sealed class TestOrderItemRequest : CreateOrderItemRequest
+        {
+            public TestOrderItemRequest(Order order, CreateOrderItemModel model, CatalogueItemType itemType)
+                : base(order, model, itemType)
+            {
+            }
         }
     }
 }

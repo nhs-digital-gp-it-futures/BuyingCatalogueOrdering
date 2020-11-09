@@ -114,7 +114,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                         ItemId = $"{order.OrderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
                         ServiceRecipientsOdsCode = orderItem.OdsCode,
                         CataloguePriceType = orderItem.CataloguePriceType.ToString(),
-                        CatalogueItemType = orderItem.CatalogueItemType.Name,
+                        CatalogueItemType = orderItem.CatalogueItemType.ToString(),
                         CatalogueItemName = orderItem.CatalogueItemName,
                         ProvisioningType = orderItem.ProvisioningType.ToString(),
                         ItemUnitDescription = orderItem.CataloguePriceUnit.Description,

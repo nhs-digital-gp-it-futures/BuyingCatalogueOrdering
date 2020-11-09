@@ -15,9 +15,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
             ServiceRecipient = serviceRecipient != null ? new ServiceRecipientModel
             {
                 OdsCode = serviceRecipient.OdsCode,
-                Name = serviceRecipient.Name
+                Name = serviceRecipient.Name,
             } : null;
-            CatalogueItemType = orderItem.CatalogueItemType.Name;
+            CatalogueItemType = orderItem.CatalogueItemType.ToString();
             CatalogueItemName = orderItem.CatalogueItemName;
             CatalogueItemId = orderItem.CatalogueItemId;
             CurrencyCode = orderItem.CurrencyCode;

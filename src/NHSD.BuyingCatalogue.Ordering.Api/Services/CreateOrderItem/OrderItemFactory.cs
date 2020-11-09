@@ -7,7 +7,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
         public OrderItem Create(CreateOrderItemRequest request)
         {
             var catalogueItemType = request.CatalogueItemType;
-            var provisioningType = request.ProvisioningType.Value;
+            var provisioningType = request.ProvisioningType;
 
             return new OrderItem(
                 request.OdsCode,
@@ -16,12 +16,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
                 request.CatalogueItemName,
                 request.CatalogueSolutionId,
                 provisioningType,
-                request.CataloguePriceType.Value,
+                request.CataloguePriceType,
                 CataloguePriceUnit.Create(request.CataloguePriceUnitTierName, request.CataloguePriceUnitDescription),
                 request.PriceTimeUnit,
                 request.CurrencyCode,
                 request.Quantity,
-                catalogueItemType.InferEstimationPeriod(provisioningType, request.EstimationPeriod.Value),
+                catalogueItemType.InferEstimationPeriod(provisioningType, request.EstimationPeriod),
                 request.DeliveryDate,
                 request.Price);
         }

@@ -17,7 +17,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [OrderingAutoData]
         public static void Create_HasExpectedCatalogueItemType(
             [Frozen] CatalogueItemType itemType,
-            CreateOrderItemRequest request,
+            CreateOrderItemSolutionRequest request,
             OrderItemFactory factory)
         {
             var orderItem = factory.Create(request);
@@ -29,7 +29,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [OrderingAutoData]
         public static void Create_HasExpectedProvisioningType(
             [Frozen] ProvisioningType provisioningType,
-            CreateOrderItemRequest request,
+            CreateOrderItemSolutionRequest request,
             OrderItemFactory factory)
         {
             var orderItem = factory.Create(request);
@@ -40,7 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [Test]
         [OrderingAutoData]
         public static void Create_HasExpectedOdsCode(
-            CreateOrderItemRequest request,
+            CreateOrderItemSolutionRequest request,
             OrderItemFactory factory)
         {
             var orderItem = factory.Create(request);
@@ -51,7 +51,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [Test]
         [OrderingAutoData]
         public static void Create_HasExpectedCatalogueItemId(
-            CreateOrderItemRequest request,
+            CreateOrderItemSolutionRequest request,
             OrderItemFactory factory)
         {
             var orderItem = factory.Create(request);
@@ -62,7 +62,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [Test]
         [OrderingAutoData]
         public static void Create_HasExpectedCatalogueItemName(
-            CreateOrderItemRequest request,
+            CreateOrderItemSolutionRequest request,
             OrderItemFactory factory)
         {
             var orderItem = factory.Create(request);
@@ -73,7 +73,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [Test]
         [OrderingAutoData]
         public static void Create_HasExpectedParentCatalogueItemId(
-            CreateOrderItemRequest request,
+            CreateOrderItemSolutionRequest request,
             OrderItemFactory factory)
         {
             var orderItem = factory.Create(request);
@@ -85,7 +85,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [OrderingAutoData]
         public static void Create_HasExpectedParentCataloguePriceType(
             [Frozen] CataloguePriceType priceType,
-            CreateOrderItemRequest request,
+            CreateOrderItemSolutionRequest request,
             OrderItemFactory factory)
         {
             var orderItem = factory.Create(request);
@@ -96,7 +96,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [Test]
         [OrderingAutoData]
         public static void Create_HasExpectedCurrencyCode(
-            CreateOrderItemRequest request,
+            CreateOrderItemSolutionRequest request,
             OrderItemFactory factory)
         {
             var orderItem = factory.Create(request);
@@ -107,7 +107,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [Test]
         [OrderingAutoData]
         public static void Create_HasExpectedQuantity(
-            CreateOrderItemRequest request,
+            CreateOrderItemSolutionRequest request,
             OrderItemFactory factory)
         {
             var orderItem = factory.Create(request);
@@ -118,7 +118,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [Test]
         [OrderingAutoData]
         public static void Create_HasExpectedDeliveryDate(
-            CreateOrderItemRequest request,
+            CreateOrderItemSolutionRequest request,
             OrderItemFactory factory)
         {
             var orderItem = factory.Create(request);
@@ -129,7 +129,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [Test]
         [OrderingAutoData]
         public static void Create_HasExpectedPrice(
-            CreateOrderItemRequest request,
+            CreateOrderItemSolutionRequest request,
             OrderItemFactory factory)
         {
             var orderItem = factory.Create(request);
@@ -140,7 +140,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [Test]
         [OrderingAutoData]
         public static void Create_HasExpectedCataloguePriceUnit(
-            CreateOrderItemRequest request,
+            CreateOrderItemSolutionRequest request,
             OrderItemFactory factory)
         {
             var orderItem = factory.Create(request);
@@ -154,7 +154,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [OrderingAutoData]
         public static void Create_HasExpectedPriceTimeUnit(
             [Frozen] TimeUnit priceTimeUnit,
-            CreateOrderItemRequest request,
+            CreateOrderItemSolutionRequest request,
             OrderItemFactory factory)
         {
             var orderItem = factory.Create(request);
@@ -166,7 +166,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [OrderingAutoData]
         public static void Create_HasExpectedEstimationPeriod(
             [Frozen] TimeUnit estimationPeriod,
-            CreateOrderItemRequest request,
+            CreateOrderItemSolutionRequest request,
             OrderItemFactory factory)
         {
             var orderItem = factory.Create(request);

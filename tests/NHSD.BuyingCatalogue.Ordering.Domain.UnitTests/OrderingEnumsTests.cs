@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using AutoFixture.NUnit3;
 using EnumsNET;
 using FluentAssertions;
@@ -15,7 +16,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         {
             var timeUnit = OrderingEnums.ParseTimeUnit("DoesNotExist");
 
-            timeUnit.Should().Be(0);
+            timeUnit.Should().Be(OrderingEnums.UndefinedTimeUnit);
         }
 
         [TestCase("month", TimeUnit.PerMonth)]
@@ -54,6 +55,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             var enumValue = OrderingEnums.Parse<ProvisioningType>("DoesNotExist");
 
             enumValue.Should().BeNull();
+        }
+
+        [TestCase("flat", CataloguePriceType.Flat)]
+        [TestCase("TIERED", CataloguePriceType.Tiered)]
+        public static void ParseIgnoreCase_ReturnsExpectedEnumValue(string value, CataloguePriceType expected)
+        {
+            var actual = OrderingEnums.ParseStrictIgnoreCase<CataloguePriceType>(value);
+
+            actual.Should().Be(expected);
+        }
+
+        [Test]
+        public static void ParseIgnoreCase_InvalidValue_ThrowsException()
+        {
+            Assert.Throws<ArgumentException>(() => OrderingEnums.ParseStrictIgnoreCase<CataloguePriceType>("InvalidPriceType"));
         }
     }
 }

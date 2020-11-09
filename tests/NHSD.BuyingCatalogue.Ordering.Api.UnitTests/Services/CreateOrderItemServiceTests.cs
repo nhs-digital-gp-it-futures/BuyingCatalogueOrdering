@@ -9,10 +9,10 @@ using AutoFixture.Idioms;
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using Moq;
+using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
-using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
-using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services;
+using NHSD.BuyingCatalogue.Ordering.Api.Validation;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Application.Services;
 using NHSD.BuyingCatalogue.Ordering.Domain;
@@ -27,7 +27,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
     internal static class CreateOrderItemServiceTests
     {
         [Test]
-        public static void Contructors_VerifyGuardClauses()
+        public static void Constructors_VerifyGuardClauses()
         {
             var fixture = new Fixture().Customize(new AutoMoqCustomization());
             var assertion = new GuardClauseAssertion(fixture);
@@ -37,79 +37,72 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public static void CreateAsync_NullCreateOrderItemRequest_ThrowsArgumentNullException()
+        [OrderingAutoData]
+        public static void CreateAsync_NullCreateOrderItemRequest_ThrowsArgumentNullException(
+            CreateOrderItemService service)
         {
-            var sut = CreateOrderItemServiceBuilder.Create().Build();
-
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.CreateAsync(null));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await service.CreateAsync(null));
         }
 
         [Test]
-        public static async Task CreateAsync_ValidatorReturnsErrors_ReturnsFailure()
+        [OrderingAutoData]
+        public static async Task CreateAsync_ValidatorReturnsErrors_ReturnsFailure(
+            CreateOrderItemSolutionRequest createOrderItemRequest,
+            [Frozen] Mock<ICreateOrderItemValidator> validator,
+            CreateOrderItemService service)
         {
-            var context = CreateOrderItemServiceTestContext.Setup();
             var expectedErrors = new List<ErrorDetails>
-                {
-                    new ErrorDetails("Error1", "ErrorField"), new ErrorDetails("Error2", "ErrorField")
-                };
+            {
+                new ErrorDetails("Error1", "ErrorField"),
+                new ErrorDetails("Error2", "ErrorField"),
+            };
 
-            var createOrderItemRequest = CreateOrderItemRequestBuilder
-                .Create()
-                .Build();
+            validator
+                .Setup(x => x.Validate(createOrderItemRequest))
+                .Returns(new ValidationResult(expectedErrors));
 
-            context.OrderItemValidatorMock.Setup(x => x.Validate(createOrderItemRequest)).Returns(
-                expectedErrors);
-
-            var actual = await context.CreateOrderItemService.CreateAsync(createOrderItemRequest);
+            var actual = await service.CreateAsync(createOrderItemRequest);
             actual.Should().Be(Result.Failure<int>(expectedErrors));
         }
 
         [Test]
-        public static async Task CreateAsync_CreateOrderItemRequest_ReturnsSuccess()
+        [OrderingAutoData]
+        public static async Task CreateAsync_CreateOrderItemRequest_ReturnsSuccess(
+            [Frozen] Order order,
+            CreateOrderItemSolutionRequest createOrderItemRequest,
+            CreateOrderItemService service)
         {
-            var context = CreateOrderItemServiceTestContext.Setup();
+            var actual = await service.CreateAsync(createOrderItemRequest);
 
-            var createOrderItemRequest = CreateOrderItemRequestBuilder
-                .Create()
-                .Build();
-
-            var actual = await context.CreateOrderItemService.CreateAsync(createOrderItemRequest);
-
-            var expected = context.Order.OrderItems.First().OrderItemId;
+            var expected = order.OrderItems.First().OrderItemId;
             actual.Should().Be(Result.Success(expected));
         }
 
-        [TestCase(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.OnDemand), TimeUnit.PerYear)]
-        [TestCase(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.Patient), TimeUnit.PerMonth)]
-        [TestCase(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.Declarative), TimeUnit.PerYear)]
-        [TestCase(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.OnDemand), TimeUnit.PerYear)]
-        [TestCase(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.Patient), TimeUnit.PerMonth)]
-        [TestCase(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.Declarative), TimeUnit.PerYear)]
-        [TestCase(nameof(CatalogueItemType.AssociatedService), nameof(ProvisioningType.OnDemand), TimeUnit.PerYear)]
-        [TestCase(nameof(CatalogueItemType.AssociatedService), nameof(ProvisioningType.Declarative), null)]
-        public static async Task CreateAsync_MapCreateOrderItemRequestToOrderItem_AreEqual(
-            string catalogueItemTypeNameInput,
-            string provisioningTypeNameInput,
-            TimeUnit? expectedEstimationPeriodNameInput)
+        [Test]
+        [OrderingInlineAutoData(ProvisioningType.OnDemand, TimeUnit.PerYear)]
+        [OrderingInlineAutoData(ProvisioningType.Patient, TimeUnit.PerMonth)]
+        [OrderingInlineAutoData(ProvisioningType.Declarative, TimeUnit.PerYear)]
+        public static async Task CreateAsync_AdditionalService_MapCreateOrderItemRequestToOrderItem_AreEqual(
+            ProvisioningType provisioningType,
+            TimeUnit? expectedEstimationPeriodNameInput,
+            Order order,
+            CreateOrderItemModel model,
+            CreateOrderItemService service)
         {
-            var context = CreateOrderItemServiceTestContext.Setup();
+            model.ProvisioningType = provisioningType.ToString();
+            var createOrderItemRequest = new CreateOrderItemAdditionalServiceRequest(order, model);
 
-            var createOrderItemRequest = CreateOrderItemRequestBuilder
-                .Create()
-                .WithCatalogueItemType(CatalogueItemType.FromName(catalogueItemTypeNameInput))
-                .WithProvisioningTypeName(provisioningTypeNameInput)
-                .Build();
+            await service.CreateAsync(createOrderItemRequest);
 
-            await context.CreateOrderItemService.CreateAsync(createOrderItemRequest);
+            var actual = order.OrderItems.First();
 
-            var actual = context.Order.OrderItems.First();
             actual.Should().BeEquivalentTo(new
             {
                 createOrderItemRequest.OdsCode,
                 createOrderItemRequest.CatalogueItemId,
                 createOrderItemRequest.CatalogueItemName,
                 ParentCatalogueItemId = createOrderItemRequest.CatalogueSolutionId,
-                ProvisioningType = createOrderItemRequest.ProvisioningType.Value,
+                createOrderItemRequest.ProvisioningType,
                 createOrderItemRequest.CataloguePriceType,
                 CataloguePriceUnit = CataloguePriceUnit.Create(
                     createOrderItemRequest.CataloguePriceUnitTierName,
@@ -119,128 +112,201 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 createOrderItemRequest.Quantity,
                 EstimationPeriod = expectedEstimationPeriodNameInput,
                 createOrderItemRequest.DeliveryDate,
-                createOrderItemRequest.Price
+                createOrderItemRequest.Price,
             });
         }
 
         [Test]
-        public static async Task CreateAsync_OrderRepository_CalledOnce()
+        [OrderingInlineAutoData(ProvisioningType.OnDemand, TimeUnit.PerYear)]
+        [OrderingInlineAutoData(ProvisioningType.Declarative, null)]
+        public static async Task CreateAsync_AssociatedService_MapCreateOrderItemRequestToOrderItem_AreEqual(
+            ProvisioningType provisioningType,
+            TimeUnit? expectedEstimationPeriodNameInput,
+            Order order,
+            CreateOrderItemModel model,
+            CreateOrderItemService service)
         {
-            var context = CreateOrderItemServiceTestContext.Setup();
+            model.ProvisioningType = provisioningType.ToString();
+            var createOrderItemRequest = new CreateOrderItemAssociatedServiceRequest(order, model);
 
-            var createOrderItemRequest = CreateOrderItemRequestBuilder
-                .Create()
-                .Build();
+            await service.CreateAsync(createOrderItemRequest);
 
-            await context.CreateOrderItemService.CreateAsync(createOrderItemRequest);
+            var actual = order.OrderItems.First();
 
-            context.OrderRepositoryMock.Verify(orderRepository =>
-                orderRepository.UpdateOrderAsync(createOrderItemRequest.Order), Times.Once);
+            actual.Should().BeEquivalentTo(new
+            {
+                createOrderItemRequest.OdsCode,
+                createOrderItemRequest.CatalogueItemId,
+                createOrderItemRequest.CatalogueItemName,
+                ParentCatalogueItemId = createOrderItemRequest.CatalogueSolutionId,
+                createOrderItemRequest.ProvisioningType,
+                createOrderItemRequest.CataloguePriceType,
+                CataloguePriceUnit = CataloguePriceUnit.Create(
+                    createOrderItemRequest.CataloguePriceUnitTierName,
+                    createOrderItemRequest.CataloguePriceUnitDescription),
+                createOrderItemRequest.PriceTimeUnit,
+                createOrderItemRequest.CurrencyCode,
+                createOrderItemRequest.Quantity,
+                EstimationPeriod = expectedEstimationPeriodNameInput,
+                createOrderItemRequest.DeliveryDate,
+                createOrderItemRequest.Price,
+            });
         }
 
         [Test]
-        public static async Task CreateAsync_OrderItemValidator_CalledOnce()
+        [OrderingInlineAutoData(ProvisioningType.OnDemand, TimeUnit.PerYear)]
+        [OrderingInlineAutoData(ProvisioningType.Patient, TimeUnit.PerMonth)]
+        [OrderingInlineAutoData(ProvisioningType.Declarative, TimeUnit.PerYear)]
+        public static async Task CreateAsync_Solution_MapCreateOrderItemRequestToOrderItem_AreEqual(
+            ProvisioningType provisioningType,
+            TimeUnit? expectedEstimationPeriodNameInput,
+            Order order,
+            CreateOrderItemModel model,
+            CreateOrderItemService service)
         {
-            var context = CreateOrderItemServiceTestContext.Setup();
+            model.ProvisioningType = provisioningType.ToString();
+            var createOrderItemRequest = new CreateOrderItemSolutionRequest(order, model);
 
-            var createOrderItemRequest = CreateOrderItemRequestBuilder
-                .Create()
-                .Build();
+            await service.CreateAsync(createOrderItemRequest);
 
-            await context.CreateOrderItemService.CreateAsync(createOrderItemRequest);
+            var actual = order.OrderItems.First();
 
-            context.OrderItemValidatorMock.Verify(validator =>
-                validator.Validate(createOrderItemRequest), Times.Once);
+            actual.Should().BeEquivalentTo(new
+            {
+                createOrderItemRequest.OdsCode,
+                createOrderItemRequest.CatalogueItemId,
+                createOrderItemRequest.CatalogueItemName,
+                ParentCatalogueItemId = createOrderItemRequest.CatalogueSolutionId,
+                createOrderItemRequest.ProvisioningType,
+                createOrderItemRequest.CataloguePriceType,
+                CataloguePriceUnit = CataloguePriceUnit.Create(
+                    createOrderItemRequest.CataloguePriceUnitTierName,
+                    createOrderItemRequest.CataloguePriceUnitDescription),
+                createOrderItemRequest.PriceTimeUnit,
+                createOrderItemRequest.CurrencyCode,
+                createOrderItemRequest.Quantity,
+                EstimationPeriod = expectedEstimationPeriodNameInput,
+                createOrderItemRequest.DeliveryDate,
+                createOrderItemRequest.Price,
+            });
         }
 
         [Test]
-        public static async Task CreateAsync_IdentityService_CalledTwice()
+        [OrderingAutoData]
+        public static async Task CreateAsync_OrderRepository_CalledOnce(
+            CreateOrderItemSolutionRequest createOrderItemRequest,
+            [Frozen] Mock<IOrderRepository> repository,
+            CreateOrderItemService service)
         {
-            var context = CreateOrderItemServiceTestContext.Setup();
+            await service.CreateAsync(createOrderItemRequest);
 
-            var createOrderItemRequest = CreateOrderItemRequestBuilder
-                .Create()
-                .Build();
-
-            await context.CreateOrderItemService.CreateAsync(createOrderItemRequest);
-
-            context.IdentityServiceMock.Verify(identityService =>
-                identityService.GetUserName(), Times.Once);
-
-            context.IdentityServiceMock.Verify(identityService =>
-                identityService.GetUserIdentity(), Times.Once);
+            repository.Verify(r => r.UpdateOrderAsync(createOrderItemRequest.Order));
         }
 
-        [TestCase(nameof(CatalogueItemType.Solution), null, null)]
-        [TestCase(nameof(CatalogueItemType.Solution), "month", TimeUnit.PerMonth)]
-        [TestCase(nameof(CatalogueItemType.Solution), "year", TimeUnit.PerYear)]
-        [TestCase(nameof(CatalogueItemType.AdditionalService), null, null)]
-        [TestCase(nameof(CatalogueItemType.AdditionalService), "month", TimeUnit.PerMonth)]
-        [TestCase(nameof(CatalogueItemType.AdditionalService), "year", TimeUnit.PerYear)]
-        [TestCase(nameof(CatalogueItemType.AssociatedService), null, null)]
-        [TestCase(nameof(CatalogueItemType.AssociatedService), "month", TimeUnit.PerMonth)]
-        [TestCase(nameof(CatalogueItemType.AssociatedService), "year", TimeUnit.PerYear)]
-        public static async Task CreateAsync_ProvisioningType_OnDemand_OrderItemAddedWithExpectedEstimationPeriod(
-            string catalogueItemTypeNameInput,
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateAsync_OrderItemValidator_CalledOnce(
+            CreateOrderItemSolutionRequest createOrderItemRequest,
+            [Frozen] Mock<ICreateOrderItemValidator> validator,
+            CreateOrderItemService service)
+        {
+            validator.Setup(v => v.Validate(createOrderItemRequest))
+                .Returns(new ValidationResult(Array.Empty<ErrorDetails>()));
+
+            await service.CreateAsync(createOrderItemRequest);
+
+            validator.Verify(v => v.Validate(createOrderItemRequest));
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateAsync_IdentityService_CalledTwice(
+            CreateOrderItemSolutionRequest createOrderItemRequest,
+            [Frozen] Mock<IIdentityService> identityService,
+            CreateOrderItemService service)
+        {
+            await service.CreateAsync(createOrderItemRequest);
+
+            identityService.Verify(i => i.GetUserName());
+            identityService.Verify(i => i.GetUserIdentity());
+        }
+
+        [Test]
+        [OrderingInlineAutoData(ProvisioningType.OnDemand, null, null)]
+        [OrderingInlineAutoData(ProvisioningType.OnDemand, "month", TimeUnit.PerMonth)]
+        [OrderingInlineAutoData(ProvisioningType.OnDemand, "year", TimeUnit.PerYear)]
+        [OrderingInlineAutoData(ProvisioningType.Patient, null, TimeUnit.PerMonth)]
+        [OrderingInlineAutoData(ProvisioningType.Declarative, null, TimeUnit.PerYear)]
+        public static async Task CreateAsync_AdditionalService_ProvisioningType_OrderItemAddedWithExpectedEstimationPeriod(
+            ProvisioningType provisioningType,
             string inputEstimationPeriod,
-            TimeUnit? expectedEstimationPeriod)
+            TimeUnit? expectedEstimationPeriod,
+            Order order,
+            CreateOrderItemModel model,
+            CreateOrderItemService service)
         {
-            var context = CreateOrderItemServiceTestContext.Setup();
+            model.EstimationPeriod = inputEstimationPeriod;
+            model.ProvisioningType = provisioningType.ToString();
 
-            var createOrderItemRequest = CreateOrderItemRequestBuilder
-                .Create()
-                .WithCatalogueItemType(CatalogueItemType.FromName(catalogueItemTypeNameInput))
-                .WithProvisioningTypeName(ProvisioningType.OnDemand.ToString())
-                .WithEstimationPeriodName(inputEstimationPeriod)
-                .Build();
+            var createOrderItemRequest = new CreateOrderItemAdditionalServiceRequest(order, model);
 
-            await context.CreateOrderItemService.CreateAsync(createOrderItemRequest);
+            await service.CreateAsync(createOrderItemRequest);
 
-            var orderItem = createOrderItemRequest.Order.OrderItems.First();
+            var orderItem = order.OrderItems.First();
 
             orderItem.EstimationPeriod.Should().Be(expectedEstimationPeriod);
         }
 
-        [TestCase(nameof(CatalogueItemType.Solution))]
-        [TestCase(nameof(CatalogueItemType.AdditionalService))]
-        public static async Task CreateAsync_ProvisioningType_Patient_OrderItemAddedWithEstimationPeriod_PerMonth(
-            string catalogueItemTypeNameInput)
+        [Test]
+        [OrderingInlineAutoData(ProvisioningType.OnDemand, null, null)]
+        [OrderingInlineAutoData(ProvisioningType.OnDemand, "month", TimeUnit.PerMonth)]
+        [OrderingInlineAutoData(ProvisioningType.OnDemand, "year", TimeUnit.PerYear)]
+        [OrderingInlineAutoData(ProvisioningType.Patient, null, null)]
+        [OrderingInlineAutoData(ProvisioningType.Declarative, null, null)]
+        public static async Task CreateAsync_AssociatedService_ProvisioningType_OrderItemAddedWithExpectedEstimationPeriod(
+            ProvisioningType provisioningType,
+            string inputEstimationPeriod,
+            TimeUnit? expectedEstimationPeriod,
+            Order order,
+            CreateOrderItemModel model,
+            CreateOrderItemService service)
         {
-            var context = CreateOrderItemServiceTestContext.Setup();
+            model.EstimationPeriod = inputEstimationPeriod;
+            model.ProvisioningType = provisioningType.ToString();
 
-            var createOrderItemRequest = CreateOrderItemRequestBuilder
-                .Create()
-                .WithCatalogueItemType(CatalogueItemType.FromName(catalogueItemTypeNameInput))
-                .WithProvisioningTypeName(ProvisioningType.Patient.ToString())
-                .WithEstimationPeriodName(null)
-                .Build();
+            var createOrderItemRequest = new CreateOrderItemAssociatedServiceRequest(order, model);
 
-            await context.CreateOrderItemService.CreateAsync(createOrderItemRequest);
+            await service.CreateAsync(createOrderItemRequest);
 
-            var orderItem = createOrderItemRequest.Order.OrderItems.First();
-            orderItem.EstimationPeriod.Should().Be(TimeUnit.PerMonth);
+            var orderItem = order.OrderItems.First();
+
+            orderItem.EstimationPeriod.Should().Be(expectedEstimationPeriod);
         }
 
-        [TestCase(nameof(CatalogueItemType.Solution), TimeUnit.PerYear)]
-        [TestCase(nameof(CatalogueItemType.AdditionalService), TimeUnit.PerYear)]
-        [TestCase(nameof(CatalogueItemType.AssociatedService), null)]
-        public static async Task CreateAsync_ProvisioningType_Declarative_OrderItemAddedWithEstimationPeriod_PerYear(
-            string catalogueItemTypeNameInput,
-            TimeUnit? expectedEstimationPeriodNameInput)
+        [Test]
+        [OrderingInlineAutoData(ProvisioningType.OnDemand, null, null)]
+        [OrderingInlineAutoData(ProvisioningType.OnDemand, "month", TimeUnit.PerMonth)]
+        [OrderingInlineAutoData(ProvisioningType.OnDemand, "year", TimeUnit.PerYear)]
+        [OrderingInlineAutoData(ProvisioningType.Patient, null, TimeUnit.PerMonth)]
+        [OrderingInlineAutoData(ProvisioningType.Declarative, null, TimeUnit.PerYear)]
+        public static async Task CreateAsync_Solution_ProvisioningType_OrderItemAddedWithExpectedEstimationPeriod(
+            ProvisioningType provisioningType,
+            string inputEstimationPeriod,
+            TimeUnit? expectedEstimationPeriod,
+            Order order,
+            CreateOrderItemModel model,
+            CreateOrderItemService service)
         {
-            var context = CreateOrderItemServiceTestContext.Setup();
+            model.EstimationPeriod = inputEstimationPeriod;
+            model.ProvisioningType = provisioningType.ToString();
 
-            var createOrderItemRequest = CreateOrderItemRequestBuilder
-                .Create()
-                .WithCatalogueItemType(CatalogueItemType.FromName(catalogueItemTypeNameInput))
-                .WithProvisioningTypeName(ProvisioningType.Declarative.ToString())
-                .WithEstimationPeriodName(null)
-                .Build();
+            var createOrderItemRequest = new CreateOrderItemSolutionRequest(order, model);
 
-            await context.CreateOrderItemService.CreateAsync(createOrderItemRequest);
+            await service.CreateAsync(createOrderItemRequest);
 
-            var orderItem = createOrderItemRequest.Order.OrderItems.First();
-            orderItem.EstimationPeriod.Should().Be(expectedEstimationPeriodNameInput);
+            var orderItem = order.OrderItems.First();
+
+            orderItem.EstimationPeriod.Should().Be(expectedEstimationPeriod);
         }
 
         [Test]
@@ -265,14 +331,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [OrderingAutoData]
         public static async Task CreateAsync_Order_IEnumerable_CreateOrderItemRequest_AddsExpectedOrderItemToOrder(
             [Frozen] Mock<IOrderItemFactory> orderItemFactory,
-            [Frozen] Mock<IIdentityService> identityService,
-            string userName,
             Order order,
             OrderItem item,
             CreateOrderItemRequest request,
             CreateOrderItemService service)
         {
-            identityService.Setup(i => i.GetUserName()).Returns(userName);
             orderItemFactory.Setup(f => f.Create(request)).Returns(item);
 
             await service.CreateAsync(order, new[] { request });
@@ -287,14 +350,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             [Frozen] Mock<IOrderItemFactory> orderItemFactory,
             [Frozen] Mock<IIdentityService> identityService,
             Guid userId,
-            string userName,
             Order order,
             OrderItem item,
             CreateOrderItemRequest request,
             CreateOrderItemService service)
         {
             identityService.Setup(i => i.GetUserIdentity()).Returns(userId);
-            identityService.Setup(i => i.GetUserName()).Returns(userName);
             orderItemFactory.Setup(f => f.Create(request)).Returns(item);
 
             await service.CreateAsync(order, new[] { request });
@@ -323,17 +384,196 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
         [Test]
         [OrderingAutoData]
-        public static async Task CreateAsync_Order_IEnumerable_CreateOrderItemRequest_InvokesUpdateOrderAsync(
+        public static async Task CreateAsync_Order_IEnumerable_CreateOrderItemRequest_FailedValidation_DoesNotAddOrderItem(
+            [Frozen] Mock<ICreateOrderItemValidator> orderItemValidator,
             [Frozen] Mock<IOrderItemFactory> orderItemFactory,
             [Frozen] Mock<IIdentityService> identityService,
-            [Frozen] Mock<IOrderRepository> repository,
+            ValidationResult validationResult,
             string userName,
             Order order,
             OrderItem item,
             CreateOrderItemRequest request,
             CreateOrderItemService service)
         {
+            orderItemValidator.Setup(v => v.Validate(request)).Returns(validationResult);
             identityService.Setup(i => i.GetUserName()).Returns(userName);
+            orderItemFactory.Setup(f => f.Create(request)).Returns(item);
+
+            await service.CreateAsync(order, new[] { request });
+
+            order.OrderItems.Should().BeEmpty();
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateAsync_Order_IEnumerable_CreateOrderItemRequest_FailedValidation_ReturnsExpectedResult(
+            [Frozen] Mock<ICreateOrderItemValidator> orderItemValidator,
+            [Frozen] Mock<IOrderItemFactory> orderItemFactory,
+            [Frozen] Mock<IIdentityService> identityService,
+            ValidationResult validationResult,
+            string userName,
+            Order order,
+            OrderItem item,
+            CreateOrderItemRequest request,
+            CreateOrderItemService service)
+        {
+            orderItemValidator.Setup(v => v.Validate(request)).Returns(validationResult);
+            identityService.Setup(i => i.GetUserName()).Returns(userName);
+            orderItemFactory.Setup(f => f.Create(request)).Returns(item);
+
+            var result = await service.CreateAsync(order, new[] { request });
+
+            result.Success.Should().BeFalse();
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateAsync_Order_IEnumerable_CreateOrderItemRequest_DoesNotAddNullServiceRecipient(
+            [Frozen] Mock<IOrderItemFactory> orderItemFactory,
+            [Frozen] Mock<IServiceRecipientRepository> repository,
+            Order order,
+            OrderItem item,
+            CreateOrderItemModel model,
+            CreateOrderItemService service)
+        {
+            static void ServiceRecipientsIsEmpty(string _, IEnumerable<ServiceRecipient> serviceRecipients)
+            {
+                serviceRecipients.Should().BeEmpty();
+            }
+
+            model.ServiceRecipient = null;
+            var request = model.ToRequest(order);
+
+            orderItemFactory.Setup(f => f.Create(request)).Returns(item);
+            repository.Setup(r => r.UpdateWithoutSavingAsync(It.IsAny<string>(), It.IsNotNull<IEnumerable<ServiceRecipient>>()))
+                .Callback<string, IEnumerable<ServiceRecipient>>(ServiceRecipientsIsEmpty);
+
+            await service.CreateAsync(order, new[] { request });
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateAsync_Order_IEnumerable_CreateOrderItemRequest_AddsServiceRecipient(
+            [Frozen] Mock<IOrderItemFactory> orderItemFactory,
+            [Frozen] Mock<IServiceRecipientRepository> repository,
+            Order order,
+            OrderItem item,
+            CreateOrderItemSolutionRequest request,
+            CreateOrderItemService service)
+        {
+            void ServiceRecipientsIsEmpty(string _, IEnumerable<ServiceRecipient> serviceRecipients)
+            {
+                serviceRecipients.Should().Contain(request.ServiceRecipient);
+            }
+
+            orderItemFactory.Setup(f => f.Create(request)).Returns(item);
+            repository.Setup(r => r.UpdateWithoutSavingAsync(It.IsAny<string>(), It.IsNotNull<IEnumerable<ServiceRecipient>>()))
+                .Callback<string, IEnumerable<ServiceRecipient>>(ServiceRecipientsIsEmpty);
+
+            await service.CreateAsync(order, new[] { request });
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateAsync_Order_IEnumerable_CreateOrderItemRequest_FailedValidation_DoesNotInvokeUpdateWithoutSavingAsync(
+            [Frozen] Mock<ICreateOrderItemValidator> orderItemValidator,
+            [Frozen] Mock<IOrderItemFactory> orderItemFactory,
+            ValidationResult validationResult,
+            Order order,
+            OrderItem item,
+            [Frozen] Mock<IServiceRecipientRepository> repository,
+            CreateOrderItemRequest request,
+            CreateOrderItemService service)
+        {
+            orderItemValidator.Setup(v => v.Validate(request)).Returns(validationResult);
+            orderItemFactory.Setup(f => f.Create(request)).Returns(item);
+
+            await service.CreateAsync(order, new[] { request });
+
+            repository.Verify(
+                s => s.UpdateWithoutSavingAsync(It.Is<string>(o => o == order.OrderId), It.IsNotNull<IEnumerable<ServiceRecipient>>()),
+                Times.Never());
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateAsync_Order_IEnumerable_CreateOrderItemRequest_InvokesServiceUpdateWithoutSavingAsync(
+            [Frozen] Mock<IOrderItemFactory> orderItemFactory,
+            Order order,
+            OrderItem item,
+            [Frozen] Mock<IServiceRecipientRepository> repository,
+            CreateOrderItemRequest request,
+            CreateOrderItemService service)
+        {
+            orderItemFactory.Setup(f => f.Create(request)).Returns(item);
+
+            await service.CreateAsync(order, new[] { request });
+
+            repository.Verify(s => s.UpdateWithoutSavingAsync(
+                It.Is<string>(o => o == order.OrderId),
+                It.IsNotNull<IEnumerable<ServiceRecipient>>()));
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateAsync_Order_IEnumerable_CreateOrderItemRequest_FailedValidation_DoesNotInvokeUpdateOrderAsync(
+            [Frozen] Mock<ICreateOrderItemValidator> orderItemValidator,
+            [Frozen] Mock<IOrderItemFactory> orderItemFactory,
+            [Frozen] Mock<IOrderRepository> repository,
+            ValidationResult validationResult,
+            Order order,
+            OrderItem item,
+            CreateOrderItemRequest request,
+            CreateOrderItemService service)
+        {
+            orderItemValidator.Setup(v => v.Validate(request)).Returns(validationResult);
+            orderItemFactory.Setup(f => f.Create(request)).Returns(item);
+
+            await service.CreateAsync(order, new[] { request });
+
+            repository.Verify(r => r.UpdateOrderAsync(order), Times.Never());
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateAsync_Order_IEnumerable_CreateOrderItemRequest_FailedValidation_AddsValidationResultsWithExpectedKey(
+            [Frozen] Mock<ICreateOrderItemValidator> orderItemValidator,
+            [Frozen] Mock<IOrderItemFactory> orderItemFactory,
+            ErrorDetails errorDetails,
+            Order order,
+            OrderItem item,
+            CreateOrderItemRequest request1,
+            CreateOrderItemRequest request2,
+            CreateOrderItemService service)
+        {
+            var expectedKeys = new[]
+            {
+                $"[0].{errorDetails.Field}",
+                $"[1].{errorDetails.Field}",
+            };
+
+            var validationResult = new ValidationResult(new[] { errorDetails });
+            orderItemValidator.Setup(v => v.Validate(It.IsNotNull<CreateOrderItemRequest>())).Returns(validationResult);
+            orderItemFactory.Setup(f => f.Create(It.IsNotNull<CreateOrderItemRequest>())).Returns(item);
+
+            var requests = new[] { request1, request2 };
+
+            var result = await service.CreateAsync(order, requests);
+
+            var errors = result.ToModelErrors();
+            errors.Select(e => e.Key).Should().BeEquivalentTo(expectedKeys);
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateAsync_Order_IEnumerable_CreateOrderItemRequest_InvokesUpdateOrderAsync(
+            [Frozen] Mock<IOrderItemFactory> orderItemFactory,
+            [Frozen] Mock<IOrderRepository> repository,
+            Order order,
+            OrderItem item,
+            CreateOrderItemRequest request,
+            CreateOrderItemService service)
+        {
             orderItemFactory.Setup(f => f.Create(request)).Returns(item);
 
             await service.CreateAsync(order, new[] { request });
@@ -341,46 +581,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             repository.Verify(r => r.UpdateOrderAsync(order));
         }
 
-        private sealed class CreateOrderItemServiceTestContext
+        [Test]
+        [OrderingAutoData]
+        public static async Task CreateAsync_Order_IEnumerable_CreateOrderItemRequest_ReturnsExpectedResult(
+            [Frozen] Mock<IOrderItemFactory> orderItemFactory,
+            Order order,
+            OrderItem item,
+            CreateOrderItemRequest request,
+            CreateOrderItemService service)
         {
-            private CreateOrderItemServiceTestContext()
-            {
-                UserId = Guid.NewGuid();
-                UserName = "Bob";
+            orderItemFactory.Setup(f => f.Create(request)).Returns(item);
 
-                OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(x => x.UpdateOrderAsync(It.IsAny<Order>())).Callback<Order>(x => Order = x);
+            var result = await service.CreateAsync(order, new[] { request });
 
-                IdentityServiceMock = new Mock<IIdentityService>();
-                IdentityServiceMock.Setup(identityService => identityService.GetUserIdentity()).Returns(() => UserId);
-                IdentityServiceMock.Setup(identityService => identityService.GetUserName()).Returns(() => UserName);
-
-                OrderItemValidatorMock = new Mock<ICreateOrderItemValidator>();
-
-                CreateOrderItemService = CreateOrderItemServiceBuilder
-                    .Create()
-                    .WithOrderRepository(OrderRepositoryMock.Object)
-                    .WithIdentityService(IdentityServiceMock.Object)
-                    .WithValidator(OrderItemValidatorMock.Object)
-                    .Build();
-            }
-
-            internal ICreateOrderItemService CreateOrderItemService { get; }
-
-            internal Mock<IOrderRepository> OrderRepositoryMock { get; }
-
-            internal Mock<IIdentityService> IdentityServiceMock { get; }
-
-            internal Mock<ICreateOrderItemValidator> OrderItemValidatorMock { get; }
-
-            internal Order Order { get; private set; }
-
-            private string UserName { get; }
-
-            private Guid UserId { get; }
-
-            internal static CreateOrderItemServiceTestContext Setup() =>
-                new CreateOrderItemServiceTestContext();
+            result.Success.Should().BeTrue();
         }
     }
 }

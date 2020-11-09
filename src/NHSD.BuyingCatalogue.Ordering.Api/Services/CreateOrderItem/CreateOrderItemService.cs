@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using NHSD.BuyingCatalogue.Ordering.Api.Validation;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Application.Services;
 using NHSD.BuyingCatalogue.Ordering.Domain;
@@ -15,17 +15,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
         private readonly IIdentityService identityService;
         private readonly IOrderItemFactory orderItemFactory;
         private readonly ICreateOrderItemValidator orderItemValidator;
+        private readonly IServiceRecipientRepository serviceRecipientRepository;
 
         public CreateOrderItemService(
             IOrderRepository orderRepository,
             IIdentityService identityService,
             IOrderItemFactory orderItemFactory,
-            ICreateOrderItemValidator orderItemValidator)
+            ICreateOrderItemValidator orderItemValidator,
+            IServiceRecipientRepository serviceRecipientRepository)
         {
             this.orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
             this.identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
             this.orderItemFactory = orderItemFactory ?? throw new ArgumentNullException(nameof(orderItemFactory));
             this.orderItemValidator = orderItemValidator ?? throw new ArgumentNullException(nameof(orderItemValidator));
+            this.serviceRecipientRepository = serviceRecipientRepository ?? throw new ArgumentNullException(nameof(serviceRecipientRepository));
         }
 
         public async Task<Result<int>> CreateAsync(CreateOrderItemRequest request)
@@ -33,15 +36,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             if (request is null)
                 throw new ArgumentNullException(nameof(request));
 
-            var validationErrors = orderItemValidator.Validate(request).ToList();
-            if (validationErrors.Any())
+            var validationResult = orderItemValidator.Validate(request);
+            if (!validationResult.Success)
             {
-                return Result.Failure<int>(validationErrors);
+                return Result.Failure<int>(validationResult.Errors);
             }
 
             var catalogueItemType = request.CatalogueItemType;
-            var provisioningType = request.ProvisioningType.Value;
-            var cataloguePriceType = request.CataloguePriceType.Value;
+            var provisioningType = request.ProvisioningType;
             var cataloguePriceUnit = CataloguePriceUnit.Create(request.CataloguePriceUnitTierName, request.CataloguePriceUnitDescription);
 
             var priceTimeUnit = request.PriceTimeUnit;
@@ -54,7 +56,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
                 request.CatalogueItemName,
                 request.CatalogueSolutionId,
                 provisioningType,
-                cataloguePriceType,
+                request.CataloguePriceType,
                 cataloguePriceUnit,
                 priceTimeUnit,
                 request.CurrencyCode,
@@ -73,7 +75,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             return Result.Success(orderItem.OrderItemId);
         }
 
-        public async Task CreateAsync(Order order, IEnumerable<CreateOrderItemRequest> requests)
+        public async Task<AggregateValidationResult> CreateAsync(Order order, IEnumerable<CreateOrderItemRequest> requests)
         {
             if (order is null)
                 throw new ArgumentNullException(nameof(order));
@@ -84,13 +86,35 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             var userId = identityService.GetUserIdentity();
             var userName = identityService.GetUserName();
 
+            var serviceRecipients = new HashSet<ServiceRecipient>();
+            var aggregateValidationResult = new AggregateValidationResult();
+
+            var itemIndex = -1;
+
             foreach (var request in requests)
             {
+                itemIndex++;
+
+                var validationResult = orderItemValidator.Validate(request);
+                aggregateValidationResult.AddValidationResult(validationResult, itemIndex);
+
+                if (!validationResult.Success)
+                    continue;
+
+                if (request.ServiceRecipient != null)
+                    serviceRecipients.Add(request.ServiceRecipient);
+
                 var orderItem = orderItemFactory.Create(request);
                 order.AddOrderItem(orderItem, userId, userName);
             }
 
+            if (!aggregateValidationResult.Success)
+                return aggregateValidationResult;
+
+            await serviceRecipientRepository.UpdateWithoutSavingAsync(order.OrderId, serviceRecipients);
             await orderRepository.UpdateOrderAsync(order);
+
+            return aggregateValidationResult;
         }
     }
 }

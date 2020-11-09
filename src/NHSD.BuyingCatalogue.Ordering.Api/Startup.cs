@@ -1,4 +1,6 @@
 ﻿using System.Net.Http;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using MailKit;
 using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -15,6 +17,7 @@ using NHSD.BuyingCatalogue.EmailClient;
 using NHSD.BuyingCatalogue.Ordering.Api.ActionFilters;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Logging;
+using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Services;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
@@ -68,35 +71,37 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             Log.Logger.Information("Purchasing settings: {@purchasingSettings}", purchasingSettings);
 
             IdentityModelEventSource.ShowPII = environment.IsDevelopment();
+            ValidatorOptions.Global.DisplayNameResolver = FluentValidationOptions.DisplayNameResolver;
 
             services.AddHttpContextAccessor();
-            services
-                .AddScoped<IServiceRecipientRepository, ServiceRecipientRepository>()
-                .AddScoped<IOrderRepository, OrderRepository>()
-                .AddScoped<IDefaultDeliveryDateValidator, DefaultDeliveryDateValidator>()
-                .AddScoped<IDefaultDeliveryDateRepository, DefaultDeliveryDateRepository>()
-                .AddScoped<IOrderItemFactory, OrderItemFactory>();
 
             services
-                .AddSingleton(validationSettings)
-                .AddTransient(provider => configuration.GetSection("Purchasing").Get<PurchasingSettings>());
+                .AddSingleton<IValidator<CreateOrderItemModel>, CreateOrderItemModelValidator>()
+                .AddSingleton<IValidator<UpdateOrderItemModel>, UpdateOrderItemModelValidator<UpdateOrderItemModel>>();
+
+            services
+                .AddScoped<IOrderRepository, OrderRepository>()
+                .AddScoped<IServiceRecipientRepository, ServiceRecipientRepository>()
+                .AddScoped<IDefaultDeliveryDateRepository, DefaultDeliveryDateRepository>()
+                .AddScoped<IOrderItemFactory, OrderItemFactory>()
+                .AddScoped<IMailTransport, SmtpClient>()
+                .AddScoped<IEmailService, MailKitEmailService>()
+                .AddScoped<IIdentityService, IdentityService>()
+                .AddScoped<ICreateOrderService, CreateOrderService>()
+                .AddScoped<ICreateOrderItemService, CreateOrderItemService>()
+                .AddScoped<IUpdateOrderItemService, UpdateOrderItemService>()
+                .AddScoped<ICompleteOrderService, CompleteOrderService>()
+                .AddScoped<ICreatePurchasingDocumentService, CreatePurchasingDocumentService>()
+                .AddScoped<ICsvStreamWriter<OdooPatientNumbersOrderItem>, CsvStreamStreamWriter<OdooPatientNumbersOrderItem, OdooPatientNumbersOrderItemMap>>()
+                .AddScoped<ICsvStreamWriter<OdooOrderItem>, CsvStreamStreamWriter<OdooOrderItem, OdooOrderItemMap>>()
+                .AddScoped<IDefaultDeliveryDateValidator, DefaultDeliveryDateValidator>()
+                .AddScoped<ICreateOrderItemValidator, OrderItemValidator>()
+                .AddScoped<IUpdateOrderItemValidator, OrderItemValidator>();
 
             services
                 .AddSingleton(smtpSettings)
-                .AddScoped<IMailTransport, SmtpClient>()
-                .AddTransient<IEmailService, MailKitEmailService>();
-
-            services
-                .AddTransient<IIdentityService, IdentityService>()
-                .AddTransient<ICreateOrderService, CreateOrderService>()
-                .AddTransient<ICreateOrderItemService, CreateOrderItemService>()
-                .AddTransient<IUpdateOrderItemService, UpdateOrderItemService>()
-                .AddTransient<ICompleteOrderService, CompleteOrderService>()
-                .AddTransient<ICreatePurchasingDocumentService, CreatePurchasingDocumentService>()
-                .AddTransient<ICreateOrderItemValidator, OrderItemValidator>()
-                .AddTransient<IUpdateOrderItemValidator, OrderItemValidator>()
-                .AddTransient<ICsvStreamWriter<OdooPatientNumbersOrderItem>, CsvStreamStreamWriter<OdooPatientNumbersOrderItem, OdooPatientNumbersOrderItemMap>>()
-                .AddTransient<ICsvStreamWriter<OdooOrderItem>, CsvStreamStreamWriter<OdooOrderItem, OdooOrderItemMap>>();
+                .AddSingleton(validationSettings)
+                .AddScoped(provider => configuration.GetSection("Purchasing").Get<PurchasingSettings>());
 
             services.RegisterHealthChecks(connectionString, smtpSettings);
 
@@ -129,6 +134,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 });
 
             services.AddControllers(options => options.Filters.Add<InputValidationActionFilter>())
+                .AddFluentValidation(c => c.ImplicitlyValidateChildProperties = true)
                 .ConfigureApiBehaviorOptions(options => options.SuppressModelStateInvalidFilter = true)
                 .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);
 

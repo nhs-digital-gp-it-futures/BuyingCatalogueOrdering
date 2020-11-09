@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using FluentAssertions;
+using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 {
@@ -9,154 +11,91 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
     [Parallelizable(ParallelScope.All)]
     internal static class CatalogueItemTypeTests
     {
-        [Test]
-        public static void List_ReturnsExpectedList()
+        [TestCase(CatalogueItemType.AdditionalService, "Additional Service")]
+        [TestCase(CatalogueItemType.AssociatedService, "Associated Service")]
+        [TestCase(CatalogueItemType.Solution, "Catalogue Solution")]
+        public static void DisplayName_ReturnsExpectedName(CatalogueItemType itemType, string expectedName)
         {
-            var actual = CatalogueItemType.List();
+            var displayName = itemType.DisplayName();
 
-            var expected = new List<CatalogueItemType>
-            {
-                CatalogueItemType.Solution,
-                CatalogueItemType.AdditionalService,
-                CatalogueItemType.AssociatedService
-            };
-
-            actual.Should().BeEquivalentTo(expected);
+            displayName.Should().Be(expectedName);
         }
 
         [Test]
-        public static void FromId_CatalogueItemTypeId_ReturnsExpectedType()
+        public static void MarkOrderSectionAsViewed_NullOrder_ThrowsException()
         {
-            var actual = CatalogueItemType.FromId(1);
-
-            actual.Should().Be(CatalogueItemType.Solution);
+            Assert.Throws<ArgumentNullException>(() => CatalogueItemType.AdditionalService.MarkOrderSectionAsViewed(null));
         }
 
         [Test]
-        public static void FromId_UnknownCatalogueItemTypeId_ReturnsNull()
+        public static void MarkOrderSectionAsViewed_InvalidType_ThrowsException()
         {
-            var actual = CatalogueItemType.FromId(10);
-            actual.Should().BeNull();
+            var order = OrderBuilder.Create().Build();
+
+            Assert.Throws<ArgumentException>(() => CatalogueItemTypeExtensions.MarkOrderSectionAsViewed(OrderingEnums.UndefinedTimeUnit, order));
         }
 
-        [Test]
-        public static void FromName_NullName_ThrowsException()
+        [TestCaseSource(nameof(MarkOrderSectionAsViewedTestCases))]
+        public static void MarkOrderSectionAsViewed_MarksExpectedSection(
+            CatalogueItemType itemType,
+            Func<Order, bool> sectionViewed)
         {
-            Assert.Throws<ArgumentNullException>(() => CatalogueItemType.FromName(null));
+            var order = OrderBuilder.Create().Build();
+            sectionViewed(order).Should().BeFalse();
+
+            itemType.MarkOrderSectionAsViewed(order);
+
+            sectionViewed(order).Should().BeTrue();
         }
 
-        [Test]
-        public static void FromName_InvalidCatalogueType_ReturnsNull()
+        [TestCaseSource(nameof(InferEstimationPeriodTestCases))]
+        public static void InferEstimationPeriod_ReturnsExpectedEstimationPeriod(
+            CatalogueItemType catalogueItemType,
+            ProvisioningType provisioningType,
+            TimeUnit? estimationPeriod,
+            TimeUnit? expectedEstimationPeriod)
         {
-            var type = CatalogueItemType.FromName("DoesNotExist");
+            var actual = catalogueItemType.InferEstimationPeriod(provisioningType, estimationPeriod);
 
-            type.Should().BeNull();
+            actual.Should().Be(expectedEstimationPeriod);
         }
 
-        [Test]
-        public static void FromName_ReturnsExpectedCatalogueType()
+        private static IEnumerable<ITestCaseData> MarkOrderSectionAsViewedTestCases()
         {
-            var type = CatalogueItemType.FromName(nameof(CatalogueItemType.Solution));
-
-            type.Should().Be(CatalogueItemType.Solution);
+            yield return new TestCaseData(CatalogueItemType.AdditionalService, new Func<Order, bool>(o => o.AdditionalServicesViewed));
+            yield return new TestCaseData(CatalogueItemType.AssociatedService, new Func<Order, bool>(o => o.AssociatedServicesViewed));
+            yield return new TestCaseData(CatalogueItemType.Solution, new Func<Order, bool>(o => o.CatalogueSolutionsViewed));
         }
 
-        [Test]
-        public static void GetHashCode_ReturnsDifferentValueForEachSolutionType()
+        private static IEnumerable<ITestCaseData> InferEstimationPeriodTestCases()
         {
-            var additionalServiceHash = CatalogueItemType.AdditionalService.GetHashCode();
-            var associatedServiceHash = CatalogueItemType.AssociatedService.GetHashCode();
-            var solutionHash = CatalogueItemType.Solution.GetHashCode();
+            foreach (var data in AdditionalServiceSolutionData(CatalogueItemType.AdditionalService))
+                yield return new TestCaseData(data);
 
-            additionalServiceHash.Should().NotBe(associatedServiceHash);
-            additionalServiceHash.Should().NotBe(solutionHash);
-            associatedServiceHash.Should().NotBe(solutionHash);
+            foreach (var data in AdditionalServiceSolutionData(CatalogueItemType.Solution))
+                yield return new TestCaseData(data);
+
+            yield return new TestCaseData(CatalogueItemType.AssociatedService, ProvisioningType.OnDemand, null, null);
+            yield return new TestCaseData(CatalogueItemType.AssociatedService, ProvisioningType.OnDemand, TimeUnit.PerYear, TimeUnit.PerYear);
+            yield return new TestCaseData(CatalogueItemType.AssociatedService, ProvisioningType.OnDemand, TimeUnit.PerMonth, TimeUnit.PerMonth);
+            yield return new TestCaseData(CatalogueItemType.AssociatedService, ProvisioningType.Declarative, null, null);
+            yield return new TestCaseData(CatalogueItemType.AssociatedService, ProvisioningType.Declarative, TimeUnit.PerYear, null);
+            yield return new TestCaseData(CatalogueItemType.AssociatedService, ProvisioningType.Declarative, TimeUnit.PerMonth, null);
         }
 
-        [TestCase(nameof(ProvisioningType.OnDemand), null, null)]
-        [TestCase(nameof(ProvisioningType.OnDemand), TimeUnit.PerMonth, TimeUnit.PerMonth)]
-        [TestCase(nameof(ProvisioningType.OnDemand), TimeUnit.PerYear, TimeUnit.PerYear)]
-        [TestCase(nameof(ProvisioningType.Patient), null, TimeUnit.PerMonth)]
-        [TestCase(nameof(ProvisioningType.Patient), TimeUnit.PerMonth, TimeUnit.PerMonth)]
-        [TestCase(nameof(ProvisioningType.Patient), TimeUnit.PerYear, TimeUnit.PerMonth)]
-        [TestCase(nameof(ProvisioningType.Declarative), null, TimeUnit.PerYear)]
-        [TestCase(nameof(ProvisioningType.Declarative), TimeUnit.PerMonth, TimeUnit.PerYear)]
-        [TestCase(nameof(ProvisioningType.Declarative), TimeUnit.PerYear, TimeUnit.PerYear)]
-        public static void InferEstimationPeriod_SolutionCatalogueItemType_ReturnsExpectedEstimationPeriod(
-            string provisioningTypeNameInput,
-            TimeUnit? estimationPeriodNameInput,
-            TimeUnit? expectedEstimationPeriodNameInput)
+        private static IEnumerable<object[]> AdditionalServiceSolutionData(CatalogueItemType itemType)
         {
-            var estimationPeriod = estimationPeriodNameInput;
-            var provisioningType = Enum.Parse<ProvisioningType>(provisioningTypeNameInput);
+            yield return new object[] { itemType, ProvisioningType.OnDemand, null, null };
+            yield return new object[] { itemType, ProvisioningType.OnDemand, TimeUnit.PerMonth, TimeUnit.PerMonth };
+            yield return new object[] { itemType, ProvisioningType.OnDemand, TimeUnit.PerYear, TimeUnit.PerYear };
 
-            var actual = CatalogueItemType.Solution.InferEstimationPeriod(provisioningType, estimationPeriod);
+            yield return new object[] { itemType, ProvisioningType.Patient, null, TimeUnit.PerMonth };
+            yield return new object[] { itemType, ProvisioningType.Patient, TimeUnit.PerMonth, TimeUnit.PerMonth };
+            yield return new object[] { itemType, ProvisioningType.Patient, TimeUnit.PerYear, TimeUnit.PerMonth };
 
-            actual.Should().Be(expectedEstimationPeriodNameInput);
-        }
-
-        [TestCase(nameof(ProvisioningType.OnDemand), null, null)]
-        [TestCase(nameof(ProvisioningType.OnDemand), TimeUnit.PerMonth, TimeUnit.PerMonth)]
-        [TestCase(nameof(ProvisioningType.OnDemand), TimeUnit.PerYear, TimeUnit.PerYear)]
-        [TestCase(nameof(ProvisioningType.Patient), null, TimeUnit.PerMonth)]
-        [TestCase(nameof(ProvisioningType.Patient), TimeUnit.PerMonth, TimeUnit.PerMonth)]
-        [TestCase(nameof(ProvisioningType.Patient), TimeUnit.PerYear, TimeUnit.PerMonth)]
-        [TestCase(nameof(ProvisioningType.Declarative), null, TimeUnit.PerYear)]
-        [TestCase(nameof(ProvisioningType.Declarative), TimeUnit.PerMonth, TimeUnit.PerYear)]
-        [TestCase(nameof(ProvisioningType.Declarative), TimeUnit.PerYear, TimeUnit.PerYear)]
-        public static void InferEstimationPeriod_AdditionalServiceCatalogueItemType_ReturnsExpectedEstimationPeriod(
-            string provisioningTypeNameInput,
-            TimeUnit? estimationPeriodNameInput,
-            TimeUnit? expectedEstimationPeriodNameInput)
-        {
-            var estimationPeriod = estimationPeriodNameInput;
-            var provisioningType = Enum.Parse<ProvisioningType>(provisioningTypeNameInput);
-
-            var actual = CatalogueItemType.AdditionalService.InferEstimationPeriod(provisioningType, estimationPeriod);
-
-            actual.Should().Be(expectedEstimationPeriodNameInput);
-        }
-
-        [TestCase(nameof(ProvisioningType.OnDemand), null, null)]
-        [TestCase(nameof(ProvisioningType.OnDemand), TimeUnit.PerYear, TimeUnit.PerYear)]
-        [TestCase(nameof(ProvisioningType.OnDemand), TimeUnit.PerYear, TimeUnit.PerYear)]
-        [TestCase(nameof(ProvisioningType.Declarative), null, null)]
-        [TestCase(nameof(ProvisioningType.Declarative), TimeUnit.PerYear, null)]
-        [TestCase(nameof(ProvisioningType.Declarative), TimeUnit.PerYear, null)]
-        public static void InferEstimationPeriod_AssociatedServiceCatalogueItemType_ReturnsExpectedEstimationPeriod(
-            string provisioningTypeNameInput,
-            TimeUnit? estimationPeriodNameInput,
-            TimeUnit? expectedEstimationPeriodNameInput)
-        {
-            var estimationPeriod = estimationPeriodNameInput;
-            var provisioningType = Enum.Parse<ProvisioningType>(provisioningTypeNameInput);
-
-            var actual = CatalogueItemType.AssociatedService.InferEstimationPeriod(provisioningType, estimationPeriod);
-
-            actual.Should().Be(expectedEstimationPeriodNameInput);
-        }
-
-        [TestCase(null)]
-        [TestCase("InvalidType")]
-        public static void Equals_ComparisonObject_AreNotEqual(object comparisonObject)
-        {
-            CatalogueItemType.Solution.Equals(comparisonObject).Should().BeFalse();
-        }
-
-        [Test]
-        public static void Equals_Same_AreEqual()
-        {
-            var instance = CatalogueItemType.Solution;
-            instance.Equals(instance).Should().BeTrue();
-        }
-
-        [Test]
-        public static void Equals_Different_AreNotEqual()
-        {
-            var instance = CatalogueItemType.Solution;
-            var comparisonObject = CatalogueItemType.AdditionalService;
-
-            instance.Equals(comparisonObject).Should().BeFalse();
+            yield return new object[] { itemType, ProvisioningType.Declarative, null, TimeUnit.PerYear };
+            yield return new object[] { itemType, ProvisioningType.Declarative, TimeUnit.PerMonth, TimeUnit.PerYear };
+            yield return new object[] { itemType, ProvisioningType.Declarative, TimeUnit.PerYear, TimeUnit.PerYear };
         }
     }
 }
