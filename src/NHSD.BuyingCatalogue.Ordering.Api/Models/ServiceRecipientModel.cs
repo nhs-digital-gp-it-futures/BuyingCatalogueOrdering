@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
@@ -7,8 +6,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
     {
         public string Name { get; set; }
 
-        [Required(ErrorMessage = "OdsCodeRequired")]
-        [MaxLength(8, ErrorMessage = "OdsCodeTooLong")]
         public string OdsCode { get; set; }
 
         public bool Equals(ServiceRecipientModel other)
@@ -18,13 +15,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
                 return false;
             }
 
-            if (ReferenceEquals(this, other))
-            {
-                return true;
-            }
-
-            return other is object
-                   && string.Equals(OdsCode, other.OdsCode, StringComparison.Ordinal);
+            return ReferenceEquals(this, other) || string.Equals(OdsCode, other.OdsCode, StringComparison.Ordinal);
         }
 
         public override bool Equals(object obj)
@@ -35,4 +26,3 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
         public override int GetHashCode() => HashCode.Combine(OdsCode);
     }
 }
-

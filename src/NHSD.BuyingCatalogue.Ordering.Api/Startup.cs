@@ -76,6 +76,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             services.AddHttpContextAccessor();
 
             services
+                .AddSingleton<IValidator<ServiceRecipientModel>, ServiceRecipientModelValidator>()
                 .AddSingleton<IValidator<CreateOrderItemModel>, CreateOrderItemModelValidator>()
                 .AddSingleton<IValidator<UpdateOrderItemModel>, UpdateOrderItemModelValidator<UpdateOrderItemModel>>();
 
