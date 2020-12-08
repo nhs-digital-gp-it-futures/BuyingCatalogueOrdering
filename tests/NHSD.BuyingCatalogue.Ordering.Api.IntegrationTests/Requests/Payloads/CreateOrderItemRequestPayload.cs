@@ -5,6 +5,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests.Payloads
 {
     internal sealed class CreateOrderItemRequestPayload
     {
+        public int? OrderItemId { get; set; }
+
+        public bool HasOrderItemId => OrderItemId.HasValue;
+
         public bool HasServiceRecipient { get; set; }
 
         public bool HasItemUnit { get; set; }

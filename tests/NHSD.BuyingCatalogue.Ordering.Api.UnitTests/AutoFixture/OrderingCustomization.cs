@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using AutoFixture;
 using AutoFixture.Kernel;
 using Moq;
@@ -42,9 +43,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
                 if (!(request as Type == typeof(IIdentityService)))
                     return new NoSpecimen();
 
+                var userId = context.Create<Guid>();
+                var userName = context.Create<string>();
+
                 var identityServiceMock = context.Create<Mock<IIdentityService>>();
-                identityServiceMock.Setup(i => i.GetUserIdentity()).Returns(context.Create<Guid>());
-                identityServiceMock.Setup(i => i.GetUserName()).Returns(context.Create<string>());
+                identityServiceMock.Setup(i => i.GetUserIdentity()).Returns(userId);
+                identityServiceMock.Setup(i => i.GetUserName()).Returns(userName);
+                identityServiceMock.Setup(i => i.GetUserInfo()).Returns(new IdentityUser(userId, userName));
 
                 return identityServiceMock.Object;
             }
@@ -59,7 +64,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
 
                 var validatorMock = context.Create<Mock<ICreateOrderItemValidator>>();
                 validatorMock.Setup(v => v.Validate(It.IsNotNull<CreateOrderItemRequest>()))
-                    .Returns(new ValidationResult(Array.Empty<ErrorDetails>()));
+                    .Returns(new ValidationResult());
+
+                validatorMock.Setup(v => v.Validate(It.IsNotNull<IReadOnlyList<CreateOrderItemRequest>>(), It.IsNotNull<IEnumerable<OrderItem>>()))
+                    .Returns(new AggregateValidationResult());
 
                 return validatorMock.Object;
             }

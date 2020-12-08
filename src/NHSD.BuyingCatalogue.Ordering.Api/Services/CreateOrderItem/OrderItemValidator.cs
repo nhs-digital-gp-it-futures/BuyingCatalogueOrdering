@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using EnumsNET;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
@@ -16,6 +17,31 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
         public OrderItemValidator(ValidationSettings validationSettings)
         {
             this.validationSettings = validationSettings ?? throw new ArgumentNullException(nameof(validationSettings));
+        }
+
+        public AggregateValidationResult Validate(
+            IReadOnlyList<CreateOrderItemRequest> requests,
+            IEnumerable<OrderItem> existingOrderItems)
+        {
+            if (requests is null)
+                throw new ArgumentNullException(nameof(requests));
+
+            if (existingOrderItems is null)
+                throw new ArgumentNullException(nameof(existingOrderItems));
+
+            var aggregateValidationResult = new AggregateValidationResult();
+            var orderItemIdValidator = new OrderItemIdValidator(existingOrderItems);
+            var itemIndex = -1;
+
+            foreach (var request in requests)
+            {
+                itemIndex++;
+
+                aggregateValidationResult.AddValidationResult(Validate(request), itemIndex);
+                aggregateValidationResult.AddValidationResult(orderItemIdValidator.Validate(request), itemIndex);
+            }
+
+            return aggregateValidationResult;
         }
 
         public ValidationResult Validate(CreateOrderItemRequest request)
@@ -110,6 +136,42 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
         {
             return deliveryDate >= commencementDate
                    && deliveryDate <= commencementDate.AddDays(validationSettings.MaxDeliveryDateOffsetInDays);
+        }
+
+        private sealed class OrderItemIdValidator
+        {
+            private readonly HashSet<int> existingOrderItemIds;
+            private readonly HashSet<int> itemIds = new HashSet<int>();
+
+            internal OrderItemIdValidator(IEnumerable<OrderItem> orderItems)
+            {
+                existingOrderItemIds = orderItems.Select(i => i.OrderItemId).ToHashSet();
+            }
+
+            internal ValidationResult Validate(UpdateOrderItemRequest request)
+            {
+                var orderItemId = request.OrderItemId;
+
+                if (orderItemId == default)
+                    return new ValidationResult();
+
+                if (!existingOrderItemIds.Contains(orderItemId))
+                    return new ValidationResult(NotFoundOrderItemId());
+
+                return itemIds.Add(orderItemId)
+                    ? new ValidationResult()
+                    : new ValidationResult(DuplicateOrderItem());
+            }
+
+            private static ErrorDetails DuplicateOrderItem()
+            {
+                return ErrorDetails(nameof(UpdateOrderItemModel.OrderItemId), "Duplicate");
+            }
+
+            private static ErrorDetails NotFoundOrderItemId()
+            {
+                return ErrorDetails(nameof(UpdateOrderItemModel.OrderItemId), "NotFound");
+            }
         }
     }
 }

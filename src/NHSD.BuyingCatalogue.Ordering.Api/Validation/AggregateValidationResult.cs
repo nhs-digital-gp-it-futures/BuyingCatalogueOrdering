@@ -10,6 +10,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Validation
     {
         private readonly Dictionary<int, ValidationResult> failedValidations = new Dictionary<int, ValidationResult>();
 
+        public IReadOnlyDictionary<int, ValidationResult> FailedValidations => failedValidations;
+
         public bool Success { get; private set; } = true;
 
         public void AddValidationResult(ValidationResult result, int index)
@@ -20,7 +22,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Validation
             if (result.Success)
                 return;
 
-            failedValidations.Add(index, result);
+            if (failedValidations.TryGetValue(index, out var existingResult))
+                failedValidations[index] = new ValidationResult(existingResult, result);
+            else
+                failedValidations.Add(index, result);
+
             Success = false;
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using AutoFixture;
@@ -11,8 +12,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Settings;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
-using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
-using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
+using NHSD.BuyingCatalogue.Ordering.Api.Validation;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
 
@@ -31,6 +31,143 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             var constructors = typeof(OrderItemValidator).GetConstructors();
 
             assertion.Verify(constructors);
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Validate_Create_Bulk_NullRequests_ThrowsException(
+            IEnumerable<OrderItem> orderItems,
+            OrderItemValidator validator)
+        {
+            Assert.Throws<ArgumentNullException>(() => validator.Validate(null, orderItems));
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Validate_Create_Bulk_NullOrderItems_ThrowsException(
+            IReadOnlyList<CreateOrderItemRequest> requests,
+            OrderItemValidator validator)
+        {
+            Assert.Throws<ArgumentNullException>(() => validator.Validate(requests, null));
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Validate_Create_Bulk_IdentifiesDuplicateOrderItemIds(
+            CreateOrderItemModel model,
+            Order order,
+            OrderItem orderItem,
+            Guid userId,
+            string userName,
+            OrderItemValidator validator)
+        {
+            var expectedFailedValidations = new Dictionary<int, ValidationResult>
+            {
+                { 1, new ValidationResult(new ErrorDetails(
+                    nameof(UpdateOrderItemModel.OrderItemId) + "Duplicate",
+                    nameof(UpdateOrderItemModel.OrderItemId)))
+                },
+            };
+
+            model.DeliveryDate = order.CommencementDate;
+            model.OrderItemId = orderItem.OrderItemId;
+            order.AddOrderItem(orderItem, userId, userName);
+
+            var requests = new[]
+            {
+                new CreateOrderItemSolutionRequest(order, model),
+                new CreateOrderItemSolutionRequest(order, model),
+            };
+
+            var result = validator.Validate(requests, new[] { orderItem });
+
+            result.Success.Should().BeFalse();
+            result.FailedValidations.Should().BeEquivalentTo(expectedFailedValidations);
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Validate_Create_Bulk_AddsValidationErrorsWithExpectedIndex(
+            CreateOrderItemModel model,
+            Order order,
+            OrderItem orderItem1,
+            OrderItem orderItem2,
+            OrderItemValidator validator)
+        {
+            var expectedFailedValidations = new Dictionary<int, ValidationResult>
+            {
+                { 0, new ValidationResult(new ErrorDetails(
+                    nameof(UpdateOrderItemModel.DeliveryDate) + "OutsideDeliveryWindow",
+                    nameof(UpdateOrderItemModel.DeliveryDate)))
+                },
+                { 1, new ValidationResult(new ErrorDetails(
+                    nameof(UpdateOrderItemModel.DeliveryDate) + "Required",
+                    nameof(UpdateOrderItemModel.DeliveryDate)))
+                },
+            };
+
+            model.DeliveryDate = order.CommencementDate?.AddDays(-1);
+            model.OrderItemId = orderItem1.OrderItemId;
+            var request1 = new CreateOrderItemSolutionRequest(order, model);
+
+            model.DeliveryDate = null;
+            model.OrderItemId = orderItem2.OrderItemId;
+            var request2 = new CreateOrderItemSolutionRequest(order, model);
+
+            var requests = new[] { request1, request2 };
+
+            var result = validator.Validate(requests, new[] { orderItem1, orderItem2 });
+
+            result.Success.Should().BeFalse();
+            result.FailedValidations.Should().BeEquivalentTo(expectedFailedValidations);
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Validate_Create_Bulk_IdentifiesNotFoundOrderItemId(
+            CreateOrderItemModel model,
+            Order order,
+            OrderItem orderItem,
+            OrderItemValidator validator)
+        {
+            var expectedFailedValidations = new Dictionary<int, ValidationResult>
+            {
+                { 0, new ValidationResult(new ErrorDetails(
+                    nameof(UpdateOrderItemModel.OrderItemId) + "NotFound",
+                    nameof(UpdateOrderItemModel.OrderItemId)))
+                },
+            };
+
+            model.DeliveryDate = order.CommencementDate;
+            model.OrderItemId = orderItem.OrderItemId + 1;
+
+            var requests = new[] { new CreateOrderItemSolutionRequest(order, model) };
+
+            var result = validator.Validate(requests, new[] { orderItem });
+
+            result.Success.Should().BeFalse();
+            result.FailedValidations.Should().BeEquivalentTo(expectedFailedValidations);
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Validate_Create_Bulk_MultipleOrdersWithZeroId_ReturnsNoErrors(
+            CreateOrderItemModel model,
+            Order order,
+            OrderItem orderItem,
+            OrderItemValidator validator)
+        {
+            model.DeliveryDate = order.CommencementDate;
+            model.OrderItemId = 0;
+
+            var request1 = new CreateOrderItemSolutionRequest(order, model);
+            var request2 = new CreateOrderItemSolutionRequest(order, model);
+
+            var requests = new[] { request1, request2 };
+
+            var result = validator.Validate(requests, new[] { orderItem });
+
+            result.Success.Should().BeTrue();
         }
 
         [Test]
@@ -163,18 +300,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public static void Validate_Update_NullRequest_ThrowsException()
+        [OrderingAutoData]
+        public static void Validate_Update_NullRequest_ThrowsException(OrderItemValidator validator)
         {
-            var context = new OrderItemValidatorTestContext();
-            Assert.Throws<ArgumentNullException>(() => context.Validator.Validate(null, CatalogueItemType.Solution, ProvisioningType.OnDemand));
+            Assert.Throws<ArgumentNullException>(() => validator.Validate(null, CatalogueItemType.Solution, ProvisioningType.OnDemand));
         }
 
         [Test]
-        public static void Validate_Update_NullProvisioningType_ThrowsException()
+        [OrderingAutoData]
+        public static void Validate_Update_NullProvisioningType_ThrowsException(
+            UpdateOrderItemRequest request,
+            OrderItemValidator validator)
         {
-            var context = new OrderItemValidatorTestContext();
-            Assert.Throws<ArgumentNullException>(() => context.Validator.Validate(
-                context.UpdateRequestBuilder.Build(), CatalogueItemType.Solution, null));
+            Assert.Throws<ArgumentNullException>(() => validator.Validate(request, CatalogueItemType.Solution, null));
         }
 
         [Test]
@@ -192,11 +330,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public static void Validate_Update_AllValid_ReturnsNoErrors()
+        [OrderingAutoData]
+        public static void Validate_Update_AllValid_ReturnsNoErrors(
+            Order order,
+            UpdateOrderItemModel model,
+            OrderItemValidator validator)
         {
-            var context = new OrderItemValidatorTestContext();
-            var results = context.Validator.Validate(
-                context.UpdateRequestBuilder.Build(),
+            model.DeliveryDate = order.CommencementDate;
+            var request = new UpdateOrderItemRequest(order, model);
+            var results = validator.Validate(
+                request,
                 CatalogueItemType.Solution,
                 ProvisioningType.OnDemand).ToList();
 
@@ -205,16 +348,22 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public static void Validate_Update_TooLateDeliveryDateForSolution_AddsErrorDetail()
+        [OrderingAutoData]
+        public static void Validate_Update_TooLateDeliveryDateForSolution_AddsErrorDetail(
+            [Frozen] ValidationSettings settings,
+            Order order,
+            UpdateOrderItemModel model,
+            OrderItemValidator validator)
         {
-            var context = new OrderItemValidatorTestContext();
             var expected = new ErrorDetails("DeliveryDateOutsideDeliveryWindow", "DeliveryDate");
 
-            var commencementDate = DateTime.Now;
-            var deliveryDate = commencementDate.AddDays((context.Settings.MaxDeliveryDateWeekOffset * 7) + 1);
+            var deliveryDate = order.CommencementDate?.AddDays(settings.MaxDeliveryDateOffsetInDays + 1);
+            model.DeliveryDate = deliveryDate;
 
-            var result = context.Validator.Validate(
-                context.UpdateRequestBuilder.WithDeliveryDate(deliveryDate).Build(),
+            var request = new UpdateOrderItemRequest(order, model);
+
+            var result = validator.Validate(
+                request,
                 CatalogueItemType.Solution,
                 ProvisioningType.OnDemand).ToList();
 
@@ -224,16 +373,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public static void Validate_Update_TooEarlyDeliveryDateForSolution_AddsErrorDetail()
+        [OrderingAutoData]
+        public static void Validate_Update_TooEarlyDeliveryDateForSolution_AddsErrorDetail(
+            Order order,
+            UpdateOrderItemModel model,
+            OrderItemValidator validator)
         {
-            var context = new OrderItemValidatorTestContext();
             var expected = new ErrorDetails("DeliveryDateOutsideDeliveryWindow", "DeliveryDate");
 
-            var commencementDate = DateTime.Now;
-            var deliveryDate = commencementDate.AddDays(-1);
+            var deliveryDate = order.CommencementDate?.AddDays(-1);
+            model.DeliveryDate = deliveryDate;
 
-            var result = context.Validator.Validate(
-                context.UpdateRequestBuilder.WithDeliveryDate(deliveryDate).Build(),
+            var request = new UpdateOrderItemRequest(order, model);
+
+            var result = validator.Validate(
+                request,
                 CatalogueItemType.Solution,
                 ProvisioningType.OnDemand).ToList();
 
@@ -243,13 +397,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public static void Validate_Update_NullEstimationPeriod_AddsErrorDetail()
+        [OrderingAutoData]
+        public static void Validate_Update_NullEstimationPeriod_AddsErrorDetail(
+            Order order,
+            UpdateOrderItemModel model,
+            OrderItemValidator validator)
         {
-            var context = new OrderItemValidatorTestContext();
             var expected = new ErrorDetails("EstimationPeriodRequiredIfVariableOnDemand", "EstimationPeriod");
 
-            var result = context.Validator.Validate(
-                context.UpdateRequestBuilder.WithEstimationPeriodName(null).Build(),
+            model.DeliveryDate = order.CommencementDate;
+            model.EstimationPeriod = null;
+            var request = new UpdateOrderItemRequest(order, model);
+
+            var result = validator.Validate(
+                request,
                 CatalogueItemType.Solution,
                 ProvisioningType.OnDemand).ToList();
 
@@ -259,39 +420,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public static void Validate_Update_InvalidEstimationPeriod_AddsErrorDetail()
+        [OrderingAutoData]
+        public static void Validate_Update_InvalidEstimationPeriod_AddsErrorDetail(
+            Order order,
+            UpdateOrderItemModel model,
+            OrderItemValidator validator)
         {
-            var context = new OrderItemValidatorTestContext();
             var expected = new ErrorDetails("EstimationPeriodValidValue", "EstimationPeriod");
 
-            var result = context.Validator.Validate(
-                context.UpdateRequestBuilder.WithEstimationPeriodName("Moose").Build(),
+            model.DeliveryDate = order.CommencementDate;
+            model.EstimationPeriod = "Moose";
+            var request = new UpdateOrderItemRequest(order, model);
+
+            var result = validator.Validate(
+                request,
                 CatalogueItemType.Solution,
                 ProvisioningType.OnDemand).ToList();
 
             result.Should().NotBeNull();
             result.Should().HaveCount(1);
             result.First().Should().Be(expected);
-        }
-
-        private sealed class OrderItemValidatorTestContext
-        {
-            public OrderItemValidatorTestContext()
-            {
-                Settings = new ValidationSettings { MaxDeliveryDateWeekOffset = 1 };
-                Validator = new OrderItemValidator(Settings);
-                OrderBuilder = OrderBuilder.Create().WithCommencementDate(DateTime.UtcNow);
-                UpdateRequestBuilder = UpdateOrderItemRequestBuilder.Create()
-                    .WithOrder(OrderBuilder.Build());
-            }
-
-            public OrderItemValidator Validator { get; }
-
-            public ValidationSettings Settings { get; }
-
-            public UpdateOrderItemRequestBuilder UpdateRequestBuilder { get; }
-
-            public OrderBuilder OrderBuilder { get; }
         }
     }
 }

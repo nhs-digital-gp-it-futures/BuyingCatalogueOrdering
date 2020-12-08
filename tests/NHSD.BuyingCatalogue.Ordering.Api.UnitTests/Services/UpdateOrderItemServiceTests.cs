@@ -10,8 +10,6 @@ using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
-using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
-using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Application.Services;
 using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
@@ -27,7 +25,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
     internal static class UpdateOrderItemServiceTests
     {
         [Test]
-        public static void Contructors_VerifyGuardClauses()
+        public static void Constructors_VerifyGuardClauses()
         {
             var fixture = new Fixture().Customize(new AutoMoqCustomization());
             var assertion = new GuardClauseAssertion(fixture);
@@ -72,122 +70,62 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public static async Task UpdateAsync_UpdateOrderItemRequest_ReturnsSuccess()
+        [OrderingAutoData]
+        public static async Task UpdateAsync_UpdateOrderItemRequest_ReturnsSuccess(
+            UpdateOrderItemRequest request,
+            UpdateOrderItemService service)
         {
-            var context = UpdateOrderItemServiceTestContext.Setup();
-
-            var updateOrderItemRequest = UpdateOrderItemRequestBuilder
-                .Create()
-                .Build();
-
-            var actual = await context.UpdateOrderItemService.UpdateAsync(updateOrderItemRequest, CatalogueItemType.Solution, ProvisioningType.OnDemand);
+            var actual = await service.UpdateAsync(request, CatalogueItemType.Solution, ProvisioningType.OnDemand);
 
             actual.Should().Be(Result.Success());
         }
 
         [Test]
-        public static async Task UpdateAsync_MapUpdateOrderItemRequestToOrderItem_AreEqual()
+        [OrderingAutoData]
+        public static async Task UpdateAsync_MapUpdateOrderItemRequestToOrderItem_AreEqual(
+            [Frozen] Order order,
+            UpdateOrderItemRequest request,
+            UpdateOrderItemService service)
         {
-            var context = UpdateOrderItemServiceTestContext.Setup();
+            var orderItem = OrderItemBuilder.Create().Build();
+            order.AddOrderItem(orderItem, Guid.Empty, string.Empty);
+            request.OrderItemId = orderItem.OrderItemId;
 
-            var updateOrderItemRequest = UpdateOrderItemRequestBuilder
-                .Create()
-                .WithOrder(context.Order)
-                .WithOrderItemId(context.OrderItem.OrderItemId)
-                .Build();
+            await service.UpdateAsync(request, CatalogueItemType.Solution, ProvisioningType.OnDemand);
 
-            await context.UpdateOrderItemService.UpdateAsync(updateOrderItemRequest, CatalogueItemType.Solution, ProvisioningType.OnDemand);
-
-            context.OrderItem.Should().BeEquivalentTo(new
+            orderItem.Should().BeEquivalentTo(new
             {
-                updateOrderItemRequest.DeliveryDate,
-                updateOrderItemRequest.EstimationPeriod,
-                updateOrderItemRequest.OrderItemId,
-                updateOrderItemRequest.Price,
-                updateOrderItemRequest.Quantity
+                request.DeliveryDate,
+                request.EstimationPeriod,
+                request.OrderItemId,
+                request.Price,
+                request.Quantity,
             });
         }
 
         [Test]
-        public static async Task UpdateAsync_OrderRepository_CalledOnce()
+        [OrderingAutoData]
+        public static async Task UpdateAsync_OrderRepository_CalledOnce(
+            [Frozen] Mock<IOrderRepository> orderRepositoryMock,
+            UpdateOrderItemRequest request,
+            UpdateOrderItemService service)
         {
-            var context = UpdateOrderItemServiceTestContext.Setup();
+            await service.UpdateAsync(request, CatalogueItemType.Solution, ProvisioningType.OnDemand);
 
-            var updateOrderItemRequest = UpdateOrderItemRequestBuilder
-                .Create()
-                .Build();
-
-            await context.UpdateOrderItemService.UpdateAsync(updateOrderItemRequest, CatalogueItemType.Solution, ProvisioningType.OnDemand);
-
-            context.OrderRepositoryMock.Verify(orderRepository =>
-                orderRepository.UpdateOrderAsync(updateOrderItemRequest.Order), Times.Once);
+            orderRepositoryMock.Verify(r => r.UpdateOrderAsync(request.Order));
         }
 
         [Test]
-        public static async Task UpdateAsync_IdentityService_CalledTwice()
+        [OrderingAutoData]
+        public static async Task UpdateAsync_IdentityService_CalledTwice(
+            [Frozen] Mock<IIdentityService> identityServiceMock,
+            UpdateOrderItemRequest request,
+            UpdateOrderItemService service)
         {
-            var context = UpdateOrderItemServiceTestContext.Setup();
+            await service.UpdateAsync(request, CatalogueItemType.Solution, ProvisioningType.OnDemand);
 
-            var updateOrderItemRequest = UpdateOrderItemRequestBuilder
-                .Create()
-                .Build();
-
-            await context.UpdateOrderItemService.UpdateAsync(updateOrderItemRequest, CatalogueItemType.Solution, ProvisioningType.OnDemand);
-
-            context.IdentityServiceMock.Verify(identityService =>
-                identityService.GetUserName(), Times.Once);
-
-            context.IdentityServiceMock.Verify(identityService =>
-                identityService.GetUserIdentity(), Times.Once);
-        }
-
-        private sealed class UpdateOrderItemServiceTestContext
-        {
-            private UpdateOrderItemServiceTestContext()
-            {
-                UserId = Guid.NewGuid();
-                UserName = "Bob";
-
-                OrderItem = OrderItemBuilder
-                    .Create()
-                    .WithOrderItemId(123)
-                    .Build();
-
-                Order = OrderBuilder
-                    .Create()
-                    .WithOrderItem(OrderItem)
-                    .Build();
-
-                OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(x => x.UpdateOrderAsync(It.IsAny<Order>())).Callback<Order>(x => Order = x);
-
-                IdentityServiceMock = new Mock<IIdentityService>();
-                IdentityServiceMock.Setup(identityService => identityService.GetUserIdentity()).Returns(() => UserId);
-                IdentityServiceMock.Setup(identityService => identityService.GetUserName()).Returns(() => UserName);
-
-                UpdateOrderItemService = UpdateOrderItemServiceBuilder
-                    .Create()
-                    .WithOrderRepository(OrderRepositoryMock.Object)
-                    .WithIdentityService(IdentityServiceMock.Object)
-                    .Build();
-            }
-
-            internal UpdateOrderItemService UpdateOrderItemService { get; }
-
-            internal Mock<IOrderRepository> OrderRepositoryMock { get; }
-
-            internal Mock<IIdentityService> IdentityServiceMock { get; }
-
-            internal Order Order { get; private set; }
-
-            internal OrderItem OrderItem { get; private set; }
-
-            private string UserName { get; }
-
-            private Guid UserId { get; }
-
-            internal static UpdateOrderItemServiceTestContext Setup() =>
-                new UpdateOrderItemServiceTestContext();
+            identityServiceMock.Verify(i => i.GetUserName());
+            identityServiceMock.Verify(i => i.GetUserIdentity());
         }
     }
 }

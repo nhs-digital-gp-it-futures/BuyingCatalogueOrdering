@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.Ordering.Api.Validation;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
@@ -75,7 +76,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             return Result.Success(orderItem.OrderItemId);
         }
 
-        public async Task<AggregateValidationResult> CreateAsync(Order order, IEnumerable<CreateOrderItemRequest> requests)
+        public async Task<AggregateValidationResult> CreateAsync(Order order, IReadOnlyList<CreateOrderItemRequest> requests)
         {
             if (order is null)
                 throw new ArgumentNullException(nameof(order));
@@ -83,38 +84,36 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             if (requests is null)
                 throw new ArgumentNullException(nameof(requests));
 
-            var userId = identityService.GetUserIdentity();
-            var userName = identityService.GetUserName();
-
-            var serviceRecipients = new HashSet<ServiceRecipient>();
-            var aggregateValidationResult = new AggregateValidationResult();
-
-            var itemIndex = -1;
-
-            foreach (var request in requests)
-            {
-                itemIndex++;
-
-                var validationResult = orderItemValidator.Validate(request);
-                aggregateValidationResult.AddValidationResult(validationResult, itemIndex);
-
-                if (!validationResult.Success)
-                    continue;
-
-                if (request.ServiceRecipient != null)
-                    serviceRecipients.Add(request.ServiceRecipient);
-
-                var orderItem = orderItemFactory.Create(request);
-                order.AddOrderItem(orderItem, userId, userName);
-            }
-
+            var aggregateValidationResult = orderItemValidator.Validate(requests, order.OrderItems);
             if (!aggregateValidationResult.Success)
                 return aggregateValidationResult;
 
-            await serviceRecipientRepository.UpdateWithoutSavingAsync(order.OrderId, serviceRecipients);
+            order.MergeOrderItems(CreateOrderItemMerge(requests));
+            await UpdateServiceRecipients(order.OrderId, requests);
             await orderRepository.UpdateOrderAsync(order);
 
             return aggregateValidationResult;
+        }
+
+        private OrderItemMerge CreateOrderItemMerge(IEnumerable<CreateOrderItemRequest> requests)
+        {
+            (Guid id, string name) = identityService.GetUserInfo();
+            var orderItemsToMerge = new OrderItemMerge(id, name);
+
+            if (!orderItemsToMerge.AddOrderItems(requests.Select(r => orderItemFactory.Create(r))))
+            {
+                // This should never happen under normal circumstances
+                // as validation should prevent it
+                throw new InvalidOperationException("Duplicate order item IDs exist.");
+            }
+
+            return orderItemsToMerge;
+        }
+
+        private async Task UpdateServiceRecipients(string orderId, IEnumerable<CreateOrderItemRequest> requests)
+        {
+            var serviceRecipients = requests.Select(r => r.ServiceRecipient).Where(r => r != null).Distinct();
+            await serviceRecipientRepository.UpdateWithoutSavingAsync(orderId, serviceRecipients);
         }
     }
 }

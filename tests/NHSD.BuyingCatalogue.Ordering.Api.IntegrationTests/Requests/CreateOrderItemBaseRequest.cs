@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
+using FluentAssertions.Equivalency;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests.Payloads;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
@@ -50,6 +51,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 
         public string OrderId { get; set; }
 
+        public OrderItemEntity OriginalEntity { get; set; }
+
         public CreateOrderItemRequestPayload Payload { get; private set; }
 
         protected abstract IDictionary<string, Func<CreateOrderItemRequestPayload>> PayloadFactory { get; }
@@ -75,36 +78,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 
         public void AssertPayload(OrderItemEntity actual)
         {
-            var timeUnit = Payload.HasTimeUnit
-                ? (TimeUnit?)Enum.Parse(typeof(TimeUnit), Payload.TimeUnitName, true)
-                : null;
-
-            var expectedBuilder = OrderItemEntityBuilder
-                .Create()
-                .WithOrderId(OrderId)
-                .WithOdsCode(Payload.OdsCode)
-                .WithCatalogueItemId(Payload.CatalogueItemId)
-                .WithCatalogueItemType(Payload.CatalogueItemType.GetValueOrDefault())
-                .WithCatalogueItemName(Payload.CatalogueItemName)
-                .WithQuantity(Payload.Quantity.GetValueOrDefault())
-                .WithDeliveryDate(Payload.DeliveryDate)
-                .WithEstimationPeriod(Payload.EstimationPeriod)
-                .WithProvisioningType(Payload.ProvisioningType.GetValueOrDefault())
-                .WithCataloguePriceType(Payload.CataloguePriceType.GetValueOrDefault())
-                .WithCurrencyCode(Payload.CurrencyCode)
-                .WithPricingUnitName(Payload.ItemUnitName)
-                .WithPricingUnitDescription(Payload.ItemUnitNameDescription)
-                .WithPrice(Payload.Price)
-                .WithTimeUnit(timeUnit);
-
-            var expected = expectedBuilder.Build();
-            actual.Should().BeEquivalentTo(expected,
-                config =>
-                    config
-                        .Excluding(entity => entity.OrderItemId)
-                        .Excluding(entity => entity.PricingUnitTierName)
-                        .Excluding(entity => entity.Created)
-                        .Excluding(entity => entity.LastUpdated));
+            if (Payload.HasOrderItemId)
+                AssertUpdatePayload(actual);
+            else
+                AssertCreatePayload(actual);
         }
 
         public object CreatePayload()
@@ -114,6 +91,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 
             return new
             {
+                Payload.OrderItemId,
                 ServiceRecipient = CreateServiceRecipient(),
                 Payload.CatalogueItemId,
                 Payload.CatalogueItemName,
@@ -137,7 +115,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                     {
                         Name = Payload.TimeUnitName,
                         Description = Payload.TimeUnitDescription
-                    } : null
+                    } : null,
             };
         }
 
@@ -148,6 +126,61 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             var response = await request.PostJsonAsync(createOrderItemUrl, payload);
 
             return new CreateOrderItemResponse(response);
+        }
+
+        private void AssertCreatePayload(OrderItemEntity actual)
+        {
+            var timeUnit = Payload.HasTimeUnit
+                ? (TimeUnit?)Enum.Parse(typeof(TimeUnit), Payload.TimeUnitName, true)
+                : null;
+
+            var expectedBuilder = OrderItemEntityBuilder
+                .Create()
+                .WithOrderId(OrderId)
+                .WithOrderItemId(Payload.OrderItemId.GetValueOrDefault())
+                .WithOdsCode(Payload.OdsCode)
+                .WithCatalogueItemId(Payload.CatalogueItemId)
+                .WithCatalogueItemType(Payload.CatalogueItemType.GetValueOrDefault())
+                .WithCatalogueItemName(Payload.CatalogueItemName)
+                .WithQuantity(Payload.Quantity.GetValueOrDefault())
+                .WithDeliveryDate(Payload.DeliveryDate)
+                .WithEstimationPeriod(Payload.EstimationPeriod)
+                .WithProvisioningType(Payload.ProvisioningType.GetValueOrDefault())
+                .WithCataloguePriceType(Payload.CataloguePriceType.GetValueOrDefault())
+                .WithCurrencyCode(Payload.CurrencyCode)
+                .WithPricingUnitName(Payload.ItemUnitName)
+                .WithPricingUnitDescription(Payload.ItemUnitNameDescription)
+                .WithPrice(Payload.Price)
+                .WithTimeUnit(timeUnit);
+
+            var expected = expectedBuilder.Build();
+            static EquivalencyAssertionOptions<OrderItemEntity> AssertionOptions(EquivalencyAssertionOptions<OrderItemEntity> options) => options
+                .Excluding(entity => entity.OrderItemId)
+                .Excluding(entity => entity.PricingUnitTierName)
+                .Excluding(entity => entity.Created)
+                .Excluding(entity => entity.LastUpdated);
+
+            actual.Should().BeEquivalentTo(expected, AssertionOptions);
+        }
+
+        private void AssertUpdatePayload(OrderItemEntity actual)
+        {
+            var expectedEstimationPeriod = OriginalEntity.ProvisioningType != ProvisioningType.OnDemand
+                ? OriginalEntity.EstimationPeriod
+                : Payload.EstimationPeriod;
+
+            var expected = OrderItemEntityBuilder
+                .Create(OriginalEntity)
+                .WithOrderId(OrderId)
+                .WithOrderItemId(Payload.OrderItemId.GetValueOrDefault())
+                .WithDeliveryDate(Payload.DeliveryDate)
+                .WithEstimationPeriod(expectedEstimationPeriod)
+                .WithPrice(Payload.Price)
+                .WithQuantity(Payload.Quantity.GetValueOrDefault())
+                .Build();
+
+            actual.Should().BeEquivalentTo(expected, o => o.Excluding(e => e.LastUpdated));
+            actual.LastUpdated.Should().BeAfter(OriginalEntity.LastUpdated);
         }
 
         private object CreateServiceRecipient()

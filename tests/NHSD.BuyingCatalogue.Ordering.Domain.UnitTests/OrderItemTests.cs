@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 {
@@ -147,6 +149,37 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
+        public static void UpdateFrom_ExpectedPropertiesUpdated()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithProvisioningType(ProvisioningType.OnDemand)
+                .WithDeliveryDate(DateTime.UtcNow)
+                .WithEstimationPeriod(TimeUnit.PerYear)
+                .Build();
+
+            var expected = new
+            {
+                DeliveryDate = orderItem.DeliveryDate?.AddDays(1),
+                Quantity = orderItem.Quantity + 1,
+                EstimationPeriod = TimeUnit.PerMonth,
+                Price = orderItem.Price + 1.00m,
+            };
+
+            var updatedOrderItem = OrderItemBuilder
+                .Create()
+                .WithDeliveryDate(expected.DeliveryDate)
+                .WithEstimationPeriod(expected.EstimationPeriod)
+                .WithQuantity(expected.Quantity)
+                .WithPrice(expected.Price)
+                .Build();
+
+            orderItem.UpdateFrom(updatedOrderItem);
+
+            orderItem.Should().BeEquivalentTo(expected);
+        }
+
+        [Test]
         public static void ChangePrice_ChangeValues_NullEstimationPeriod_ExpectedPropertiesUpdated()
         {
             var orderItem = OrderItemBuilder
@@ -172,6 +205,22 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
                 null);
 
             orderItem.Should().BeEquivalentTo(expected);
+        }
+
+        [TestCaseSource(nameof(ChangePriceTestCases))]
+        public static void ChangePrice_SetsExpectedUpdatedValue(
+            OrderItem orderItem,
+            DateTime deliveryDate,
+            TimeUnit estimationPeriod,
+            int quantity,
+            decimal price,
+            bool expectedValue)
+        {
+            orderItem.Updated.Should().BeFalse();
+
+            orderItem.ChangePrice(deliveryDate, quantity, estimationPeriod, price, null);
+
+            orderItem.Updated.Should().Be(expectedValue);
         }
 
         [TestCase(0, 0, false, 0, 0)]
@@ -395,6 +444,29 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             var orderItem = CreateOrderItem(catalogueItemType, provisioningType);
 
             orderItem.CostType.Should().Be(costType);
+        }
+
+        private static IEnumerable<ITestCaseData> ChangePriceTestCases()
+        {
+            const TimeUnit estimationPeriod = TimeUnit.PerMonth;
+            const int quantity = 1;
+            const decimal price = 1.00m;
+
+            var deliveryDate = DateTime.UtcNow;
+
+            OrderItem OrderItem() =>
+                OrderItemBuilder.Create()
+                    .WithDeliveryDate(deliveryDate)
+                    .WithEstimationPeriod(estimationPeriod)
+                    .WithPrice(price)
+                    .WithQuantity(quantity)
+                    .Build();
+
+            yield return new TestCaseData(OrderItem(), deliveryDate, estimationPeriod, quantity, price, false);
+            yield return new TestCaseData(OrderItem(), deliveryDate.AddDays(1), estimationPeriod, quantity, price, true);
+            yield return new TestCaseData(OrderItem(), deliveryDate, TimeUnit.PerYear, quantity, price, true);
+            yield return new TestCaseData(OrderItem(), deliveryDate, estimationPeriod, quantity + 1, price, true);
+            yield return new TestCaseData(OrderItem(), deliveryDate, estimationPeriod, quantity, price + 1.00m, true);
         }
 
         private static OrderItem CreateOrderItem(CatalogueItemType catalogueItemType, ProvisioningType provisioningType)

@@ -160,15 +160,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             var validationResult = await createOrderItemService.CreateAsync(
                 order,
-                model.Select(item => item.ToRequest(order)));
+                model.Select(item => item.ToRequest(order)).ToList());
 
             if (validationResult.Success)
-                return CreatedAtAction(nameof(ListAsync).TrimAsync(), "OrderItems", new { orderId }, null);
+                return NoContent();
 
             foreach ((string key, string errorMessage) in validationResult.ToModelErrors())
-            {
                 ModelState.AddModelError(key, errorMessage);
-            }
 
             return ValidationProblem(ModelState);
         }
@@ -198,25 +196,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (orderItem is null)
                 return NotFound();
 
+            // TODO: remove this hack (consider custom model binder or HybridModelBinding package)
+            model.OrderItemId = orderItemId;
+
             var result = await updateOrderItemService.UpdateAsync(
-                new UpdateOrderItemRequest(
-                    model.DeliveryDate,
-                    model.EstimationPeriod,
-                    order,
-                    orderItemId,
-                    model.Price,
-                    model.Quantity),
+                new UpdateOrderItemRequest(order, model),
                 orderItem.CatalogueItemType,
                 orderItem.ProvisioningType);
 
             if (result.IsSuccess)
                 return NoContent();
 
-            var updateOrderItemResponse =
-                new UpdateOrderItemResponseModel
-                {
-                    Errors = result.Errors.Select(x => new ErrorModel(x.Id, x.Field))
-                };
+            var updateOrderItemResponse = new UpdateOrderItemResponseModel
+            {
+                Errors = result.Errors.Select(x => new ErrorModel(x.Id, x.Field)),
+            };
 
             return BadRequest(updateOrderItemResponse);
         }

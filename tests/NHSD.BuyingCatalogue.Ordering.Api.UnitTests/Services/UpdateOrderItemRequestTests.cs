@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using AutoFixture.NUnit3;
 using FluentAssertions;
+using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Domain;
@@ -14,30 +16,42 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
     internal static class UpdateOrderItemRequestTests
     {
         [Test]
-        public static void Constructor_NullOrder_ThrowsException()
+        [OrderingAutoData]
+        public static void Constructor_NullModelQuantity_ThrowsException(
+            Order order,
+            CreateOrderItemModel model)
         {
-            Assert.Throws<ArgumentNullException>(() => _ = new UpdateOrderItemRequest(
-                null,
-                null,
-                null,
-                0,
-                null,
-                null));
+            model.Quantity = null;
+
+            Assert.Throws<ArgumentException>(() => _ = new UpdateOrderItemRequest(order, model));
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Constructor_NullModelPrice_ThrowsException(
+            Order order,
+            CreateOrderItemModel model)
+        {
+            model.Price = null;
+
+            Assert.Throws<ArgumentException>(() => _ = new UpdateOrderItemRequest(order, model));
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Constructor_NullOrder_ThrowsException(UpdateOrderItemModel model)
+        {
+            Assert.Throws<ArgumentNullException>(() => _ = new UpdateOrderItemRequest(null, model));
         }
 
         [Test]
         [OrderingAutoData]
         public static void Constructor_Initializes_DeliveryDate(
-            DateTime deliveryDate,
-            Order order)
+            [Frozen] DateTime deliveryDate,
+            Order order,
+            UpdateOrderItemModel model)
         {
-            var request = new UpdateOrderItemRequest(
-                deliveryDate,
-                null,
-                order,
-                0,
-                null,
-                null);
+            var request = new UpdateOrderItemRequest(order, model);
 
             request.DeliveryDate.Should().Be(deliveryDate);
         }
@@ -45,31 +59,22 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [Test]
         [OrderingAutoData]
         public static void Constructor_Initializes_EstimationPeriod(
-            TimeUnit estimationPeriod,
-            Order order)
+            [Frozen] TimeUnit estimationPeriod,
+            Order order,
+            UpdateOrderItemModel model)
         {
-            var request = new UpdateOrderItemRequest(
-                null,
-                estimationPeriod.Name(),
-                order,
-                0,
-                null,
-                null);
+            var request = new UpdateOrderItemRequest(order, model);
 
             request.EstimationPeriod.Should().Be(estimationPeriod);
         }
 
         [Test]
         [OrderingAutoData]
-        public static void Constructor_Initializes_Order(Order order)
+        public static void Constructor_Initializes_Order(
+            Order order,
+            UpdateOrderItemModel model)
         {
-            var request = new UpdateOrderItemRequest(
-                null,
-                null,
-                order,
-                0,
-                null,
-                null);
+            var request = new UpdateOrderItemRequest(order, model);
 
             request.Order.Should().Be(order);
         }
@@ -78,15 +83,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [OrderingAutoData]
         public static void Constructor_Initializes_OrderItemId(
             int orderItemId,
-            Order order)
+            Order order,
+            UpdateOrderItemModel model)
         {
-            var request = new UpdateOrderItemRequest(
-                null,
-                null,
-                order,
-                orderItemId,
-                null,
-                null);
+            model.OrderItemId = orderItemId;
+            var request = new UpdateOrderItemRequest(order, model);
 
             request.OrderItemId.Should().Be(orderItemId);
         }
@@ -94,16 +95,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [Test]
         [OrderingAutoData]
         public static void Constructor_Initializes_Price(
-            decimal price,
-            Order order)
+            [Frozen] decimal price,
+            Order order,
+            UpdateOrderItemModel model)
         {
-            var request = new UpdateOrderItemRequest(
-                null,
-                null,
-                order,
-                0,
-                price,
-                null);
+            var request = new UpdateOrderItemRequest(order, model);
 
             request.Price.Should().Be(price);
         }
@@ -112,15 +108,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [OrderingAutoData]
         public static void Constructor_Initializes_Quantity(
             int quantity,
-            Order order)
+            Order order,
+            UpdateOrderItemModel model)
         {
-            var request = new UpdateOrderItemRequest(
-                null,
-                null,
-                order,
-                0,
-                null,
-                quantity);
+            model.Quantity = quantity;
+
+            var request = new UpdateOrderItemRequest(order, model);
 
             request.Quantity.Should().Be(quantity);
         }

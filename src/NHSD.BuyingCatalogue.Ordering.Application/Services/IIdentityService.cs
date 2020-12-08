@@ -7,5 +7,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Application.Services
         Guid GetUserIdentity();
 
         string GetUserName();
+
+        IdentityUser GetUserInfo();
     }
 }

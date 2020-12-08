@@ -173,5 +173,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             orderItem.EstimationPeriod.Should().Be(estimationPeriod);
         }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Create_HasExpectedOrderItemId(
+            CreateOrderItemSolutionRequest request,
+            OrderItemFactory factory)
+        {
+            var orderItem = factory.Create(request);
+
+            orderItem.OrderItemId.Should().Be(request.OrderItemId);
+        }
     }
 }

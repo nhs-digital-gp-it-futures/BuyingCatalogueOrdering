@@ -16,7 +16,7 @@ Scenario: Create order items
         | catalogue solution | complete    | Item A            | ODS2    | Recipient 1          |
         | catalogue solution | complete    | Item B            | ODS3    | Recipient 2          |
     When the user sends the create order items request
-    Then a response with status code 201 is returned
+    Then a response with status code 204 is returned
     And the expected order items are created
     And the persisted service recipients are
         | OrderId    | OdsCode | Name        |
@@ -45,7 +45,7 @@ Scenario: Create order items with an invalid order ID
 @6036
 Scenario: If a user is not authorized then they cannot create order items
     Given no user is logged in
-    And the user creates a request to add the following items to the order with ID 'INVALID'
+    And the user creates a request to add the following items to the order with ID 'C000014-01'
         | ItemType           | PayloadType | CatalogueItemName | OdsCode | ServiceRecipientName |
         | catalogue solution | complete    | Item A            | ODS2    | Recipient 1          |
     When the user sends the create order items request
@@ -54,7 +54,7 @@ Scenario: If a user is not authorized then they cannot create order items
 @6036
 Scenario: A non buyer user cannot create order items
     Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
-    And the user creates a request to add the following items to the order with ID 'INVALID'
+    And the user creates a request to add the following items to the order with ID 'C000014-01'
         | ItemType           | PayloadType | CatalogueItemName | OdsCode | ServiceRecipientName |
         | catalogue solution | complete    | Item A            | ODS2    | Recipient 1          |
     When the user sends the create order items request
@@ -63,7 +63,7 @@ Scenario: A non buyer user cannot create order items
 @6036
 Scenario: Service failure
     Given the call to the database will fail
-    And the user creates a request to add the following items to the order with ID 'INVALID'
+    And the user creates a request to add the following items to the order with ID 'C000014-01'
         | ItemType           | PayloadType | CatalogueItemName | OdsCode | ServiceRecipientName |
         | catalogue solution | complete    | Item A            | ODS2    | Recipient 1          |
     When the user sends the create order items request

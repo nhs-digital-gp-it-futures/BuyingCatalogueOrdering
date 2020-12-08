@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using AutoFixture.NUnit3;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Domain.Orders;
@@ -10,20 +12,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
+    [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class OrderTests
     {
         [Test]
         public static void AddOrderItem_NullOrderItem_ThrowsArgumentNullException()
         {
-            static void Test()
-            {
-                OrderBuilder
-                    .Create()
-                    .Build()
-                    .AddOrderItem(null, Guid.Empty, string.Empty);
-            }
+            var order = OrderBuilder.Create().Build();
 
-            Assert.Throws<ArgumentNullException>(Test);
+            Assert.Throws<ArgumentNullException>(() => order.AddOrderItem(null, Guid.Empty, string.Empty));
         }
 
         [Test]
@@ -201,6 +198,146 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             order.AddOrderItem(orderItem, Guid.Empty, "Should not be set");
 
             order.LastUpdatedByName.Should().Be(lastUpdatedByName);
+        }
+
+        [Test]
+        public static void MergeOrderItems_NullOrderItemMerge_ThrowsException()
+        {
+            var order = OrderBuilder.Create().Build();
+
+            Assert.Throws<ArgumentNullException>(() => order.MergeOrderItems(null));
+        }
+
+        [Test]
+        public static void MergeOrderItems_RemovesOrderItemsNotInMerge()
+        {
+            var orderItem = OrderItemBuilder.Create().Build();
+            var order = OrderBuilder.Create().WithOrderItem(orderItem).Build();
+
+            order.OrderItems.Should().HaveCount(1);
+            order.OrderItems.Should().Contain(orderItem);
+
+            order.MergeOrderItems(new OrderItemMerge(Guid.Empty, "Name"));
+
+            order.OrderItems.Should().HaveCount(0);
+            order.OrderItems.Should().NotContain(orderItem);
+        }
+
+        [Test]
+        [AutoData]
+        public static void MergeOrderItems_UpdatesExistingItems(
+            int orderId,
+            DateTime originalDeliveryDate,
+            OrderItemMerge merge)
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithOrderItemId(orderId)
+                .WithDeliveryDate(originalDeliveryDate)
+                .Build();
+
+            var newDeliveryDate = originalDeliveryDate.AddDays(1);
+
+            var updatedOrderItem = OrderItemBuilder
+                .Create()
+                .WithOrderItemId(orderId)
+                .WithDeliveryDate(newDeliveryDate)
+                .Build();
+
+            var order = OrderBuilder.Create().WithOrderItem(orderItem).Build();
+            merge.AddOrderItem(updatedOrderItem);
+
+            orderItem.DeliveryDate.Should().Be(originalDeliveryDate);
+
+            order.MergeOrderItems(merge);
+
+            order.OrderItems.Should().HaveCount(1);
+            orderItem.DeliveryDate.Should().Be(newDeliveryDate);
+        }
+
+        [Test]
+        [AutoData]
+        public static void MergeOrderItems_AddsNewOrderItemsInMerge(OrderItemMerge merge)
+        {
+            var orderItem = OrderItemBuilder.Create().Build();
+            var order = OrderBuilder.Create().Build();
+            merge.AddOrderItem(orderItem);
+
+            order.OrderItems.Should().HaveCount(0);
+            order.OrderItems.Should().NotContain(orderItem);
+
+            order.MergeOrderItems(merge);
+
+            order.OrderItems.Should().HaveCount(1);
+            order.OrderItems.Should().Contain(orderItem);
+        }
+
+        [Test]
+        [AutoData]
+        public static void MergeOrderItems_MarksSectionsAsViewed(OrderItemMerge merge)
+        {
+            var order = OrderBuilder.Create().Build();
+            var orderItem = OrderItemBuilder.Create().WithCatalogueItemType(CatalogueItemType.AssociatedService).Build();
+            merge.AddOrderItem(orderItem);
+
+            order.AssociatedServicesViewed.Should().BeFalse();
+
+            merge.MarkOrderSectionsAsViewed(order);
+
+            order.AssociatedServicesViewed.Should().BeTrue();
+        }
+
+        [Test]
+        [AutoData]
+        public static void MergeOrderItems_ItemsChanged_SetsLastUpdatedBy(
+            int orderItemId,
+            Guid originalUserId,
+            string originalUserName,
+            OrderItemMerge merge)
+        {
+            var orderItem = OrderItemBuilder.Create().WithOrderItemId(orderItemId).Build();
+            var updatedOrderItem = OrderItemBuilder
+                .Create()
+                .WithOrderItemId(orderItemId)
+                .WithDeliveryDate(orderItem.DeliveryDate?.AddDays(1))
+                .Build();
+
+            var order = OrderBuilder
+                .Create()
+                .WithOrderItem(orderItem)
+                .WithLastUpdatedBy(originalUserId)
+                .WithLastUpdatedByName(originalUserName)
+                .Build();
+
+            merge.AddOrderItem(updatedOrderItem);
+
+            order.MergeOrderItems(merge);
+
+            order.LastUpdatedBy.Should().Be(merge.UserId);
+            order.LastUpdatedByName.Should().Be(merge.UserName);
+        }
+
+        [Test]
+        [AutoData]
+        public static void MergeOrderItems_ItemsUnchanged_DoesNotSetLastUpdatedBy(
+            Guid originalUserId,
+            string originalUserName,
+            OrderItemMerge merge)
+        {
+            var orderItem = OrderItemBuilder.Create().WithOrderItemId(1).Build();
+            var order = OrderBuilder
+                .Create()
+                .WithOrderItem(orderItem)
+                .WithLastUpdatedBy(originalUserId)
+                .WithLastUpdatedByName(originalUserName)
+                .Build();
+
+            merge.AddOrderItem(orderItem);
+
+            order.MergeOrderItems(merge);
+
+            order.LastUpdatedBy.Should().Be(originalUserId);
+            order.LastUpdatedByName.Should().Be(originalUserName);
         }
 
         [Test]

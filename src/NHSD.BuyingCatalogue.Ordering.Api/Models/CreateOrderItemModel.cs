@@ -31,9 +31,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
             if (order is null)
                 throw new ArgumentNullException(nameof(order));
 
-            if (Quantity is null)
-                throw new InvalidOperationException($"{nameof(CreateOrderItemModel)}.{nameof(Quantity)} should never be null at this point.");
-
             var itemType = OrderingEnums.Parse<CatalogueItemType>(CatalogueItemType);
 
             return itemType switch

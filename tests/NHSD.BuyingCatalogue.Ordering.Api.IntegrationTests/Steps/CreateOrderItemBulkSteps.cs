@@ -34,24 +34,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Given(@"the user creates a request to add the following items to the order with ID '(.*)'")]
-        public void GivenTheUserCreatesARequestToAddTheFollowingItemsToTheOrderWithId(string orderId, Table requestInfoTable)
+        public async Task GivenTheUserCreatesARequestToAddTheFollowingItemsToTheOrderWithId(string orderId, Table requestInfoTable)
         {
-            var requestInfo = requestInfoTable.CreateSet<RequestInfo>();
-            bulkRequest = new BulkRequest(orderId, settings.OrderingApiBaseUrl, settings.ConnectionString);
+            await CreateBulkRequest(
+                requestInfoTable,
+                orderId,
+                new CreateOrderItemRequestForCreateFactory(request, settings, orderId));
+        }
 
-            foreach (var info in requestInfo)
-            {
-                bulkRequest.Items.Add(CreateItemRequest(info, orderId));
-            }
+        [Given(@"the user creates a request to update the order with ID '(.*)' with the following items")]
+        public async Task GivenTheUserCreatesARequestToUpdateTheFollowingItemsToTheOrderWithId(string orderId, Table requestInfoTable)
+        {
+            await CreateBulkRequest(
+                requestInfoTable,
+                orderId,
+                new CreateOrderItemRequestForUpdateFactory(request, settings, orderId));
         }
 
         [When(@"the user sends the create order items request")]
+        [When(@"the user sends the edit order items request")]
         public async Task WhenTheUserSendsTheCreateOrderItemsRequest()
         {
             await bulkRequest.SendRequest(request);
         }
 
         [Then(@"the expected order items are created")]
+        [Then(@"the expected order items exist")]
         public async Task ThenTheExpectedOrderItemsAreCreated()
         {
             await bulkRequest.OrderItemsCreatedAsExpected();
@@ -66,6 +74,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             for (var i = 0; i < expectedErrorDetails.Count; i++)
             {
                 var expectedErrorDetail = expectedErrorDetails[i];
+                if (string.IsNullOrWhiteSpace(expectedErrorDetail.Field))
+                    continue;
+
                 expectedErrors.Add($"[{i}].{expectedErrorDetail.Field}", new string[] { expectedErrorDetail.Id });
             }
 
@@ -75,21 +86,107 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             problemDetails.Errors.Should().BeEquivalentTo(expectedErrors);
         }
 
-        private CreateOrderItemBaseRequest CreateItemRequest(RequestInfo info, string orderId)
+        private async Task CreateBulkRequest(
+            Table requestInfoTable,
+            string orderId,
+            CreateOrderItemRequestFactory itemFactory)
         {
-            var itemRequest = CreateOrderItemBaseRequest.Create(info.ItemType, request, settings.OrderingApiBaseUrl, orderId);
-            itemRequest.SetPayload(info.PayloadType);
+            var requestInfo = requestInfoTable.CreateSet<RequestInfo>();
+            bulkRequest = new BulkRequest(orderId, settings.OrderingApiBaseUrl, settings.ConnectionString);
 
-            var serviceRecipientName = info.ServiceRecipientName;
-            if (string.IsNullOrWhiteSpace(serviceRecipientName))
-                return itemRequest;
+            foreach (var info in requestInfo)
+            {
+                bulkRequest.Items.Add(await itemFactory.CreateOrderItemRequest(info));
+            }
+        }
 
-            var payload = itemRequest.Payload;
-            payload.CatalogueItemName = info.CatalogueItemName;
-            payload.OdsCode = info.OdsCode;
-            payload.ServiceRecipientName = info.ServiceRecipientName;
+        private abstract class CreateOrderItemRequestFactory
+        {
+            private readonly string orderId;
+            private readonly Request request;
+            private readonly Settings settings;
 
-            return itemRequest;
+            protected CreateOrderItemRequestFactory(
+                Request request,
+                Settings settings,
+                string orderId)
+            {
+                this.orderId = orderId;
+                this.request = request;
+                this.settings = settings;
+            }
+
+            internal CreateOrderItemBaseRequest OrderItemRequest { get; private set; }
+
+            internal async Task<CreateOrderItemBaseRequest> CreateOrderItemRequest(RequestInfo requestInfo)
+            {
+                OrderItemRequest = CreateOrderItemBaseRequest.Create(requestInfo.ItemType, request, settings.OrderingApiBaseUrl, orderId);
+                OrderItemRequest.SetPayload(requestInfo.PayloadType);
+
+                return await InitializeOrderItemRequest(requestInfo);
+            }
+
+            protected abstract Task<CreateOrderItemBaseRequest> InitializeOrderItemRequest(RequestInfo requestInfo);
+
+            protected async Task<CreateOrderItemBaseRequest> SetAdditionalPayloadValues(RequestInfo requestInfo)
+            {
+                var payload = OrderItemRequest.Payload;
+
+                if (!string.IsNullOrWhiteSpace(requestInfo.CatalogueItemName))
+                    payload.CatalogueItemName = requestInfo.CatalogueItemName;
+
+                if (!string.IsNullOrWhiteSpace(requestInfo.OdsCode))
+                    payload.OdsCode = requestInfo.OdsCode;
+
+                if (!string.IsNullOrWhiteSpace(requestInfo.ServiceRecipientName))
+                    payload.ServiceRecipientName = requestInfo.ServiceRecipientName;
+
+                payload.OrderItemId = requestInfo.OrderItemId;
+
+                if (payload.HasOrderItemId)
+                {
+                    // ReSharper disable once PossibleInvalidOperationException
+                    // Use the admin connection to prevent exception on service failure test
+                    OrderItemRequest.OriginalEntity = await OrderItemEntity.FetchByOrderItemId(
+                        settings.OrderingDbAdminConnectionString,
+                        payload.OrderItemId.Value);
+                }
+
+                return OrderItemRequest;
+            }
+        }
+
+        private sealed class CreateOrderItemRequestForCreateFactory : CreateOrderItemRequestFactory
+        {
+            internal CreateOrderItemRequestForCreateFactory(
+                Request request,
+                Settings settings,
+                string orderId)
+                : base(request, settings, orderId)
+            {
+            }
+
+            protected override async Task<CreateOrderItemBaseRequest> InitializeOrderItemRequest(RequestInfo requestInfo)
+            {
+                if (string.IsNullOrWhiteSpace(requestInfo.ServiceRecipientName))
+                    return OrderItemRequest;
+
+                return await SetAdditionalPayloadValues(requestInfo);
+            }
+        }
+
+        private sealed class CreateOrderItemRequestForUpdateFactory : CreateOrderItemRequestFactory
+        {
+            internal CreateOrderItemRequestForUpdateFactory(
+                Request request,
+                Settings settings,
+                string orderId)
+                : base(request, settings, orderId)
+            {
+            }
+
+            protected override async Task<CreateOrderItemBaseRequest> InitializeOrderItemRequest(RequestInfo requestInfo) =>
+                await SetAdditionalPayloadValues(requestInfo);
         }
 
         private sealed class BulkRequest
@@ -122,6 +219,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
         private sealed class RequestInfo
         {
+            public int? OrderItemId { get; set; }
+
             public string ItemType { get; set; }
 
             public string PayloadType { get; set; }
