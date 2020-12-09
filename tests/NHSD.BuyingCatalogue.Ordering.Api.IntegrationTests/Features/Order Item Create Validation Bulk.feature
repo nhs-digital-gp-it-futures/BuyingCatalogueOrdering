@@ -40,6 +40,7 @@ Scenario: Create catalogue solution order items with a missing required field
         | above-delivery-window             | DeliveryDateOutsideDeliveryWindow          | DeliveryDate             | below-delivery-window           | DeliveryDateOutsideDeliveryWindow | DeliveryDate             |
         | less-than-min-quantity            | QuantityGreaterThanZero                    | Quantity                 | greater-than-max-quantity       | QuantityLessThanMax               | Quantity                 |
         | less-than-min-price               | PriceGreaterThanOrEqualToZero              | Price                    | greater-than-max-price          | PriceLessThanMax                  | Price                    |
+        | too-long-item-unit-name           | ItemUnitNameTooLong                        | ItemUnit.Name            | too-long-item-unit-description  | ItemUnitDescriptionTooLong        | ItemUnit.Description     |
 
 @6306
 Scenario: Create additional service order items with a missing required field
@@ -71,6 +72,7 @@ Scenario: Create additional service order items with a missing required field
         | too-long-catalogue-item-id        | CatalogueItemIdTooLong                     | CatalogueItemId          | too-long-catalogue-item-name    | CatalogueItemNameTooLong    | CatalogueItemName    |
         | less-than-min-quantity            | QuantityGreaterThanZero                    | Quantity                 | greater-than-max-quantity       | QuantityLessThanMax         | Quantity             |
         | less-than-min-price               | PriceGreaterThanOrEqualToZero              | Price                    | greater-than-max-price          | PriceLessThanMax            | Price                |
+        | too-long-item-unit-name           | ItemUnitNameTooLong                        | ItemUnit.Name            | too-long-item-unit-description  | ItemUnitDescriptionTooLong  | ItemUnit.Description |
 
 @6306
 Scenario: Create associated service order items with a missing required field
@@ -86,16 +88,17 @@ Scenario: Create associated service order items with a missing required field
         | <item-2-error-id> | <item-2-error-field> |
 
     Examples: Request payloads
-        | item-1-payload-type           | item-1-error-id               | item-1-error-field   | item-2-payload-type               | item-2-error-id                            | item-2-error-field |
-        | missing-catalogue-item-type   | CatalogueItemTypeRequired     | CatalogueItemType    | missing-catalogue-item-type       | CatalogueItemTypeRequired                  | CatalogueItemType  |
-        | missing-catalogue-item-id     | CatalogueItemIdRequired       | CatalogueItemId      | missing-catalogue-item-name       | CatalogueItemNameRequired                  | CatalogueItemName  |
-        | missing-item-unit             | ItemUnitRequired              | ItemUnit             | missing-item-unit-name            | ItemUnitNameRequired                       | ItemUnit.Name      |
-        | missing-item-unit-description | ItemUnitDescriptionRequired   | ItemUnit.Description | missing-provisioning-type         | ProvisioningTypeRequired                   | ProvisioningType   |
-        | missing-type                  | TypeRequired                  | Type                 | invalid-value-catalogue-item-type | CatalogueItemTypeValidValue                | CatalogueItemType  |
-        | missing-currency-code         | CurrencyCodeRequired          | CurrencyCode         | missing-estimation-period         | EstimationPeriodRequiredIfVariableOnDemand | EstimationPeriod   |
-        | missing-quantity              | QuantityRequired              | Quantity             | missing-price                     | PriceRequired                              | Price              |
-        | invalid-value-currency-code   | CurrencyCodeValidValue        | CurrencyCode         | invalid-value-estimation-period   | EstimationPeriodValidValue                 | EstimationPeriod   |
-        | invalid-value-type            | TypeValidValue                | Type                 | invalid-value-provisioning-type   | ProvisioningTypeValidValue                 | ProvisioningType   |
-        | too-long-catalogue-item-id    | CatalogueItemIdTooLong        | CatalogueItemId      | too-long-catalogue-item-name      | CatalogueItemNameTooLong                   | CatalogueItemName  |
-        | less-than-min-quantity        | QuantityGreaterThanZero       | Quantity             | greater-than-max-quantity         | QuantityLessThanMax                        | Quantity           |
-        | less-than-min-price           | PriceGreaterThanOrEqualToZero | Price                | greater-than-max-price            | PriceLessThanMax                           | Price              |
+        | item-1-payload-type           | item-1-error-id               | item-1-error-field   | item-2-payload-type               | item-2-error-id                            | item-2-error-field   |
+        | missing-catalogue-item-type   | CatalogueItemTypeRequired     | CatalogueItemType    | missing-catalogue-item-type       | CatalogueItemTypeRequired                  | CatalogueItemType    |
+        | missing-catalogue-item-id     | CatalogueItemIdRequired       | CatalogueItemId      | missing-catalogue-item-name       | CatalogueItemNameRequired                  | CatalogueItemName    |
+        | missing-item-unit             | ItemUnitRequired              | ItemUnit             | missing-item-unit-name            | ItemUnitNameRequired                       | ItemUnit.Name        |
+        | missing-item-unit-description | ItemUnitDescriptionRequired   | ItemUnit.Description | missing-provisioning-type         | ProvisioningTypeRequired                   | ProvisioningType     |
+        | missing-type                  | TypeRequired                  | Type                 | invalid-value-catalogue-item-type | CatalogueItemTypeValidValue                | CatalogueItemType    |
+        | missing-currency-code         | CurrencyCodeRequired          | CurrencyCode         | missing-estimation-period         | EstimationPeriodRequiredIfVariableOnDemand | EstimationPeriod     |
+        | missing-quantity              | QuantityRequired              | Quantity             | missing-price                     | PriceRequired                              | Price                |
+        | invalid-value-currency-code   | CurrencyCodeValidValue        | CurrencyCode         | invalid-value-estimation-period   | EstimationPeriodValidValue                 | EstimationPeriod     |
+        | invalid-value-type            | TypeValidValue                | Type                 | invalid-value-provisioning-type   | ProvisioningTypeValidValue                 | ProvisioningType     |
+        | too-long-catalogue-item-id    | CatalogueItemIdTooLong        | CatalogueItemId      | too-long-catalogue-item-name      | CatalogueItemNameTooLong                   | CatalogueItemName    |
+        | less-than-min-quantity        | QuantityGreaterThanZero       | Quantity             | greater-than-max-quantity         | QuantityLessThanMax                        | Quantity             |
+        | less-than-min-price           | PriceGreaterThanOrEqualToZero | Price                | greater-than-max-price            | PriceLessThanMax                           | Price                |
+        | too-long-item-unit-name       | ItemUnitNameTooLong           | ItemUnit.Name        | too-long-item-unit-description    | ItemUnitDescriptionTooLong                 | ItemUnit.Description |
