@@ -11,7 +11,7 @@
     CataloguePriceTypeId int NOT NULL,
     PricingUnitTierName nvarchar(20) NULL,
     PricingUnitName nvarchar(20) NOT NULL,
-    PricingUnitDescription nvarchar(35) NOT NULL,
+    PricingUnitDescription nvarchar(40) NOT NULL,
     TimeUnitId int NULL,
     CurrencyCode nvarchar(3) NOT NULL,
     Quantity int NOT NULL,

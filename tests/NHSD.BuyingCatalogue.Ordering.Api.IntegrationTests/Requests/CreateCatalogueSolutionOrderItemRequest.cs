@@ -42,6 +42,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             { "too-long-ods-code", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithOdsCode(new string('1', 9)).Build() },
             { "too-long-catalogue-item-id", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithCatalogueItemId(new string('1', 15)).Build() },
             { "too-long-catalogue-item-name", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithCatalogueItemName(new string('1', 256)).Build() },
+            { "too-long-item-unit-name", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithItemUnitName(new string('a', 21)).Build() },
+            { "too-long-item-unit-description", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithItemUnitNameDescription(new string('a', 41)).Build() },
             { "above-delivery-window", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithDeliveryDate(new DateTime(2021,1,1).AddDays(MaximumDeliveryDateOffsetDays)).Build() },
             { "below-delivery-window", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithDeliveryDate(new DateTime(2021,1,1).AddDays(-1)).Build() },
             { "less-than-min-quantity", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithQuantity(0).Build() },
