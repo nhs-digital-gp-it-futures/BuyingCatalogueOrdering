@@ -17,12 +17,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     [Binding]
     internal sealed class OrderItemSteps
     {
-        private readonly Request _request;
-        private readonly Response _response;
-        private readonly Settings _settings;
-        private readonly OrderContext _orderContext;
-        private GetOrderItemsRequest _getOrderItemsRequest;
-        private GetOrderItemsResponse _getOrderItemsResponse;
+        private readonly Request request;
+        private readonly Response response;
+        private readonly Settings settings;
+        private readonly OrderContext orderContext;
+        private GetOrderItemsRequest getOrderItemsRequest;
+        private GetOrderItemsResponse getOrderItemsResponse;
 
         public OrderItemSteps(
             Request request,
@@ -30,10 +30,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             Settings settings,
             OrderContext orderContext)
         {
-            _request = request;
-            _response = response;
-            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-            _orderContext = orderContext;
+            this.request = request;
+            this.response = response;
+            this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            this.orderContext = orderContext;
         }
 
         [Given(@"Order items exist")]
@@ -60,19 +60,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithCreated(orderItemTableItem.Created ?? DateTime.UtcNow)
                     .Build();
 
-                var orderItemId = await orderItemEntity.InsertAsync<int>(_settings.ConnectionString);
+                var orderItemId = await orderItemEntity.InsertAsync<int>(settings.ConnectionString);
                 orderItemEntity.OrderItemId = orderItemId;
 
-                _orderContext.OrderItemReferenceList.Add(orderItemEntity.CatalogueItemName, orderItemEntity);
+                orderContext.OrderItemReferenceList.Add(orderItemEntity.CatalogueItemName, orderItemEntity);
             }
         }
 
         [When(@"the user makes a request to retrieve a list of order items with orderID (.*) and catalogueItemType (.*)")]
         public void WhenTheUserMakesARequestToRetrieveAnOrderItemWithOrderIdAndCatalogueItemType(string orderId, string catalogueItemType)
         {
-            _getOrderItemsRequest = new GetOrderItemsRequest(
-                _request,
-                _settings.OrderingApiBaseUrl,
+            getOrderItemsRequest = new GetOrderItemsRequest(
+                request,
+                settings.OrderingApiBaseUrl,
                 orderId,
                 catalogueItemType);
         }
@@ -80,32 +80,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [When(@"the user sends the retrieve a list of order items request")]
         public async Task WhenTheUserSendsTheOrderItemRequest()
         {
-            _getOrderItemsResponse = await _getOrderItemsRequest.ExecuteAsync();
+            getOrderItemsResponse = await getOrderItemsRequest.ExecuteAsync();
         }
 
         [Then(@"the order item response displays the expected order items")]
         public async Task ThenTheOrderItemResponseDisplaysTheExpectedOrderItem()
         {
-            var orderItems = _orderContext.OrderItemReferenceList.FindByOrderId(_getOrderItemsRequest.OrderId);
-            var serviceRecipients = _orderContext.ServiceRecipientReferenceList.FindByOrderId(_getOrderItemsRequest.OrderId);
+            var orderItems = orderContext.OrderItemReferenceList.FindByOrderId(getOrderItemsRequest.OrderId);
+            var serviceRecipients = orderContext.ServiceRecipientReferenceList.FindByOrderId(getOrderItemsRequest.OrderId);
 
-            await _getOrderItemsResponse.AssertAsync(orderItems, serviceRecipients, _getOrderItemsRequest.CatalogueItemType);
+            await getOrderItemsResponse.AssertAsync(orderItems, serviceRecipients, getOrderItemsRequest.CatalogueItemType);
         }
 
         [Then(@"the list order items response contains no entries")]
         public async Task ThenAnEmptyCatalogueItemListIsReturned()
         {
-            var orderItems = (await _response.ReadBodyAsJsonAsync());
+            var orderItems = (await response.ReadBodyAsJsonAsync());
             orderItems.Count().Should().Be(0);
         }
-        
+
         private sealed class OrderItemTable
         {
             public string OrderId { get; set; }
 
             public string OdsCode { get; set; }
 
-            public string CatalogueItemId { get; set; } = "1000-001";
+            public string CatalogueItemId { get; set; } = "100001-001";
 
             public CatalogueItemType CatalogueItemType { get; set; }
 

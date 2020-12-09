@@ -10,6 +10,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
     {
         Task<Result<int>> CreateAsync(CreateOrderItemRequest request);
 
-        Task<AggregateValidationResult> CreateAsync(Order order, IEnumerable<CreateOrderItemRequest> model);
+        Task<AggregateValidationResult> CreateAsync(Order order, IReadOnlyList<CreateOrderItemRequest> model);
     }
 }

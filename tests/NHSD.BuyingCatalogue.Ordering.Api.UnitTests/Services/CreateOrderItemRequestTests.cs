@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using AutoFixture.Idioms;
 using AutoFixture.NUnit3;
 using FluentAssertions;
@@ -24,39 +23,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             var constructors = typeof(CreateOrderItemAssociatedServiceRequest).GetConstructors();
 
             assertion.Verify(constructors);
-        }
-
-        [Test]
-        [OrderingAutoData]
-        public static void Constructor_NullModelQuantity_ThrowsException(
-            Order order,
-            CatalogueItemType itemType,
-            CreateOrderItemModel model)
-        {
-            model.Quantity = null;
-
-            Assert.Throws<ArgumentException>(() => _ = new TestOrderItemRequest(order, model, itemType));
-        }
-
-        [Test]
-        [OrderingAutoData]
-        public static void Constructor_NullModelPrice_ThrowsException(
-            Order order,
-            CatalogueItemType itemType,
-            CreateOrderItemModel model)
-        {
-            model.Price = null;
-
-            Assert.Throws<ArgumentException>(() => _ = new TestOrderItemRequest(order, model, itemType));
-        }
-
-        [Test]
-        [OrderingAutoData]
-        public static void Constructor_Initializes_Order(
-            [Frozen] Order order,
-            TestOrderItemRequest request)
-        {
-            request.Order.Should().Be(order);
         }
 
         [Test]
@@ -129,33 +95,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             TestOrderItemRequest request)
         {
             request.CurrencyCode.Should().Be(model.CurrencyCode);
-        }
-
-        [Test]
-        [OrderingAutoData]
-        public static void Constructor_Initializes_Quantity(
-            [Frozen] CreateOrderItemModel model,
-            TestOrderItemRequest request)
-        {
-            request.Quantity.Should().Be(model.Quantity);
-        }
-
-        [Test]
-        [OrderingAutoData]
-        public static void Constructor_Initializes_EstimationPeriod(
-            [Frozen] TimeUnit timeUnit,
-            TestOrderItemRequest request)
-        {
-            request.EstimationPeriod.Should().Be(timeUnit);
-        }
-
-        [Test]
-        [OrderingAutoData]
-        public static void Constructor_Initializes_Price(
-            [Frozen] decimal price,
-            TestOrderItemRequest request)
-        {
-            request.Price.Should().Be(price);
         }
 
         public sealed class TestOrderItemRequest : CreateOrderItemRequest

@@ -25,7 +25,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
         private OrderItemBuilder()
         {
             odsCode = "ODS1";
-            catalogueItemId = "1000-001";
+            catalogueItemId = "100001-001";
             catalogueItemType = CatalogueItemType.Solution;
             catalogueItemName = Guid.NewGuid().ToString();
             provisioningType = ProvisioningType.Patient;

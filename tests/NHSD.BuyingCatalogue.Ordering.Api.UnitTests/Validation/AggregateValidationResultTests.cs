@@ -22,9 +22,27 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
 
         [Test]
         [OrderingAutoData]
-        public static void Success_SuccessfulResultsOnly_IsTrue(AggregateValidationResult aggregateResult)
+        public static void AddValidationResult_CombinesExistingResults(
+            ErrorDetails error1,
+            ErrorDetails error2,
+            AggregateValidationResult aggregateResult)
         {
-            aggregateResult.AddValidationResult(new ValidationResult(Array.Empty<ErrorDetails>()), 0);
+            var result1 = new ValidationResult(error1);
+            var result2 = new ValidationResult(error2);
+
+            aggregateResult.AddValidationResult(result1, 0);
+            aggregateResult.AddValidationResult(result2, 0);
+
+            aggregateResult.FailedValidations.Should().HaveCount(1);
+        }
+
+        [Test]
+        [OrderingAutoData]
+        public static void Success_SuccessfulResultsOnly_IsTrue(
+            ValidationResult result,
+            AggregateValidationResult aggregateResult)
+        {
+            aggregateResult.AddValidationResult(result, 0);
 
             aggregateResult.Success.Should().BeTrue();
         }
@@ -32,9 +50,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         [Test]
         [OrderingAutoData]
         public static void Success_FailedResults_IsFalse(
-            ValidationResult result,
+            ErrorDetails error,
             AggregateValidationResult aggregateResult)
         {
+            var result = new ValidationResult(error);
+
             aggregateResult.AddValidationResult(result, 0);
 
             aggregateResult.Success.Should().BeFalse();

@@ -1,11 +1,13 @@
-﻿using AutoFixture;
+﻿using System;
+using System.Collections.Generic;
+using AutoFixture;
 using AutoFixture.AutoMoq;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
 {
     internal static class OrderingFixtureFactory
     {
-        private static readonly ICustomization[] Customizations =
+        private static readonly ICustomization[] BasicCustomizations =
         {
             new AutoMoqCustomization(),
             new ControllerBaseCustomization(),
@@ -13,8 +15,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
             new EnumValueByNameCustomization(),
         };
 
-        private static ICustomization Instance { get; } = new CompositeCustomization(Customizations);
+        internal static IFixture Create() => new Fixture().Customize(CompositeCustomization());
 
-        internal static IFixture Create() => new Fixture().Customize(Instance);
+        internal static IFixture Create(Guid userId, string userName) => new Fixture().Customize(
+            CompositeCustomization(new HttpContextAccessorCustomization(userId, userName)));
+
+        private static ICustomization CompositeCustomization(params ICustomization[] additionalCustomizations)
+        {
+            var customizations = new List<ICustomization>(BasicCustomizations);
+            customizations.AddRange(additionalCustomizations);
+
+            return new CompositeCustomization(customizations);
+        }
     }
 }

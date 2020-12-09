@@ -6,6 +6,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
     {
 #pragma warning disable 649
         private readonly DateTime _created;
+
         private int _orderItemId;
 #pragma warning restore 649
 
@@ -23,7 +24,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             int quantity,
             TimeUnit? estimationPeriod,
             DateTime? deliveryDate,
-            decimal? price)
+            decimal? price,
+            int orderItemId = default)
             : this()
         {
             if (string.IsNullOrWhiteSpace(catalogueItemId))
@@ -50,6 +52,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             DeliveryDate = deliveryDate;
             Price = price;
             _created = DateTime.UtcNow;
+            _orderItemId = orderItemId;
         }
 
         private OrderItem()
@@ -102,6 +105,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public decimal? Price { get; private set; }
 
+        public DateTime LastUpdated { get; private set; }
+
         /// <summary>
         /// Gets the created date and time for auditing purposes.
         /// </summary>
@@ -122,6 +127,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             ProvisioningType.Equals(ProvisioningType.Declarative)
                 ? CostType.OneOff
                 : CostType.Recurring;
+
+        internal bool Updated { get; private set; }
 
         public decimal CalculateTotalCostPerYear()
         {
@@ -152,6 +159,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             return base.GetHashCode();
         }
 
+        internal void UpdateFrom(OrderItem updatedItem)
+        {
+            ChangePrice(
+                updatedItem.DeliveryDate,
+                updatedItem.Quantity,
+                updatedItem.EstimationPeriod,
+                updatedItem.Price,
+                null);
+        }
+
         internal void ChangePrice(
             DateTime? deliveryDate,
             int quantity,
@@ -174,8 +191,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
             Price = price;
 
-            if (changed)
-                onPropertyChangedCallback?.Invoke();
+            if (!changed)
+                return;
+
+            onPropertyChangedCallback?.Invoke();
+            LastUpdated = DateTime.UtcNow;
+            Updated = true;
         }
 
         internal void MarkOrderSectionAsViewed(Order order)

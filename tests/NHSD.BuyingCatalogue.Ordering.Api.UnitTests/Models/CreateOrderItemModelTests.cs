@@ -31,17 +31,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
 
         [Test]
         [OrderingAutoData]
-        public static void ToRequest_NullQuantity_ThrowsInvalidOperationException(
-            Order order,
-            CreateOrderItemModel model)
-        {
-            model.Quantity = null;
-
-            Assert.Throws<InvalidOperationException>(() => model.ToRequest(order));
-        }
-
-        [Test]
-        [OrderingAutoData]
         public static void ToRequest_AdditionalService_ReturnsExpectedType(
             Order order,
             CreateOrderItemModel model)

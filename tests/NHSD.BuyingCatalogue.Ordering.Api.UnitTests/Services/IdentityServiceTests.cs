@@ -1,83 +1,51 @@
 ﻿using System;
-using System.Security.Claims;
+using System.Diagnostics.CodeAnalysis;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
-using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services;
-using NHSD.BuyingCatalogue.Ordering.Application.Services;
+using NHSD.BuyingCatalogue.Ordering.Api.Services;
+using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class IdentityServiceTests
+    [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
+    internal static class IdentityServiceTests
     {
-        [Test]
-        public void Constructor_NullHttpContextAccessor_ThrowsArgumentNullException()
-        {
-            static void Test()
-            {
-                IdentityServiceBuilder
-                    .Create()
-                    .WithHttpContextAccessor(null)
-                    .Build();
-            }
+        private const string UserId = "2a12304b-b721-497d-9136-12be384c1dbe";
+        private const string UserName = "UserName-18e14622-187e-4d27-acca-96cd53008da0";
 
-            Assert.Throws<ArgumentNullException>(Test);
+        [Test]
+        public static void Constructor_NullHttpContextAccessor_ThrowsArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => _ = new IdentityService(null));
         }
 
         [Test]
-        public void GetUserIdentity_ReturnsUserIdentity()
+        [OrderingAutoData(UserId, UserName)]
+        public static void GetUserIdentity_ReturnsUserIdentity(IdentityService service)
         {
-            var context = IdentityServiceTestContext.Setup();
+            var actual = service.GetUserIdentity();
 
-            var actual = context.IdentityService.GetUserIdentity();
-
-            actual.Should().Be(context.UserId);
+            actual.Should().Be(UserId);
         }
 
         [Test]
-        public void GetUserName_ReturnsUserName()
+        [OrderingAutoData(UserId, UserName)]
+        public static void GetUserName_ReturnsUserName(IdentityService service)
         {
-            var context = IdentityServiceTestContext.Setup();
+            var actual = service.GetUserName();
 
-            var actual = context.IdentityService.GetUserName();
-
-            actual.Should().Be(context.UserName);
+            actual.Should().Be(UserName);
         }
 
-        private sealed class IdentityServiceTestContext
+        [Test]
+        [OrderingAutoData(UserId, UserName)]
+        public static void GetUserInfo_ReturnsExpectedInfo(IdentityService service)
         {
-            private IdentityServiceTestContext()
-            {
-                UserId = Guid.NewGuid();
-                UserName = "Bob";
+            var actual = service.GetUserInfo();
 
-                IdentityService = IdentityServiceBuilder
-                    .Create()
-                    .WithHttpContextAccessor(new HttpContextAccessor
-                    {
-                        HttpContext = new DefaultHttpContext
-                        {
-                            User = new ClaimsPrincipal(new ClaimsIdentity(
-                                new[]
-                                {
-                                    new Claim(ClaimTypes.NameIdentifier, UserId.ToString()),
-                                    new Claim(ClaimTypes.Name, UserName)
-                                }, "mock"))
-                        }
-                    })
-                    .Build();
-            }
-
-            internal IIdentityService IdentityService { get; }
-
-            internal string UserName { get; }
-
-            internal Guid UserId { get; }
-
-            internal static IdentityServiceTestContext Setup() =>
-                new IdentityServiceTestContext();
+            actual.Should().BeEquivalentTo(new { Id = Guid.Parse(UserId), Name = UserName });
         }
     }
 }

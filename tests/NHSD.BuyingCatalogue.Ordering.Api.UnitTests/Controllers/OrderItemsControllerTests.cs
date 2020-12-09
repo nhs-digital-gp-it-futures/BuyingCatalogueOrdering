@@ -468,7 +468,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             IReadOnlyList<CreateOrderItemRequest> requests = null;
 
-            service.Setup(s => s.CreateAsync(order, It.IsNotNull<IEnumerable<CreateOrderItemRequest>>()))
+            service.Setup(s => s.CreateAsync(order, It.IsNotNull<IReadOnlyList<CreateOrderItemRequest>>()))
                 .Callback<Order, IEnumerable<CreateOrderItemRequest>>((o, r) => requests = r.ToList())
                 .ReturnsAsync(new AggregateValidationResult());
 
@@ -489,7 +489,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             [Frozen] Mock<IOrderRepository> repository,
             OrderItemsController controller)
         {
-            service.Setup(s => s.CreateAsync(order, It.IsNotNull<IEnumerable<CreateOrderItemRequest>>()))
+            service.Setup(s => s.CreateAsync(order, It.IsNotNull<IReadOnlyList<CreateOrderItemRequest>>()))
                 .ReturnsAsync(new AggregateValidationResult());
 
             repository.Setup(r => r.GetOrderByIdAsync(orderId)).ReturnsAsync(order);
@@ -497,7 +497,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             service.Verify(s => s.CreateAsync(
                 It.Is<Order>(o => o == order),
-                It.IsNotNull<IEnumerable<CreateOrderItemRequest>>()));
+                It.IsNotNull<IReadOnlyList<CreateOrderItemRequest>>()));
         }
 
         [Test]
@@ -510,13 +510,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             [Frozen] Mock<IOrderRepository> repository,
             OrderItemsController controller)
         {
-            service.Setup(s => s.CreateAsync(order, It.IsNotNull<IEnumerable<CreateOrderItemRequest>>()))
+            service.Setup(s => s.CreateAsync(order, It.IsNotNull<IReadOnlyList<CreateOrderItemRequest>>()))
                 .ReturnsAsync(new AggregateValidationResult());
 
             repository.Setup(r => r.GetOrderByIdAsync(orderId)).ReturnsAsync(order);
             var response = await controller.CreateOrderItemsAsync(orderId, model);
 
-            response.Should().BeOfType<CreatedAtActionResult>();
+            response.Should().BeOfType<NoContentResult>();
         }
 
         [Test]
@@ -526,16 +526,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             IEnumerable<CreateOrderItemModel> model,
             Order order,
             [Frozen] IReadOnlyList<ErrorDetails> errorDetails,
-            ValidationResult validationResult,
             AggregateValidationResult aggregateValidationResult,
             [Frozen] Mock<ICreateOrderItemService> service,
             [Frozen] Mock<IOrderRepository> repository,
             OrderItemsController controller)
         {
             controller.ProblemDetailsFactory = new TestProblemDetailsFactory();
-            aggregateValidationResult.AddValidationResult(validationResult, 0);
+            aggregateValidationResult.AddValidationResult(new ValidationResult(errorDetails), 0);
 
-            service.Setup(s => s.CreateAsync(order, It.IsNotNull<IEnumerable<CreateOrderItemRequest>>()))
+            service.Setup(s => s.CreateAsync(order, It.IsNotNull<IReadOnlyList<CreateOrderItemRequest>>()))
                 .ReturnsAsync(aggregateValidationResult);
 
             repository.Setup(r => r.GetOrderByIdAsync(orderId)).ReturnsAsync(order);
@@ -555,16 +554,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             string orderId,
             IEnumerable<CreateOrderItemModel> model,
             Order order,
-            ValidationResult validationResult,
+            ErrorDetails errorDetails,
             AggregateValidationResult aggregateValidationResult,
             [Frozen] Mock<ICreateOrderItemService> service,
             [Frozen] Mock<IOrderRepository> repository,
             OrderItemsController controller)
         {
             controller.ProblemDetailsFactory = new TestProblemDetailsFactory();
-            aggregateValidationResult.AddValidationResult(validationResult, 0);
+            aggregateValidationResult.AddValidationResult(new ValidationResult(errorDetails), 0);
 
-            service.Setup(s => s.CreateAsync(order, It.IsNotNull<IEnumerable<CreateOrderItemRequest>>()))
+            service.Setup(s => s.CreateAsync(order, It.IsNotNull<IReadOnlyList<CreateOrderItemRequest>>()))
                 .ReturnsAsync(aggregateValidationResult);
 
             repository.Setup(r => r.GetOrderByIdAsync(orderId)).ReturnsAsync(order);

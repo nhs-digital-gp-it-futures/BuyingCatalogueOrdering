@@ -88,6 +88,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
             builder.Property(orderItem => orderItem.Created)
                 .HasColumnName(nameof(OrderItem.Created))
                 .IsRequired();
+
+            builder.Property(orderItem => orderItem.LastUpdated)
+                .HasColumnName(nameof(OrderItem.LastUpdated))
+                .IsRequired();
         }
     }
 }

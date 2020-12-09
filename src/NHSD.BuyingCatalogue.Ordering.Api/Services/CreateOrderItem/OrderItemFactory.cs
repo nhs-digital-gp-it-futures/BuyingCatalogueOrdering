@@ -23,7 +23,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
                 request.Quantity,
                 catalogueItemType.InferEstimationPeriod(provisioningType, request.EstimationPeriod),
                 request.DeliveryDate,
-                request.Price);
+                request.Price,
+                request.OrderItemId);
         }
     }
 }

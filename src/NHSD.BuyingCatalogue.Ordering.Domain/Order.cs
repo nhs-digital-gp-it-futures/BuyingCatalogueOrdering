@@ -174,6 +174,27 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 () => SetLastUpdatedBy(userId, name));
         }
 
+        public void MergeOrderItems(OrderItemMerge merge)
+        {
+            if (merge is null)
+                throw new ArgumentNullException(nameof(merge));
+
+            var startingOrderItemsHash = GetOrderItemsHash();
+            orderItems.RemoveAll(i => !merge.UpdatedItems.ContainsKey(i.OrderItemId));
+
+            foreach (var orderItem in orderItems)
+            {
+                var updatedItem = merge.UpdatedItems[orderItem.OrderItemId];
+                orderItem.UpdateFrom(updatedItem);
+            }
+
+            orderItems.AddRange(merge.NewItems);
+            merge.MarkOrderSectionsAsViewed(this);
+
+            if (startingOrderItemsHash != GetOrderItemsHash())
+                SetLastUpdatedBy(merge.UserId, merge.UserName);
+        }
+
         public void SetServiceRecipients(IEnumerable<OdsOrganisation> recipients, Guid userId, string lastUpdatedName)
         {
             if (recipients is null)
@@ -187,7 +208,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 {
                     Name = name,
                     OdsCode = code,
-                    Order = this
+                    Order = this,
                 });
             }
 
@@ -233,6 +254,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             SetLastUpdatedBy(lastUpdatedBy, lastUpdatedByName);
 
             return Result.Success();
+        }
+
+        private int GetOrderItemsHash()
+        {
+            var hash = default(HashCode);
+            foreach (var orderItem in orderItems)
+            {
+                hash.Add(orderItem.GetHashCode());
+                hash.Add(orderItem.Updated.GetHashCode());
+            }
+
+            return hash.ToHashCode();
         }
     }
 }

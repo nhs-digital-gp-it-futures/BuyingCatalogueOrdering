@@ -1,24 +1,16 @@
-﻿using System;
+﻿using System.Diagnostics.CodeAnalysis;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
+using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 {
-    public abstract class CreateOrderItemRequest
+    public abstract class CreateOrderItemRequest : UpdateOrderItemRequest
     {
+        [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "model is validated by base constructor")]
         protected CreateOrderItemRequest(Order order, CreateOrderItemModel model, CatalogueItemType itemType)
+            : base(order, model)
         {
-            if (model is null)
-                throw new ArgumentNullException(nameof(model));
-
-            // Model validation should ensure Quantity and Price are not null under normal circumstances
-            if (model.Quantity is null)
-                throw ModelPropertyIsNullException(nameof(model), nameof(CreateOrderItemModel.Quantity));
-
-            if (model.Price is null)
-                throw ModelPropertyIsNullException(nameof(model), nameof(CreateOrderItemModel.Price));
-
-            Order = order ?? throw new ArgumentNullException(nameof(order));
             CatalogueItemId = model.CatalogueItemId;
             CatalogueItemType = itemType;
             CatalogueItemName = model.CatalogueItemName;
@@ -27,12 +19,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             CataloguePriceUnitTierName = model.ItemUnit.Name;
             CataloguePriceUnitDescription = model.ItemUnit.Description;
             CurrencyCode = model.CurrencyCode;
-            Quantity = model.Quantity.Value;
-            EstimationPeriod = OrderingEnums.ParseTimeUnit(model.EstimationPeriod);
-            Price = model.Price.Value;
         }
-
-        public Order Order { get; }
 
         public ServiceRecipient ServiceRecipient { get; protected set; }
 
@@ -57,18 +44,5 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
         public TimeUnit? PriceTimeUnit { get; protected set; }
 
         public string CurrencyCode { get; }
-
-        public int Quantity { get; }
-
-        public TimeUnit? EstimationPeriod { get; }
-
-        public DateTime? DeliveryDate { get; protected set; }
-
-        public decimal Price { get; }
-
-        private static ArgumentException ModelPropertyIsNullException(string modelParamName, string propertyName)
-        {
-            return new ArgumentException($"{modelParamName}.{propertyName} should not be null", modelParamName);
-        }
     }
 }

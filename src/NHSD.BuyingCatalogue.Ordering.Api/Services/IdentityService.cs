@@ -7,21 +7,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services
 {
     internal sealed class IdentityService : IIdentityService
     {
-        private readonly IHttpContextAccessor _context;
+        private readonly IHttpContextAccessor context;
 
         public IdentityService(IHttpContextAccessor context)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         public Guid GetUserIdentity()
         {
-            return _context.HttpContext.User.GetUserId();
+            return context.HttpContext.User.GetUserId();
         }
 
         public string GetUserName()
         {
-            return _context.HttpContext.User.GetUserName();
+            return context.HttpContext.User.GetUserName();
         }
+
+        public IdentityUser GetUserInfo() => new IdentityUser(GetUserIdentity(), GetUserName());
     }
 }
