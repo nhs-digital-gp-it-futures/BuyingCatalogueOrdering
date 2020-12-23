@@ -140,6 +140,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                 .WithOrderItemId(Payload.OrderItemId.GetValueOrDefault())
                 .WithOdsCode(Payload.OdsCode)
                 .WithCatalogueItemId(Payload.CatalogueItemId)
+                .WithParentCatalogueItemId(Payload.CatalogueSolutionId)
                 .WithCatalogueItemType(Payload.CatalogueItemType.GetValueOrDefault())
                 .WithCatalogueItemName(Payload.CatalogueItemName)
                 .WithQuantity(Payload.Quantity.GetValueOrDefault())

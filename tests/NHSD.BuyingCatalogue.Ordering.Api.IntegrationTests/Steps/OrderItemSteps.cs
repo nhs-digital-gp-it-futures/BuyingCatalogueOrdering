@@ -45,6 +45,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .Create()
                     .WithOrderId(orderItemTableItem.OrderId)
                     .WithCatalogueItemId(orderItemTableItem.CatalogueItemId)
+                    .WithParentCatalogueItemId(orderItemTableItem.ParentCatalogueItemId)
                     .WithCatalogueItemName(orderItemTableItem.CatalogueItemName)
                     .WithCatalogueItemType(orderItemTableItem.CatalogueItemType)
                     .WithOdsCode(orderItemTableItem.OdsCode)
@@ -77,6 +78,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 catalogueItemType);
         }
 
+        [When(@"the user makes a request to retrieve a list of order items for the order with ID (.*)")]
+        public void WhenTheUserMakesARequestToRetrieveAnOrderItemWithOrderId(string orderId)
+        {
+            getOrderItemsRequest = new GetOrderItemsRequest(
+                request,
+                settings.OrderingApiBaseUrl,
+                orderId,
+                null);
+        }
+
         [When(@"the user sends the retrieve a list of order items request")]
         public async Task WhenTheUserSendsTheOrderItemRequest()
         {
@@ -99,6 +110,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             orderItems.Count().Should().Be(0);
         }
 
+        [Then(@"each order item has the expected service instance ID as follows")]
+        public async Task ThenEachOrderItemHasTheExpectedServiceInstanceIDAsFollows(Table table)
+        {
+            var expected = table.CreateSet<ServiceInstanceItem>();
+            await getOrderItemsResponse.AssertServiceInstanceIdAsync(expected);
+        }
+
+        private sealed class ServiceInstanceItem
+        {
+            public int OrderItemId { get; set; }
+
+            public string ServiceInstanceId { get; set; }
+        }
+
         private sealed class OrderItemTable
         {
             public string OrderId { get; set; }
@@ -107,9 +132,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             public string CatalogueItemId { get; set; } = "100001-001";
 
+            public string ParentCatalogueItemId { get; set; }
+
             public CatalogueItemType CatalogueItemType { get; set; }
 
-            public string CatalogueItemName { get; set; }
+            public string CatalogueItemName { get; set; } = Guid.NewGuid().ToString();
 
             public ProvisioningType ProvisioningType { get; set; } = ProvisioningType.OnDemand;
 

@@ -11,6 +11,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
     {
         private readonly List<OrderItem> orderItems = new List<OrderItem>();
         private readonly List<ServiceRecipient> serviceRecipients = new List<ServiceRecipient>();
+        private readonly List<ServiceInstanceItem> serviceInstanceItems = new List<ServiceInstanceItem>();
 
 #pragma warning disable 649
         private DateTime? _completed;
@@ -102,6 +103,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public IReadOnlyList<ServiceRecipient> ServiceRecipients =>
             serviceRecipients.AsReadOnly();
+
+        public IReadOnlyList<ServiceInstanceItem> ServiceInstanceItems =>
+            serviceInstanceItems.AsReadOnly();
 
         public static Order Create(
             OrderDescription orderDescription,

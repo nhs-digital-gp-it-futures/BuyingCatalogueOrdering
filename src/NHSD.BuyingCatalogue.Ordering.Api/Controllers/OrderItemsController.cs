@@ -43,7 +43,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             string orderId,
             [FromQuery] string catalogueItemType)
         {
-            var order = await orderRepository.GetOrderByIdAsync(orderId);
+            static void ConfigureQuery(IOrderQuery query) => query
+                .WithOrderItems()
+                .WithServiceInstanceItems()
+                .WithServiceRecipients()
+                .WithoutTracking();
+
+            var order = await orderRepository.GetOrderByIdAsync(
+                orderId,
+                ConfigureQuery);
+
             if (order is null)
             {
                 return NotFound();
@@ -65,18 +74,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     return new List<GetOrderItemModel>();
                 }
 
-                orderItems = orderItems.Where(y => y.CatalogueItemType.Equals(catalogueItemTypeFromName));
+                orderItems = orderItems.Where(i => i.CatalogueItemType.Equals(catalogueItemTypeFromName));
             }
 
-            var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(x => x.OdsCode.ToUpperInvariant());
-            serviceRecipientDictionary.TryAdd(order.OrganisationOdsCode.ToUpperInvariant(),
+            var serviceInstanceItems = order.ServiceInstanceItems.ToDictionary(i => i.OrderItemId, i => i.ServiceInstanceId);
+            var serviceRecipients = order.ServiceRecipients.ToDictionary(r => r.OdsCode, StringComparer.OrdinalIgnoreCase);
+            serviceRecipients.TryAdd(
+                order.OrganisationOdsCode,
                 new ServiceRecipient { OdsCode = order.OrganisationOdsCode, Name = order.OrganisationName });
 
+            GetOrderItemModel Selector(OrderItem item) => new GetOrderItemModel(
+                item,
+                serviceRecipients[item.OdsCode],
+                serviceInstanceItems.GetValueOrDefault(item.OrderItemId));
+
             return orderItems
-                .OrderBy(x => x.Created)
-                .Select(orderItem => new GetOrderItemModel(
-                    orderItem,
-                    serviceRecipientDictionary[orderItem.OdsCode.ToUpperInvariant()])).ToList();
+                .OrderBy(i => i.Created)
+                .Select(Selector)
+                .ToList();
         }
 
         [HttpGet]

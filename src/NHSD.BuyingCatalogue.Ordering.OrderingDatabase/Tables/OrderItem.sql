@@ -20,11 +20,12 @@
     Price decimal(18, 3) NULL,
     Created datetime2 CONSTRAINT DF_OrderItem_Created DEFAULT GETUTCDATE() NOT NULL,
     LastUpdated datetime2 CONSTRAINT DF_OrderItem_LastUpdated DEFAULT GETUTCDATE() NOT NULL,
-    CONSTRAINT PK_OrderItem PRIMARY KEY (OrderItemId),
+    CONSTRAINT PK_OrderItem PRIMARY KEY NONCLUSTERED (OrderItemId),
     CONSTRAINT FK_OrderItem_Order_OrderId FOREIGN KEY (OrderId) REFERENCES dbo.[Order](OrderId),
     CONSTRAINT FK_OrderItem_CatalogueItemType_CatalogueItemTypeId FOREIGN KEY (CatalogueItemTypeId) REFERENCES dbo.CatalogueItemType(CatalogueItemTypeId),
     CONSTRAINT FK_OrderItem_ProvisioningType_ProvisioningTypeId FOREIGN KEY (ProvisioningTypeId) REFERENCES dbo.ProvisioningType(ProvisioningTypeId),
     CONSTRAINT FK_OrderItem_CataloguePriceType_CataloguePriceTypeId FOREIGN KEY (CataloguePriceTypeId) REFERENCES dbo.CataloguePriceType(CataloguePriceTypeId),
     CONSTRAINT FK_OrderItem_TimeUnit_TimeUnitId FOREIGN KEY (TimeUnitId) REFERENCES dbo.TimeUnit(TimeUnitId),
-    CONSTRAINT FK_OrderItem_TimeUnit_EstimationPeriodId FOREIGN KEY (EstimationPeriodId) REFERENCES dbo.TimeUnit(TimeUnitId)
+    CONSTRAINT FK_OrderItem_TimeUnit_EstimationPeriodId FOREIGN KEY (EstimationPeriodId) REFERENCES dbo.TimeUnit(TimeUnitId),
+    INDEX CX_OrderItem UNIQUE CLUSTERED (OrderId, OrderItemId)
 );

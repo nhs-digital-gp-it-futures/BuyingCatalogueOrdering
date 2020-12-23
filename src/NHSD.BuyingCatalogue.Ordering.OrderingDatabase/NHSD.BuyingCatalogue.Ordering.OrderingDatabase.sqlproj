@@ -61,11 +61,18 @@
     <Folder Include="Deployment" />
     <Folder Include="Security\Logins" />
     <Folder Include="Security\Users" />
+    <Folder Include="Views" />
+    <Folder Include="Functions" />
+    <Folder Include="Indexes" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Security\Users\NHSD.sql" />
     <Build Include="Security\Logins\NHSD.sql" />
     <None Include="Deployment\InsertOrderStatuses.sql" />
+    <Build Include="Views\ServiceInstanceItem.sql" />
+    <Build Include="Functions\GetServiceInstanceIncrement.sql" />
+    <Build Include="Functions\HasParentSolution.sql" />
+    <Build Include="Indexes\IX_ServiceInstance.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\OrderStatus.sql" />

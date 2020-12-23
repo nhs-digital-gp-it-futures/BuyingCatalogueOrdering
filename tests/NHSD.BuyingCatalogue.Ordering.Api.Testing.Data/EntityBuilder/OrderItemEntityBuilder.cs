@@ -6,30 +6,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
 {
     public sealed class OrderItemEntityBuilder
     {
-        private int _orderItemId;
-        private string _orderId;
-        private string _odsCode;
-        private string _catalogueItemId;
-        private CatalogueItemType _catalogueItemType;
-        private string _catalogueItemName;
-        private DateTime? _deliveryDate;
-        private int _quantity;
-        private TimeUnit? _estimationPeriod;
-        private ProvisioningType _provisioningType;
-        private CataloguePriceType _cataloguePriceType;
-        private string _currencyCode;
-        private TimeUnit? _timeUnit;
-        private string _pricingUnitTierName;
-        private string _pricingUnitName;
-        private string _pricingUnitDescription;
-        private decimal? _price;
-        private DateTime _created;
-        private readonly DateTime _lastUpdated;
+        private readonly DateTime lastUpdated;
+        private int orderItemId;
+        private string orderId;
+        private string odsCode;
+        private string catalogueItemId;
+        private string parentCatalogueItemId;
+        private CatalogueItemType catalogueItemType;
+        private string catalogueItemName;
+        private DateTime? deliveryDate;
+        private int quantity;
+        private TimeUnit? estimationPeriod;
+        private ProvisioningType provisioningType;
+        private CataloguePriceType cataloguePriceType;
+        private string currencyCode;
+        private TimeUnit? timeUnit;
+        private string pricingUnitTierName;
+        private string pricingUnitName;
+        private string pricingUnitDescription;
+        private decimal? price;
+        private DateTime created;
 
         private OrderItemEntityBuilder(
             string orderId,
             string odsCode,
             string catalogueItemId,
+            string parentCatalogueItemId,
             CatalogueItemType catalogueItemType,
             string catalogueItemName,
             DateTime? deliveryDate,
@@ -46,30 +48,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
             DateTime created,
             DateTime lastUpdated)
         {
-            _orderId = orderId;
-            _odsCode = odsCode;
-            _catalogueItemId = catalogueItemId;
-            _catalogueItemType = catalogueItemType;
-            _catalogueItemName = catalogueItemName;
-            _deliveryDate = deliveryDate;
-            _quantity = quantity;
-            _estimationPeriod = estimationPeriod;
-            _provisioningType = provisioningType;
-            _cataloguePriceType = cataloguePriceType;
-            _currencyCode = currencyCode;
-            _timeUnit = timeUnit;
-            _pricingUnitTierName = pricingUnitTierName;
-            _pricingUnitName = pricingUnitName;
-            _pricingUnitDescription = pricingUnitDescription;
-            _price = price;
-            _created = created;
-            _lastUpdated = lastUpdated;
+            this.orderId = orderId;
+            this.odsCode = odsCode;
+            this.catalogueItemId = catalogueItemId;
+            this.parentCatalogueItemId = parentCatalogueItemId;
+            this.catalogueItemType = catalogueItemType;
+            this.catalogueItemName = catalogueItemName;
+            this.deliveryDate = deliveryDate;
+            this.quantity = quantity;
+            this.estimationPeriod = estimationPeriod;
+            this.provisioningType = provisioningType;
+            this.cataloguePriceType = cataloguePriceType;
+            this.currencyCode = currencyCode;
+            this.timeUnit = timeUnit;
+            this.pricingUnitTierName = pricingUnitTierName;
+            this.pricingUnitName = pricingUnitName;
+            this.pricingUnitDescription = pricingUnitDescription;
+            this.price = price;
+            this.created = created;
+            this.lastUpdated = lastUpdated;
         }
 
         private OrderItemEntityBuilder() : this(
             "C10000-001",
             "ODS1",
             "100001-001",
+            null,
             CatalogueItemType.Solution,
             Guid.NewGuid().ToString(),
             DateTime.UtcNow.Date,
@@ -100,6 +104,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
                 orderItemEntity.OrderId,
                 orderItemEntity.OdsCode,
                 orderItemEntity.CatalogueItemId,
+                orderItemEntity.ParentCatalogueItemId,
                 orderItemEntity.CatalogueItemType,
                 orderItemEntity.CatalogueItemName,
                 orderItemEntity.DeliveryDate,
@@ -116,112 +121,118 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
                 orderItemEntity.Created,
                 orderItemEntity.LastUpdated);
         }
-        
-        public OrderItemEntityBuilder WithOrderItemId(int orderItemId)
+
+        public OrderItemEntityBuilder WithOrderItemId(int id)
         {
-            _orderItemId = orderItemId;
+            orderItemId = id;
             return this;
         }
 
-        public OrderItemEntityBuilder WithOrderId(string orderId)
+        public OrderItemEntityBuilder WithOrderId(string id)
         {
-            _orderId = orderId;
+            orderId = id;
             return this;
         }
 
-        public OrderItemEntityBuilder WithOdsCode(string odsCode)
+        public OrderItemEntityBuilder WithOdsCode(string code)
         {
-            _odsCode = odsCode;
+            odsCode = code;
             return this;
         }
 
-        public OrderItemEntityBuilder WithCatalogueItemId(string catalogueItemId)
+        public OrderItemEntityBuilder WithCatalogueItemId(string id)
         {
-            _catalogueItemId = catalogueItemId;
+            catalogueItemId = id;
             return this;
         }
 
-        public OrderItemEntityBuilder WithCatalogueItemType(CatalogueItemType catalogueItemType)
+        public OrderItemEntityBuilder WithParentCatalogueItemId(string id)
         {
-            _catalogueItemType = catalogueItemType;
+            parentCatalogueItemId = id;
             return this;
         }
 
-        public OrderItemEntityBuilder WithCatalogueItemName(string catalogueItemName)
+        public OrderItemEntityBuilder WithCatalogueItemType(CatalogueItemType type)
         {
-            _catalogueItemName = catalogueItemName;
+            catalogueItemType = type;
             return this;
         }
 
-        public OrderItemEntityBuilder WithDeliveryDate(DateTime? deliveryDate)
+        public OrderItemEntityBuilder WithCatalogueItemName(string name)
         {
-            _deliveryDate = deliveryDate?.Date;
+            catalogueItemName = name;
             return this;
         }
 
-        public OrderItemEntityBuilder WithQuantity(int quantity)
+        public OrderItemEntityBuilder WithDeliveryDate(DateTime? date)
         {
-            _quantity = quantity;
+            deliveryDate = date?.Date;
             return this;
         }
 
-        public OrderItemEntityBuilder WithEstimationPeriod(TimeUnit? estimationPeriod)
+        public OrderItemEntityBuilder WithQuantity(int number)
         {
-            _estimationPeriod = estimationPeriod;
+            quantity = number;
             return this;
         }
 
-        public OrderItemEntityBuilder WithProvisioningType(ProvisioningType provisioningType)
+        public OrderItemEntityBuilder WithEstimationPeriod(TimeUnit? period)
         {
-            _provisioningType = provisioningType;
+            estimationPeriod = period;
             return this;
         }
 
-        public OrderItemEntityBuilder WithCataloguePriceType(CataloguePriceType cataloguePriceType)
+        public OrderItemEntityBuilder WithProvisioningType(ProvisioningType type)
         {
-            _cataloguePriceType = cataloguePriceType;
+            provisioningType = type;
             return this;
         }
 
-        public OrderItemEntityBuilder WithCurrencyCode(string currencyCode)
+        public OrderItemEntityBuilder WithCataloguePriceType(CataloguePriceType type)
         {
-            _currencyCode = currencyCode;
+            cataloguePriceType = type;
             return this;
         }
 
-        public OrderItemEntityBuilder WithTimeUnit(TimeUnit? timeUnit)
+        public OrderItemEntityBuilder WithCurrencyCode(string code)
         {
-            _timeUnit = timeUnit;
+            currencyCode = code;
             return this;
         }
 
-        public OrderItemEntityBuilder WithPricingUnitTierName(string pricingUnitTierName)
+        public OrderItemEntityBuilder WithTimeUnit(TimeUnit? unit)
         {
-            _pricingUnitTierName = pricingUnitTierName;
+            timeUnit = unit;
             return this;
         }
 
-        public OrderItemEntityBuilder WithPricingUnitName(string pricingUnitName)
+        public OrderItemEntityBuilder WithPricingUnitTierName(string tierName)
         {
-            _pricingUnitName = pricingUnitName;
+            pricingUnitTierName = tierName;
             return this;
         }
 
-        public OrderItemEntityBuilder WithPricingUnitDescription(string pricingUnitDescription)
+        public OrderItemEntityBuilder WithPricingUnitName(string name)
         {
-            _pricingUnitDescription = pricingUnitDescription;
+            pricingUnitName = name;
             return this;
         }
 
-        public OrderItemEntityBuilder WithPrice(decimal? price)
+        public OrderItemEntityBuilder WithPricingUnitDescription(string description)
         {
-            _price = price;
+            pricingUnitDescription = description;
             return this;
         }
 
-        public OrderItemEntityBuilder WithCreated(DateTime created)
+        public OrderItemEntityBuilder WithPrice(decimal? cost)
         {
-            _created = created;
+            price = cost;
+            return this;
+        }
+
+        public OrderItemEntityBuilder WithCreated(DateTime dateCreated)
+        {
+            created = dateCreated;
             return this;
         }
 
@@ -229,25 +240,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
         {
             return new OrderItemEntity
             {
-                OrderItemId = _orderItemId,
-                OrderId = _orderId,
-                OdsCode = _odsCode,
-                CatalogueItemId = _catalogueItemId,
-                CatalogueItemType = _catalogueItemType,
-                CatalogueItemName = _catalogueItemName,
-                DeliveryDate = _deliveryDate,
-                Quantity = _quantity,
-                EstimationPeriod = _estimationPeriod,
-                ProvisioningType = _provisioningType,
-                CataloguePriceType = _cataloguePriceType,
-                CurrencyCode = _currencyCode,
-                TimeUnit = _timeUnit,
-                PricingUnitTierName = _pricingUnitTierName,
-                PricingUnitName = _pricingUnitName,
-                PricingUnitDescription = _pricingUnitDescription,
-                Price = _price,
-                Created = _created,
-                LastUpdated = _lastUpdated
+                OrderItemId = orderItemId,
+                OrderId = orderId,
+                OdsCode = odsCode,
+                CatalogueItemId = catalogueItemId,
+                ParentCatalogueItemId = parentCatalogueItemId,
+                CatalogueItemType = catalogueItemType,
+                CatalogueItemName = catalogueItemName,
+                DeliveryDate = deliveryDate,
+                Quantity = quantity,
+                EstimationPeriod = estimationPeriod,
+                ProvisioningType = provisioningType,
+                CataloguePriceType = cataloguePriceType,
+                CurrencyCode = currencyCode,
+                TimeUnit = timeUnit,
+                PricingUnitTierName = pricingUnitTierName,
+                PricingUnitName = pricingUnitName,
+                PricingUnitDescription = pricingUnitDescription,
+                Price = price,
+                Created = created,
+                LastUpdated = lastUpdated,
             };
         }
     }

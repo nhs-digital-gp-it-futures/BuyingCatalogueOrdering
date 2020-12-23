@@ -57,63 +57,80 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public static async Task ListAsync_CatalogueItemTypeIsInvalid_ReturnsEmptyList()
+        [OrderingAutoData]
+        public static async Task ListAsync_CatalogueItemTypeIsInvalid_ReturnsEmptyList(
+            [Frozen] Order order,
+            [Frozen] Mock<IOrderRepository> repository,
+            OrderItemsController controller)
         {
-            var context = OrderItemsControllerTestContext.Setup();
+            const string orderId = "myOrder";
 
-            var response = await context.OrderItemsController.ListAsync("myOrder", "INVALID");
+            repository.Setup(r => r.GetOrderByIdAsync(orderId, It.IsAny<Action<IOrderQuery>>()))
+                .ReturnsAsync(order);
+
+            var response = await controller.ListAsync(orderId, "INVALID");
             response.Value.Should().BeEmpty();
         }
 
         [Test]
-        public static async Task ListAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
+        [OrderingAutoData]
+        public static async Task ListAsync_InvalidPrimaryOrganisationId_ReturnsForbid(
+            Order order,
+            [Frozen] Mock<IOrderRepository> repository,
+            OrderItemsController controller)
         {
-            var context = OrderItemsControllerTestContext.Setup();
-            context.Order = OrderBuilder
-                .Create()
-                .WithOrganisationId(Guid.NewGuid())
-                .Build();
+            const string orderId = "myOrder";
 
-            var result = await context.OrderItemsController.ListAsync("myOrder", null);
+            repository.Setup(r => r.GetOrderByIdAsync(orderId, It.IsAny<Action<IOrderQuery>>()))
+                .ReturnsAsync(order);
+
+            var result = await controller.ListAsync(orderId, null);
 
             result.Result.Should().BeOfType<ForbidResult>();
         }
 
-        [TestCase(null)]
-        [TestCase("Solution")]
-        [TestCase("AdditionalService")]
-        [TestCase("AssociatedService")] // ReSharper disable StringLiteralTypo
-        [TestCase("SOLutiON")]
-        [TestCase("ADDitIONalServiCE")]
-        [TestCase("associatedSERVICe")] // ReSharper restore StringLiteralTypo
-        public static async Task ListAsync_OrderExistsWithFilter_ReturnsListOfOrderItems(string catalogueItemTypeFilter)
+        [Test]
+        [OrderingInlineAutoData(null)]
+        [OrderingInlineAutoData("Solution")]
+        [OrderingInlineAutoData("AdditionalService")]
+        [OrderingInlineAutoData("AssociatedService")] // ReSharper disable StringLiteralTypo
+        [OrderingInlineAutoData("SOLutiON")]
+        [OrderingInlineAutoData("ADDitIONalServiCE")]
+        [OrderingInlineAutoData("associatedSERVICe")] // ReSharper restore StringLiteralTypo
+        public static async Task ListAsync_OrderExistsWithFilter_ReturnsListOfOrderItems(
+            string catalogueItemTypeFilter,
+            [Frozen] Order order,
+            [Frozen] Mock<IOrderRepository> repository,
+            OrderItemsController controller)
         {
-            var context = OrderItemsControllerTestContext.Setup();
-
             var serviceRecipients = new List<OdsOrganisation>
             {
                 new OdsOrganisation("eu", "EU test"),
                 new OdsOrganisation("auz", null),
             };
 
-            context.Order.SetServiceRecipients(serviceRecipients, Guid.Empty, String.Empty);
+            order.SetServiceRecipients(serviceRecipients, Guid.Empty, string.Empty);
 
             var solutionOrderItem1 = CreateOrderItem(CatalogueItemType.Solution, serviceRecipients[0].Code, 1, new DateTime(2020, 04, 13));
             var solutionOrderItem2 = CreateOrderItem(CatalogueItemType.Solution, serviceRecipients[1].Code, 2, new DateTime(2020, 04, 12));
             var additionalServiceOrderItem1 = CreateOrderItem(CatalogueItemType.AdditionalService, serviceRecipients[1].Code, 3, new DateTime(2020, 05, 13));
             var associatedServiceOrderItem1 = CreateOrderItem(CatalogueItemType.AssociatedService, serviceRecipients[0].Code, 4, new DateTime(2020, 05, 11));
 
-            context.Order.AddOrderItem(solutionOrderItem1, Guid.Empty, string.Empty);
-            context.Order.AddOrderItem(solutionOrderItem2, Guid.Empty, string.Empty);
-            context.Order.AddOrderItem(additionalServiceOrderItem1, Guid.Empty, string.Empty);
-            context.Order.AddOrderItem(associatedServiceOrderItem1, Guid.Empty, string.Empty);
+            order.AddOrderItem(solutionOrderItem1, Guid.Empty, string.Empty);
+            order.AddOrderItem(solutionOrderItem2, Guid.Empty, string.Empty);
+            order.AddOrderItem(additionalServiceOrderItem1, Guid.Empty, string.Empty);
+            order.AddOrderItem(associatedServiceOrderItem1, Guid.Empty, string.Empty);
 
             const string orderId = "myOrder";
-            var result = await context.OrderItemsController.ListAsync(orderId, catalogueItemTypeFilter);
+
+            repository.Setup(r => r.GetOrderByIdAsync(orderId, It.IsAny<Action<IOrderQuery>>()))
+                .ReturnsAsync(order);
+
+            var result = await controller.ListAsync(orderId, catalogueItemTypeFilter);
+
             result.Value.Should().BeOfType<List<GetOrderItemModel>>();
 
-            var expectedOrderItems =
-                CreateOrderItemModels(
+            var expectedOrderItems = CreateOrderItemModels(
                     new List<OrderItem>
                     {
                         solutionOrderItem1,
@@ -122,7 +139,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         associatedServiceOrderItem1,
                     },
                     catalogueItemTypeFilter,
-                    context.Order.ServiceRecipients);
+                    order.ServiceRecipients);
 
             result.Value.Should().BeEquivalentTo(expectedOrderItems, options => options.WithStrictOrdering());
         }

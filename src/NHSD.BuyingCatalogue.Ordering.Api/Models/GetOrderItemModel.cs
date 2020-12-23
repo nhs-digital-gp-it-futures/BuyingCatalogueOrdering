@@ -25,7 +25,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
             ItemUnit = new ItemUnitModel
             {
                 Name = orderItem.CataloguePriceUnit.Name,
-                Description = orderItem.CataloguePriceUnit.Description
+                Description = orderItem.CataloguePriceUnit.Description,
             };
             Price = orderItem.Price;
             ProvisioningType = orderItem.ProvisioningType.ToString();
@@ -35,32 +35,43 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
             EstimationPeriod = orderItem.EstimationPeriod?.Name();
         }
 
-        public int OrderItemId { get; set; }
+        public GetOrderItemModel(
+            OrderItem orderItem,
+            ServiceRecipient serviceRecipient,
+            string serviceInstanceId)
+            : this(orderItem, serviceRecipient)
+        {
+            ServiceInstanceId = serviceInstanceId;
+        }
 
-        public string CatalogueItemId { get; set; }
+        public int OrderItemId { get; }
 
-        public string CatalogueItemType { get; set; }
+        public string CatalogueItemId { get; }
 
-        public string CatalogueItemName { get; set; }
+        public string CatalogueItemType { get; }
 
-        public string CurrencyCode { get; set; }
+        public string CatalogueItemName { get; }
 
-        public DateTime? DeliveryDate { get; set; }
+        public string CurrencyCode { get; }
 
-        public ItemUnitModel ItemUnit { get; set; }
+        public DateTime? DeliveryDate { get; }
 
-        public decimal? Price { get; set; }
+        public ItemUnitModel ItemUnit { get; }
 
-        public string ProvisioningType { get; set; }
+        public decimal? Price { get; }
 
-        public int Quantity { get; set; }
+        public string ProvisioningType { get; }
 
-        public ServiceRecipientModel ServiceRecipient { get; set; }
+        public int Quantity { get; }
 
-        public TimeUnitModel TimeUnit { get; set; }
+        public ServiceRecipientModel ServiceRecipient { get; }
 
-        public string Type { get; set; }
+        public string ServiceInstanceId { get; }
 
-        public string EstimationPeriod { get; set; }
+        public TimeUnitModel TimeUnit { get; }
+
+        public string Type { get; }
+
+        public string EstimationPeriod { get; }
     }
 }
