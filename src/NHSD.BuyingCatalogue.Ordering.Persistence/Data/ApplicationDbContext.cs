@@ -31,6 +31,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
             modelBuilder.ApplyConfiguration(new OrderItemEntityTypeConfiguration());
             modelBuilder.ApplyConfiguration(new ServiceRecipientConfiguration());
             modelBuilder.ApplyConfiguration(new DefaultDeliveryDateEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new ServiceInstanceItemEntityTypeConfiguration());
         }
     }
 }

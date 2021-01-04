@@ -14,6 +14,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 
         public string CatalogueItemId { get; set; }
 
+        public string ParentCatalogueItemId { get; set; }
+
         public CatalogueItemType CatalogueItemType { get; set; }
 
         public string CatalogueItemName { get; set; }
@@ -51,6 +53,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
             (
                 OrderId,
                 CatalogueItemId,
+                ParentCatalogueItemId,
                 CatalogueItemTypeId,
                 CatalogueItemName,
                 OdsCode,
@@ -72,6 +75,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
             (
                 @OrderId,
                 @CatalogueItemId,
+                @ParentCatalogueItemId,
                 @CatalogueItemType,
                 @CatalogueItemName,
                 @OdsCode,
@@ -94,33 +98,34 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
         public static async Task<IEnumerable<OrderItemEntity>> FetchAllAsync(string connectionString)
         {
             return await SqlRunner.QueryAsync<OrderItemEntity>(connectionString, @"
-                SELECT  OrderItemId,
-                        OrderId,
-                        CatalogueItemId,
-                        CatalogueItemTypeId AS CatalogueItemType,
-                        CatalogueItemName,
-                        OdsCode,
-                        ProvisioningTypeId AS ProvisioningType,
-                        CataloguePriceTypeId AS CataloguePriceType,
-                        PricingUnitTierName,
-                        PricingUnitName,
-                        PricingUnitDescription,
-                        TimeUnitId AS TimeUnit,
-                        CurrencyCode,
-                        Quantity,
-                        EstimationPeriodId AS EstimationPeriod,
-                        DeliveryDate,
-                        Price,
-                        Created,
-                        LastUpdated
-                FROM    dbo.OrderItem;");
+                SELECT OrderItemId,
+                       OrderId,
+                       CatalogueItemId,
+                       ParentCatalogueItemId,
+                       CatalogueItemTypeId AS CatalogueItemType,
+                       CatalogueItemName,
+                       OdsCode,
+                       ProvisioningTypeId AS ProvisioningType,
+                       CataloguePriceTypeId AS CataloguePriceType,
+                       PricingUnitTierName,
+                       PricingUnitName,
+                       PricingUnitDescription,
+                       TimeUnitId AS TimeUnit,
+                       CurrencyCode,
+                       Quantity,
+                       EstimationPeriodId AS EstimationPeriod,
+                       DeliveryDate,
+                       Price,
+                       Created,
+                       LastUpdated
+                  FROM dbo.OrderItem;");
         }
 
-        public static async Task<OrderItemEntity> FetchByOrderItemId(string connectionString, int orderItemId) => 
+        public static async Task<OrderItemEntity> FetchByOrderItemId(string connectionString, int orderItemId) =>
             (await FetchAllAsync(connectionString)).Single(item => orderItemId == item.OrderItemId);
 
-        public static async Task<OrderItemEntity> FetchByCatalogueItemName(string connectionString, string catalogueItemName) => 
-            (await FetchAllAsync(connectionString)).Single(item => 
+        public static async Task<OrderItemEntity> FetchByCatalogueItemName(string connectionString, string catalogueItemName) =>
+            (await FetchAllAsync(connectionString)).Single(item =>
                 string.Equals(catalogueItemName, item.CatalogueItemName, StringComparison.OrdinalIgnoreCase));
     }
 }
