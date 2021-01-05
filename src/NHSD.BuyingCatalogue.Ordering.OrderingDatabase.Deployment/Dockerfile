@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1 AS dacpacbuild
+FROM mcr.microsoft.com/dotnet/sdk:latest AS dacpacbuild
 WORKDIR ~/dacpac
 COPY src/NHSD.BuyingCatalogue.Ordering.OrderingDatabase.Deployment/*.csproj .
 COPY src/NHSD.BuyingCatalogue.Ordering.OrderingDatabase .

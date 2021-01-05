@@ -2,8 +2,8 @@
 {
     public enum CataloguePriceType
     {
+        Invalid = 0,
         Flat = 1,
         Tiered = 2,
-        Invalid = 3
     }
 }

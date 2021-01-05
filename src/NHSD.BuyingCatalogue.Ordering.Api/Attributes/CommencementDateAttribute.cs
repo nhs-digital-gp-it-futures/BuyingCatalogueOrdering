@@ -3,17 +3,17 @@ using System.ComponentModel.DataAnnotations;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Attributes
 {
-    public class CommencementDateAttribute : ValidationAttribute
+    public sealed class CommencementDateAttribute : ValidationAttribute
     {
-        private readonly int _days;
-
         public CommencementDateAttribute(int days = -60)
         {
-            _days = days;
+            Days = days;
         }
 
+        public int Days { get; }
+
         protected override ValidationResult IsValid(
-            object value,
+                    object value,
             ValidationContext validationContext)
         {
             if (validationContext is null)
@@ -28,7 +28,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Attributes
 
             var commencementDate = (DateTime)value;
 
-            if (commencementDate.ToUniversalTime() <= DateTime.UtcNow.AddDays(_days))
+            if (commencementDate.ToUniversalTime() <= DateTime.UtcNow.AddDays(Days))
             {
                 return new ValidationResult(ErrorMessage);
             }

@@ -96,15 +96,15 @@ spec:
             {{- if .Values.purchasing }}
             {{- with .Values.purchasing.emailMessage }}
             {{- if .senderName }}
-            - name: PURCHASING__EMAILMESSAGE__SENDER__NAME
+            - name: PURCHASING__EMAILMESSAGE__MESSAGE__SENDER__DISPLAYNAME
               value: {{ .senderName | quote }}
             {{- end }}
             {{- if .senderAddress }}
-            - name: PURCHASING__EMAILMESSAGE__SENDER__ADDRESS
+            - name: PURCHASING__EMAILMESSAGE__MESSAGE__SENDER__ADDRESS
               value: {{ .senderAddress | quote }}
             {{- end }}
             {{- if .recipientName }}
-            - name: PURCHASING__EMAILMESSAGE__RECIPIENT__NAME
+            - name: PURCHASING__EMAILMESSAGE__RECIPIENT__DISPLAYNAME
               value: {{ .recipientName | quote }}
             {{- end }}
             {{- if .recipientAddress }}
@@ -112,15 +112,15 @@ spec:
               value: {{ .recipientAddress | quote }}
             {{- end }}
             {{- if .subject }}
-            - name: PURCHASING__EMAILMESSAGE__SUBJECT
+            - name: PURCHASING__EMAILMESSAGE__MESSAGE__SUBJECT
               value: {{ .subject | quote }}
             {{- end }}
             {{- if .htmlBody }}
-            - name: PURCHASING__EMAILMESSAGE__HTMLBODY
+            - name: PURCHASING__EMAILMESSAGE__MESSAGE__HTMLCONTENT
               value: {{ .htmlBody | quote }}
             {{- end }}
             {{- if .textBody }}
-            - name: PURCHASING__EMAILMESSAGE__TEXTBODY
+            - name: PURCHASING__EMAILMESSAGE__MESSAGE__PLAINTEXTCONTENT
               value: {{ .textBody | quote }}
             {{- end }}                              
             {{- end }} #email Message 

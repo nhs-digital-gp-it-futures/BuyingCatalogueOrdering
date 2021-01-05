@@ -36,7 +36,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 .WithIdentityService(hasIdentityService ? Mock.Of<IIdentityService>() : null)
                 .WithOrderRepository(hasOrderRepository ? Mock.Of<IOrderRepository>() : null)
                 .WithEmailService(hasEmailService ? Mock.Of<IEmailService>() : null)
-                .WithPurchasingSettings(hasPurchasingSettings ? Mock.Of<PurchasingSettings>() : null);
+                .WithPurchasingSettings(hasPurchasingSettings ? new PurchasingSettings() : null);
 
             Assert.Throws<ArgumentNullException>(() => builder.Build());
         }
@@ -112,7 +112,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
 
             context.OrderRepositoryMock.Verify(orderRepository =>
-                orderRepository.UpdateOrderAsync(It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))), Times.Once);
+                orderRepository.UpdateOrderAsync(It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))));
         }
 
         [Test]
@@ -126,15 +126,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public static async Task CompleteAsync_EmailServiceSubjectIsSet_SubjectNameIsChanged()
+        public static async Task CompleteAsync_EmailServiceSubjectIsSet_SubjectIsChanged()
         {
+            EmailMessage sentMessage = null;
+
             var context = CompleteOrderServiceTestContext.Setup();
+            context.EmailServiceMock.Setup(s => s.SendEmailAsync(It.IsAny<EmailMessage>()))
+                .Callback<EmailMessage>(m => sentMessage = m);
 
             await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
 
             var order = context.CompleteOrderRequest.Order;
-            context.PurchasingSettings.EmailMessage.Subject.Should()
-                .BeEquivalentTo($"New Order {order.OrderId}_{order.OrganisationOdsCode}");
+            sentMessage.Subject.Should().BeEquivalentTo($"New Order {order.OrderId}_{order.OrganisationOdsCode}");
         }
 
         [Test]
@@ -144,8 +147,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
 
-            context.EmailServiceMock.Verify(emailService =>
-                emailService.SendEmailAsync(context.PurchasingSettings.EmailMessage), Times.Once);
+            context.EmailServiceMock.Verify(emailService => emailService.SendEmailAsync(It.IsNotNull<EmailMessage>()));
         }
 
         [Test]
@@ -157,7 +159,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             context.CreatePurchaseDocumentServiceMock.Verify(purchasingDocumentService =>
                 purchasingDocumentService.CreatePatientNumbersCsvAsync(It.IsAny<Stream>(),
-                    It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))), Times.Once);
+                    It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))));
         }
 
         [TestCase(false, false, false)]
@@ -167,7 +169,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [TestCase(true, false, true)]
         [TestCase(true, true, false)]
         [TestCase(false, true, true)]
-        public static async Task CompleteAsync_RequirementsAreIncorrect_CreatePatientNumbersCsvNotCalled(bool fundingSource, bool isPatient, bool isSolution)
+        public static async Task CompleteAsync_RequirementsAreIncorrect_CreatePatientNumbersCsvNotCalled(
+            bool fundingSource,
+            bool isPatient,
+            bool isSolution)
         {
             var context = CompleteOrderServiceTestContext.Setup(fundingSource, isPatient, isSolution);
 
@@ -181,7 +186,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [TestCase(false, false)]
         [TestCase(false, true)]
         [TestCase(true, false)]
-        public static async Task CompleteAsync_RequirementsAreCorrect_CreatePriceTypeCsvCalled(bool isPatient, bool isSolution)
+        public static async Task CompleteAsync_RequirementsAreCorrect_CreatePriceTypeCsvCalled(
+            bool isPatient,
+            bool isSolution)
         {
             var context = CompleteOrderServiceTestContext.Setup(true, isPatient, isSolution);
 
@@ -210,7 +217,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             {
                 UserId = Guid.NewGuid();
                 UserName = $"Username {Guid.NewGuid()}";
-                PurchasingSettings = new PurchasingSettings { EmailMessage = new EmailMessage() };
+                PurchasingSettings = new PurchasingSettings
+                {
+                    EmailMessage = new PurchasingEmailSettings
+                    {
+                        Message = new EmailMessageTemplate
+                        {
+                            Sender = new EmailAddressTemplate("dandelion@catalogue.test"),
+                        },
+                        Recipient = new EmailAddressTemplate("dainty@catalogue.test"),
+                    },
+                };
+
                 CompleteOrderRequest = new CompleteOrderRequest(
                     OrderBuilder
                         .Create()
@@ -270,9 +288,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             internal CompleteOrderRequest CompleteOrderRequest { get; }
 
-            public static CompleteOrderServiceTestContext Setup(bool fundingSource = true, bool isPatient = true, bool isSolution = true)
+            public static CompleteOrderServiceTestContext Setup(
+                bool fundingSource = true,
+                bool isPatient = true,
+                bool isSolution = true)
             {
-                return new CompleteOrderServiceTestContext(fundingSource, isPatient, isSolution);
+                return new(fundingSource, isPatient, isSolution);
             }
         }
     }

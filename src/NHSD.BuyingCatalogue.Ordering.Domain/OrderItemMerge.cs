@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class OrderItemMerge
     {
-        private readonly HashSet<CatalogueItemType> catalogueItemTypes = new HashSet<CatalogueItemType>();
-        private readonly List<OrderItem> newItems = new List<OrderItem>();
-        private readonly Dictionary<int, OrderItem> updatedItems = new Dictionary<int, OrderItem>();
+        private readonly HashSet<CatalogueItemType> catalogueItemTypes = new();
+        private readonly List<OrderItem> newItems = new();
+        private readonly Dictionary<int, OrderItem> updatedItems = new();
 
+        [SuppressMessage(
+            "Maintainability",
+            "CA1508:Avoid dead conditional code",
+            Justification = "string.IsNullOrWhiteSpace(userName) is true for white space")]
         public OrderItemMerge(Guid userId, string userName)
         {
             if (userName is null)

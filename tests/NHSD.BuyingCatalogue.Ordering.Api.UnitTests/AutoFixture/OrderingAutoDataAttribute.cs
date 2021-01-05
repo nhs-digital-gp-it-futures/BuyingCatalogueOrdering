@@ -13,6 +13,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
         public OrderingAutoDataAttribute(string userId, string userName)
             : base(() => OrderingFixtureFactory.Create(Guid.Parse(userId), userName))
         {
+            UserId = userId;
+            UserName = userName;
         }
+
+        public string UserId { get; }
+
+        public string UserName { get; }
     }
 }

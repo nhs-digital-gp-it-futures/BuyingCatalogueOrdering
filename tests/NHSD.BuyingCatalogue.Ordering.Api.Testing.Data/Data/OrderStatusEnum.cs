@@ -2,7 +2,8 @@
 {
     public enum OrderStatus
     {
+        Invalid = 0,
         Complete = 1,
-        Incomplete = 2
+        Incomplete = 2,
     }
 }

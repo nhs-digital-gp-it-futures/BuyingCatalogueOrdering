@@ -76,20 +76,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             return Result.Success(orderItem.OrderItemId);
         }
 
-        public async Task<AggregateValidationResult> CreateAsync(Order order, IReadOnlyList<CreateOrderItemRequest> requests)
+        public async Task<AggregateValidationResult> CreateAsync(Order order, IReadOnlyList<CreateOrderItemRequest> model)
         {
             if (order is null)
                 throw new ArgumentNullException(nameof(order));
 
-            if (requests is null)
-                throw new ArgumentNullException(nameof(requests));
+            if (model is null)
+                throw new ArgumentNullException(nameof(model));
 
-            var aggregateValidationResult = orderItemValidator.Validate(requests, order.OrderItems);
+            var aggregateValidationResult = orderItemValidator.Validate(model, order.OrderItems);
             if (!aggregateValidationResult.Success)
                 return aggregateValidationResult;
 
-            order.MergeOrderItems(CreateOrderItemMerge(requests));
-            await UpdateServiceRecipients(order.OrderId, requests);
+            order.MergeOrderItems(CreateOrderItemMerge(model));
+            await UpdateServiceRecipients(order.OrderId, model);
             await orderRepository.UpdateOrderAsync(order);
 
             return aggregateValidationResult;
