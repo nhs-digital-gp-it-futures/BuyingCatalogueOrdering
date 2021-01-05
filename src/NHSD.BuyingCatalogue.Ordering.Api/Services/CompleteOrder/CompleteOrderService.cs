@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -56,13 +57,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
             await createPurchasingDocumentService.CreateCsvAsync(priceTypeStream, order);
             priceTypeStream.Position = 0;
 
-            var emailMessage = purchasingSettings.EmailMessage;
             var callOffAgreementId = order.OrderId;
             var orderingPartyId = order.OrganisationOdsCode;
 
-            emailMessage.Subject = $"New Order {callOffAgreementId}_{orderingPartyId}";
+            var messageTemplate = purchasingSettings.EmailMessage.Message with
+            {
+                Subject = $"New Order {callOffAgreementId}_{orderingPartyId}",
+            };
 
-            emailMessage.Attachments.Add(new EmailAttachment($"{callOffAgreementId}_{orderingPartyId}_Full.csv", priceTypeStream));
+            var attachments = new List<EmailAttachment>(2)
+            {
+                new($"{callOffAgreementId}_{orderingPartyId}_Full.csv", priceTypeStream),
+            };
 
             var patientNumbers = order.OrderItems.Where(x =>
                 x.ProvisioningType.Equals(ProvisioningType.Patient) &&
@@ -73,10 +79,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
                 await createPurchasingDocumentService.CreatePatientNumbersCsvAsync(patientNumbersStream, order);
                 patientNumbersStream.Position = 0;
 
-                emailMessage.Attachments.Add(new EmailAttachment($"{callOffAgreementId}_{orderingPartyId}_Patients.csv", patientNumbersStream));
+                attachments.Add(new EmailAttachment($"{callOffAgreementId}_{orderingPartyId}_Patients.csv", patientNumbersStream));
             }
 
-            await emailService.SendEmailAsync(emailMessage);
+            var message = new EmailMessage(
+                messageTemplate,
+                new[] { new EmailAddress(purchasingSettings.EmailMessage.Recipient) },
+                attachments);
+
+            await emailService.SendEmailAsync(message);
 
             return Result.Success();
         }

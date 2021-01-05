@@ -37,8 +37,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
             {
                 itemUnit = new
                 {
-                    Name = itemUnitToken?.Value<string>("name"),
-                    Description = itemUnitToken?.Value<string>("description")
+                    Name = itemUnitToken.Value<string>("name"),
+                    Description = itemUnitToken.Value<string>("description"),
                 };
             }
 
@@ -65,8 +65,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
             {
                 timeUnit = new
                 {
-                    Name = timeUnitToken?.Value<string>("name"),
-                    Description = timeUnitToken?.Value<string>("description")
+                    Name = timeUnitToken.Value<string>("name"),
+                    Description = timeUnitToken.Value<string>("description"),
                 };
             }
 
@@ -82,8 +82,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
             {
                 serviceRecipient = new
                 {
-                    OdsCode = serviceRecipientToken?.Value<string>("odsCode"),
-                    Name = serviceRecipientToken?.Value<string>("name"),
+                    OdsCode = serviceRecipientToken.Value<string>("odsCode"),
+                    Name = serviceRecipientToken.Value<string>("name"),
                 };
             }
 
@@ -114,14 +114,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 ServiceRecipient = new
                 {
                     orderItemEntity.OdsCode, 
-                    serviceRecipient.Name
+                    serviceRecipient.Name,
                 },
                 TimeUnit = orderItemEntity.TimeUnit is null ? null : new
                 {
-                    Name = orderItemEntity.TimeUnit?.ToString().ToLower(),
-                    Description = orderItemEntity.TimeUnit?.ToDescription()
+                    Name = orderItemEntity.TimeUnit.ToString().ToLower(),
+                    Description = orderItemEntity.TimeUnit?.ToDescription(),
                 },
-                Type = orderItemEntity.CataloguePriceType
+                Type = orderItemEntity.CataloguePriceType,
             };
         }
     }

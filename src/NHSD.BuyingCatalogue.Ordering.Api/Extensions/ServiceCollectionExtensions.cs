@@ -2,7 +2,7 @@
 using HealthChecks.Network.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using NHSD.BuyingCatalogue.EmailClient;
+using NHSD.BuyingCatalogue.EmailClient.Configuration;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
@@ -10,8 +10,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
     public static class ServiceCollectionExtensions
     {
         public static IServiceCollection RegisterHealthChecks(
-            this IServiceCollection services, 
-            string connectionString, 
+            this IServiceCollection services,
+            string connectionString,
             SmtpSettings smtpSettings)
         {
             if (connectionString is null)

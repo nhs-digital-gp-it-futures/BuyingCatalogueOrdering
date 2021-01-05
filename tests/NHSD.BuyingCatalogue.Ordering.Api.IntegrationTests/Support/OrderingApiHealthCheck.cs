@@ -10,11 +10,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
     {
         internal async Task AwaitApiRunningAsync(Settings settings)
         {
-            var _baseUrl = settings.OrderingApiBaseUrl;
+            var baseUrl = settings.OrderingApiBaseUrl;
             TimeSpan testTimeOut = TimeSpan.FromSeconds(settings.OrderingApiHealthCheckTimeout);
 
-            await AwaitApiRunningAsync(($"{_baseUrl}/health/live"), testTimeOut);
-            await AwaitApiRunningAsync(($"{_baseUrl}/health/ready"), testTimeOut);
+            await AwaitApiRunningAsync(($"{baseUrl}/health/live"), testTimeOut);
+            await AwaitApiRunningAsync(($"{baseUrl}/health/ready"), testTimeOut);
         }
 
         internal async Task AwaitApiRunningAsync(string url, TimeSpan testTimeOut)
@@ -22,7 +22,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
             var started = await HttpClientAwaiter.WaitForGetAsync(url, testTimeOut);
             if (!started)
             {
-                throw new Exception($"Start Ordering API failed, could not get a successful health status from '{url}' after trying for '{testTimeOut}'");
+                throw new TimeoutException($"Start Ordering API failed, could not get a successful health status from '{url}' after trying for '{testTimeOut}'");
             }
         }
     }

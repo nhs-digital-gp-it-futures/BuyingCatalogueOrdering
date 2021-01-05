@@ -2,7 +2,7 @@ variables:
   - name: dockerVersion
     value: '19.03.5'
   - name: dotnetVersion
-    value: '3.x'
+    value: '5.0.x'
   - name: MSBUILDSINGLELOADCONTEXT
     value: '1'
   - group: dev-acr-secrets
@@ -22,7 +22,7 @@ jobs:
   - task: UseGitVersion@5
     displayName: gitversion
     inputs:
-      versionSpec: '5.0.1'
+      versionSpec: '5.x'
   - script: echo "##vso[task.setvariable variable=semVer;isOutput=true]$(GitVersion.SemVer)"
     name: setVersionStep
   - script: echo semVer $(setVersionStep.semVer)
@@ -121,7 +121,7 @@ jobs:
 
   - task: DockerCompose@0
     displayName: 'Build: Dev'
-    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
+    condition: succeeded()
     inputs:
       containerregistrytype: 'Azure Container Registry'
       azureSubscription: 'NHSAPP-BuyingCatalogue (Non-Prod)'
@@ -133,7 +133,7 @@ jobs:
 
   - task: DockerCompose@0
     displayName: 'Push: Dev'
-    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
+    condition: succeeded()
     inputs:
       containerregistrytype: 'Azure Container Registry'
       azureSubscription: 'NHSAPP-BuyingCatalogue (Non-Prod)'
@@ -145,7 +145,7 @@ jobs:
 
   - task: HelmInstaller@1
     displayName: 'Install helm'
-    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
+    condition: succeeded()
     inputs:
       helmVersionToInstall: 'latest'
   - bash: |
@@ -158,7 +158,7 @@ jobs:
       done;
     failOnStderr: true
     displayName: 'Helm package'
-    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
+    condition: succeeded()
   - bash: |
       cd charts  
       for chartPackage in *.tgz; do
@@ -171,7 +171,7 @@ jobs:
     failOnStderr: false
     name: helmPush
     displayName: 'Push helm to az acr'
-    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
+    condition: succeeded()
 
   - task: DockerCompose@0
     displayName: 'Build: Test'

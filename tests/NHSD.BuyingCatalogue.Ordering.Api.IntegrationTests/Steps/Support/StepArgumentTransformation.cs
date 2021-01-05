@@ -1,4 +1,5 @@
-﻿using TechTalk.SpecFlow;
+﻿using System;
+using TechTalk.SpecFlow;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
 {
@@ -6,6 +7,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
     public sealed class StepArgumentTransformation
     {
         [StepArgumentTransformation]
-        internal static string ParseStringToNull(string nullString) => string.Equals(nullString, "NULL") ? null : nullString;
+        internal static string ParseStringToNull(string nullString) =>
+            string.Equals(nullString, "NULL", StringComparison.OrdinalIgnoreCase) ? null : nullString;
     }
 }

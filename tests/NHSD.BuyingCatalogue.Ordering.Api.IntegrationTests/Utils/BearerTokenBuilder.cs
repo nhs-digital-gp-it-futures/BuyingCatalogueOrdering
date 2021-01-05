@@ -10,34 +10,34 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
 {
     public sealed class BearerTokenBuilder
     {
-        private X509Certificate2 _signingCertificate;
-        private string _issuer;
-        private string _audience = "Ordering";
-        private TimeSpan _life = TimeSpan.FromHours(1);
-        private DateTime _notBefore = DateTime.UtcNow;
-        private readonly List<Claim> _claims = new List<Claim>();
-        private readonly JwtSecurityTokenHandler _securityTokenHandler = new JwtSecurityTokenHandler();
+        private readonly List<Claim> claims = new();
+        private readonly JwtSecurityTokenHandler securityTokenHandler = new();
+        private X509Certificate2 signingCertificate;
+        private string issuer;
+        private string audience = "Ordering";
+        private TimeSpan life = TimeSpan.FromHours(1);
+        private DateTime notBefore = DateTime.UtcNow;
 
-        public BearerTokenBuilder IssuedBy(string issuer)
+        public BearerTokenBuilder IssuedBy(string issuedBy)
         {
-            if (string.IsNullOrEmpty(issuer))
+            if (string.IsNullOrEmpty(issuedBy))
             {
-                throw new ArgumentException("Issued by cannot be null or empty", nameof(issuer));
+                throw new ArgumentException("Issued by cannot be null or empty", nameof(issuedBy));
             }
 
-            _issuer = issuer;
+            issuer = issuedBy;
 
             return this;
         }
 
-        public BearerTokenBuilder ForAudience(string audience)
+        public BearerTokenBuilder ForAudience(string value)
         {
-            if (string.IsNullOrEmpty(audience))
+            if (string.IsNullOrEmpty(value))
             {
-                throw new ArgumentException("Audience cannot be null or empty", nameof(audience));
+                throw new ArgumentException("Audience cannot be null or empty", nameof(value));
             }
 
-            _audience = audience;
+            audience = value;
 
             return this;
         }
@@ -49,9 +49,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
                 throw new ArgumentException("Subject cannot be null or empty", nameof(subject));
             }
 
-            if (_claims.FirstOrDefault(claim => claim.Type == "sub") == null)
+            if (claims.FirstOrDefault(claim => claim.Type == "sub") == null)
             {
-                _claims.Add(new Claim("sub", subject));
+                claims.Add(new Claim("sub", subject));
             }
 
             return this;
@@ -59,9 +59,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
 
         public BearerTokenBuilder WithSigningCertificate(X509Certificate2 certificate)
         {
-            _signingCertificate = certificate ??
-                                  throw new ArgumentException("Certificate cannot be null or empty",
-                                      nameof(certificate));
+            signingCertificate = certificate ?? throw new ArgumentException(
+                "Certificate cannot be null or empty",
+                nameof(certificate));
 
             return this;
         }
@@ -73,69 +73,54 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
                 throw new ArgumentException("Claim type cannot be null or empty", nameof(claimType));
             }
 
-            if (value == null)
-            {
-                value = string.Empty;
-            }
+            value ??= string.Empty;
 
-            _claims.Add(new Claim(claimType, value));
+            claims.Add(new Claim(claimType, value));
 
             return this;
         }
 
-        public BearerTokenBuilder WithLifetime(TimeSpan life)
+        public BearerTokenBuilder WithLifetime(TimeSpan lifetime)
         {
-            if (life == null)
-            {
-                throw new ArgumentException("Lifetime cannot be null", nameof(life));
-            }
-
-            _life = life;
-
+            life = lifetime;
             return this;
         }
 
-        public BearerTokenBuilder NotBefore(DateTime notBefore)
+        public BearerTokenBuilder NotBefore(DateTime notBeforeDate)
         {
-            if (notBefore == null)
-            {
-                throw new ArgumentException("Not before cannot be null", nameof(notBefore));
-            }
-
-            _notBefore = notBefore;
-
+            notBefore = notBeforeDate;
             return this;
         }
 
         public string BuildToken()
         {
-            if (_signingCertificate == null)
+            if (signingCertificate == null)
             {
                 throw new InvalidOperationException(
                     "You must specify an X509 certificate to use for signing the JWT Token");
             }
 
             var signingCredentials =
-                new SigningCredentials(new X509SecurityKey(_signingCertificate), SecurityAlgorithms.RsaSha256);
+                new SigningCredentials(new X509SecurityKey(signingCertificate), SecurityAlgorithms.RsaSha256);
 
-            var notBefore = _notBefore;
-            var expires = notBefore.Add(_life);
+            var notBeforeDate = notBefore;
+            var expires = notBeforeDate.Add(life);
 
-            var identity = new ClaimsIdentity(_claims);
+            var identity = new ClaimsIdentity(claims);
 
             var securityTokenDescriptor = new SecurityTokenDescriptor
             {
-                Audience = _audience,
-                Issuer = _issuer,
-                NotBefore = notBefore,
+                Audience = audience,
+                Issuer = issuer,
+                NotBefore = notBeforeDate,
                 Expires = expires,
                 SigningCredentials = signingCredentials,
                 Subject = identity
             };
 
-            var token = _securityTokenHandler.CreateToken(securityTokenDescriptor);
+            var token = securityTokenHandler.CreateToken(securityTokenDescriptor);
 
-            var encodedAccessToken = _securityTokenHandler.WriteToken(token);
+            var encodedAccessToken = securityTokenHandler.WriteToken(token);
 
             return encodedAccessToken;
         }

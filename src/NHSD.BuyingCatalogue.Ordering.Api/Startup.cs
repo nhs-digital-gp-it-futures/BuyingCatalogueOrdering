@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using NHSD.BuyingCatalogue.EmailClient;
+using NHSD.BuyingCatalogue.EmailClient.Configuration;
 using NHSD.BuyingCatalogue.Ordering.Api.ActionFilters;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Logging;

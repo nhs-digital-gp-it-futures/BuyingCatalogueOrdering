@@ -718,9 +718,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             await context.OrderItemsController.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
 
-            context.UpdateOrderItemServiceMock.Verify(x =>
-                x.UpdateAsync(It.Is<UpdateOrderItemRequest>(r =>
-                        orderId.Equals(r.Order.OrderId)
+            context.UpdateOrderItemServiceMock.Verify(s =>
+                s.UpdateAsync(It.Is<UpdateOrderItemRequest>(r =>
+                        orderId.Equals(r.Order.OrderId, StringComparison.Ordinal)
                         && orderItemId.Equals(r.OrderItemId)),
                     It.IsAny<CatalogueItemType>(),
                     It.IsAny<ProvisioningType>()), Times.Once);
