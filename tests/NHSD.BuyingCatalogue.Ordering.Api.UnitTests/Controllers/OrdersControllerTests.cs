@@ -390,7 +390,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var createOrderRequest = new CreateOrderModel
             {
                 Description = "Test Order 1",
-                OrganisationId = context.PrimaryOrganisationId
+                OrganisationId = context.PrimaryOrganisationId,
             };
 
             var controller = context.OrdersController;
@@ -415,7 +415,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var createOrderModel = new CreateOrderModel
             {
                 Description = "Description1",
-                OrganisationId = context.PrimaryOrganisationId
+                OrganisationId = context.PrimaryOrganisationId,
             };
 
             await controller.CreateOrderAsync(createOrderModel);
@@ -429,7 +429,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = OrdersControllerTestContext.Setup();
             var controller = context.OrdersController;
 
-            var errors = new List<ErrorDetails> { new ErrorDetails("TestErrorId", "TestField") };
+            var errors = new List<ErrorDetails> { new("TestErrorId", "TestField") };
 
             var createOrderRequest = new CreateOrderModel
             {
@@ -445,7 +445,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var actual = response.Result;
 
             var expectedErrors =
-                new List<ErrorModel> { new ErrorModel("TestErrorId", "TestField") };
+                new List<ErrorModel> { new("TestErrorId", "TestField") };
             var expected = new BadRequestObjectResult(new ErrorResponseModel { Errors = expectedErrors });
             actual.Should().BeEquivalentTo(expected);
         }
@@ -608,7 +608,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var expected = new ErrorResponseModel
             {
-                Errors = new List<ErrorModel> { ErrorMessages.InvalidOrderStatus() }
+                Errors = new List<ErrorModel> { ErrorMessages.InvalidOrderStatus() },
             };
 
             actual.Should().BeEquivalentTo(expected);
@@ -681,7 +681,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var expected = new ErrorResponseModel
             {
-                Errors = new List<ErrorModel> { new ErrorModel(expectedErrorDetails.Id, expectedErrorDetails.Field) }
+                Errors = new List<ErrorModel> { new(expectedErrorDetails.Id, expectedErrorDetails.Field) },
             };
 
             actual.Should().BeEquivalentTo(expected);
@@ -708,12 +708,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     DateCreated = repositoryOrder.Created,
                     LastUpdated = repositoryOrder.LastUpdated,
                     LastUpdatedBy = repositoryOrder.LastUpdatedByName,
-                    OnlyGms = repositoryOrder.FundingSourceOnlyGMS
+                    OnlyGms = repositoryOrder.FundingSourceOnlyGMS,
                 });
         }
 
-        private static (Order order, OrderSummaryModel expectedSummary) CreateOrderSummaryTestData(string orderId,
-            string description, Guid organisationId)
+        private static (Order order, OrderSummaryModel expectedSummary) CreateOrderSummaryTestData(
+            string orderId,
+            string description,
+            Guid organisationId)
         {
             var repositoryOrder = OrderBuilder
                 .Create()
@@ -741,24 +743,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         SectionModel.ServiceRecipients,
                         SectionModel.CatalogueSolutions,
                         SectionModel.AdditionalServices,
-                        SectionModel.FundingSource
+                        SectionModel.FundingSource,
                     }
                 });
         }
 
-        private static (Order order, OrderModel expectedOrder) CreateGetTestData(string orderId, Guid organisationId, string odsCode)
+        private static (Order order, OrderModel expectedOrder) CreateGetTestData(
+            string orderId,
+            Guid organisationId,
+            string odsCode)
         {
-            var repositoryOrder = OrderBuilder.Create()
-                .WithOrderId(orderId)
-                .WithOrganisationId(organisationId)
-                .WithCompleted(DateTime.UtcNow)
-                .Build();
-
             var repositoryOrderItem = OrderItemBuilder.Create()
+                .WithOrderItemId(1)
                 .WithOdsCode(odsCode)
                 .Build();
 
             var oneOffOrderItem = OrderItemBuilder.Create()
+                .WithOrderItemId(2)
                 .WithOdsCode(odsCode)
                 .WithCatalogueItemType(CatalogueItemType.AssociatedService)
                 .WithProvisioningType(ProvisioningType.Declarative)
@@ -766,18 +767,29 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithPriceTimeUnit(null)
                 .Build();
 
-            var serviceRecipients = new List<OdsOrganisation>
-            {
-                new OdsOrganisation(odsCode, "EU test")
-            };
+            var repositoryOrder = OrderBuilder.Create()
+                .WithOrderId(orderId)
+                .WithOrganisationId(organisationId)
+                .WithCompleted(DateTime.UtcNow)
+                .WithOrderItem(repositoryOrderItem)
+                .WithServiceInstanceId(repositoryOrderItem, 1)
+                .WithOrderItem(oneOffOrderItem)
+                .Build();
 
-            repositoryOrder.AddOrderItem(repositoryOrderItem, Guid.Empty, string.Empty);
-            repositoryOrder.AddOrderItem(oneOffOrderItem, Guid.Empty, string.Empty);
+            var serviceRecipients = new List<OdsOrganisation> { new(odsCode, "EU test") };
             repositoryOrder.SetServiceRecipients(serviceRecipients, Guid.Empty, string.Empty);
 
             const int monthsPerYear = 12;
             var calculatedCostPerYear = repositoryOrder.CalculateCostPerYear(CostType.Recurring);
             var totalOneOffCost = repositoryOrder.CalculateCostPerYear(CostType.OneOff);
+
+            static string GetServiceInstanceId(IEnumerable<ServiceInstanceItem> items, OrderItem orderItem) =>
+                items.FirstOrDefault(s => s.OrderItemId == orderItem.OrderItemId)?.ServiceInstanceId;
+
+            OrderItemModel OrderItemSelector(OrderItem orderItem) => new(
+                orderId,
+                orderItem,
+                GetServiceInstanceId(repositoryOrder.ServiceInstanceItems, orderItem));
 
             return (order: repositoryOrder, expectedOrder: new OrderModel
             {
@@ -787,14 +799,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     Name = repositoryOrder.OrganisationName,
                     OdsCode = repositoryOrder.OrganisationOdsCode,
                     Address = repositoryOrder.OrganisationAddress.ToModel(),
-                    PrimaryContact = repositoryOrder.OrganisationContact.ToModel()
+                    PrimaryContact = repositoryOrder.OrganisationContact.ToModel(),
                 },
                 CommencementDate = repositoryOrder.CommencementDate,
                 Supplier = new SupplierModel
                 {
                     Name = repositoryOrder.SupplierName,
                     Address = repositoryOrder.SupplierAddress.ToModel(),
-                    PrimaryContact = repositoryOrder.SupplierContact.ToModel()
+                    PrimaryContact = repositoryOrder.SupplierContact.ToModel(),
                 },
                 TotalOneOffCost = totalOneOffCost,
                 TotalRecurringCostPerMonth = calculatedCostPerYear / monthsPerYear,
@@ -806,25 +818,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     new ServiceRecipientModel
                     {
                         Name = serviceRecipient.Name,
-                        OdsCode = serviceRecipient.OdsCode
+                        OdsCode = serviceRecipient.OdsCode,
                     }),
-                OrderItems = repositoryOrder.OrderItems.Select(orderItem =>
-                    new OrderItemModel
-                    {
-                        ItemId = $"{repositoryOrder.OrderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
-                        ServiceRecipientsOdsCode = orderItem.OdsCode,
-                        CataloguePriceType = orderItem.CataloguePriceType.ToString(),
-                        CatalogueItemType = orderItem.CatalogueItemType.ToString(),
-                        CatalogueItemName = orderItem.CatalogueItemName,
-                        ProvisioningType = orderItem.ProvisioningType.ToString(),
-                        ItemUnitDescription = orderItem.CataloguePriceUnit.Description,
-                        TimeUnitDescription = orderItem.PriceTimeUnit?.Description(),
-                        QuantityPeriodDescription = orderItem.EstimationPeriod?.Description(),
-                        Price = orderItem.Price,
-                        Quantity = orderItem.Quantity,
-                        CostPerYear = orderItem.CalculateTotalCostPerYear(),
-                        DeliveryDate = orderItem.DeliveryDate
-                    }),
+                OrderItems = repositoryOrder.OrderItems.Select(OrderItemSelector),
             });
         }
 
@@ -842,7 +838,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     .Build();
 
                 OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
+                OrderRepositoryMock.Setup(r => r.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
+                OrderRepositoryMock.Setup(r => r.GetOrderByIdAsync(It.IsAny<string>(), It.IsAny<Action<IOrderQuery>>()))
+                    .ReturnsAsync(() => Order);
 
                 CreateOrderServiceMock = new Mock<ICreateOrderService>();
                 CreateOrderServiceMock.Setup(x => x.CreateAsync(It.IsAny<CreateOrderRequest>()))
@@ -851,8 +849,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 Orders = new List<Order>();
                 OrderRepositoryMock.Setup(x => x.ListOrdersByOrganisationIdAsync(It.IsAny<Guid>()))
                     .ReturnsAsync(() => Orders);
-
-                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
 
                 ServiceRecipientRepositoryMock = new Mock<IServiceRecipientRepository>();
                 ServiceRecipientRepositoryMock
@@ -870,7 +866,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         new Claim("Ordering", "Manage"),
                         new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
                         new Claim(ClaimTypes.Name, Name),
-                        new Claim(ClaimTypes.NameIdentifier, NameIdentity.ToString())
+                        new Claim(ClaimTypes.NameIdentifier, NameIdentity.ToString()),
                     }, "mock"));
 
                 OrdersController = OrdersControllerBuilder
@@ -883,13 +879,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
                 OrdersController.ControllerContext = new ControllerContext
                 {
-                    HttpContext = new DefaultHttpContext { User = ClaimsPrincipal }
+                    HttpContext = new DefaultHttpContext { User = ClaimsPrincipal },
                 };
             }
 
-            internal StatusModel IncompleteOrderStatusModel { get; } = new StatusModel { Status = "incomplete" };
+            internal StatusModel IncompleteOrderStatusModel { get; } = new() { Status = "incomplete" };
 
-            internal StatusModel CompleteOrderStatusModel { get; } = new StatusModel { Status = "complete" };
+            internal StatusModel CompleteOrderStatusModel { get; } = new() { Status = "complete" };
 
             internal string Name { get; }
 
@@ -921,12 +917,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             internal static OrdersControllerTestContext Setup()
             {
-                return new OrdersControllerTestContext(Guid.NewGuid());
+                return new(Guid.NewGuid());
             }
 
             internal static OrdersControllerTestContext Setup(Guid primaryOrganisationId)
             {
-                return new OrdersControllerTestContext(primaryOrganisationId);
+                return new(primaryOrganisationId);
             }
         }
 

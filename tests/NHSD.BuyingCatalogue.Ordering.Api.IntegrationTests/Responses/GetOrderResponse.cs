@@ -12,19 +12,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 {
     internal sealed class GetOrderResponse
     {
-        private readonly string _content;
+        private readonly string content;
+
+        private GetOrderResponse(string content)
+        {
+            this.content = content;
+        }
 
         private JToken ContentAsJson
         {
             get
             {
-                return JToken.Parse(_content);
+                return JToken.Parse(content);
             }
-        }
-
-        private GetOrderResponse(string content)
-        {
-            _content = content;
         }
 
         public static async Task<GetOrderResponse> CreateAsync(Response response)
@@ -48,9 +48,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
             responseContent.Value<decimal>(item).Should().Be(recurringCost);
         }
 
+        public void AssertServiceInstanceId(IEnumerable<object> expectedServiceInstanceIds)
+        {
+            var actual = ReadOrderItems(ContentAsJson);
+            actual.Should().BeEquivalentTo(expectedServiceInstanceIds, c => c.IncludingAllDeclaredProperties());
+        }
+
         public void AssertOrder(
             OrderEntity orderEntity,
-            AddressEntity orderingPartyAddress, 
+            AddressEntity orderingPartyAddress,
             ContactEntity orderPartyContact,
             AddressEntity supplierAddress,
             ContactEntity supplierContact,
@@ -76,14 +82,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                         orderingPartyAddress?.Town,
                         orderingPartyAddress?.County,
                         orderingPartyAddress?.Postcode,
-                        orderingPartyAddress?.Country
+                        orderingPartyAddress?.Country,
                     },
                     PrimaryContact = new
                     {
                         orderPartyContact.FirstName,
                         orderPartyContact.LastName,
                         EmailAddress = orderPartyContact.Email,
-                        TelephoneNumber = orderPartyContact.Phone
+                        TelephoneNumber = orderPartyContact.Phone,
                     }
                 },
                 orderEntity.CommencementDate,
@@ -100,14 +106,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                         supplierAddress?.Town,
                         supplierAddress?.County,
                         supplierAddress?.Postcode,
-                        supplierAddress?.Country
+                        supplierAddress?.Country,
                     },
                     PrimaryContact = new
                     {
                         supplierContact.FirstName,
                         supplierContact.LastName,
                         EmailAddress = supplierContact.Email,
-                        TelephoneNumber = supplierContact.Phone
+                        TelephoneNumber = supplierContact.Phone,
                     }
                 },
                 OrderItems = orderItems.Select(orderItem => new
@@ -123,15 +129,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                     QuantityPeriodDescription = orderItem.EstimationPeriod?.ToDescription(),
                     orderItem.Price,
                     orderItem.Quantity,
-                    orderItem.DeliveryDate
+                    orderItem.DeliveryDate,
                 }),
                 ServiceRecipients = serviceRecipients.Select(serviceRecipient => new
                 {
                     serviceRecipient.Name,
-                    serviceRecipient.OdsCode
+                    serviceRecipient.OdsCode,
                 }),
                 OrderStatus = orderEntity.OrderStatus.ToString(),
-                orderEntity.Completed
+                orderEntity.Completed,
             };
 
             var actual = ReadOrder(responseContent);
@@ -154,28 +160,28 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 TotalRecurringCostPerMonth = responseContent.Value<decimal>("totalRecurringCostPerMonth"),
                 TotalRecurringCostPerYear = responseContent.Value<decimal>("totalRecurringCostPerYear"),
                 TotalOwnershipCost = responseContent.Value<decimal>("totalOwnershipCost"),
-                Completed = responseContent.Value<DateTime?>("dateCompleted")
+                Completed = responseContent.Value<DateTime?>("dateCompleted"),
             };
         }
 
         private static object ReadOrderingParty(JToken orderingPartyToken)
         {
-            return new 
+            return new
             {
                 Name = orderingPartyToken?.Value<string>("name"),
                 OdsCode = orderingPartyToken?.Value<string>("odsCode"),
                 Address = ReadAddress(orderingPartyToken?.SelectToken("address")),
-                PrimaryContact = ReadPrimaryContact(orderingPartyToken?.SelectToken("primaryContact"))
+                PrimaryContact = ReadPrimaryContact(orderingPartyToken?.SelectToken("primaryContact")),
             };
         }
 
         private static object ReadSupplier(JToken supplierToken)
         {
-            return new 
+            return new
             {
                 Name = supplierToken?.Value<string>("name"),
                 Address = ReadAddress(supplierToken?.SelectToken("address")),
-                PrimaryContact = ReadPrimaryContact(supplierToken?.SelectToken("primaryContact"))
+                PrimaryContact = ReadPrimaryContact(supplierToken?.SelectToken("primaryContact")),
             };
         }
 
@@ -191,7 +197,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 Town = addressToken?.Value<string>("town"),
                 County = addressToken?.Value<string>("county"),
                 Postcode = addressToken?.Value<string>("postcode"),
-                Country = addressToken?.Value<string>("country")
+                Country = addressToken?.Value<string>("country"),
             };
         }
 
@@ -202,7 +208,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 FirstName = primaryContactToken?.Value<string>("firstName"),
                 LastName = primaryContactToken?.Value<string>("lastName"),
                 EmailAddress = primaryContactToken?.Value<string>("emailAddress"),
-                TelephoneNumber = primaryContactToken?.Value<string>("telephoneNumber")
+                TelephoneNumber = primaryContactToken?.Value<string>("telephoneNumber"),
             };
         }
 
@@ -224,7 +230,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 Price = orderItem.Value<decimal?>("price"),
                 Quantity = orderItem.Value<int>("quantity"),
                 DeliveryDate = orderItem.Value<DateTime?>("deliveryDate"),
-                CostPerYear = orderItem.Value<decimal>("costPerYear")
+                CostPerYear = orderItem.Value<decimal>("costPerYear"),
+                ServiceInstanceId = orderItem.Value<string>("serviceInstanceId"),
             });
         }
 
@@ -234,7 +241,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 .Select(serviceRecipient => new
                 {
                     OdsCode = serviceRecipient.Value<string>("odsCode"),
-                    Name = serviceRecipient.Value<string>("name")
+                    Name = serviceRecipient.Value<string>("name"),
                 });
         }
     }
