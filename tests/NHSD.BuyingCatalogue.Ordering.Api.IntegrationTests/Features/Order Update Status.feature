@@ -143,8 +143,8 @@ Scenario: When an order is complete, an the funding source is true, but the orde
     Then a response with status code 204 is returned
     And only one email is sent
     And the email contains the following information
-        | From                           | To                          | Subject                                      | Text                                 |
-        | noreply@buyingcatalogue.nhs.uk | gpitfutures.finance@nhs.net | INTEGRATION_TEST New Order C000014-04_OrgOds | Thank you for completing your order. |
+        | FromAddress                    | FromName              | ToAddress                   | ToName                           | Subject                                      | Text                                 |
+        | noreply@buyingcatalogue.nhs.uk | Buying Catalogue Team | gpitfutures.finance@nhs.net | Buying Catalogue Finance Partner | INTEGRATION_TEST New Order C000014-04_OrgOds | Thank you for completing your order. |
     And the email contains the following attachments
         | Filename                   |
         | C000014-04_OrgOds_Full.csv |
@@ -162,8 +162,8 @@ Scenario: When an order is complete, and the funding source is true, the order o
     Then a response with status code 204 is returned
     And only one email is sent
     And the email contains the following information
-        | From                           | To                          | Subject                                      | Text                                 |
-        | noreply@buyingcatalogue.nhs.uk | gpitfutures.finance@nhs.net | INTEGRATION_TEST New Order C000014-01_OrgOds | Thank you for completing your order. |
+        | FromAddress                    | FromName              | ToAddress                   | ToName                           | Subject                                      | Text                                 |
+        | noreply@buyingcatalogue.nhs.uk | Buying Catalogue Team | gpitfutures.finance@nhs.net | Buying Catalogue Finance Partner | INTEGRATION_TEST New Order C000014-01_OrgOds | Thank you for completing your order. |
     And the email contains the following attachments
         | Filename                       |
         | C000014-01_OrgOds_Full.csv     |

@@ -44,15 +44,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 .WithClaim(ClaimTypes.Name, "Test User")
                 .WithClaim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString());
 
-            if (role.Equals("Readonly-Buyer", StringComparison.InvariantCulture))
+            if (role.Equals("Readonly-Buyer", StringComparison.OrdinalIgnoreCase))
             {
                 builder.WithClaim("Ordering", "view");
             }
-            if (role.Equals("Buyer", StringComparison.InvariantCultureIgnoreCase))
+            if (role.Equals("Buyer", StringComparison.OrdinalIgnoreCase))
             {
                 builder = builder.WithClaim("Ordering", "Manage");
             }
-            else if (role.Equals("Authority", StringComparison.InvariantCultureIgnoreCase))
+            else if (role.Equals("Authority", StringComparison.OrdinalIgnoreCase))
             {
                 builder = builder.WithClaim("Organisation", "Manage");
                 builder = builder.WithClaim("Account", "Manage");

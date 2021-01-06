@@ -6,18 +6,18 @@
 
 ### Requirements
 
-- .NET Core Version 3.1
+- .NET 5.0
 - Docker
 
-> Before you begin please install **.NET Core 3.1** & **Docker** on your machine.
+> Before you begin please install **.NET 5.0** & **Docker** on your machine.
 
 ## Overview
 
-This application uses **.NET core** to provide an ordering API.
+This application uses **.NET 5** to provide an ordering API.
 
 ### Project structure
 
-This repository uses **.NET Core**,  **Docker**.
+This repository uses **.NET 5**,  **Docker**.
 
 It contains the following endpoints:
 
@@ -44,15 +44,13 @@ The database project is a SQL Server project, which is only fully supported by V
 
 When making changes to the database make sure to remove the Docker volume as described [below](#to-stop-the-application) before [running the application](#running-the-application).
 
-
 ##### How to connect
 
 | From                       | Host                       | Port  | TLS |
 |            :-:             |            :-:             |  :-:  | :-: |
 | outside the docker network | localhost                  | 5104  |  X  |
 
-
-Navigate yourself to [localhost:5104/health/live](http://localhost:5104health/live) to view the health status of the service 
+Navigate to [localhost:5104/health/live](http://localhost:5104health/live) to view the health status of the service.
 
 ## Running the Application
 
@@ -68,6 +66,7 @@ This will start the application in a docker container. You can verify that the s
 http://localhost:5104//health/live
 http://localhost:5104//health/ready
 ```
+
 If both URLs return 'Healthy', the environment is configured correctly, and can be accessed via the public endpoints.
 
 If the ready URL returns 'Unhealthy', the associated dependencies of the application may have failed to launch, or cannot be accessed.

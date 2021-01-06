@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Domain.Common;
 using NUnit.Framework;
@@ -38,6 +39,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
+        [SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "Test of null equality")]
+        [SuppressMessage("ReSharper", "ExpressionIsAlwaysNull", Justification = "Test of null equality")]
         public void GivenTwoNullsShouldReturnTrue()
         {
             _size1 = null;
@@ -53,14 +56,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
         private class Size : ValueObject
         {
-            private int Width { get; }
-            private int Height { get; }
-
             public Size(int width, int height)
             {
                 Width = width;
                 Height = height;
             }
+
+            private int Width { get; }
+
+            private int Height { get; }
 
             protected override IEnumerable<object> GetEqualityComponents()
             {

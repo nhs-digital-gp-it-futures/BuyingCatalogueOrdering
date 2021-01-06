@@ -39,6 +39,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		NHSD.BuyingCatalogue.Ordering.Api.sln.DotSettings = NHSD.BuyingCatalogue.Ordering.Api.sln.DotSettings
 		NuGet.config = NuGet.config
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHSD.BuyingCatalogue.Ordering.OrderingDatabase.Deployment", "src\NHSD.BuyingCatalogue.Ordering.OrderingDatabase.Deployment\NHSD.BuyingCatalogue.Ordering.OrderingDatabase.Deployment.csproj", "{BD446434-F4B2-42AB-A5F8-FEF23E1C6EF0}"

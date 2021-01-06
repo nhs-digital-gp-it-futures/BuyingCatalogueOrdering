@@ -2,9 +2,9 @@
 {
     public enum ProvisioningType
     {
+        Invalid = 0,
         Patient = 1,
         Declarative = 2,
         OnDemand = 3,
-        Invalid = 4
     }
 }

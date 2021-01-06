@@ -38,10 +38,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
 
         public DateTime? M1Planned { get; set; }
 
-        public DateTime? ActualM1Date { get; set; } = null;
+        public DateTime? ActualM1Date { get; set; }
 
-        public DateTime? BuyerVerificationDate { get; set; } = null;
+        public DateTime? BuyerVerificationDate { get; set; }
 
-        public DateTime? CeaseDate { get; set; } = null;
+        public DateTime? CeaseDate { get; set; }
     }
 }
