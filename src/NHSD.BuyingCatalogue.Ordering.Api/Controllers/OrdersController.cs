@@ -52,7 +52,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [Route("{orderId}")]
         public async Task<ActionResult<OrderModel>> GetAsync(string orderId)
         {
-            var order = await orderRepository.GetOrderByIdAsync(orderId);
+            static void ConfigureQuery(IOrderQuery query) => query
+                .WithOrderItems()
+                .WithServiceInstanceItems()
+                .WithServiceRecipients()
+                .WithOrganisationDetails()
+                .WithSupplierDetails()
+                .WithoutTracking();
+
+            var order = await orderRepository.GetOrderByIdAsync(orderId, ConfigureQuery);
             if (order is null)
             {
                 return NotFound();
@@ -64,9 +72,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            var serviceRecipientDictionary = order.ServiceRecipients.Select(serviceRecipient =>
-                    new ServiceRecipientModel { Name = serviceRecipient.Name, OdsCode = serviceRecipient.OdsCode })
-                .ToDictionary(x => x.OdsCode);
+            var serviceInstanceItems = order.ServiceInstanceItems.ToDictionary(i => i.OrderItemId, i => i.ServiceInstanceId);
+            var serviceRecipientDictionary = order.ServiceRecipients
+                .Select(recipient => new ServiceRecipientModel { Name = recipient.Name, OdsCode = recipient.OdsCode })
+                .ToDictionary(x => x.OdsCode, StringComparer.OrdinalIgnoreCase);
 
             var orderItems = order.OrderItems;
             var orderOrganisationOdsCode = order.OrganisationOdsCode;
@@ -75,7 +84,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             {
                 if (!serviceRecipientDictionary.ContainsKey(orderOrganisationOdsCode))
                 {
-                    serviceRecipientDictionary.TryAdd(orderOrganisationOdsCode.ToUpperInvariant(),
+                    serviceRecipientDictionary.TryAdd(
+                        orderOrganisationOdsCode.ToUpperInvariant(),
                         new ServiceRecipientModel { Name = order.OrganisationName, OdsCode = orderOrganisationOdsCode });
                 }
             }
@@ -83,6 +93,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             const int monthsPerYear = 12;
             var calculatedCostPerYear = order.CalculateCostPerYear(CostType.Recurring);
             var totalOneOffCost = order.CalculateCostPerYear(CostType.OneOff);
+
+            OrderItemModel OrderItemSelector(OrderItem item) => new(
+                order.OrderId,
+                item,
+                serviceInstanceItems.GetValueOrDefault(item.OrderItemId));
 
             return new OrderModel
             {
@@ -92,14 +107,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     Name = order.OrganisationName,
                     OdsCode = order.OrganisationOdsCode,
                     Address = order.OrganisationAddress.ToModel(),
-                    PrimaryContact = order.OrganisationContact.ToModel()
+                    PrimaryContact = order.OrganisationContact.ToModel(),
                 },
                 CommencementDate = order.CommencementDate,
                 Supplier = new SupplierModel
                 {
                     Name = order.SupplierName,
                     Address = order.SupplierAddress.ToModel(),
-                    PrimaryContact = order.SupplierContact.ToModel()
+                    PrimaryContact = order.SupplierContact.ToModel(),
                 },
                 TotalOneOffCost = totalOneOffCost,
                 TotalRecurringCostPerMonth = calculatedCostPerYear / monthsPerYear,
@@ -108,23 +123,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 ServiceRecipients = serviceRecipientDictionary.Values,
                 Status = order.OrderStatus.Name,
                 DateCompleted = order.Completed,
-                OrderItems = order.OrderItems.Select(orderItem =>
-                    new OrderItemModel
-                    {
-                        ItemId = $"{order.OrderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
-                        ServiceRecipientsOdsCode = orderItem.OdsCode,
-                        CataloguePriceType = orderItem.CataloguePriceType.ToString(),
-                        CatalogueItemType = orderItem.CatalogueItemType.ToString(),
-                        CatalogueItemName = orderItem.CatalogueItemName,
-                        ProvisioningType = orderItem.ProvisioningType.ToString(),
-                        ItemUnitDescription = orderItem.CataloguePriceUnit.Description,
-                        TimeUnitDescription = orderItem.PriceTimeUnit?.Description(),
-                        QuantityPeriodDescription = orderItem.EstimationPeriod?.Description(),
-                        DeliveryDate = orderItem.DeliveryDate,
-                        Price = orderItem.Price,
-                        Quantity = orderItem.Quantity,
-                        CostPerYear = orderItem.CalculateTotalCostPerYear()
-                    })
+                OrderItems = order.OrderItems.Select(OrderItemSelector),
             };
         }
 
@@ -148,7 +147,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 DateCreated = order.Created,
                 DateCompleted = order.Completed,
                 Status = order.OrderStatus.Name,
-                OnlyGms = order.FundingSourceOnlyGMS
+                OnlyGms = order.FundingSourceOnlyGMS,
             }).ToList();
 
             return orderModelResult;
@@ -202,7 +201,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     SectionModel.FundingSource.WithStatus(order.IsFundingSourceComplete() ? "complete" : "incomplete")
                 },
                 SectionStatus = order.IsSectionStatusComplete() ? "complete" : "incomplete",
-                Status = order.OrderStatus.Name
+                Status = order.OrderStatus.Name,
             };
 
             return Ok(orderSummaryModel);
@@ -285,7 +284,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             {
                 return BadRequest(new ErrorResponseModel
                 {
-                    Errors = new[] { ErrorMessages.InvalidOrderStatus() }
+                    Errors = new[] { ErrorMessages.InvalidOrderStatus() },
                 });
             }
 
@@ -306,7 +305,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             {
                 return BadRequest(new ErrorResponseModel
                 {
-                    Errors = completeOrderResult.Errors.Select(error => new ErrorModel(error.Id, error.Field))
+                    Errors = completeOrderResult.Errors.Select(error => new ErrorModel(error.Id, error.Field)),
                 });
             }
 

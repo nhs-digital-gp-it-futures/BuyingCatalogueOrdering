@@ -20,10 +20,10 @@ Background:
         | C000014-01 | eu      | EU Test |
         | C000014-01 | au      | UA Test |
     Given Order items exist
-        | OrderId    | CatalogueItemId | CatalogueItemName | CatalogueItemType | OdsCode | CataloguePriceUnitDescription | Price   | ProvisioningType | Quantity | PriceTimeUnit | EstimationPeriod | DeliveryDate |
-        | C000014-01 | Cat Item 1      | Sol1              | Solution          | eu      | Desc                          | 461.34  | OnDemand         | 5        | Null          | Month            | 21/03/2021   |
-        | C000014-01 | Cat Item 2      | Sol2              | AssociatedService | au      | Desc                          | 721.34  | Declarative      | 2        | Month         | Null             | 15/07/2020   |
-        | C000014-01 | Cat Item 3      | Sol3              | AdditionalService | eu      | Desc                          | 3532.12 | Patient          | 1        | Year          | Year             | NULL         |
+        | OrderId    | CatalogueItemId | ParentCatalogueItemId | CatalogueItemName | CatalogueItemType | OdsCode | CataloguePriceUnitDescription | Price   | ProvisioningType | Quantity | PriceTimeUnit | EstimationPeriod | DeliveryDate |
+        | C000014-01 | Cat Item 1      | NULL                  | Sol1              | Solution          | eu      | Desc                          | 461.34  | OnDemand         | 5        | Null          | Month            | 21/03/2021   |
+        | C000014-01 | Cat Item 2      | NULL                  | Sol2              | AssociatedService | au      | Desc                          | 721.34  | Declarative      | 2        | Month         | Null             | 15/07/2020   |
+        | C000014-01 | Cat Item 3      | Cat Item 1            | Sol3              | AdditionalService | eu      | Desc                          | 3532.12 | Patient          | 1        | Year          | Year             | NULL         |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @8122
@@ -32,6 +32,19 @@ Scenario: Get an order
     When the user sends the get order request
     Then a response with status code 200 is returned
     And the get order response displays the expected order
+
+@10035
+@10684
+Scenario: The service instance ID is included for each order item
+    Given the user creates a request to retrieve the details of an order by ID 'C000014-01'
+    When the user sends the get order request
+    Then a response with status code 200 is returned
+    And the get order response displays the expected order
+    And the expected service instance ID is included for each order item as follows
+        | ItemId          | ServiceInstanceId |
+        | C000014-01-eu-1 | SI1-eu            |
+        | C000014-01-au-2 | NULL              |
+        | C000014-01-eu-3 | SI1-eu            |
 
 @8122
 Scenario: Get a single deleted order returns not found

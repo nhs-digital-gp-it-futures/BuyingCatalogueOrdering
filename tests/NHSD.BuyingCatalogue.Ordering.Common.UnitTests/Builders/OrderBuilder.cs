@@ -12,6 +12,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
         private readonly Address organisationAddress;
         private readonly DateTime created;
         private readonly IList<OrderItem> orderItems = new List<OrderItem>();
+        private readonly IList<ServiceInstanceItem> serviceInstanceItems = new List<ServiceInstanceItem>();
         private readonly IList<OdsOrganisation> serviceRecipients = new List<OdsOrganisation>();
         private string orderId;
         private string orderDescription;
@@ -58,7 +59,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             completed = null;
         }
 
-        public static OrderBuilder Create() => new OrderBuilder();
+        public static OrderBuilder Create() => new();
 
         public OrderBuilder WithOrderId(string id)
         {
@@ -74,97 +75,97 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
 
         public OrderBuilder WithOrganisationId(Guid id)
         {
-            this.organisationId = id;
+            organisationId = id;
             return this;
         }
 
         public OrderBuilder WithOrganisationContact(Contact contact)
         {
-            this.organisationContact = contact;
+            organisationContact = contact;
             return this;
         }
 
         public OrderBuilder WithSupplierId(string id)
         {
-            this.supplierId = id;
+            supplierId = id;
             return this;
         }
 
         public OrderBuilder WithSupplierName(string name)
         {
-            this.supplierName = name;
+            supplierName = name;
             return this;
         }
 
         public OrderBuilder WithSupplierAddress(Address address)
         {
-            this.supplierAddress = address;
+            supplierAddress = address;
             return this;
         }
 
         public OrderBuilder WithSupplierContact(Contact contact)
         {
-            this.supplierContact = contact;
+            supplierContact = contact;
             return this;
         }
 
         public OrderBuilder WithCommencementDate(DateTime? date)
         {
-            this.commencementDate = date;
+            commencementDate = date;
             return this;
         }
 
         public OrderBuilder WithServiceRecipientsViewed(bool viewed)
         {
-            this.serviceRecipientsViewed = viewed;
+            serviceRecipientsViewed = viewed;
             return this;
         }
 
         public OrderBuilder WithCatalogueSolutionsViewed(bool viewed)
         {
-            this.catalogueSolutionsViewed = viewed;
+            catalogueSolutionsViewed = viewed;
             return this;
         }
 
         public OrderBuilder WithAdditionalServicesViewed(bool viewed)
         {
-            this.additionalServicesViewed = viewed;
+            additionalServicesViewed = viewed;
             return this;
         }
 
         public OrderBuilder WithAssociatedServicesViewed(bool viewed)
         {
-            this.associatedServicesViewed = viewed;
+            associatedServicesViewed = viewed;
             return this;
         }
 
         public OrderBuilder WithFundingSourceOnlyGms(bool? onlyGms)
         {
-            this.fundingSourceOnlyGms = onlyGms;
+            fundingSourceOnlyGms = onlyGms;
             return this;
         }
 
         public OrderBuilder WithLastUpdatedBy(Guid updatedBy)
         {
-            this.lastUpdatedBy = updatedBy;
+            lastUpdatedBy = updatedBy;
             return this;
         }
 
         public OrderBuilder WithLastUpdatedByName(string name)
         {
-            this.lastUpdatedByName = name;
+            lastUpdatedByName = name;
             return this;
         }
 
         public OrderBuilder WithLastUpdated(DateTime updated)
         {
-            this.lastUpdated = updated;
+            lastUpdated = updated;
             return this;
         }
 
         public OrderBuilder WithCompleted(DateTime? dateCompleted)
         {
-            this.completed = dateCompleted;
+            completed = dateCompleted;
             return this;
         }
 
@@ -182,6 +183,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
         public OrderBuilder WithServiceRecipient(OdsOrganisation serviceRecipient)
         {
             serviceRecipients.Add(serviceRecipient);
+            return this;
+        }
+
+        public OrderBuilder WithServiceInstanceId(OrderItem forOrderItem, int increment)
+        {
+            if (forOrderItem is null)
+                throw new ArgumentNullException(nameof(forOrderItem));
+
+            serviceInstanceItems.Add(new ServiceInstanceItem
+            {
+                OrderItemId = forOrderItem.OrderItemId,
+                ServiceInstanceId = $"SI{increment}-{forOrderItem.OdsCode}",
+            });
+
             return this;
         }
 
@@ -218,14 +233,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             order.Created = created;
             order.LastUpdated = lastUpdated;
 
-            if (completed != null)
+            SetField(order, "serviceInstanceItems", serviceInstanceItems);
+
+            if (completed is not null)
             {
-                var completedFieldInfo =
-                    order.GetType().GetField("_completed", BindingFlags.Instance | BindingFlags.NonPublic);
-                completedFieldInfo?.SetValue(order, completed);
+                SetField(order, "_completed", completed);
             }
 
             return order;
+        }
+
+        private static void SetField(object obj, string fieldName, object value)
+        {
+            var fieldInfo = obj.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
+            fieldInfo?.SetValue(obj, value);
         }
     }
 }
