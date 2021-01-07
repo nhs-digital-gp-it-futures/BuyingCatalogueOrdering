@@ -21,7 +21,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
             if (services is null)
                 throw new ArgumentNullException(nameof(services));
 
-            if(configuration is null)
+            if (configuration is null)
                 throw new ArgumentNullException(nameof(configuration));
 
             var authorityUrl = configuration.GetValue<string>("Authority");
@@ -79,7 +79,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 
             app.UseSwaggerUI(options =>
             {
-                options.SwaggerEndpoint($"{ (endpointPrefix) }/swagger/{Version}/swagger.json", $"Buying Catalogue Ordering API {Version}");
+                options.SwaggerEndpoint($"{(endpointPrefix)}/swagger/{Version}/swagger.json", $"Buying Catalogue Ordering API {Version}");
             });
 
             return app;
@@ -108,16 +108,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
                     Reference = new OpenApiReference
                     {
                         Id = "oauth2",
-                        Type = ReferenceType.SecurityScheme
+                        Type = ReferenceType.SecurityScheme,
                     }
                 };
 
                 operation.Security = new List<OpenApiSecurityRequirement>
                 {
-                    new OpenApiSecurityRequirement
-                    {
-                        [ oAuthScheme ] = new [] { "orderingapi" }
-                    }
+                    new() { [oAuthScheme] = new[] { "orderingapi" } },
                 };
             }
 

@@ -127,7 +127,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var organisationId = Guid.NewGuid();
             const string orderId = "C0000014-01";
             var context = FundingSourceControllerTestContext.Setup(organisationId);
-            var model = new UpdateFundingSourceModel {OnlyGMS = fundingSource};
+            var model = new UpdateFundingSourceModel { OnlyGMS = fundingSource };
 
             var response = await context.Controller.PutFundingSourceAsync(orderId, model);
             response.Should().BeEquivalentTo(new NoContentResult());
@@ -136,7 +136,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 x.UpdateOrderAsync(It.Is<Order>(
                     y => y.FundingSourceOnlyGMS == fundingSource)));
         }
-        
+
         [Test]
         public async Task Put_AllValid_UpdatesLastUpdated()
         {
@@ -161,8 +161,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 PrimaryOrganisationId = primaryOrganisationId;
                 Name = "Test User";
                 NameIdentity = Guid.NewGuid();
-                
-				Order = OrderBuilder.Create()
+
+                Order = OrderBuilder.Create()
                     .WithOrganisationId(PrimaryOrganisationId)
                     .WithLastUpdatedBy(Guid.NewGuid())
                     .WithLastUpdatedByName("Gandalf the Gray")
@@ -201,17 +201,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
 
             internal FundingSourceController Controller { get; }
-            
+
             internal Order Order { get; set; }
 
             internal static FundingSourceControllerTestContext Setup()
             {
-                return new FundingSourceControllerTestContext(Guid.NewGuid());
+                return new(Guid.NewGuid());
             }
 
             internal static FundingSourceControllerTestContext Setup(Guid primaryOrganisationId)
             {
-                return new FundingSourceControllerTestContext(primaryOrganisationId);
+                return new(primaryOrganisationId);
             }
         }
     }

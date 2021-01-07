@@ -21,7 +21,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     {
         private readonly IOrderRepository _orderRepository;
 
-        private static readonly Dictionary<string, Action<Order>> _completeSectionActionsDictionary = new Dictionary<string, Action<Order>>
+        private static readonly Dictionary<string, Action<Order>> _completeSectionActionsDictionary = new()
         {
             { SectionModel.CatalogueSolutions.Id, o => o.CatalogueSolutionsViewed = true },
             { SectionModel.AdditionalServices.Id, o => o.AdditionalServicesViewed = true },
@@ -36,7 +36,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [HttpPut]
         [Route("{orderId}/sections/{sectionId}")]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult> UpdateStatusAsync(string orderId, string sectionId, UpdateOrderSectionModel sectionStatus )
+        public async Task<ActionResult> UpdateStatusAsync(string orderId, string sectionId, UpdateOrderSectionModel sectionStatus)
         {
             if (sectionStatus is null)
             {

@@ -196,7 +196,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                         .WithStatus(order.IsCatalogueSolutionsSectionComplete() ? "complete" : "incomplete")
                         .WithCount(catalogueSolutionsCount),
                     SectionModel.AdditionalServices
-                        .WithStatus(order.IsAdditionalServicesSectionComplete() ? "complete": "incomplete")
+                        .WithStatus(order.IsAdditionalServicesSectionComplete() ? "complete" : "incomplete")
                         .WithCount(additionalServicesCount),
                     SectionModel.FundingSource.WithStatus(order.IsFundingSourceComplete() ? "complete" : "incomplete")
                 },

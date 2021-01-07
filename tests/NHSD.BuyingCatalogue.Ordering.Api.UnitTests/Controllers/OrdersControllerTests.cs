@@ -282,8 +282,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     .Build())
                 .WithOrderItem(OrderItemBuilder.Create()
                     .WithCatalogueItemType(CatalogueItemType.Solution)
-                    .Build()
-                ).Build();
+                    .Build())
+                .Build();
 
             var context = OrdersControllerTestContext.Setup(order.OrganisationId);
             context.Order = order;

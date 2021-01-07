@@ -11,7 +11,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
     {
         protected override IDictionary<string, Func<CreateOrderItemRequestPayload>> PayloadFactory => new Dictionary<string, Func<CreateOrderItemRequestPayload>>
         {
-            { "complete", () => CreateOrderItemRequestPayloadBuilder.CreateAssociatedService().Build()},
+            { "complete", () => CreateOrderItemRequestPayloadBuilder.CreateAssociatedService().Build() },
             { "high-boundary", () => CreateOrderItemRequestPayloadBuilder.CreateAssociatedService().WithPrice(999999999999999.999m).WithQuantity(int.MaxValue - 1).Build() },
             { "low-boundary", () => CreateOrderItemRequestPayloadBuilder.CreateAssociatedService().WithPrice(0).WithQuantity(1).Build() },
             { "missing-catalogue-item-type", () => CreateOrderItemRequestPayloadBuilder.CreateAssociatedService().WithCatalogueItemType(null).Build() },

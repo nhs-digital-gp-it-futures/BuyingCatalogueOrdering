@@ -27,10 +27,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 
         internal static Address FromModel(this Address address, AddressModel model)
         {
-            if(address is null)
+            if (address is null)
                 address = new Address();
 
-            if(model is null)
+            if (model is null)
                 throw new ArgumentNullException(nameof(model));
 
             address.Line1 = model.Line1;

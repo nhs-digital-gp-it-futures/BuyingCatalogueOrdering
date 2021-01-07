@@ -44,38 +44,36 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task Get_OrderIdExists_ReturnsTheOrdersDescription()
         {
-            var orderId = "C0000014-01";
+            const string orderId = "C0000014-01";
             var context = OrderDescriptionTestContext.Setup();
 
-            var testData = CreateOrderDescriptionTestData(
+            (Order order, OrderDescriptionModel expectedDescription) = CreateOrderDescriptionTestData(
                 orderId, 
                 OrderDescription.Create("Test Description").Value,
-                context.PrimaryOrganisationId
-                );
+                context.PrimaryOrganisationId);
 
-            context.Order = testData.order;
+            context.Order = order;
 
             using var controller = context.OrderDescriptionController;
 
             var result = await controller.GetAsync(orderId) as OkObjectResult;
 
-            var orderDescription = result.Value as OrderDescriptionModel;
-            orderDescription.Should().BeEquivalentTo(testData.expectedDescription);
+            var orderDescription = result?.Value as OrderDescriptionModel;
+            orderDescription.Should().BeEquivalentTo(expectedDescription);
         }
 
         [Test]
         public async Task Get_OtherOrganisationId_ReturnsForbidden()
         {
-            var orderId = "C0000014-01";
+            const string orderId = "C0000014-01";
             var context = OrderDescriptionTestContext.Setup();
 
-            var testData = CreateOrderDescriptionTestData(
+            (Order order, _) = CreateOrderDescriptionTestData(
                 orderId,
                 OrderDescription.Create("Test Description").Value,
-                Guid.NewGuid()
-            );
+                Guid.NewGuid());
 
-            context.Order = testData.order;
+            context.Order = order;
 
             using var controller = context.OrderDescriptionController;
 
@@ -204,8 +202,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             (Order order, _) = CreateOrderDescriptionTestData(
                 orderId, 
                 OrderDescription.Create("Test Description").Value,
-                context.PrimaryOrganisationId
-                );
+                context.PrimaryOrganisationId);
 
             context.Order = order;
 
@@ -254,8 +251,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 {
                     ControllerContext = new ControllerContext
                     {
-                        HttpContext = new DefaultHttpContext {User = ClaimsPrincipal}
-                    }
+                        HttpContext = new DefaultHttpContext { User = ClaimsPrincipal }
+                    },
                 };
             }
 
@@ -271,7 +268,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             internal static OrderDescriptionTestContext Setup()
             {
-                return new OrderDescriptionTestContext();
+                return new();
             }
         }
     }

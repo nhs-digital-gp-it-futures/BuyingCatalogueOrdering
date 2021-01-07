@@ -15,7 +15,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         }
 
         private CataloguePriceUnit(
-            string name, 
+            string name,
             string description) : this()
         {
             Name = name;

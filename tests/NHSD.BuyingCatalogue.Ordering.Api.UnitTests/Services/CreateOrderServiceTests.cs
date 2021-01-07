@@ -74,7 +74,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             context.OrderRepositoryMock.Verify(x =>
                 x.CreateOrderAsync(It.Is<Order>(
-                    actual => actual.OrganisationId==expected.OrganisationId && actual.Description==expected.Description)), Times.Once);
+                    actual => actual.OrganisationId == expected.OrganisationId && actual.Description == expected.Description)), Times.Once);
         }
 
         [Test]
@@ -92,7 +92,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             var actual = await sut.CreateAsync(request);
 
-            var expected = Result.Failure<string>(new List<ErrorDetails> {new ErrorDetails("OrganisationIdRequired", "OrganisationId") });
+            var expected = Result.Failure<string>(new List<ErrorDetails> { new("OrganisationIdRequired", "OrganisationId") });
             
             actual.Should().Be(expected);
         }
@@ -111,7 +111,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             var actual = await sut.CreateAsync(request);
 
-            var expected = Result.Failure<string>(new List<ErrorDetails> { new ErrorDetails("OrderDescriptionRequired", "Description") });
+            var expected = Result.Failure<string>(new List<ErrorDetails> { new("OrderDescriptionRequired", "Description") });
 
             actual.Should().Be(expected);
         }
@@ -130,7 +130,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             var actual = await sut.CreateAsync(request);
 
-            var expected = Result.Failure<string>(new List<ErrorDetails> { new ErrorDetails("OrderDescriptionTooLong", "Description") });
+            var expected = Result.Failure<string>(new List<ErrorDetails> { new("OrderDescriptionTooLong", "Description") });
 
             actual.Should().Be(expected);
         }

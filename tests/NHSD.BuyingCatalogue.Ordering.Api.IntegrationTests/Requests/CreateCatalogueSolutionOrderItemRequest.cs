@@ -13,7 +13,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 
         protected override IDictionary<string, Func<CreateOrderItemRequestPayload>> PayloadFactory => new Dictionary<string, Func<CreateOrderItemRequestPayload>>
         {
-            { "complete", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().Build()},
+            { "complete", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().Build() },
             { "high-boundary", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithPrice(999999999999999.999m).WithQuantity(int.MaxValue - 1).Build() },
             { "low-boundary", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithPrice(0).WithQuantity(1).Build() },
             { "missing-catalogue-item-type", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithCatalogueItemType(null).Build() },
@@ -44,8 +44,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             { "too-long-catalogue-item-name", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithCatalogueItemName(new string('1', 256)).Build() },
             { "too-long-item-unit-name", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithItemUnitName(new string('a', 21)).Build() },
             { "too-long-item-unit-description", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithItemUnitNameDescription(new string('a', 41)).Build() },
-            { "above-delivery-window", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithDeliveryDate(new DateTime(2021,1,1).AddDays(MaximumDeliveryDateOffsetDays)).Build() },
-            { "below-delivery-window", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithDeliveryDate(new DateTime(2021,1,1).AddDays(-1)).Build() },
+            { "above-delivery-window", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithDeliveryDate(new DateTime(2021, 1, 1).AddDays(MaximumDeliveryDateOffsetDays)).Build() },
+            { "below-delivery-window", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithDeliveryDate(new DateTime(2021, 1, 1).AddDays(-1)).Build() },
             { "less-than-min-quantity", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithQuantity(0).Build() },
             { "greater-than-max-quantity", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithQuantity(int.MaxValue).Build() },
             { "less-than-min-price", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithPrice(-1).Build() },
