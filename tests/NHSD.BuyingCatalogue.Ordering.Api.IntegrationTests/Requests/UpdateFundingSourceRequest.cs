@@ -13,9 +13,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
         private readonly string _updateFundingSourceUrl;
 
         public string OrderId { get; set; }
+
         public UpdateFundingSourceRequestPayload Payload { get; private set; }
 
-        protected IDictionary<string, Func<UpdateFundingSourceRequestPayload>> PayloadFactory = new Dictionary<string, Func<UpdateFundingSourceRequestPayload>>
+        protected IDictionary<string, Func<UpdateFundingSourceRequestPayload>> payloadFactory = new Dictionary<string, Func<UpdateFundingSourceRequestPayload>>
         {
             { "funding-source-true", () => new UpdateFundingSourceRequestPayload { OnlyGMS = true } },
             { "funding-source-false", () => new UpdateFundingSourceRequestPayload { OnlyGMS = false } },
@@ -39,7 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             if (key is null)
                 throw new ArgumentNullException(nameof(key));
 
-            if (!PayloadFactory.TryGetValue(key, out var factory))
+            if (!payloadFactory.TryGetValue(key, out var factory))
                 Assert.Fail("Unexpected update funding source payload type.");
 
             Payload = factory();

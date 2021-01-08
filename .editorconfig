@@ -216,9 +216,6 @@ dotnet_diagnostic.SA1204.severity = none
 # SA1214: Readonly fields should appear before non-readonly fields
 dotnet_diagnostic.SA1214.severity = none
 
-# SA1306: Field names should begin with lower-case letter
-dotnet_diagnostic.SA1306.severity = none
-
 # SA1309: Field names should not begin with underscore
 dotnet_diagnostic.SA1309.severity = none
 
@@ -227,12 +224,6 @@ dotnet_diagnostic.SA1633.severity = none
 
 # SA1503: Braces should not be omitted
 dotnet_diagnostic.SA1503.severity = none
-
-# SA1312: Variable names should begin with lower-case letter
-dotnet_diagnostic.SA1312.severity = none
-
-# SA1313: Parameter names should begin with lower-case letter
-dotnet_diagnostic.SA1313.severity = none
 
 # SA1401: Fields should be private
 dotnet_diagnostic.SA1401.severity = none

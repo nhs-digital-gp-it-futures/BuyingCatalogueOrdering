@@ -24,7 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var _ = new OrderingPartyController(null);
+                _ = new OrderingPartyController(null);
             });
         }
 
@@ -148,7 +148,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             Assert.ThrowsAsync<ArgumentNullException>(async () =>
             {
-                var _ = await controller.UpdateAsync(
+                _ = await controller.UpdateAsync(
                     orderId,
                     new OrderingPartyModel
                     {

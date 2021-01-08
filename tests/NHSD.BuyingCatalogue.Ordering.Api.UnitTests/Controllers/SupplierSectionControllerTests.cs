@@ -24,12 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public void Constructor_NullRepository_Throws()
         {
-            static void Test()
-            {
-                var _ = new SupplierSectionController(null);
-            }
-
-            Assert.Throws<ArgumentNullException>(Test);
+            Assert.Throws<ArgumentNullException>(() => _ = new SupplierSectionController(null));
         }
 
         [Test]
@@ -88,7 +83,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public async Task GetAsync_DifferentOrganisationId_ForbiddenReturned()
         {
-            var orderId = "C0000014-01";
+            const string orderId = "C0000014-01";
             var context = SupplierSectionControllerTestContext.Setup();
 
             context.PrimaryOrganisationId = Guid.NewGuid();
@@ -177,7 +172,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             Assert.ThrowsAsync<ArgumentNullException>(async () =>
             {
-                var _ = await controller.UpdateAsync(
+                _ = await controller.UpdateAsync(
                     orderId,
                     new SupplierModel
                     {
