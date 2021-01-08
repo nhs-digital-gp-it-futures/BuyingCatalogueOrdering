@@ -69,26 +69,27 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
             this.lastUpdated = lastUpdated;
         }
 
-        private OrderItemEntityBuilder() : this(
-            "C10000-001",
-            "ODS1",
-            "100001-001",
-            null,
-            CatalogueItemType.Solution,
-            Guid.NewGuid().ToString(),
-            DateTime.UtcNow.Date,
-            5,
-            TimeUnit.Month,
-            ProvisioningType.OnDemand,
-            CataloguePriceType.Flat,
-            "GBP",
-            null,
-            "Tier",
-            "Price Name",
-            "per consultation",
-            1.5m,
-            DateTime.UtcNow,
-            DateTime.UtcNow)
+        private OrderItemEntityBuilder()
+            : this(
+                "C10000-001",
+                "ODS1",
+                "100001-001",
+                null,
+                CatalogueItemType.Solution,
+                Guid.NewGuid().ToString(),
+                DateTime.UtcNow.Date,
+                5,
+                TimeUnit.Month,
+                ProvisioningType.OnDemand,
+                CataloguePriceType.Flat,
+                "GBP",
+                null,
+                "Tier",
+                "Price Name",
+                "per consultation",
+                1.5m,
+                DateTime.UtcNow,
+                DateTime.UtcNow)
         {
         }
 

@@ -116,7 +116,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 
         public static async Task<OrderEntity> FetchOrderByOrderId(string connectionString, string orderId)
         {
-            return (await SqlRunner.QueryFirstAsync<OrderEntity>(connectionString, @"SELECT
+            return await SqlRunner.QueryFirstAsync<OrderEntity>(connectionString, @"SELECT
                           OrderId,
                           Description,
                           OrganisationId,
@@ -144,7 +144,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
                           IsDeleted,
                           Completed
                          FROM dbo.[Order]
-                         WHERE OrderId = @orderId;", new { orderId }));
+                         WHERE OrderId = @orderId;", new { orderId });
         }
     }
 }

@@ -27,7 +27,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
             string returnValue = match.Value;
 
             var matchedValue = match.Groups[PatternMatchGroupKey];
-            if (Int32.TryParse(matchedValue.Value, NumberStyles.Integer, new NumberFormatInfo(), out var stringLength))
+            if (int.TryParse(matchedValue.Value, NumberStyles.Integer, new NumberFormatInfo(), out var stringLength))
             {
                 returnValue = new string('a', stringLength);
             }

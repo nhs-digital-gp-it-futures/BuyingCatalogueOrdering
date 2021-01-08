@@ -13,7 +13,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Attributes
         public int Days { get; }
 
         protected override ValidationResult IsValid(
-                    object value,
+            object value,
             ValidationContext validationContext)
         {
             if (validationContext is null)

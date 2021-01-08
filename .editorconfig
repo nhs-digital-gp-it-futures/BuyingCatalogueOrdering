@@ -213,21 +213,6 @@ dotnet_diagnostic.SA1117.severity = none
 # SA1118: Parameter should not span multiple lines
 dotnet_diagnostic.SA1118.severity = none
 
-# SA1119: Statement should not use unnecessary parenthesis
-dotnet_diagnostic.SA1119.severity = none
-
-# SA1121: Use built-in type alias
-dotnet_diagnostic.SA1121.severity = none
-
-# SA1127: Generic type constraints should be on their own line
-dotnet_diagnostic.SA1127.severity = none
-
-# SA1128: Put constructor initializers on their own line
-dotnet_diagnostic.SA1128.severity = none
-
-# SA1137: Elements should have the same indentation
-dotnet_diagnostic.SA1137.severity = none
-
 # SA1200: Using directives should be placed correctly
 dotnet_diagnostic.SA1200.severity = none
 

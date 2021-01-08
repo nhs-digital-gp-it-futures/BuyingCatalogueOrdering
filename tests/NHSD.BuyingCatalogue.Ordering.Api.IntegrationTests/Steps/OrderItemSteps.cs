@@ -106,7 +106,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Then(@"the list order items response contains no entries")]
         public async Task ThenAnEmptyCatalogueItemListIsReturned()
         {
-            var orderItems = (await response.ReadBodyAsJsonAsync());
+            var orderItems = await response.ReadBodyAsJsonAsync();
             orderItems.Count().Should().Be(0);
         }
 
