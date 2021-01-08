@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Data;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder;
@@ -38,8 +34,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
                     .Build());
         }
 
-        public static OrderSummaryDataBuilder Create(string orderId = "C000016-01") =>
-            new OrderSummaryDataBuilder(orderId);
+        public static OrderSummaryDataBuilder Create(string orderId = "C000016-01") => new(orderId);
 
         public OrderSummaryDataBuilder WithOrderEntity(OrderEntity orderEntity)
         {

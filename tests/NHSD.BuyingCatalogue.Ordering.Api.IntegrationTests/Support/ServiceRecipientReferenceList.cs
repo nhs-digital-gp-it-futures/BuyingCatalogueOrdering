@@ -8,7 +8,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
 {
     internal sealed class ServiceRecipientReferenceList
     {
-        private readonly Dictionary<string, ServiceRecipientEntity> _cache = new Dictionary<string, ServiceRecipientEntity>();
+        private readonly Dictionary<string, ServiceRecipientEntity> _cache = new();
 
         public void Add(ServiceRecipientEntity entity)
         {

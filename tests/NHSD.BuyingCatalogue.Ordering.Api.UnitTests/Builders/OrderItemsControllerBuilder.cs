@@ -15,10 +15,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         {
         }
 
-        internal static OrderItemsControllerBuilder Create()
-        {
-            return new OrderItemsControllerBuilder();
-        }
+        internal static OrderItemsControllerBuilder Create() => new();
 
         internal OrderItemsControllerBuilder WithOrderRepository(IOrderRepository repository)
         {
@@ -38,7 +35,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
-        internal OrderItemsController Build() => new OrderItemsController(
+        internal OrderItemsController Build() => new(
             orderRepository,
             updateOrderItemRepository,
             createOrderItemService);

@@ -54,8 +54,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         {
             var expectedErrors = new List<ErrorDetails>
             {
-                new ErrorDetails("Error1", "ErrorField"),
-                new ErrorDetails("Error2", "ErrorField"),
+                new("Error1", "ErrorField"),
+                new("Error2", "ErrorField"),
             };
 
             validator

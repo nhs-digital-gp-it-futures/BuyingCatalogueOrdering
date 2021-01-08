@@ -28,10 +28,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _fundingSource = SectionModel.FundingSource;
         }
 
-        public static SectionModelListBuilder Create()
-        {
-            return new SectionModelListBuilder();
-        }
+        public static SectionModelListBuilder Create() => new();
 
         public SectionModelListBuilder WithDescription(SectionModel description)
         {

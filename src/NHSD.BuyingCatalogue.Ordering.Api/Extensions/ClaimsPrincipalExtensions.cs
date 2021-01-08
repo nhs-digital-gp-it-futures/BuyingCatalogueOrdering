@@ -9,12 +9,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 
         public static Guid GetPrimaryOrganisationId(this ClaimsPrincipal user)
         {
-            return new Guid(user.FindFirst(PrimaryOrganisationIdType).Value);
+            return new(user.FindFirst(PrimaryOrganisationIdType).Value);
         }
 
         public static Guid GetUserId(this ClaimsPrincipal user)
         {
-            return new Guid(user.FindFirstValue(ClaimTypes.NameIdentifier));
+            return new(user.FindFirstValue(ClaimTypes.NameIdentifier));
         }
 
         public static string GetUserName(this ClaimsPrincipal user)

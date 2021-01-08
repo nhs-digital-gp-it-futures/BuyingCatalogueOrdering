@@ -11,7 +11,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
         private const string PatternMatchGroupKey = "StringLength";
 
         private static readonly Regex _substituteStringPattern =
-            new Regex(@$"#A string of length (?<{PatternMatchGroupKey}>\d+)#", RegexOptions.IgnoreCase);
+            new(@$"#A string of length (?<{PatternMatchGroupKey}>\d+)#", RegexOptions.IgnoreCase);
 
         public bool CanRetrieve(KeyValuePair<string, string> keyValuePair, Type targetType, Type propertyType)
             => propertyType == typeof(string) && _substituteStringPattern.IsMatch(keyValuePair.Value);

@@ -7,7 +7,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Results
 {
     public sealed class Result : IEquatable<Result>
     {
-        private static readonly Result _success = new Result();
+        private static readonly Result _success = new();
 
         public bool IsSuccess { get; }
 
@@ -34,27 +34,27 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Results
 
         public static Result<T> Success<T>(T value)
         {
-            return new Result<T>(true, new List<ErrorDetails>(), value);
+            return new(true, new List<ErrorDetails>(), value);
         }
 
         public static Result Failure(IEnumerable<ErrorDetails> errors)
         {
-            return new Result(errors);
+            return new(errors);
         }
 
         public static Result Failure(params ErrorDetails[] errors)
         {
-            return new Result(errors);
+            return new(errors);
         }
 
         public static Result<T> Failure<T>(params ErrorDetails[] errors)
         {
-            return new Result<T>(false, errors, default);
+            return new(false, errors, default);
         }
 
         public static Result<T> Failure<T>(IEnumerable<ErrorDetails> errors)
         {
-            return new Result<T>(false, errors, default);
+            return new(false, errors, default);
         }
 
         private static bool AreErrorsEqual(IEnumerable<ErrorDetails> first, IEnumerable<ErrorDetails> second)

@@ -13,7 +13,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
 
         public static AddressEntityBuilder Create()
         {
-            return new AddressEntityBuilder();
+            return new();
         }
 
         public AddressEntityBuilder WithLine1(string line1)

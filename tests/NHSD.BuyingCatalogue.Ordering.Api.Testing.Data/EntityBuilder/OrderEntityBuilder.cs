@@ -61,7 +61,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
 
         public static OrderEntityBuilder Create()
         {
-            return new OrderEntityBuilder();
+            return new();
         }
 
         public OrderEntityBuilder WithOrderId(string orderId)
@@ -216,7 +216,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
 
         public OrderEntity Build()
         {
-            return new OrderEntity
+            return new()
             {
                 OrderId = _orderId,
                 Description = _description,

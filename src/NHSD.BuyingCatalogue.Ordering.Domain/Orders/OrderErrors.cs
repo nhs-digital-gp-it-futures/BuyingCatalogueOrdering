@@ -4,22 +4,22 @@
     {
         public static ErrorDetails OrderDescriptionRequired()
         {
-            return new ErrorDetails("OrderDescriptionRequired", nameof(Order.Description));
+            return new("OrderDescriptionRequired", nameof(Order.Description));
         }
 
         public static ErrorDetails OrderDescriptionTooLong()
         {
-            return new ErrorDetails("OrderDescriptionTooLong", nameof(Order.Description));
+            return new("OrderDescriptionTooLong", nameof(Order.Description));
         }
 
         public static ErrorDetails OrderOrganisationIdRequired()
         {
-            return new ErrorDetails("OrganisationIdRequired", nameof(Order.OrganisationId));
+            return new("OrganisationIdRequired", nameof(Order.OrganisationId));
         }
 
         public static ErrorDetails OrderNotComplete()
         {
-            return new ErrorDetails("OrderNotComplete");
+            return new("OrderNotComplete");
         }
     }
 }

@@ -8,7 +8,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Validation
 {
     public sealed class AggregateValidationResult
     {
-        private readonly Dictionary<int, ValidationResult> failedValidations = new Dictionary<int, ValidationResult>();
+        private readonly Dictionary<int, ValidationResult> failedValidations = new();
 
         public IReadOnlyDictionary<int, ValidationResult> FailedValidations => failedValidations;
 

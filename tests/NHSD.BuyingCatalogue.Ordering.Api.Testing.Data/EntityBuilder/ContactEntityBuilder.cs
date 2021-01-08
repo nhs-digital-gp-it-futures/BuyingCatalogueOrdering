@@ -13,7 +13,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
 
         public static ContactEntityBuilder Create()
         {
-            return new ContactEntityBuilder();
+            return new();
         }
 
         public ContactEntityBuilder WithFirstName(string firstName)

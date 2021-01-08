@@ -11,8 +11,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
         {
         }
 
-        public static CreatePurchasingDocumentServiceBuilder Create() =>
-            new CreatePurchasingDocumentServiceBuilder();
+        public static CreatePurchasingDocumentServiceBuilder Create() => new();
 
         public CreatePurchasingDocumentServiceBuilder WithPatientNumbersCsvWriter(
             ICsvStreamWriter<OdooPatientNumbersOrderItem> patientNumbersCsvStreamWriter)
@@ -28,7 +27,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
             return this;
         }
 
-        public CreatePurchasingDocumentService Build() =>
-            new CreatePurchasingDocumentService(patientNumbersCsvWriter, priceTypeCsvWriter);
+        public CreatePurchasingDocumentService Build() => new(patientNumbersCsvWriter, priceTypeCsvWriter);
     }
 }

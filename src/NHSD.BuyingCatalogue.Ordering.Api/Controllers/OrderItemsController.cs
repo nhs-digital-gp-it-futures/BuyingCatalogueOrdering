@@ -83,7 +83,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 order.OrganisationOdsCode,
                 new ServiceRecipient { OdsCode = order.OrganisationOdsCode, Name = order.OrganisationName });
 
-            GetOrderItemModel Selector(OrderItem item) => new GetOrderItemModel(
+            GetOrderItemModel Selector(OrderItem item) => new(
                 item,
                 serviceRecipients[item.OdsCode],
                 serviceInstanceItems.GetValueOrDefault(item.OrderItemId));
