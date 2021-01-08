@@ -16,8 +16,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _controllerContext = null;
         }
 
-        public static FundingSourceControllerBuilder Create() => 
-            new FundingSourceControllerBuilder();
+        public static FundingSourceControllerBuilder Create() => new();
 
         public FundingSourceControllerBuilder WithOrderRepository(IOrderRepository orderRepository)
         {
@@ -31,10 +30,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
-        public FundingSourceController Build() => 
-            new FundingSourceController(_orderRepository)
-            {
-                ControllerContext = _controllerContext
-            };
+        public FundingSourceController Build() => new(_orderRepository) { ControllerContext = _controllerContext };
     }
 }

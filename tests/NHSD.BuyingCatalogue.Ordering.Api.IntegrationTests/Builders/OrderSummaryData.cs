@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
@@ -18,7 +15,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
         public OrderSummaryData(OrderEntity orderEntity, ServiceRecipientEntity serviceRecipientEntity, OrderItemEntity catalogueSolutionEntity, OrderItemEntity additionalServiceEntity, OrderItemEntity associatedServiceEntity)
         {
             OrderEntity = orderEntity;
-            
+
             ServiceRecipientEntity = serviceRecipientEntity;
             CatalogueSolutionEntity = catalogueSolutionEntity;
             AdditionalServiceEntity = additionalServiceEntity;

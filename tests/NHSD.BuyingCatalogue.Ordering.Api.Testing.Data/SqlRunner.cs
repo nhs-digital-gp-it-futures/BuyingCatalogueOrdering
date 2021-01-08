@@ -31,6 +31,5 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data
             await using var databaseConnection = new SqlConnection(connectionString);
             return await databaseConnection.QueryAsync<T>(sql, parameters);
         }
-
     }
 }

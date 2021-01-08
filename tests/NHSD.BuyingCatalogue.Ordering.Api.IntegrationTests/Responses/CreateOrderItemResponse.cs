@@ -13,7 +13,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
             _response = response;
         }
 
-        public async Task<int?> GetOrderItemIdAsync() => 
+        public async Task<int?> GetOrderItemIdAsync() =>
             (await _response.ReadBodyAsJsonAsync()).Value<int>("orderItemId");
     }
 }

@@ -20,12 +20,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [Test]
         public void Constructor_NullOrderRepository_ThrowsException()
         {
-            static void Test()
-            {
-                var context = CreateOrderServiceTestContext.Setup();
-                var sut = new CreateOrderService(null);
-            }
-            Assert.Throws<ArgumentNullException>(Test);
+            Assert.Throws<ArgumentNullException>(() => _ = new CreateOrderService(null));
         }
 
         [Test]
@@ -88,12 +83,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 .Create()
                 .WithOrganisationId(Guid.Empty)
                 .Build();
-            
 
             var actual = await sut.CreateAsync(request);
 
             var expected = Result.Failure<string>(new List<ErrorDetails> { new("OrganisationIdRequired", "OrganisationId") });
-            
+
             actual.Should().Be(expected);
         }
 
@@ -151,9 +145,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
         internal CreateOrderService CreateOrderService { get; }
 
-        public static CreateOrderServiceTestContext Setup()
-        {
-            return new CreateOrderServiceTestContext();
-        }
+        public static CreateOrderServiceTestContext Setup() => new();
     }
 }

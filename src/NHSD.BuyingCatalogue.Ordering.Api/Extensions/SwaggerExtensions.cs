@@ -40,10 +40,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
                         TokenUrl = tokenUrl,
                         Scopes = new Dictionary<string, string>
                         {
-                            { "Ordering", "Organisation" }
-                        }
-                    }
-                }
+                            { "Ordering", "Organisation" },
+                        },
+                    },
+                },
             };
 
             services.AddSwaggerGen(options =>
@@ -52,7 +52,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
                 {
                     Version = Version,
                     Title = "Ordering API",
-                    Description = "NHS Digital GP IT Buying Catalogue HTTP Ordering API"
+                    Description = "NHS Digital GP IT Buying Catalogue HTTP Ordering API",
                 });
 
                 options.AddSecurityDefinition("oauth2", openApiSecurityScheme);
@@ -96,11 +96,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
                 }
 
                 operation.Responses.TryAdd(
-                    StatusCodes.Status401Unauthorized.ToString(CultureInfo.InvariantCulture), 
+                    StatusCodes.Status401Unauthorized.ToString(CultureInfo.InvariantCulture),
                     new OpenApiResponse { Description = "Unauthorized" });
 
                 operation.Responses.TryAdd(
-                    StatusCodes.Status403Forbidden.ToString(CultureInfo.InvariantCulture), 
+                    StatusCodes.Status403Forbidden.ToString(CultureInfo.InvariantCulture),
                     new OpenApiResponse { Description = "Forbidden" });
 
                 var oAuthScheme = new OpenApiSecurityScheme
@@ -109,7 +109,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
                     {
                         Id = "oauth2",
                         Type = ReferenceType.SecurityScheme,
-                    }
+                    },
                 };
 
                 operation.Security = new List<OpenApiSecurityRequirement>

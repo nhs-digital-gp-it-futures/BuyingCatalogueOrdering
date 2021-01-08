@@ -8,12 +8,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
 {
     internal sealed class OrderItemReferenceList
     {
-        private readonly Dictionary<string, OrderItemEntity> _cache = new Dictionary<string, OrderItemEntity>();
+        private readonly Dictionary<string, OrderItemEntity> _cache = new();
 
-        public IEnumerable<OrderItemEntity> GetAll() => 
+        public IEnumerable<OrderItemEntity> GetAll() =>
             _cache.Values;
 
-        public OrderItemEntity GetByOrderCatalogueItemName(string catalogueItemName) => 
+        public OrderItemEntity GetByOrderCatalogueItemName(string catalogueItemName) =>
             _cache[catalogueItemName]
                 .Should()
                 .NotBeNull()
@@ -32,7 +32,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
         public IEnumerable<OrderItemEntity> FindByOrderId(string orderId) => _cache.Values.Where(x =>
             string.Equals(x.OrderId, orderId, StringComparison.OrdinalIgnoreCase));
 
-        public OrderItemEntity FindByOrderItemId(int? orderItemId) => 
+        public OrderItemEntity FindByOrderItemId(int? orderItemId) =>
             _cache.Values.SingleOrDefault(x => x.OrderItemId == orderItemId.GetValueOrDefault());
     }
 }

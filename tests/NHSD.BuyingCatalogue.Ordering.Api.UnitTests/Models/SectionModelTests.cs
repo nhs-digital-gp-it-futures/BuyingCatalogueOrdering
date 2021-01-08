@@ -13,7 +13,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         public void Description_ReturnsExpected()
         {
             var actual = SectionModel.Description;
-            
+
             actual.Id.Should().Be("description");
             actual.Status.Should().Be("complete");
         }
@@ -22,7 +22,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         public void OrderingParty_ReturnsExpected()
         {
             var actual = SectionModel.OrderingParty;
-            
+
             actual.Id.Should().Be("ordering-party");
             actual.Status.Should().Be("incomplete");
         }

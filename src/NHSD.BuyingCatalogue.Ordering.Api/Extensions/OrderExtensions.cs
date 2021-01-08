@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using NHSD.BuyingCatalogue.Ordering.Domain;
+﻿using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 {
@@ -26,6 +25,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
             {
                 return false;
             }
+
             return order.ServiceRecipientsViewed;
         }
 
@@ -35,6 +35,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
             {
                 return false;
             }
+
             return order.CatalogueSolutionsViewed;
         }
 
@@ -58,7 +59,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
             return !(order is null) && order.AssociatedServicesViewed;
         }
 
-        public static bool IsSectionStatusComplete(this Order order) => 
+        public static bool IsSectionStatusComplete(this Order order) =>
             order != null && order.CanComplete();
     }
 }

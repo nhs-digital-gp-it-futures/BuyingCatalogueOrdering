@@ -14,7 +14,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _name = "Some name";
         }
 
-        internal static ServiceRecipientBuilder Create() => new ServiceRecipientBuilder();
+        internal static ServiceRecipientBuilder Create() => new();
 
         internal ServiceRecipientBuilder WithOdsCode(string odsCode)
         {
@@ -34,15 +34,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
-        internal ServiceRecipient Build() => 
-            new ServiceRecipient
+        internal ServiceRecipient Build() =>
+            new()
             {
                 OdsCode = _odsCode,
                 Name = _name,
                 Order = OrderBuilder
                     .Create()
                     .WithOrderId(_orderId)
-                    .Build()
+                    .Build(),
             };
     }
 }

@@ -48,7 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = OrderDescriptionTestContext.Setup();
 
             (Order order, OrderDescriptionModel expectedDescription) = CreateOrderDescriptionTestData(
-                orderId, 
+                orderId,
                 OrderDescription.Create("Test Description").Value,
                 context.PrimaryOrganisationId);
 
@@ -130,10 +130,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = OrderDescriptionTestContext.Setup();
 
             (Order order, _) = CreateOrderDescriptionTestData(
-                orderId, 
-                OrderDescription.Create("Test Description").Value, 
+                orderId,
+                OrderDescription.Create("Test Description").Value,
                 context.PrimaryOrganisationId);
-            
+
             context.Order = order;
 
             using var controller = context.OrderDescriptionController;
@@ -154,7 +154,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = OrderDescriptionTestContext.Setup();
 
             (Order order, _) = CreateOrderDescriptionTestData(
-                orderId, 
+                orderId,
                 OrderDescription.Create("Test Description").Value,
                 context.PrimaryOrganisationId);
 
@@ -200,7 +200,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = OrderDescriptionTestContext.Setup();
 
             (Order order, _) = CreateOrderDescriptionTestData(
-                orderId, 
+                orderId,
                 OrderDescription.Create("Test Description").Value,
                 context.PrimaryOrganisationId);
 

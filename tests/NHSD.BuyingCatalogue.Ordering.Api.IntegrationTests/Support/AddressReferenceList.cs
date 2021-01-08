@@ -8,7 +8,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
 {
     internal sealed class AddressReferenceList
     {
-        private readonly Dictionary<int, AddressEntity> _cache = new Dictionary<int, AddressEntity>();
+        private readonly Dictionary<int, AddressEntity> _cache = new();
 
         public IEnumerable<AddressEntity> GetAll() =>
             _cache.Values;
@@ -23,7 +23,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
 
         public AddressEntity GetByPostcode(string postcode) =>
             GetAll()
-                .FirstOrDefault(addressEntity => 
+                .FirstOrDefault(addressEntity =>
                     string.Equals(postcode, addressEntity.Postcode, StringComparison.OrdinalIgnoreCase));
 
         public void Add(AddressEntity addressEntity)

@@ -48,7 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var actual = new SupplierSectionTable
             {
                 SupplierId = response.Value<string>("supplierId"),
-                SupplierName = response.Value<string>("name")
+                SupplierName = response.Value<string>("name"),
             };
 
             var expected = table.CreateInstance<SupplierSectionTable>();
@@ -68,7 +68,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 FirstName = primaryContactResponse.Value<string>("firstName"),
                 LastName = primaryContactResponse.Value<string>("lastName"),
                 Email = primaryContactResponse.Value<string>("emailAddress"),
-                Phone = primaryContactResponse.Value<string>("telephoneNumber")
+                Phone = primaryContactResponse.Value<string>("telephoneNumber"),
             };
 
             var expected = table.CreateInstance<SupplierContactTable>();
@@ -93,7 +93,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 Town = address.Value<string>("town"),
                 County = address.Value<string>("county"),
                 Postcode = address.Value<string>("postcode"),
-                Country = address.Value<string>("country")
+                Country = address.Value<string>("country"),
             };
 
             var expected = table.CreateInstance<SupplierAddressTable>();
@@ -104,7 +104,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public async Task WhenTheUserMakesARequestToUpdateTheSupplierWithOrderId(string orderId, Table table)
         {
             var supplierTable = table.CreateInstance<SupplierSectionTable>();
-            
+
             _context.TryGetValue(ScenarioContextKeys.SupplierAddress, out var address);
             _context.TryGetValue(ScenarioContextKeys.SupplierContact, out var contact);
 
@@ -113,7 +113,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 supplierTable.SupplierId,
                 Name = supplierTable.SupplierName,
                 Address = address,
-                PrimaryContact = contact
+                PrimaryContact = contact,
             };
 
             await _request.PutJsonAsync(string.Format(_orderSupplierSectionUrl, orderId), data);
@@ -167,7 +167,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var address = table.CreateInstance<SupplierAddressTable>();
             _context[ScenarioContextKeys.SupplierAddress] = address;
         }
-        
+
         [Given(@"the user wants to update the supplier contact section")]
         public void WhenTheUserWantsToUpdateTheSectionForTheContact(Table table)
         {

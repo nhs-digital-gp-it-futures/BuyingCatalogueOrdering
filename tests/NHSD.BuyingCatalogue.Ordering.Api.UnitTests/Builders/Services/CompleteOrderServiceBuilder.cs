@@ -20,8 +20,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
         {
         }
 
-        public static CompleteOrderServiceBuilder Create() => 
-            new CompleteOrderServiceBuilder();
+        public static CompleteOrderServiceBuilder Create() => new();
 
         public CompleteOrderServiceBuilder WithIdentityService(IIdentityService identityService)
         {
@@ -54,8 +53,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
             return this;
         }
 
-        public CompleteOrderService Build() =>
-            new CompleteOrderService(_identityService, _orderRepository, _emailService,
-                _createPurchasingDocumentService, _purchasingSettings);
+        public CompleteOrderService Build() => new(
+            _identityService,
+            _orderRepository,
+            _emailService,
+            _createPurchasingDocumentService,
+            _purchasingSettings);
     }
 }

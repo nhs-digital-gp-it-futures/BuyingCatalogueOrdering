@@ -25,6 +25,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             {
                 return Result.Failure<Guid>(OrderErrors.OrderOrganisationIdRequired());
             }
+
             return Result.Success(organisationId);
         }
 

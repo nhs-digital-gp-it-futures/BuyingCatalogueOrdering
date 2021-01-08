@@ -19,8 +19,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
             _quantity = 100;
         }
 
-        public static UpdateOrderItemRequestPayloadBuilder Create() => 
-            new UpdateOrderItemRequestPayloadBuilder();
+        public static UpdateOrderItemRequestPayloadBuilder Create() => new();
 
         public UpdateOrderItemRequestPayloadBuilder WithDeliveryDate(DateTime? deliveryDate)
         {
@@ -48,7 +47,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
 
         public UpdateOrderItemRequestPayload Build()
         {
-            return new UpdateOrderItemRequestPayload
+            return new()
             {
                 DeliveryDate = _deliveryDate,
                 EstimationPeriod = _estimationPeriod,

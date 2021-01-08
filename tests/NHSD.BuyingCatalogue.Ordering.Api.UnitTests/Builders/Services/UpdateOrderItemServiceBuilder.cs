@@ -19,7 +19,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
             _orderItemValidator = Mock.Of<IUpdateOrderItemValidator>();
         }
 
-        public static UpdateOrderItemServiceBuilder Create() => new UpdateOrderItemServiceBuilder();
+        public static UpdateOrderItemServiceBuilder Create() => new();
 
         public UpdateOrderItemServiceBuilder WithOrderRepository(IOrderRepository orderRepository)
         {
@@ -42,7 +42,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
         public UpdateOrderItemService Build()
         {
             return new(
-                _orderRepository, 
+                _orderRepository,
                 _identityService,
                 _orderItemValidator);
         }

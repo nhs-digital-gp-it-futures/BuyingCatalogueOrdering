@@ -198,17 +198,11 @@ dotnet_remove_unnecessary_suppression_exclusions = category: ReSharper
 # SA0001: XML comment analysis is disabled due to project configuration
 dotnet_diagnostic.SA0001.severity = none
 
-# SA1028: Code should not contain trailing whitespace
-dotnet_diagnostic.SA1028.severity = none
-
 # SA1101: Prefix local calls with this
 dotnet_diagnostic.SA1101.severity = none
 
 # SA1106: Code should not contain empty statements
 dotnet_diagnostic.SA1106.severity = none
-
-# SA1107: Code should not contain multiple statements on one line
-dotnet_diagnostic.SA1107.severity = none
 
 # SA1111: Closing parenthesis should be on line of last parameter
 dotnet_diagnostic.SA1111.severity = none
@@ -294,26 +288,8 @@ dotnet_diagnostic.SA1408.severity = none
 # SA1414: Tuple types in signatures should have element names
 dotnet_diagnostic.SA1414.severity = none
 
-# SA1500: Braces for multi-line statements should not share line
-dotnet_diagnostic.SA1500.severity = none
-
-# SA1505: Opening braces should not be followed by blank line
-dotnet_diagnostic.SA1505.severity = none
-
-# SA1507: Code should not contain multiple blank lines in a row
-dotnet_diagnostic.SA1507.severity = none
-
-# SA1508: Closing braces should not be preceded by blank line
-dotnet_diagnostic.SA1508.severity = none
-
-# SA1513: Closing brace should be followed by blank line
-dotnet_diagnostic.SA1513.severity = none
-
 # SA1516: Elements should be separated by blank line
 dotnet_diagnostic.SA1516.severity = none
-
-# SA1518: Use line endings correctly at end of file
-dotnet_diagnostic.SA1518.severity = none
 
 # SA1600: Elements should be documented
 dotnet_diagnostic.SA1600.severity = none

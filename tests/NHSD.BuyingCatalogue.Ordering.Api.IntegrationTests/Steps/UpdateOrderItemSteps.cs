@@ -32,7 +32,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var orderItemId = _orderContext.OrderItemReferenceList.GetByOrderCatalogueItemName(name).OrderItemId;
 
             _updateOrderItemRequest = new UpdateOrderItemRequest(
-                _request, 
+                _request,
                 _settings.OrderingApiBaseUrl,
                 orderId,
                 orderItemId);
@@ -49,7 +49,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             await _updateOrderItemRequest.ExecuteAsync();
         }
-        
+
         [Then(@"the order item is updated")]
         public async Task ThenTheOrderItemIsUpdated()
         {

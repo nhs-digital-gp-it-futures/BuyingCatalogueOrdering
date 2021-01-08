@@ -16,24 +16,27 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
     internal abstract class CreateOrderItemBaseRequest
     {
         private static readonly Dictionary<string, Func<Request, string, string, CreateOrderItemBaseRequest>> CreateFunctions
-            = new Dictionary<string, Func<Request, string, string, CreateOrderItemBaseRequest>>
-        {
-            { "catalogue solution", (request, url, orderId) => new CreateCatalogueSolutionOrderItemRequest(
-                request,
-                url,
-                orderId)
-            },
-            { "additional service", (request, url, orderId) => new CreateAdditionalServiceOrderItemRequest(
-                request,
-                url,
-                orderId)
-            },
-            { "associated service", (request, url, orderId) => new CreateAssociatedServiceOrderItemRequest(
-                request,
-                url,
-                orderId)
-            }
-        };
+            = new()
+            {
+                {
+                    "catalogue solution", (request, url, orderId) => new CreateCatalogueSolutionOrderItemRequest(
+                        request,
+                        url,
+                        orderId)
+                },
+                {
+                    "additional service", (request, url, orderId) => new CreateAdditionalServiceOrderItemRequest(
+                        request,
+                        url,
+                        orderId)
+                },
+                {
+                    "associated service", (request, url, orderId) => new CreateAssociatedServiceOrderItemRequest(
+                        request,
+                        url,
+                        orderId)
+                }
+            };
 
         private readonly Request request;
         private readonly string createOrderItemUrl;
@@ -103,19 +106,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                 ProvisioningType = Payload.ProvisioningType?.ToString(),
                 Type = Payload.CataloguePriceType?.ToString(),
                 Payload.CurrencyCode,
-                ItemUnit = Payload.HasItemUnit ?
-                    new
+                ItemUnit = Payload.HasItemUnit
+                    ? new
                     {
                         Name = Payload.ItemUnitName,
-                        Description = Payload.ItemUnitNameDescription
-                    } : null,
+                        Description = Payload.ItemUnitNameDescription,
+                    }
+                    : null,
                 Payload.Price,
                 TimeUnit = Payload.HasTimeUnit ?
                     new
                     {
                         Name = Payload.TimeUnitName,
-                        Description = Payload.TimeUnitDescription
-                    } : null,
+                        Description = Payload.TimeUnitDescription,
+                    }
+                    : null,
             };
         }
 

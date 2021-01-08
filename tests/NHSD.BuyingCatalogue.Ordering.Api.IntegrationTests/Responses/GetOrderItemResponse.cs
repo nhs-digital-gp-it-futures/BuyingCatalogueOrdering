@@ -23,7 +23,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
         }
 
         public void AssertBody(
-            OrderItemEntity orderItemEntity, 
+            OrderItemEntity orderItemEntity,
             ServiceRecipientEntity serviceRecipient)
         {
             var actual = ReadOrderItem(JToken.Parse(_content));

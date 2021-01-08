@@ -8,7 +8,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
 {
     internal sealed class ContactReferenceList
     {
-        private readonly Dictionary<int, ContactEntity> _cache = new Dictionary<int, ContactEntity>();
+        private readonly Dictionary<int, ContactEntity> _cache = new();
 
         public IEnumerable<ContactEntity> GetAll() =>
             _cache.Values;
@@ -23,7 +23,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
 
         public ContactEntity GetByEmail(string email) =>
             GetAll()
-                .FirstOrDefault(contactEntity => 
+                .FirstOrDefault(contactEntity =>
                     string.Equals(email, contactEntity.Email, StringComparison.OrdinalIgnoreCase));
 
         public void Add(ContactEntity contactEntity)

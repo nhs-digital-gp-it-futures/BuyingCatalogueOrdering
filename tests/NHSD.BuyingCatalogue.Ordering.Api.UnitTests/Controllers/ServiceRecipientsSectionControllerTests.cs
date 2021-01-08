@@ -21,6 +21,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
     [Parallelizable(ParallelScope.All)]
     internal sealed class ServiceRecipientsSectionControllerTests
     {
+        private static ServiceRecipientsModel DefaultServiceRecipientsModel
+        {
+            get
+            {
+                var service = ServiceRecipientsModelBuilder.Create()
+                    .WithServiceRecipientModel(ServiceRecipientModelBuilder.Create().Build())
+                    .Build();
+                return service;
+            }
+        }
+
         [TestCase(false, true)]
         [TestCase(true, false)]
         [TestCase(false, false)]
@@ -91,7 +102,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             };
 
             context.ServiceRecipients = serviceRecipients.Select(x => x.serviceRecipient).ToList();
-
 
             var expectedList = serviceRecipients.Select(x => x.expectedModel);
 
@@ -276,17 +286,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             context.ServiceRecipientRepositoryMock.Verify(x => x.UpdateAsync(expectedOrderId, It.IsAny<IEnumerable<ServiceRecipient>>()), Times.Once);
         }
 
-        private static ServiceRecipientsModel DefaultServiceRecipientsModel
-        {
-            get
-            {
-                var service = ServiceRecipientsModelBuilder.Create()
-                    .WithServiceRecipientModel(ServiceRecipientModelBuilder.Create().Build())
-                    .Build();
-                return service;
-            }
-        }
-
         private static (ServiceRecipient serviceRecipient, ServiceRecipientModel expectedModel)
             CreateServiceRecipientData(string odsCode, string orderId, string name)
         {
@@ -351,16 +350,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             internal ServiceRecipientsSectionController Controller { get; }
 
-            private ClaimsPrincipal ClaimsPrincipal { get; }
-            
             internal Guid UserId { get; }
 
             internal string Username { get; }
 
-            internal static ServiceRecipientsTestContext Setup()
-            {
-                return new ServiceRecipientsTestContext();
-            }
+            private ClaimsPrincipal ClaimsPrincipal { get; }
+
+            internal static ServiceRecipientsTestContext Setup() => new();
         }
     }
 }

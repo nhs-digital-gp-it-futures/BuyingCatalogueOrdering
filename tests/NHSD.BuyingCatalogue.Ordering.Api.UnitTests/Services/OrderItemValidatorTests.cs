@@ -63,9 +63,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         {
             var expectedFailedValidations = new Dictionary<int, ValidationResult>
             {
-                { 1, new ValidationResult(new ErrorDetails(
-                    nameof(UpdateOrderItemModel.OrderItemId) + "Duplicate",
-                    nameof(UpdateOrderItemModel.OrderItemId)))
+                {
+                    1, new ValidationResult(new ErrorDetails(
+                        nameof(UpdateOrderItemModel.OrderItemId) + "Duplicate",
+                        nameof(UpdateOrderItemModel.OrderItemId)))
                 },
             };
 
@@ -96,13 +97,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         {
             var expectedFailedValidations = new Dictionary<int, ValidationResult>
             {
-                { 0, new ValidationResult(new ErrorDetails(
-                    nameof(UpdateOrderItemModel.DeliveryDate) + "OutsideDeliveryWindow",
-                    nameof(UpdateOrderItemModel.DeliveryDate)))
+                {
+                    0, new ValidationResult(new ErrorDetails(
+                        nameof(UpdateOrderItemModel.DeliveryDate) + "OutsideDeliveryWindow",
+                        nameof(UpdateOrderItemModel.DeliveryDate)))
                 },
-                { 1, new ValidationResult(new ErrorDetails(
-                    nameof(UpdateOrderItemModel.DeliveryDate) + "Required",
-                    nameof(UpdateOrderItemModel.DeliveryDate)))
+                {
+                    1, new ValidationResult(new ErrorDetails(
+                        nameof(UpdateOrderItemModel.DeliveryDate) + "Required",
+                        nameof(UpdateOrderItemModel.DeliveryDate)))
                 },
             };
 
@@ -132,9 +135,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         {
             var expectedFailedValidations = new Dictionary<int, ValidationResult>
             {
-                { 0, new ValidationResult(new ErrorDetails(
-                    nameof(UpdateOrderItemModel.OrderItemId) + "NotFound",
-                    nameof(UpdateOrderItemModel.OrderItemId)))
+                {
+                    0, new ValidationResult(new ErrorDetails(
+                        nameof(UpdateOrderItemModel.OrderItemId) + "NotFound",
+                        nameof(UpdateOrderItemModel.OrderItemId)))
                 },
             };
 
