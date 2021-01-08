@@ -14,7 +14,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         {
         }
 
-        private OrderOrganisationId(Guid value) : this()
+        private OrderOrganisationId(Guid value)
+            : this()
         {
             Value = value;
         }

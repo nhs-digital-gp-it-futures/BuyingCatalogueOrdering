@@ -34,14 +34,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
                 return null;
             }
 
-            return (await SqlRunner.QueryFirstAsync<ContactEntity>(connectionString, @"SELECT
+            return await SqlRunner.QueryFirstAsync<ContactEntity>(connectionString, @"SELECT
                          ContactId,
                          FirstName,
                          LastName,
                          Email,
                          Phone
                          FROM dbo.Contact
-                         WHERE ContactId = @contactId;", new { contactId }));
+                         WHERE ContactId = @contactId;", new { contactId });
         }
     }
 }

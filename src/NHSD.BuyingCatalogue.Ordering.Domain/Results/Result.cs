@@ -13,11 +13,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Results
 
         public IReadOnlyCollection<ErrorDetails> Errors { get; }
 
-        private Result() : this(true, Enumerable.Empty<ErrorDetails>())
+        private Result()
+            : this(true, Enumerable.Empty<ErrorDetails>())
         {
         }
 
-        private Result(IEnumerable<ErrorDetails> errors) : this(false, errors)
+        private Result(IEnumerable<ErrorDetails> errors)
+            : this(false, errors)
         {
         }
 

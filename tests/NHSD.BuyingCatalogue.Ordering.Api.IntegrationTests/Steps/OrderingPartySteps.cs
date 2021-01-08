@@ -129,7 +129,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var expected = table.CreateSet<OrganisationTable>().FirstOrDefault();
 
-            var response = (await _response.ReadBodyAsJsonAsync());
+            var response = await _response.ReadBodyAsJsonAsync();
 
             var actual = new OrganisationTable
             {

@@ -13,8 +13,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
             var baseUrl = settings.OrderingApiBaseUrl;
             TimeSpan testTimeOut = TimeSpan.FromSeconds(settings.OrderingApiHealthCheckTimeout);
 
-            await AwaitApiRunningAsync(($"{baseUrl}/health/live"), testTimeOut);
-            await AwaitApiRunningAsync(($"{baseUrl}/health/ready"), testTimeOut);
+            await AwaitApiRunningAsync($"{baseUrl}/health/live", testTimeOut);
+            await AwaitApiRunningAsync($"{baseUrl}/health/ready", testTimeOut);
         }
 
         internal async Task AwaitApiRunningAsync(string url, TimeSpan testTimeOut)

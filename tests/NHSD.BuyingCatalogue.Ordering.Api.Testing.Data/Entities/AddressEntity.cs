@@ -49,7 +49,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
                 return null;
             }
 
-            return (await SqlRunner.QueryFirstAsync<AddressEntity>(connectionString, @"SELECT
+            return await SqlRunner.QueryFirstAsync<AddressEntity>(connectionString, @"SELECT
                           AddressId,
                           Line1,
                           Line2,
@@ -61,7 +61,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
                           Postcode,
                           Country
                          FROM dbo.[Address]
-                         WHERE AddressId = @addressId;", new { addressId }));
+                         WHERE AddressId = @addressId;", new { addressId });
         }
     }
 }

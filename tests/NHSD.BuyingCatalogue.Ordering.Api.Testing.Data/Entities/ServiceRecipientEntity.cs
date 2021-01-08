@@ -25,11 +25,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 
         public static async Task<IEnumerable<ServiceRecipientEntity>> FetchAllServiceRecipients(string connectionString)
         {
-            return (await SqlRunner.QueryAsync<ServiceRecipientEntity>(connectionString, @"SELECT
+            return await SqlRunner.QueryAsync<ServiceRecipientEntity>(connectionString, @"SELECT
                           OdsCode,
                           Name,
                           OrderId
-                         FROM dbo.ServiceRecipient;"));
+                         FROM dbo.ServiceRecipient;");
         }
     }
 }

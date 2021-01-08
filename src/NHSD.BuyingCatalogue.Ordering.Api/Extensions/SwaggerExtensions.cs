@@ -79,7 +79,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 
             app.UseSwaggerUI(options =>
             {
-                options.SwaggerEndpoint($"{(endpointPrefix)}/swagger/{Version}/swagger.json", $"Buying Catalogue Ordering API {Version}");
+                options.SwaggerEndpoint($"{endpointPrefix}/swagger/{Version}/swagger.json", $"Buying Catalogue Ordering API {Version}");
             });
 
             return app;

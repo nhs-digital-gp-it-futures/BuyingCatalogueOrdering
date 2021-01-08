@@ -29,7 +29,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             var order = OrderBuilder.Create().Build();
             var orderItem = OrderItemBuilder.Create().Build();
 
-            order.AddOrderItem(orderItem, Guid.Empty, String.Empty);
+            order.AddOrderItem(orderItem, Guid.Empty, string.Empty);
 
             var expected = new List<OrderItem> { orderItem };
             order.OrderItems.Should().BeEquivalentTo(expected);
@@ -52,7 +52,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
                 .WithCatalogueItemType(catalogueItemType)
                 .Build();
 
-            order.AddOrderItem(orderItem, Guid.Empty, String.Empty);
+            order.AddOrderItem(orderItem, Guid.Empty, string.Empty);
 
             order.CatalogueSolutionsViewed.Should().Be(expectedInput);
         }
@@ -74,7 +74,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
                 .WithCatalogueItemType(catalogueItemType)
                 .Build();
 
-            order.AddOrderItem(orderItem, Guid.Empty, String.Empty);
+            order.AddOrderItem(orderItem, Guid.Empty, string.Empty);
 
             order.AdditionalServicesViewed.Should().Be(expectedInput);
         }
@@ -96,7 +96,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
                 .WithCatalogueItemType(catalogueItemType)
                 .Build();
 
-            order.AddOrderItem(orderItem, Guid.Empty, String.Empty);
+            order.AddOrderItem(orderItem, Guid.Empty, string.Empty);
 
             order.AdditionalServicesViewed.Should().Be(expectedInput);
         }
@@ -107,8 +107,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             var order = OrderBuilder.Create().Build();
             var orderItem = OrderItemBuilder.Create().Build();
 
-            order.AddOrderItem(orderItem, Guid.Empty, String.Empty);
-            order.AddOrderItem(orderItem, Guid.Empty, String.Empty);
+            order.AddOrderItem(orderItem, Guid.Empty, string.Empty);
+            order.AddOrderItem(orderItem, Guid.Empty, string.Empty);
 
             var expected = new List<OrderItem> { orderItem };
             order.OrderItems.Should().BeEquivalentTo(expected);
@@ -121,8 +121,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             var orderItem = OrderItemBuilder.Create().Build();
             var orderItemSecond = OrderItemBuilder.Create().Build();
 
-            order.AddOrderItem(orderItem, Guid.Empty, String.Empty);
-            order.AddOrderItem(orderItemSecond, Guid.Empty, String.Empty);
+            order.AddOrderItem(orderItem, Guid.Empty, string.Empty);
+            order.AddOrderItem(orderItemSecond, Guid.Empty, string.Empty);
 
             var expected = new List<OrderItem> { orderItem, orderItemSecond };
             order.OrderItems.Should().BeEquivalentTo(expected);
@@ -141,7 +141,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
             order.LastUpdatedBy.Should().NotBe(lastUpdatedBy);
 
-            order.AddOrderItem(orderItem, lastUpdatedBy, String.Empty);
+            order.AddOrderItem(orderItem, lastUpdatedBy, string.Empty);
 
             order.LastUpdatedBy.Should().Be(lastUpdatedBy);
         }
@@ -739,7 +739,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
             order.LastUpdatedBy.Should().NotBe(lastUpdatedBy);
 
-            order.Complete(lastUpdatedBy, String.Empty);
+            order.Complete(lastUpdatedBy, string.Empty);
 
             order.LastUpdatedBy.Should().Be(lastUpdatedBy);
         }

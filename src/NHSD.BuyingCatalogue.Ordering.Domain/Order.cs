@@ -21,7 +21,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         {
         }
 
-        private Order(OrderDescription orderDescription, Guid organisationId) : this()
+        private Order(OrderDescription orderDescription, Guid organisationId)
+            : this()
         {
             Description = orderDescription ?? throw new ArgumentNullException(nameof(orderDescription));
             OrganisationId = organisationId;
