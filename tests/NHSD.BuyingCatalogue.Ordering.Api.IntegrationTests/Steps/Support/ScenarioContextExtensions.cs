@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using TechTalk.SpecFlow;
+﻿using TechTalk.SpecFlow;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
 {
