@@ -1,6 +1,6 @@
 ﻿using System;
-using FluentAssertions;
 using System.Threading.Tasks;
+using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using TechTalk.SpecFlow;

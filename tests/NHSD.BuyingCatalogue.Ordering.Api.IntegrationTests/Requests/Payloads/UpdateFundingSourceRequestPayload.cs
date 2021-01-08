@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests.Payloads
+﻿namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests.Payloads
 {
     internal sealed class UpdateFundingSourceRequestPayload
     {
