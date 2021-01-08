@@ -444,8 +444,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             await context.OrderItemsController.CreateOrderItemAsync(orderId, createModel);
 
-            context.CreateOrderItemServiceMock.Verify(x =>
-                x.CreateAsync(It.IsNotNull<CreateOrderItemRequest>()), Times.Once);
+            context.CreateOrderItemServiceMock.Verify(s => s.CreateAsync(It.IsNotNull<CreateOrderItemRequest>()));
         }
 
         [Test]
@@ -718,12 +717,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             await context.OrderItemsController.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
 
-            context.UpdateOrderItemServiceMock.Verify(s =>
-                s.UpdateAsync(It.Is<UpdateOrderItemRequest>(r =>
-                        orderId.Equals(r.Order.OrderId, StringComparison.Ordinal)
-                        && orderItemId.Equals(r.OrderItemId)),
-                    It.IsAny<CatalogueItemType>(),
-                    It.IsAny<ProvisioningType>()), Times.Once);
+            context.UpdateOrderItemServiceMock.Verify(s => s.UpdateAsync(
+                It.Is<UpdateOrderItemRequest>(r => orderId.Equals(r.Order.OrderId, StringComparison.Ordinal) && r.OrderItemId == orderItemId),
+                It.IsAny<CatalogueItemType>(),
+                It.IsAny<ProvisioningType>()));
         }
 
         [Test]
@@ -880,7 +877,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
                     new Claim(ClaimTypes.Name, "Test User"),
                     new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
-                }, "mock"));
+                },
+                "mock"));
 
             OrderItemsController = OrderItemsControllerBuilder.Create()
                 .WithOrderRepository(OrderRepositoryMock.Object)

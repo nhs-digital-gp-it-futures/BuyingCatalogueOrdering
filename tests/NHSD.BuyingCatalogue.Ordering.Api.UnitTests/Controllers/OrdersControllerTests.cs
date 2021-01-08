@@ -162,8 +162,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             await controller.GetAllAsync(context.PrimaryOrganisationId);
 
-            context.OrderRepositoryMock.Verify(x => x.ListOrdersByOrganisationIdAsync(context.PrimaryOrganisationId),
-                Times.Once);
+            context.OrderRepositoryMock.Verify(r => r.ListOrdersByOrganisationIdAsync(context.PrimaryOrganisationId));
         }
 
         [Test]
@@ -222,7 +221,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.AssociatedServicesSectionStatusCases))]
         [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.FundingStatusCases))]
         [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.SectionStatusCases))]
-        public static async Task GetOrderSummaryAsync_ChangeOrderData_ReturnsExpectedSummary(Order order,
+        public static async Task GetOrderSummaryAsync_ChangeOrderData_ReturnsExpectedSummary(
+            Order order,
             OrderSummaryModel expected)
         {
             var context = OrdersControllerTestContext.Setup(order.OrganisationId);
@@ -399,8 +399,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var actual = response.Result;
 
-            var expectation = new CreatedAtActionResult(nameof(controller.CreateOrderAsync).TrimAsync(), null,
-                new { orderId = newOrderId }, new ErrorResponseModel { OrderId = newOrderId });
+            var expectation = new CreatedAtActionResult(
+                nameof(controller.CreateOrderAsync).TrimAsync(),
+                null,
+                new { orderId = newOrderId },
+                new ErrorResponseModel { OrderId = newOrderId });
 
             actual.Should().BeEquivalentTo(expectation);
         }
@@ -652,9 +655,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             await context.OrdersController.UpdateStatusAsync("Order", context.CompleteOrderStatusModel);
 
-            context.CompleteOrderServiceMock
-                .Verify(x => x.CompleteAsync(
-                    It.Is<CompleteOrderRequest>(request => request.Order.Equals(context.Order))), Times.Once);
+            context.CompleteOrderServiceMock.Verify(
+                s => s.CompleteAsync(It.Is<CompleteOrderRequest>(request => request.Order.Equals(context.Order))));
         }
 
         [Test]
@@ -867,7 +869,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
                         new Claim(ClaimTypes.Name, Name),
                         new Claim(ClaimTypes.NameIdentifier, NameIdentity.ToString()),
-                    }, "mock"));
+                    },
+                    "mock"));
 
                 OrdersController = OrdersControllerBuilder
                     .Create()

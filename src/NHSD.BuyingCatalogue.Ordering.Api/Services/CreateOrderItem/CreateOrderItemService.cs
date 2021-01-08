@@ -67,7 +67,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
                 request.Price);
 
             Order order = request.Order;
-            order.AddOrderItem(orderItem,
+            order.AddOrderItem(
+                orderItem,
                 identityService.GetUserIdentity(),
                 identityService.GetUserName());
 

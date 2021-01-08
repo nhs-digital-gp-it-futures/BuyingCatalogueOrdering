@@ -67,9 +67,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 .WithOrganisationId(request.OrganisationId)
                 .Build();
 
-            context.OrderRepositoryMock.Verify(x =>
-                x.CreateOrderAsync(It.Is<Order>(
-                    actual => actual.OrganisationId == expected.OrganisationId && actual.Description == expected.Description)), Times.Once);
+            context.OrderRepositoryMock.Verify(x => x.CreateOrderAsync(It.Is<Order>(
+                actual => actual.OrganisationId == expected.OrganisationId && actual.Description == expected.Description)));
         }
 
         [Test]

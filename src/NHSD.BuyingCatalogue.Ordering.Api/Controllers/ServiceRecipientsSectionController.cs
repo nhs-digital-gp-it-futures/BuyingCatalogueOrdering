@@ -21,7 +21,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         private readonly IOrderRepository _orderRepository;
         private readonly IServiceRecipientRepository _serviceRecipientRepository;
 
-        public ServiceRecipientsSectionController(IOrderRepository orderRepository,
+        public ServiceRecipientsSectionController(
+            IOrderRepository orderRepository,
             IServiceRecipientRepository serviceRecipientRepository)
         {
             _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));

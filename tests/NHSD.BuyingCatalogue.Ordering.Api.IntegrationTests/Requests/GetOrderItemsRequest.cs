@@ -9,7 +9,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
         private readonly Request _request;
         private readonly string _getOrderItemUrl;
 
-        public GetOrderItemsRequest(Request request,
+        public GetOrderItemsRequest(
+            Request request,
             string orderingApiBaseAddress,
             string orderId,
             string catalogueItemType)

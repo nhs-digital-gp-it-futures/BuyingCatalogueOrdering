@@ -148,9 +148,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             await context.Controller.GetAllAsync(string.Empty);
 
-            context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(string.Empty), Times.Once);
-            context.ServiceRecipientRepositoryMock.Verify(x => x.ListServiceRecipientsByOrderIdAsync(string.Empty),
-                Times.Once);
+            context.OrderRepositoryMock.Verify(r => r.GetOrderByIdAsync(string.Empty));
+            context.ServiceRecipientRepositoryMock.Verify(r => r.ListServiceRecipientsByOrderIdAsync(string.Empty));
         }
 
         [TestCase(null)]
@@ -320,14 +319,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 ServiceRecipientRepositoryMock.Setup(x => x.ListServiceRecipientsByOrderIdAsync(It.IsAny<string>()))
                     .ReturnsAsync(() => ServiceRecipients);
 
-                ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]
-                {
-                    new Claim("Ordering", "Manage"),
-                    new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
-                    new Claim(ClaimTypes.Name, Username),
-                    new Claim(ClaimTypes.NameIdentifier, UserId.ToString()),
-                },
-                "mock"));
+                ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
+                    new[]
+                    {
+                        new Claim("Ordering", "Manage"),
+                        new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
+                        new Claim(ClaimTypes.Name, Username),
+                        new Claim(ClaimTypes.NameIdentifier, UserId.ToString()),
+                    },
+                    "mock"));
 
                 Controller = new ServiceRecipientsSectionController(OrderRepositoryMock.Object, ServiceRecipientRepositoryMock.Object)
                 {

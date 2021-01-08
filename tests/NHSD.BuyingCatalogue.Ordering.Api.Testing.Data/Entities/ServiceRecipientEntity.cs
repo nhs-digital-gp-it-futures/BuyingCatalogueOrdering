@@ -6,11 +6,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
     public sealed class ServiceRecipientEntity : EntityBase
     {
         public string OdsCode { get; set; }
+
         public string Name { get; set; }
+
         public string OrderId { get; set; }
 
-        protected override string InsertSql => @"
-            INSERT INTO dbo.ServiceRecipient
+        protected override string InsertSql =>
+            @"INSERT INTO dbo.ServiceRecipient
             (
                 OdsCode,
                 Name,
@@ -25,11 +27,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 
         public static async Task<IEnumerable<ServiceRecipientEntity>> FetchAllServiceRecipients(string connectionString)
         {
-            return await SqlRunner.QueryAsync<ServiceRecipientEntity>(connectionString, @"SELECT
-                          OdsCode,
-                          Name,
-                          OrderId
-                         FROM dbo.ServiceRecipient;");
+            const string sql =
+                @"SELECT OdsCode,
+                         [Name],
+                         OrderId
+                    FROM dbo.ServiceRecipient;";
+
+            return await SqlRunner.QueryAsync<ServiceRecipientEntity>(connectionString, @sql);
         }
     }
 }

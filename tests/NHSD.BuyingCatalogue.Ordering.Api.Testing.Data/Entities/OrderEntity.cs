@@ -56,8 +56,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 
         public bool IsDeleted { get; set; }
 
-        protected override string InsertSql => @"
-            INSERT INTO dbo.[Order]
+        protected override string InsertSql =>
+            @"INSERT INTO dbo.[Order]
             (
                 OrderId,
                 Description,
@@ -116,35 +116,37 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 
         public static async Task<OrderEntity> FetchOrderByOrderId(string connectionString, string orderId)
         {
-            return await SqlRunner.QueryFirstAsync<OrderEntity>(connectionString, @"SELECT
-                          OrderId,
-                          Description,
-                          OrganisationId,
-                          OrganisationName,
-                          OrganisationOdsCode,
-                          OrganisationAddressId,
-                          OrganisationContactId,
-                          OrderStatusId AS OrderStatus,
-                          Created,
-                          SupplierId,
-                          SupplierName,
-                          SupplierAddressId,
-                          SupplierContactId,
-                          LastUpdated,
-                          LastUpdatedBy,
-                          CommencementDate,
-                          LastUpdatedByName,
-                          SupplierId,
-                          SupplierName,
-                          ServiceRecipientsViewed,
-                          CatalogueSolutionsViewed,
-                          AdditionalServicesViewed,
-                          AssociatedServicesViewed,
-                          FundingSourceOnlyGMS,
-                          IsDeleted,
-                          Completed
-                         FROM dbo.[Order]
-                         WHERE OrderId = @orderId;", new { orderId });
+            const string sql =
+                @"SELECT OrderId,
+                         [Description],
+                         OrganisationId,
+                         OrganisationName,
+                         OrganisationOdsCode,
+                         OrganisationAddressId,
+                         OrganisationContactId,
+                         OrderStatusId AS OrderStatus,
+                         Created,
+                         SupplierId,
+                         SupplierName,
+                         SupplierAddressId,
+                         SupplierContactId,
+                         LastUpdated,
+                         LastUpdatedBy,
+                         CommencementDate,
+                         LastUpdatedByName,
+                         SupplierId,
+                         SupplierName,
+                         ServiceRecipientsViewed,
+                         CatalogueSolutionsViewed,
+                         AdditionalServicesViewed,
+                         AssociatedServicesViewed,
+                         FundingSourceOnlyGMS,
+                         IsDeleted,
+                         Completed
+                    FROM dbo.[Order]
+                   WHERE OrderId = @orderId;";
+
+            return await SqlRunner.QueryFirstAsync<OrderEntity>(connectionString, sql, new { orderId });
         }
     }
 }

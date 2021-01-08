@@ -116,7 +116,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(x => x.OdsCode.ToUpperInvariant());
 
-            serviceRecipientDictionary.TryAdd(order.OrganisationOdsCode.ToUpperInvariant(),
+            serviceRecipientDictionary.TryAdd(
+                order.OrganisationOdsCode.ToUpperInvariant(),
                 new ServiceRecipient { OdsCode = order.OrganisationOdsCode, Name = order.OrganisationName });
 
             serviceRecipientDictionary.TryGetValue(orderItem.OdsCode.ToUpperInvariant(), out var serviceRecipient);

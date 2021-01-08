@@ -201,18 +201,6 @@ dotnet_diagnostic.SA0001.severity = none
 # SA1101: Prefix local calls with this
 dotnet_diagnostic.SA1101.severity = none
 
-# SA1111: Closing parenthesis should be on line of last parameter
-dotnet_diagnostic.SA1111.severity = none
-
-# SA1116: Split parameters should start on line after declaration
-dotnet_diagnostic.SA1116.severity = none
-
-# SA1117: Parameters should be on same line or separate lines
-dotnet_diagnostic.SA1117.severity = none
-
-# SA1118: Parameter should not span multiple lines
-dotnet_diagnostic.SA1118.severity = none
-
 # SA1200: Using directives should be placed correctly
 dotnet_diagnostic.SA1200.severity = none
 
