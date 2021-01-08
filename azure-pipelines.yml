@@ -47,7 +47,7 @@ jobs:
       CleanTargetFolder: true
 
   - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact: database'
+    displayName: 'Publish Artefact: database'
     inputs:
       PathtoPublish: '$(build.artifactstagingdirectory)/database'
       ArtifactName: database
@@ -70,7 +70,7 @@ jobs:
 
   steps:
   - task: UseDotNet@2
-    displayName: 'Use DotNet Core $(dotnetVersion)'
+    displayName: 'Use DotNet $(dotnetVersion)'
     inputs:
       version: $(dotnetVersion)
       includePreviewVersions: false

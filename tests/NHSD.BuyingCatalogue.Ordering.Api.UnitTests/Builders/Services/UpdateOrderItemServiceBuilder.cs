@@ -41,11 +41,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
 
         public UpdateOrderItemService Build()
         {
-            return new UpdateOrderItemService(
+            return new(
                 _orderRepository, 
                 _identityService,
-                _orderItemValidator
-                );
+                _orderItemValidator);
         }
     }
 }

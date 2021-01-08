@@ -11,9 +11,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         private OrderDescription()
         {
-
         }
-        
+
         private OrderDescription(string value) : this()
         {
             Value = value;

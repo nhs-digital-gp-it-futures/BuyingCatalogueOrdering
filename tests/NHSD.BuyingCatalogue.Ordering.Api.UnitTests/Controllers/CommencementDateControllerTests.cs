@@ -22,7 +22,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public async Task Update_ValidDateTime_UpdatesAndReturnsNoContent()
         {
             var context = CommencementDateControllerTestContext.Setup();
-            var model = new CommencementDateModel {CommencementDate = DateTime.Now};
+            var model = new CommencementDateModel { CommencementDate = DateTime.Now };
             var result = await context.Controller.Update("myOrder", model);
             context.OrderRepositoryMock.Verify(x => x.UpdateOrderAsync(It.Is<Order>(order => order.CommencementDate == model.CommencementDate)));
             result.Should().BeOfType<NoContentResult>();

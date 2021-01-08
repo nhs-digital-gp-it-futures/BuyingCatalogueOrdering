@@ -9,7 +9,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
     {
         public void Configure(EntityTypeBuilder<ServiceRecipient> builder)
         {
-            if(builder is null)
+            if (builder is null)
                 throw new ArgumentNullException(nameof(builder));
 
             builder.HasKey(x => new { x.OrderId, x.OdsCode });

@@ -48,7 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             return null;
         }
 
-        private static void SetOrganisationPartyPayloadByOrderId(ScenarioContext context,string orderId, OrganisationPartyPayload payload)
+        private static void SetOrganisationPartyPayloadByOrderId(ScenarioContext context, string orderId, OrganisationPartyPayload payload)
         {
             if (context is null)
             {
@@ -56,7 +56,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             }
 
             if (payload == null)
-                return ;
+                return;
 
             var payloadDictionary =
                 context.Get<IDictionary<string, OrganisationPartyPayload>>(ScenarioContextKeys.OrganisationPayloadDictionary, new Dictionary<string, OrganisationPartyPayload>());
@@ -86,7 +86,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Given(@"the order party update request for order ID (.*) has a address")]
         public void GivenTheOrderPartyUpdateRequestForOrderIdHasAAddress(string orderId, Table table)
         {
-            var payload = GetOrganisationPartyPayloadByOrderId(_context,orderId);
+            var payload = GetOrganisationPartyPayloadByOrderId(_context, orderId);
 
             payload.Address = table.CreateInstance<AddressPayload>();
         }

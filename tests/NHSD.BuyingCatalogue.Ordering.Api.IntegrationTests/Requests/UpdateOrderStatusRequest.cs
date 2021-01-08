@@ -17,10 +17,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 
         protected IDictionary<string, Func<UpdateOrderStatusRequestPayload>> PayloadFactory = new Dictionary<string, Func<UpdateOrderStatusRequestPayload>>
         {
-            {"order-status-complete", () => new UpdateOrderStatusRequestPayload{ Status = "Complete"}},
-            {"order-status-incomplete", () => new UpdateOrderStatusRequestPayload{ Status = "Incomplete"}},
-            {"order-status-invalid", () => new UpdateOrderStatusRequestPayload{ Status = "INVALID"}},
-            {"order-status-missing", () => new UpdateOrderStatusRequestPayload{ Status = null}}
+            { "order-status-complete", () => new UpdateOrderStatusRequestPayload { Status = "Complete" } },
+            { "order-status-incomplete", () => new UpdateOrderStatusRequestPayload { Status = "Incomplete" } },
+            { "order-status-invalid", () => new UpdateOrderStatusRequestPayload { Status = "INVALID" } },
+            { "order-status-missing", () => new UpdateOrderStatusRequestPayload { Status = null } },
         };
 
         public UpdateOrderStatusRequest(Request request, string orderingApiBaseAddress, string orderId)

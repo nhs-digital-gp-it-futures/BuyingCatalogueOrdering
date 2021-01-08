@@ -43,7 +43,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 OnlyGMS = order.FundingSourceOnlyGMS
             };
         }
-        
+
         [HttpPut]
         [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult> PutFundingSourceAsync(string orderId, UpdateFundingSourceModel model)

@@ -10,10 +10,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         private ServiceRecipientModelBuilder()
         {
             _name = "Some Name";
-            _odsCode ="Ods1";
+            _odsCode = "Ods1";
         }
 
-        internal static ServiceRecipientModelBuilder Create() => new ServiceRecipientModelBuilder();
+        internal static ServiceRecipientModelBuilder Create() => new();
 
         internal ServiceRecipientModelBuilder WithOdsCode(string odsCode)
         {
@@ -29,7 +29,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 
         internal ServiceRecipientModel Build()
         {
-            return  new ServiceRecipientModel {Name = _name, OdsCode = _odsCode};
+            return new() { Name = _name, OdsCode = _odsCode };
         }
     }
 }

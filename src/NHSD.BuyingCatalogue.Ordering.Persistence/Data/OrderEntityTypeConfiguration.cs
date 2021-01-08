@@ -9,7 +9,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
     {
         public void Configure(EntityTypeBuilder<Order> builder)
         {
-            if(builder is null)
+            if (builder is null)
                 throw new ArgumentNullException(nameof(builder));
 
             builder.Property(x => x.Description)

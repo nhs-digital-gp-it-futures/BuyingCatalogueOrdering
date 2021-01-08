@@ -61,7 +61,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public async Task WhenTheUserMakesARequestToRetrieveTheService_RecipientsSectionWithOrderID(string orderId, Table table)
         {
             var payload = new ServiceRecipientsTable { ServiceRecipients = table.CreateSet<ServiceRecipientTable>() };
-            await _request.PutJsonAsync(string.Format(_serviceRecipientUrl, orderId),payload);
+            await _request.PutJsonAsync(string.Format(_serviceRecipientUrl, orderId), payload);
         }
 
 

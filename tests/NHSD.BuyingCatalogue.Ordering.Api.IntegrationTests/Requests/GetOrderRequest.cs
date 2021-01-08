@@ -11,8 +11,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
         private readonly string _getOrderUrl;
 
         public GetOrderRequest(
-            Request request, 
-            string orderingApiBaseAddress, 
+            Request request,
+            string orderingApiBaseAddress,
             string orderId)
         {
             _request = request ?? throw new ArgumentNullException(nameof(request));
@@ -26,7 +26,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 
         public async Task<GetOrderResponse> ExecuteAsync()
         {
-            var response  = await _request.GetAsync(_getOrderUrl);
+            var response = await _request.GetAsync(_getOrderUrl);
             return await GetOrderResponse.CreateAsync(response);
         }
     }

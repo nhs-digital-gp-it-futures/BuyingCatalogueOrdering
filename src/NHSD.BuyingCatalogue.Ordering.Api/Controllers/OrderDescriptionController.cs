@@ -64,7 +64,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             {
                 return NotFound();
             }
-            
+
             var primaryOrganisationId = User.GetPrimaryOrganisationId();
             if (primaryOrganisationId != order.OrganisationId)
             {
@@ -79,7 +79,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             order.SetDescription(isValid.Value);
-            
+
             var name = User.Identity.Name;
             order.SetLastUpdatedBy(User.GetUserId(), name);
 

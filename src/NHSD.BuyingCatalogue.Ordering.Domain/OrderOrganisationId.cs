@@ -21,7 +21,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public static Result<Guid> Create(Guid organisationId)
         {
-            if (organisationId==Guid.Empty)
+            if (organisationId == Guid.Empty)
             {
                 return Result.Failure<Guid>(OrderErrors.OrderOrganisationIdRequired());
             }

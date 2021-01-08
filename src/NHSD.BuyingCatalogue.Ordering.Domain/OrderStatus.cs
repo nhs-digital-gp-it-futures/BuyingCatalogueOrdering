@@ -6,8 +6,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class OrderStatus : IEquatable<OrderStatus>
     {
-        public static readonly OrderStatus Complete = new OrderStatus(1, nameof(Complete));
-        public static readonly OrderStatus Incomplete = new OrderStatus(2, nameof(Incomplete));
+        public static readonly OrderStatus Complete = new(1, nameof(Complete));
+        public static readonly OrderStatus Incomplete = new(2, nameof(Incomplete));
 
         private OrderStatus(int id, string name)
         {
@@ -19,10 +19,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public string Name { get; }
 
-        internal static IEnumerable<OrderStatus> List() => 
+        internal static IEnumerable<OrderStatus> List() =>
             new[] { Complete, Incomplete };
 
-        public static OrderStatus FromId(int id) => 
+        public static OrderStatus FromId(int id) =>
             List().SingleOrDefault(item => id == item.Id);
 
         public static OrderStatus FromName(string name)

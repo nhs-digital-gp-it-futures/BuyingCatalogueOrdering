@@ -198,48 +198,6 @@ dotnet_remove_unnecessary_suppression_exclusions = category: ReSharper
 # SA0001: XML comment analysis is disabled due to project configuration
 dotnet_diagnostic.SA0001.severity = none
 
-# SA1000: Keywords should be spaced correctly
-dotnet_diagnostic.SA1000.severity = none
-
-# SA1001: Commas should be spaced correctly
-dotnet_diagnostic.SA1001.severity = none
-
-# SA1002: Semicolons should be spaced correctly
-dotnet_diagnostic.SA1002.severity = none
-
-# SA1003: Symbols should be spaced correctly
-dotnet_diagnostic.SA1003.severity = none
-
-# SA1008: Opening parenthesis should be spaced correctly
-dotnet_diagnostic.SA1008.severity = none
-
-# SA1009: Closing parenthesis should be spaced correctly
-dotnet_diagnostic.SA1009.severity = none
-
-# SA1010: Opening square brackets should be spaced correctly
-dotnet_diagnostic.SA1010.severity = none
-
-# SA1011: Closing square brackets should be spaced correctly
-dotnet_diagnostic.SA1011.severity = none
-
-# SA1012: Opening braces should be spaced correctly
-dotnet_diagnostic.SA1012.severity = none
-
-# SA1013: Closing braces should be spaced correctly
-dotnet_diagnostic.SA1013.severity = none
-
-# SA1024: Colons Should Be Spaced Correctly
-dotnet_diagnostic.SA1024.severity = none
-
-# SA1025: Code should not contain multiple whitespace in a row
-dotnet_diagnostic.SA1025.severity = none
-
-# SA1026: Code should not contain space after new or stackalloc keyword in implicitly typed array allocation
-dotnet_diagnostic.SA1026.severity = none
-
-# SA1027: Use tabs correctly
-dotnet_diagnostic.SA1027.severity = none
-
 # SA1028: Code should not contain trailing whitespace
 dotnet_diagnostic.SA1028.severity = none
 

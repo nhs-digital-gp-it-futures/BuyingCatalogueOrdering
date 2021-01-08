@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using FluentAssertions;
-using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
@@ -10,14 +9,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     [Binding]
     internal sealed class SectionStatusUpdateSteps
     {
-        private readonly Response _response;
         private readonly Request _request;
         private readonly Settings _settings;
         private readonly string _sectionStatusUpdateUrl;
 
-        public SectionStatusUpdateSteps(Response response, Request request, Settings settings)
+        public SectionStatusUpdateSteps(Request request, Settings settings)
         {
-            _response = response;
             _request = request;
             _settings = settings;
             _sectionStatusUpdateUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/{1}";
@@ -26,7 +23,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [When(@"the user makes a request to complete order section with order Id (.*) section Id (.*)")]
         public async Task WhenTheUserMakesARequestToRetrieveTheOrderSummaryWithTheId(string orderId, string sectionId)
         {
-            var payload = new {Status = "complete"};
+            var payload = new { Status = "complete" };
             await _request.PutJsonAsync(string.Format(_sectionStatusUpdateUrl, orderId, sectionId), payload);
         }
 

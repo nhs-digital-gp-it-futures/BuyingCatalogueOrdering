@@ -70,8 +70,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             var expectedKey = $"[0].{field}";
             var expectedErrors = new (string, string)[]
             {
-                ( expectedKey, id ),
-                ( expectedKey, id ),
+                (expectedKey, id),
+                (expectedKey, id),
             };
 
             var details = new ErrorDetails(id, field);

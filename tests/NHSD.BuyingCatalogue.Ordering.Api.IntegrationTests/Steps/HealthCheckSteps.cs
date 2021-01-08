@@ -23,7 +23,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [When(@"the dependency health-check endpoint is hit for API")]
         public async Task WhenTheHealthCheckEndpointIsHit()
         {
-            var baseUrl =_context["orderingBaseUrl"];
+            var baseUrl = _context["orderingBaseUrl"];
             using var client = new HttpClient();
             _response.Result = await client.GetAsync($"{baseUrl}/health/ready");
         }

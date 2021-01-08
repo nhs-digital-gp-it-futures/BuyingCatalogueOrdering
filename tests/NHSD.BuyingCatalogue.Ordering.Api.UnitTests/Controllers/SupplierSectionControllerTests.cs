@@ -218,7 +218,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var response =
                 await controller.UpdateAsync(orderId,
-                    new SupplierModel() { Name = "New Description",SupplierId = "New", PrimaryContact = new PrimaryContactModel(), Address = new AddressModel()});
+                    new SupplierModel { Name = "New Description", SupplierId = "New", PrimaryContact = new PrimaryContactModel(), Address = new AddressModel() });
 
             response.Should().BeOfType<NoContentResult>();
         }

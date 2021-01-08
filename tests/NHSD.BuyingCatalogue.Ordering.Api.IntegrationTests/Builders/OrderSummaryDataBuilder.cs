@@ -38,7 +38,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
                     .Build());
         }
 
-        public static OrderSummaryDataBuilder Create(string orderId="C000016-01") =>
+        public static OrderSummaryDataBuilder Create(string orderId = "C000016-01") =>
             new OrderSummaryDataBuilder(orderId);
 
         public OrderSummaryDataBuilder WithOrderEntity(OrderEntity orderEntity)

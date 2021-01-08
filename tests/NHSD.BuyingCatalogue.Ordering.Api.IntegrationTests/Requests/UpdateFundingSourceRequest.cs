@@ -17,9 +17,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 
         protected IDictionary<string, Func<UpdateFundingSourceRequestPayload>> PayloadFactory = new Dictionary<string, Func<UpdateFundingSourceRequestPayload>>
         {
-            {"funding-source-true", () => new UpdateFundingSourceRequestPayload{ OnlyGMS = true}},
-            {"funding-source-false", () => new UpdateFundingSourceRequestPayload{ OnlyGMS = false}},
-            {"funding-source-missing", () => new UpdateFundingSourceRequestPayload{ OnlyGMS = null}},
+            { "funding-source-true", () => new UpdateFundingSourceRequestPayload { OnlyGMS = true } },
+            { "funding-source-false", () => new UpdateFundingSourceRequestPayload { OnlyGMS = false } },
+            { "funding-source-missing", () => new UpdateFundingSourceRequestPayload { OnlyGMS = null } },
         };
 
         public UpdateFundingSourceRequest(
