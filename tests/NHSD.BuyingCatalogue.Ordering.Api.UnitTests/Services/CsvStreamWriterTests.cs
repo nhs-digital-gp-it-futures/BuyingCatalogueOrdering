@@ -23,9 +23,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         {
             var csvWriter = new CsvStreamStreamWriter<CsvHeaderContent, CsvHeaderContentMap>();
 
-            Assert.ThrowsAsync<ArgumentNullException>(async () =>
-                await csvWriter.WriteRecordsAsync(hasStream ? new MemoryStream() : null,
-                    hasRecords ? new List<CsvHeaderContent>() : null));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await csvWriter.WriteRecordsAsync(
+                hasStream ? new MemoryStream() : null,
+                hasRecords ? new List<CsvHeaderContent>() : null));
         }
 
         [Test]

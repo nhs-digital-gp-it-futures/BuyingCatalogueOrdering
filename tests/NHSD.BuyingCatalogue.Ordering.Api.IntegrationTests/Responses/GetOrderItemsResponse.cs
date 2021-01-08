@@ -34,9 +34,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 .OrderBy(expectedItem => expectedItem.Created)
                 .Select(expectedItem =>
                 {
-                    var serviceRecipient = expectedServiceRecipients.FirstOrDefault(item =>
-                        string.Equals(expectedItem.OdsCode,
-                            item.OdsCode, StringComparison.OrdinalIgnoreCase));
+                    var serviceRecipient = expectedServiceRecipients.FirstOrDefault(item => string.Equals(
+                        expectedItem.OdsCode,
+                        item.OdsCode,
+                        StringComparison.OrdinalIgnoreCase));
 
                     return ConvertToExpectedBody(expectedItem, serviceRecipient);
                 });

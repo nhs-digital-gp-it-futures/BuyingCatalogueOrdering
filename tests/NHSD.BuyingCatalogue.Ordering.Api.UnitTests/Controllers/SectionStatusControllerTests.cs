@@ -141,7 +141,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
                         new Claim(ClaimTypes.Name, Name),
                         new Claim(ClaimTypes.NameIdentifier, NameIdentity.ToString()),
-                    }, "mock"));
+                    },
+                    "mock"));
 
                 SectionStatusController = SectionStatusControllerBuilder
                     .Create()

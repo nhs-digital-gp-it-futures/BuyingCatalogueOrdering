@@ -147,13 +147,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy(PolicyName.CanAccessOrders,
+                options.AddPolicy(
+                    PolicyName.CanAccessOrders,
                     policyBuilder =>
                     {
                         policyBuilder.RequireClaim(ApplicationClaimTypes.Ordering);
                     });
 
-                options.AddPolicy(PolicyName.CanManageOrders,
+                options.AddPolicy(
+                    PolicyName.CanManageOrders,
                     policyBuilder =>
                     {
                         policyBuilder.RequireClaim(ApplicationClaimTypes.Ordering, ApplicationPermissions.Manage);

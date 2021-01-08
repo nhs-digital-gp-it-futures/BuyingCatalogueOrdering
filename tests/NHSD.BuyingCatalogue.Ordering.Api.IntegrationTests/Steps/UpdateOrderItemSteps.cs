@@ -56,7 +56,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var original = _orderContext.OrderItemReferenceList
                 .FindByOrderItemId(_updateOrderItemRequest.OrderItemId);
 
-            var orderItem = await OrderItemEntity.FetchByOrderItemId(_settings.ConnectionString,
+            var orderItem = await OrderItemEntity.FetchByOrderItemId(
+                _settings.ConnectionString,
                 _updateOrderItemRequest.OrderItemId);
 
             _updateOrderItemRequest.AssertPayload(orderItem, original);

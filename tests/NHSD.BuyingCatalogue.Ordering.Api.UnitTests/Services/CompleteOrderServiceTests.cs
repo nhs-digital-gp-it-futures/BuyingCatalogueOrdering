@@ -97,11 +97,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
 
-            context.IdentityServiceMock.Verify(identityService =>
-                identityService.GetUserName(), Times.Once);
-
-            context.IdentityServiceMock.Verify(identityService =>
-                identityService.GetUserIdentity(), Times.Once);
+            context.IdentityServiceMock.Verify(identityService => identityService.GetUserName());
+            context.IdentityServiceMock.Verify(identityService => identityService.GetUserIdentity());
         }
 
         [Test]
@@ -157,9 +154,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
 
-            context.CreatePurchaseDocumentServiceMock.Verify(purchasingDocumentService =>
-                purchasingDocumentService.CreatePatientNumbersCsvAsync(It.IsAny<Stream>(),
-                    It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))));
+            context.CreatePurchaseDocumentServiceMock.Verify(s => s.CreatePatientNumbersCsvAsync(
+                It.IsAny<Stream>(),
+                It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))));
         }
 
         [TestCase(false, false, false)]
@@ -178,9 +175,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
 
-            context.CreatePurchaseDocumentServiceMock.Verify(purchasingDocumentService =>
-                purchasingDocumentService.CreatePatientNumbersCsvAsync(It.IsAny<Stream>(),
-                    It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))), Times.Never);
+            context.CreatePurchaseDocumentServiceMock.Verify(
+                s => s.CreatePatientNumbersCsvAsync(
+                    It.IsAny<Stream>(),
+                    It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))),
+                Times.Never);
         }
 
         [TestCase(false, false)]
@@ -194,9 +193,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
 
-            context.CreatePurchaseDocumentServiceMock.Verify(purchasingDocumentService =>
-                purchasingDocumentService.CreateCsvAsync(It.IsAny<Stream>(),
-                    It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))), Times.Once);
+            context.CreatePurchaseDocumentServiceMock.Verify(s => s.CreateCsvAsync(
+                It.IsAny<Stream>(),
+                It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))));
         }
 
         [Test]
@@ -206,9 +205,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             await context.CompleteOrderService.CompleteAsync(context.CompleteOrderRequest);
 
-            context.CreatePurchaseDocumentServiceMock.Verify(purchasingDocumentService =>
-                purchasingDocumentService.CreateCsvAsync(It.IsAny<Stream>(),
-                    It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))), Times.Never);
+            context.CreatePurchaseDocumentServiceMock.Verify(
+                s => s.CreateCsvAsync(
+                    It.IsAny<Stream>(),
+                    It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))),
+                Times.Never);
         }
 
         internal sealed class CompleteOrderServiceTestContext

@@ -148,7 +148,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             Assert.ThrowsAsync<ArgumentNullException>(async () =>
             {
-                var _ = await controller.UpdateAsync(orderId,
+                var _ = await controller.UpdateAsync(
+                    orderId,
                     new OrderingPartyModel
                     {
                         Name = "New Description",
@@ -171,15 +172,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var controller = context.OrderingPartyController;
 
-            var response =
-                await controller.UpdateAsync(orderId,
-                    new OrderingPartyModel
-                    {
-                        Name = "New Description",
-                        OdsCode = "New",
-                        PrimaryContact = new PrimaryContactModel(),
-                        Address = new AddressModel(),
-                    });
+            var response = await controller.UpdateAsync(
+                orderId,
+                new OrderingPartyModel
+                {
+                    Name = "New Description",
+                    OdsCode = "New",
+                    PrimaryContact = new PrimaryContactModel(),
+                    Address = new AddressModel(),
+                });
 
             response.Should().BeOfType<NoContentResult>();
         }
@@ -230,13 +231,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
                 OrderRepositoryMock = new Mock<IOrderRepository>();
                 OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
-                ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]
-                {
-                    new Claim("Ordering", "Manage"),
-                    new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
-                    new Claim(ClaimTypes.Name, "Test User"),
-                    new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
-                }, "mock"));
+                ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
+                    new[]
+                    {
+                        new Claim("Ordering", "Manage"),
+                        new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
+                        new Claim(ClaimTypes.Name, "Test User"),
+                        new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
+                    },
+                    "mock"));
 
                 OrderingPartyController = new OrderingPartyController(OrderRepositoryMock.Object)
                 {

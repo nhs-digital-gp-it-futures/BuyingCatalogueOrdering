@@ -48,8 +48,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 
         public DateTime LastUpdated { get; set; }
 
-        protected override string InsertSql => @"
-            INSERT INTO dbo.OrderItem
+        protected override string InsertSql =>
+            @"INSERT INTO dbo.OrderItem
             (
                 OrderId,
                 CatalogueItemId,
@@ -97,28 +97,30 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 
         public static async Task<IEnumerable<OrderItemEntity>> FetchAllAsync(string connectionString)
         {
-            return await SqlRunner.QueryAsync<OrderItemEntity>(connectionString, @"
-                SELECT OrderItemId,
-                       OrderId,
-                       CatalogueItemId,
-                       ParentCatalogueItemId,
-                       CatalogueItemTypeId AS CatalogueItemType,
-                       CatalogueItemName,
-                       OdsCode,
-                       ProvisioningTypeId AS ProvisioningType,
-                       CataloguePriceTypeId AS CataloguePriceType,
-                       PricingUnitTierName,
-                       PricingUnitName,
-                       PricingUnitDescription,
-                       TimeUnitId AS TimeUnit,
-                       CurrencyCode,
-                       Quantity,
-                       EstimationPeriodId AS EstimationPeriod,
-                       DeliveryDate,
-                       Price,
-                       Created,
-                       LastUpdated
-                  FROM dbo.OrderItem;");
+            const string sql =
+                @"SELECT OrderItemId,
+                         OrderId,
+                         CatalogueItemId,
+                         ParentCatalogueItemId,
+                         CatalogueItemTypeId AS CatalogueItemType,
+                         CatalogueItemName,
+                         OdsCode,
+                         ProvisioningTypeId AS ProvisioningType,
+                         CataloguePriceTypeId AS CataloguePriceType,
+                         PricingUnitTierName,
+                         PricingUnitName,
+                         PricingUnitDescription,
+                         TimeUnitId AS TimeUnit,
+                         CurrencyCode,
+                         Quantity,
+                         EstimationPeriodId AS EstimationPeriod,
+                         DeliveryDate,
+                         Price,
+                         Created,
+                         LastUpdated
+                    FROM dbo.OrderItem;";
+
+            return await SqlRunner.QueryAsync<OrderItemEntity>(connectionString, sql);
         }
 
         public static async Task<OrderItemEntity> FetchByOrderItemId(string connectionString, int orderItemId) =>

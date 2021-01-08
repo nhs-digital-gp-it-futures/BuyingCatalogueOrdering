@@ -85,7 +85,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             context.ContainsKey("CommencementDate").Should()
                 .BeTrue("Commencement Date should have been set via the 'Given the user sets the commencement date' steps");
             var date = context["CommencementDate"] as DateTime?;
-            await request.PutJsonAsync(string.Format(orderCommencementDateUrl, orderId),
+            await request.PutJsonAsync(
+                string.Format(orderCommencementDateUrl, orderId),
                 new { commencementDate = date });
         }
 
