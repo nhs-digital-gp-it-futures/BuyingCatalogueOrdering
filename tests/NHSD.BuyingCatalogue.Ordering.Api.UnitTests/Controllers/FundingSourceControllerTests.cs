@@ -71,7 +71,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var expected = new GetFundingSourceModel
             {
-                OnlyGMS = context.Order.FundingSourceOnlyGMS
+                OnlyGMS = context.Order.FundingSourceOnlyGMS,
             };
 
             actual.Value.Should().BeEquivalentTo(expected);
@@ -176,7 +176,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     new Claim("Ordering", "Manage"),
                     new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
                     new Claim(ClaimTypes.Name, Name),
-                    new Claim(ClaimTypes.NameIdentifier, NameIdentity.ToString())
+                    new Claim(ClaimTypes.NameIdentifier, NameIdentity.ToString()),
                 }, "mock"));
 
                 Controller = FundingSourceControllerBuilder
@@ -185,7 +185,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     .WithControllerContext(
                         new ControllerContext
                         {
-                            HttpContext = new DefaultHttpContext { User = ClaimsPrincipal }
+                            HttpContext = new DefaultHttpContext { User = ClaimsPrincipal },
                         })
                     .Build();
             }

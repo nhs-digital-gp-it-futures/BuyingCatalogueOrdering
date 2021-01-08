@@ -29,10 +29,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             _country = "Some country";
         }
 
-        public static AddressBuilder Create()
-        {
-            return new AddressBuilder();
-        }
+        public static AddressBuilder Create() => new();
 
         public AddressBuilder WithLine1(string line1)
         {
@@ -90,7 +87,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
 
         public Address Build()
         {
-            return new Address
+            return new()
             {
                 AddressId = _addressId,
                 Line1 = _line1,
@@ -101,7 +98,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
                 Town = _town,
                 County = _county,
                 Postcode = _postcode,
-                Country = _country
+                Country = _country,
             };
         }
     }

@@ -35,7 +35,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                         request,
                         url,
                         orderId)
-                }
+                },
             };
 
         private readonly Request request;

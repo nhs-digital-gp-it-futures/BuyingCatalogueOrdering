@@ -140,7 +140,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         new Claim("Ordering", "Manage"),
                         new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
                         new Claim(ClaimTypes.Name, Name),
-                        new Claim(ClaimTypes.NameIdentifier, NameIdentity.ToString())
+                        new Claim(ClaimTypes.NameIdentifier, NameIdentity.ToString()),
                     }, "mock"));
 
                 SectionStatusController = SectionStatusControllerBuilder
@@ -150,7 +150,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
                 SectionStatusController.ControllerContext = new ControllerContext
                 {
-                    HttpContext = new DefaultHttpContext { User = ClaimsPrincipal }
+                    HttpContext = new DefaultHttpContext { User = ClaimsPrincipal },
                 };
             }
 
@@ -170,15 +170,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             private ClaimsPrincipal ClaimsPrincipal { get; }
 
-            internal static SectionStatusControllerTestContext Setup()
-            {
-                return new SectionStatusControllerTestContext(Guid.NewGuid());
-            }
+            internal static SectionStatusControllerTestContext Setup() => new(Guid.NewGuid());
 
-            internal static SectionStatusControllerTestContext Setup(Guid primaryOrganisationId)
-            {
-                return new SectionStatusControllerTestContext(primaryOrganisationId);
-            }
+            internal static SectionStatusControllerTestContext Setup(Guid primaryOrganisationId) => new(primaryOrganisationId);
         }
     }
 }

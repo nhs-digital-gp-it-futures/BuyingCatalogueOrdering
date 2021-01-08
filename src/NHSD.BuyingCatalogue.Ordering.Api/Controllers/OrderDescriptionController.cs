@@ -42,9 +42,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            var descriptionModel = new OrderDescriptionModel()
+            var descriptionModel = new OrderDescriptionModel
             {
-                Description = order.Description.Value
+                Description = order.Description.Value,
             };
 
             return Ok(descriptionModel);

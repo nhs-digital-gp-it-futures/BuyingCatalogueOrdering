@@ -185,7 +185,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
 
         public CreateOrderItemRequestPayload Build()
         {
-            return new CreateOrderItemRequestPayload
+            return new()
             {
                 HasServiceRecipient = _hasServiceRecipient,
                 CatalogueItemType = _catalogueItemType,
@@ -205,7 +205,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
                 ItemUnitNameDescription = _itemUnitNameDescription,
                 TimeUnitName = _timeUnitName,
                 TimeUnitDescription = _timeUnitDescription,
-                Price = _price
+                Price = _price,
             };
         }
     }

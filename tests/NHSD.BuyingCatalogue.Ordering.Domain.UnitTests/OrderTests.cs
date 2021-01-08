@@ -398,7 +398,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
                 orderItem.DeliveryDate,
                 orderItem.Quantity,
                 orderItem.PriceTimeUnit,
-                orderItem.Price
+                orderItem.Price,
             };
 
             orderItem.Should().BeEquivalentTo(expected);
@@ -428,7 +428,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             {
                 order.LastUpdatedBy,
                 order.LastUpdatedByName,
-                order.LastUpdated
+                order.LastUpdated,
             };
 
             order.UpdateOrderItem(

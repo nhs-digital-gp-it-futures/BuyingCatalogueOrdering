@@ -14,7 +14,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 CatalogueItemType.AssociatedService => provisioningType == ProvisioningType.OnDemand
                     ? provisioningType.InferEstimationPeriod(estimationPeriod)
                     : null,
-                _ => provisioningType.InferEstimationPeriod(estimationPeriod)
+                _ => provisioningType.InferEstimationPeriod(estimationPeriod),
             };
         }
 

@@ -49,7 +49,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             var actual = new CommencementDateTable
             {
-                CommencementDate = apiReponse.Value<DateTime?>("commencementDate")
+                CommencementDate = apiReponse.Value<DateTime?>("commencementDate"),
             };
 
             actual.Should().BeEquivalentTo(expected);

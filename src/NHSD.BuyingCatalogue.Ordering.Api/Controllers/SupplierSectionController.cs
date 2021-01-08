@@ -43,7 +43,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 SupplierId = order.SupplierId,
                 Name = order.SupplierName,
                 Address = order.SupplierAddress.ToModel(),
-                PrimaryContact = order.SupplierContact.ToModel()
+                PrimaryContact = order.SupplierContact.ToModel(),
             };
 
             return Ok(supplierModel);

@@ -9,12 +9,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 
         private CreateOrderRequestBuilder()
         {
-            _createOrderRequest = new CreateOrderRequest()
+            _createOrderRequest = new CreateOrderRequest
             {
                 Description = "Some Description",
                 OrganisationId = Guid.NewGuid(),
                 LastUpdatedById = Guid.NewGuid(),
-                LastUpdatedByName = "Some user name"
+                LastUpdatedByName = "Some user name",
             };
         }
 

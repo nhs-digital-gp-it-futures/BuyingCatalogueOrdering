@@ -53,7 +53,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             {
                 OrderId = response.Value<string>("orderId"),
                 OrganisationId = response.SelectToken("organisationId").ToObject<Guid>(),
-                Description = response.Value<string>("description")
+                Description = response.Value<string>("description"),
             };
 
             actual.Should().BeEquivalentTo(expected);
@@ -71,7 +71,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             var actual = new SectionsTable
             {
-                Sections = sections.ToObject<IEnumerable<SectionTable>>()
+                Sections = sections.ToObject<IEnumerable<SectionTable>>(),
             };
 
             actual.Sections.Should().BeEquivalentTo(expected);

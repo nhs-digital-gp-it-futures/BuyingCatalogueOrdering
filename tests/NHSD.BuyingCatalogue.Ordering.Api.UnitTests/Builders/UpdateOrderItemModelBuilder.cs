@@ -24,15 +24,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
-        public static UpdateOrderItemModelBuilder Create() => new UpdateOrderItemModelBuilder();
+        public static UpdateOrderItemModelBuilder Create() => new();
 
-        public UpdateOrderItemModel BuildSolution() =>
-            new UpdateOrderItemModel
+        public UpdateOrderItemModel BuildSolution() => new()
             {
                 DeliveryDate = _deliveryDate,
                 Quantity = _quantity,
                 EstimationPeriod = _estimationPeriod,
-                Price = _price
+                Price = _price,
             };
     }
 }

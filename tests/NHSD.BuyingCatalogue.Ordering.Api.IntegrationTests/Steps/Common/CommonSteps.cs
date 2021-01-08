@@ -33,7 +33,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common
             var actual = response.SelectToken("errors").Select(x => new ResponseErrorsTable()
             {
                 Id = x.Value<string>("id"),
-                Field = x.Value<string>("field")
+                Field = x.Value<string>("field"),
             });
 
             actual.Should().BeEquivalentTo(expected);

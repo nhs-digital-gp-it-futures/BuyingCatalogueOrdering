@@ -53,14 +53,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 .Select(recipient => new ServiceRecipientModel
                 {
                     OdsCode = recipient.OdsCode,
-                    Name = recipient.Name
+                    Name = recipient.Name,
                 })
                 .OrderBy(serviceRecipientModel => serviceRecipientModel.Name)
                 .ToList();
 
             var model = new ServiceRecipientsModel
             {
-                ServiceRecipients = recipientModelList
+                ServiceRecipients = recipientModelList,
             };
 
             return model;
@@ -91,7 +91,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             {
                 Name = recipient.Name,
                 OdsCode = recipient.OdsCode,
-                Order = order
+                Order = order,
             }).ToList();
 
             await _serviceRecipientRepository.UpdateAsync(order.OrderId, serviceRecipients);

@@ -115,7 +115,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
                 NotBefore = notBeforeDate,
                 Expires = expires,
                 SigningCredentials = signingCredentials,
-                Subject = identity
+                Subject = identity,
             };
 
             var token = securityTokenHandler.CreateToken(securityTokenDescriptor);

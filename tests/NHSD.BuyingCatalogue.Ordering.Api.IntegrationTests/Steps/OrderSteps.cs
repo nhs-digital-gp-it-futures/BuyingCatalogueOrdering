@@ -190,7 +190,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 LastUpdatedByName = token.Value<string>("lastUpdatedBy"),
                 Created = token.Value<DateTime>("dateCreated"),
                 Completed = token.Value<DateTime>("dateCompleted"),
-                FundingSourceOnlyGMS = token.Value<bool?>("onlyGMS")
+                FundingSourceOnlyGMS = token.Value<bool?>("onlyGMS"),
             };
         }
 

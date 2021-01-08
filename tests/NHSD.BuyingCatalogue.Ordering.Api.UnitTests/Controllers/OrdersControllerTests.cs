@@ -100,7 +100,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = OrdersControllerTestContext.Setup();
             var orders = new List<(Order order, OrderListItemModel expected)>
             {
-                CreateOrderTestData(orderId, context.PrimaryOrganisationId, orderDescription)
+                CreateOrderTestData(orderId, context.PrimaryOrganisationId, orderDescription),
             };
 
             context.Orders = orders.Select(x => x.order);
@@ -120,7 +120,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = OrdersControllerTestContext.Setup();
             var orders = new List<(Order order, OrderListItemModel expected)>
             {
-                CreateOrderTestData("C0000014-01", otherOrganisationId, "A description")
+                CreateOrderTestData("C0000014-01", otherOrganisationId, "A description"),
             };
 
             context.Orders = orders.Select(x => x.order);
@@ -140,7 +140,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var orders = new List<(Order order, OrderListItemModel expected)>
             {
                 CreateOrderTestData("C0000014-01", context.PrimaryOrganisationId, "Some Description"),
-                CreateOrderTestData("C000012-01", context.PrimaryOrganisationId, "Another Description")
+                CreateOrderTestData("C000012-01", context.PrimaryOrganisationId, "Another Description"),
             };
 
             context.Orders = orders.Select(x => x.order);
@@ -434,7 +434,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var createOrderRequest = new CreateOrderModel
             {
                 Description = "Test Order 1",
-                OrganisationId = context.PrimaryOrganisationId
+                OrganisationId = context.PrimaryOrganisationId,
             };
 
             context.CreateOrderResult = Result.Failure<string>(errors);
@@ -744,7 +744,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         SectionModel.CatalogueSolutions,
                         SectionModel.AdditionalServices,
                         SectionModel.FundingSource,
-                    }
+                    },
                 });
         }
 

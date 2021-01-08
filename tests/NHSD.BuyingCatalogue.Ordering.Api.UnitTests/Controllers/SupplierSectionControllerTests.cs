@@ -79,7 +79,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 SupplierId = supplierId,
                 Name = supplierName,
                 Address = supplierAddress.ToModel(),
-                PrimaryContact = supplierContact.ToModel()
+                PrimaryContact = supplierContact.ToModel(),
             };
 
             response.Should().BeEquivalentTo(new ActionResult<SupplierModel>(new OkObjectResult(expected)));
@@ -183,7 +183,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         Name = "New Description",
                         SupplierId = "New",
                         PrimaryContact = hasPrimaryContact ? new PrimaryContactModel() : null,
-                        Address = hasAddress ? new AddressModel() : null
+                        Address = hasAddress ? new AddressModel() : null,
                     });
             });
         }

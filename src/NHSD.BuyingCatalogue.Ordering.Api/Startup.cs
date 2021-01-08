@@ -56,7 +56,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             var bypassIdentity = configuration.GetValue<bool>("BypassIdentity");
             var validationSettings = new ValidationSettings
             {
-                MaxDeliveryDateWeekOffset = configuration.GetValue<int>("MaxDeliveryDateWeekOffset")
+                MaxDeliveryDateWeekOffset = configuration.GetValue<int>("MaxDeliveryDateWeekOffset"),
             };
 
             var smtpSettings = configuration.GetSection("SmtpServer").Get<SmtpSettings>();
@@ -103,7 +103,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             services
                 .AddSingleton(smtpSettings)
                 .AddSingleton(validationSettings)
-                .AddScoped(provider => configuration.GetSection("Purchasing").Get<PurchasingSettings>());
+                .AddScoped(_ => configuration.GetSection("Purchasing").Get<PurchasingSettings>());
 
             services.RegisterHealthChecks(connectionString, smtpSettings);
 
@@ -117,7 +117,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                     options.Audience = "Ordering";
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        NameClaimType = "name"
+                        NameClaimType = "name",
                     };
 
                     if (bypassIdentity)
@@ -130,7 +130,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                         options.BackchannelHttpHandler = new HttpClientHandler
                         {
                             ServerCertificateCustomValidationCallback =
-                                HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                                HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
                         };
                     }
                 });
@@ -192,12 +192,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 endpoints.MapControllers();
                 endpoints.MapHealthChecks("/health/live", new HealthCheckOptions
                 {
-                    Predicate = healthCheckRegistration => healthCheckRegistration.Tags.Contains(HealthCheckTags.Live)
+                    Predicate = healthCheckRegistration => healthCheckRegistration.Tags.Contains(HealthCheckTags.Live),
                 });
 
                 endpoints.MapHealthChecks("/health/ready", new HealthCheckOptions
                 {
-                    Predicate = healthCheckRegistration => healthCheckRegistration.Tags.Contains(HealthCheckTags.Ready)
+                    Predicate = healthCheckRegistration => healthCheckRegistration.Tags.Contains(HealthCheckTags.Ready),
                 });
             });
         }

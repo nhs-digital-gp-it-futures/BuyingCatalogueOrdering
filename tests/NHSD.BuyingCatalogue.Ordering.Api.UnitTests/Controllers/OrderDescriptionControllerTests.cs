@@ -244,14 +244,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     new Claim("Ordering", "Manage"),
                     new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
                     new Claim(ClaimTypes.Name, "Test User"),
-                    new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
+                    new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
                 }, "mock"));
 
                 OrderDescriptionController = new OrderDescriptionController(OrderRepositoryMock.Object)
                 {
                     ControllerContext = new ControllerContext
                     {
-                        HttpContext = new DefaultHttpContext { User = ClaimsPrincipal }
+                        HttpContext = new DefaultHttpContext { User = ClaimsPrincipal },
                     },
                 };
             }

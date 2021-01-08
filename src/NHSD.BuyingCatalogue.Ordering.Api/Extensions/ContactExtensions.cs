@@ -16,7 +16,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
                 FirstName = contact.FirstName,
                 LastName = contact.LastName,
                 EmailAddress = contact.Email,
-                TelephoneNumber = contact.Phone
+                TelephoneNumber = contact.Phone,
             };
         }
 

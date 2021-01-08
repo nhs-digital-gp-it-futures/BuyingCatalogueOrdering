@@ -82,7 +82,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = ServiceRecipientsTestContext.Setup();
             var expected = new ServiceRecipientsModel
             {
-                ServiceRecipients = new List<ServiceRecipientModel>()
+                ServiceRecipients = new List<ServiceRecipientModel>(),
             };
 
             var response = await context.Controller.GetAllAsync("myOrder");
@@ -98,7 +98,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var serviceRecipients = new List<(ServiceRecipient serviceRecipient, ServiceRecipientModel expectedModel)>
             {
-                CreateServiceRecipientData("ODS1", orderId, "name")
+                CreateServiceRecipientData("ODS1", orderId, "name"),
             };
 
             context.ServiceRecipients = serviceRecipients.Select(x => x.serviceRecipient).ToList();
@@ -107,7 +107,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var expected = new ServiceRecipientsModel
             {
-                ServiceRecipients = expectedList
+                ServiceRecipients = expectedList,
             };
 
             var response = await context.Controller.GetAllAsync(orderId);
@@ -127,7 +127,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             {
                 CreateServiceRecipientData("ODS1", orderId, "Test"),
                 CreateServiceRecipientData("ODS2", orderId, "Service recipient"),
-                CreateServiceRecipientData("ODS3", orderId, "Data")
+                CreateServiceRecipientData("ODS3", orderId, "Data"),
             };
 
             context.ServiceRecipients = serviceRecipients.Select(x => x.serviceRecipient).ToList();
@@ -325,7 +325,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     new Claim("Ordering", "Manage"),
                     new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
                     new Claim(ClaimTypes.Name, Username),
-                    new Claim(ClaimTypes.NameIdentifier, UserId.ToString())
+                    new Claim(ClaimTypes.NameIdentifier, UserId.ToString()),
                 },
                 "mock"));
 
@@ -333,8 +333,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 {
                     ControllerContext = new ControllerContext
                     {
-                        HttpContext = new DefaultHttpContext { User = ClaimsPrincipal }
-                    }
+                        HttpContext = new DefaultHttpContext { User = ClaimsPrincipal },
+                    },
                 };
             }
 

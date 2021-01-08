@@ -46,7 +46,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
                 Town = address.Town,
                 County = address.County,
                 Postcode = address.Postcode,
-                Country = address.Country
+                Country = address.Country,
             };
 
             actual.Should().BeEquivalentTo(expected);
@@ -82,7 +82,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
                 Town = Guid.NewGuid().ToString(),
                 County = Guid.NewGuid().ToString(),
                 Postcode = Guid.NewGuid().ToString(),
-                Country = Guid.NewGuid().ToString()
+                Country = Guid.NewGuid().ToString(),
             };
 
             var actualAddress = address.FromModel(inputAddressModel);
