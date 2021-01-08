@@ -31,17 +31,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public void GivenTheUserCreatesARequestToRetrieveTheFundingSourceForOrderWithId(string orderId)
         {
             _getFundingSourceRequest = new GetFundingSourceRequest(
-                _request, 
-                _settings.OrderingApiBaseUrl, 
+                _request,
+                _settings.OrderingApiBaseUrl,
                 orderId);
         }
-        
+
         [When(@"the user sends the retrieve funding source request")]
         public async Task WhenTheUserSendsTheRetrieveFundingSourceRequest()
         {
             _getFundingSourceResponse = await _getFundingSourceRequest.ExecuteAsync();
         }
-        
+
         [Then(@"the response contains the expected funding source details")]
         public void ThenTheResponseContainsTheExpectedFundingSourceDetails()
         {

@@ -48,6 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             {
                 builder.WithClaim("Ordering", "view");
             }
+
             if (role.Equals("Buyer", StringComparison.OrdinalIgnoreCase))
             {
                 builder = builder.WithClaim("Ordering", "Manage");

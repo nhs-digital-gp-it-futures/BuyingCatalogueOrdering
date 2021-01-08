@@ -18,7 +18,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
         private readonly string _createOrderItemUrl;
 
         private static readonly IDictionary<string, Func<UpdateOrderItemRequestPayload>> PayloadFactory =
-            new Dictionary<string, Func<UpdateOrderItemRequestPayload>>()
+            new Dictionary<string, Func<UpdateOrderItemRequestPayload>>
             {
                 {
                     "complete", () =>
@@ -78,28 +78,28 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                             .Build()
                 },
                 {
-                    "less-than-min-quantity", () => 
+                    "less-than-min-quantity", () =>
                         UpdateOrderItemRequestPayloadBuilder
                             .Create()
                             .WithQuantity(0)
                             .Build()
                 },
                 {
-                    "greater-than-max-quantity", () => 
+                    "greater-than-max-quantity", () =>
                         UpdateOrderItemRequestPayloadBuilder
                             .Create()
                             .WithQuantity(int.MaxValue)
                             .Build()
                 },
                 {
-                    "less-than-min-price", () => 
+                    "less-than-min-price", () =>
                         UpdateOrderItemRequestPayloadBuilder
                             .Create()
                             .WithPrice(-1)
                             .Build()
                 },
                 {
-                    "greater-than-max-price", () => 
+                    "greater-than-max-price", () =>
                         UpdateOrderItemRequestPayloadBuilder
                             .Create()
                             .WithPrice(1000000000000000m)
@@ -144,7 +144,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                 Payload.DeliveryDate,
                 Payload.Quantity,
                 EstimationPeriod = Payload.EstimationPeriod?.ToString(),
-                Payload.Price
+                Payload.Price,
             });
         }
 
@@ -174,7 +174,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                 OrderItemId,
                 DeliveryDate = Payload.DeliveryDate?.Date,
                 EstimationPeriod = expectedEstimationPeriod,
-                Payload.Price
+                Payload.Price,
             };
 
             actual.Should().BeEquivalentTo(expected);

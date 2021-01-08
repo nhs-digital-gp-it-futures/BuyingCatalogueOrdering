@@ -24,7 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 ServiceRecipient = ReadServiceRecipient(responseBody),
                 TimeUnit = ReadTimeUnit(responseBody),
                 Type = Enum.Parse<CataloguePriceType>(responseBody.Value<string>("type")),
-                EstimationPeriod = ReadEstimationPeriod(responseBody)
+                EstimationPeriod = ReadEstimationPeriod(responseBody),
             };
         }
 
@@ -91,7 +91,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
         }
 
         protected static object ConvertToExpectedBody(
-            OrderItemEntity orderItemEntity, 
+            OrderItemEntity orderItemEntity,
             ServiceRecipientEntity serviceRecipient)
         {
             return new
@@ -113,7 +113,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 orderItemEntity.Quantity,
                 ServiceRecipient = new
                 {
-                    orderItemEntity.OdsCode, 
+                    orderItemEntity.OdsCode,
                     serviceRecipient.Name,
                 },
                 TimeUnit = orderItemEntity.TimeUnit is null ? null : new

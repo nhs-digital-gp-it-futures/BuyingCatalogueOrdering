@@ -51,7 +51,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
             _price = 1.5m;
         }
 
-        public static CreateOrderItemRequestPayloadBuilder CreateSolution() => 
+        public static CreateOrderItemRequestPayloadBuilder CreateSolution() =>
             new CreateOrderItemRequestPayloadBuilder()
                 .WithCatalogueItemType(CatalogueItemType.Solution)
                 .WithCatalogueSolutionId(null);

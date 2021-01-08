@@ -108,7 +108,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         public void Ctor_NullRepository_ThrowsException()
         {
-            Assert.Throws<ArgumentNullException>(() => new CommencementDateController(null));
+            Assert.Throws<ArgumentNullException>(() => _ = new CommencementDateController(null));
         }
 
         private sealed class CommencementDateControllerTestContext
@@ -120,7 +120,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     .Create()
                     .WithOrganisationId(PrimaryOrganisationId)
                     .Build();
-                
+
                 OrderRepositoryMock = new Mock<IOrderRepository>();
                 OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]
@@ -150,10 +150,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             internal CommencementDateController Controller { get; }
 
-            internal static CommencementDateControllerTestContext Setup()
-            {
-                return new CommencementDateControllerTestContext();
-            }
+            internal static CommencementDateControllerTestContext Setup() => new();
         }
     }
 }

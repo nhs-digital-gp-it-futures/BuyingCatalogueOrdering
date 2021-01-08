@@ -30,13 +30,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
         [Given(@"the user creates a request to retrieve an order item with catalogue item name '(.*)' and order ID '(.*)'")]
         public void GivenTheUserCreatesARequestToRetrieveAnOrderItemWithCatalogueItemNameAndOrderId(
-            string catalogueSolutionName, 
+            string catalogueSolutionName,
             string orderId)
         {
             var orderItem = _orderContext.OrderItemReferenceList.GetByOrderCatalogueItemName(catalogueSolutionName);
 
             _getOrderItemRequest = new GetOrderItemRequest(
-                _request, 
+                _request,
                 _settings.OrderingApiBaseUrl,
                 orderId,
                 orderItem.OrderItemId);
@@ -48,7 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var order = _orderContext.OrderReferenceList.GetAll().First();
 
             _getOrderItemRequest = new GetOrderItemRequest(
-                _request, 
+                _request,
                 _settings.OrderingApiBaseUrl,
                 order.OrderId,
                 999);
@@ -60,7 +60,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var orderItem = _orderContext.OrderItemReferenceList.GetAll().First();
 
             _getOrderItemRequest = new GetOrderItemRequest(
-                _request, 
+                _request,
                 _settings.OrderingApiBaseUrl,
                 Guid.NewGuid().ToString(),
                 orderItem.OrderItemId);
@@ -71,7 +71,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             _getOrderItemResponse = await _getOrderItemRequest.ExecuteAsync();
         }
-        
+
         [Then(@"the response contains the expected order item")]
         public void ThenTheResponseContainsTheExpectedOrderItem()
         {

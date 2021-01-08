@@ -18,7 +18,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             };
         }
 
-        internal static CreateOrderRequestBuilder Create() => new CreateOrderRequestBuilder();
+        internal static CreateOrderRequestBuilder Create() => new();
 
         internal CreateOrderRequestBuilder WithDescription(string description)
         {
@@ -33,6 +33,5 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         }
 
         internal CreateOrderRequest Build() => _createOrderRequest;
-
     }
 }

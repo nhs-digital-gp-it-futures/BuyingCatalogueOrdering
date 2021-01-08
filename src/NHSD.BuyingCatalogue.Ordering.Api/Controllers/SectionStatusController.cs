@@ -25,7 +25,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         {
             { SectionModel.CatalogueSolutions.Id, o => o.CatalogueSolutionsViewed = true },
             { SectionModel.AdditionalServices.Id, o => o.AdditionalServicesViewed = true },
-            { SectionModel.AssociatedServices.Id, o => o.AssociatedServicesViewed = true }
+            { SectionModel.AssociatedServices.Id, o => o.AssociatedServicesViewed = true },
         };
 
         public SectionStatusController(IOrderRepository orderRepository)
@@ -67,7 +67,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             {
                 return Forbid();
             }
-            
+
             order.SetLastUpdatedBy(User.GetUserId(), User.GetUserName());
 
             await _orderRepository.UpdateOrderAsync(order);

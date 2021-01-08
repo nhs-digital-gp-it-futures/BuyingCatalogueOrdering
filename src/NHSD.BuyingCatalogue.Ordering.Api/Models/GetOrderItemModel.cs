@@ -12,11 +12,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
                 throw new ArgumentNullException(nameof(orderItem));
 
             OrderItemId = orderItem.OrderItemId;
-            ServiceRecipient = serviceRecipient != null ? new ServiceRecipientModel
-            {
-                OdsCode = serviceRecipient.OdsCode,
-                Name = serviceRecipient.Name,
-            } : null;
+            ServiceRecipient = serviceRecipient != null
+                ? new ServiceRecipientModel
+                    {
+                        OdsCode = serviceRecipient.OdsCode,
+                        Name = serviceRecipient.Name,
+                    }
+                : null;
             CatalogueItemType = orderItem.CatalogueItemType.ToString();
             CatalogueItemName = orderItem.CatalogueItemName;
             CatalogueItemId = orderItem.CatalogueItemId;

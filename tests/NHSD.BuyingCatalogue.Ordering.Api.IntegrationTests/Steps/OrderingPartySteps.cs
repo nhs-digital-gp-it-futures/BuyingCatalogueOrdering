@@ -26,7 +26,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             _request = request;
             _context = context;
             _orderingPartyUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/ordering-party";
-
         }
 
         private static OrganisationPartyPayload GetOrganisationPartyPayloadByOrderId(ScenarioContext context, string orderId)
@@ -69,7 +68,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             }
         }
 
-
         [Given(@"an order party update request exist for order ID (.*)")]
         public void GivenAnOrderPartyUpdateRequestExistForOrderID(string orderId)
         {
@@ -96,7 +94,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var payload = GetOrganisationPartyPayloadByOrderId(_context, orderId);
 
-           
             payload.Name = name;
         }
 

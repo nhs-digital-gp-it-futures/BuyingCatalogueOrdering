@@ -11,7 +11,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
             var resourceName = $"{EmbeddedResourceQualifier}.IdentitySigningKey.pfx";
             using var certificateStream =
                 typeof(EmbeddedResourceReader).Assembly.GetManifestResourceStream(resourceName);
-            
+
             if (certificateStream == null)
             {
                 return null;

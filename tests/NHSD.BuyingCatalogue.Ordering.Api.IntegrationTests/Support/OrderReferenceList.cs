@@ -6,12 +6,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
 {
     internal sealed class OrderReferenceList
     {
-        private readonly Dictionary<string, OrderEntity> _cache = new Dictionary<string, OrderEntity>();
+        private readonly Dictionary<string, OrderEntity> _cache = new();
 
         public IEnumerable<OrderEntity> GetAll() =>
             _cache.Values;
 
-        public OrderEntity GetByOrderId(string orderId) => 
+        public OrderEntity GetByOrderId(string orderId) =>
             _cache[orderId]
                 .Should()
                 .NotBeNull()

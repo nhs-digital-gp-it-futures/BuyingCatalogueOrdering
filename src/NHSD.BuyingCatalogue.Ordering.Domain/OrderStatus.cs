@@ -31,7 +31,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 return null;
 
             return List()
-                .SingleOrDefault(s => 
+                .SingleOrDefault(s =>
                     name.Equals(s.Name, StringComparison.OrdinalIgnoreCase));
         }
 

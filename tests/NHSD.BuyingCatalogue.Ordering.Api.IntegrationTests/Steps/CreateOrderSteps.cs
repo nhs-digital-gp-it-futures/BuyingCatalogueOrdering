@@ -16,8 +16,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private readonly string _orderingUrl;
 
         public CreateOrderSteps(
-            Response response, 
-            Request request, 
+            Response response,
+            Request request,
             Settings settings)
         {
             _response = response;

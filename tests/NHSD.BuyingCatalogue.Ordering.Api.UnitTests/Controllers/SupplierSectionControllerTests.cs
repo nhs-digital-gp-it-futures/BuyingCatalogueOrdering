@@ -171,14 +171,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithSupplierName(supplierName)
                 .WithSupplierAddress(supplierAddress)
                 .WithSupplierContact(supplierContact)
-                .Build(); ;
+                .Build();
 
             var controller = context.SupplierSectionController;
 
             Assert.ThrowsAsync<ArgumentNullException>(async () =>
             {
                 var _ = await controller.UpdateAsync(orderId,
-                    new SupplierModel()
+                    new SupplierModel
                     {
                         Name = "New Description",
                         SupplierId = "New",
@@ -212,7 +212,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithSupplierName(supplierName)
                 .WithSupplierAddress(supplierAddress)
                 .WithSupplierContact(supplierContact)
-                .Build(); ;
+                .Build();
 
             var controller = context.SupplierSectionController;
 
@@ -237,15 +237,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 {
                     new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
                     new Claim(ClaimTypes.Name, "Test User"),
-                    new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
+                    new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
                 }, "mock"));
 
                 SupplierSectionController = new SupplierSectionController(OrderRepositoryMock.Object)
                 {
                     ControllerContext = new ControllerContext
                     {
-                        HttpContext = new DefaultHttpContext { User = ClaimsPrincipal }
-                    }
+                        HttpContext = new DefaultHttpContext { User = ClaimsPrincipal },
+                    },
                 };
             }
 
@@ -259,10 +259,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             internal SupplierSectionController SupplierSectionController { get; }
 
-            internal static SupplierSectionControllerTestContext Setup()
-            {
-                return new SupplierSectionControllerTestContext();
-            }
+            internal static SupplierSectionControllerTestContext Setup() => new();
         }
     }
 }

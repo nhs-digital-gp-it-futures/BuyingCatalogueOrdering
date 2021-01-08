@@ -64,7 +64,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await _request.PutJsonAsync(string.Format(_serviceRecipientUrl, orderId), payload);
         }
 
-
         [Then(@"the service recipients are returned")]
         public async Task ThenTheServiceRecipientsAreReturned(Table table)
         {
@@ -92,10 +91,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
         private static ServiceRecipientTable CreateServiceRecipients(JToken token)
         {
-            return new ServiceRecipientTable
+            return new()
             {
                 Name = token.SelectToken("name").ToString(),
-                OdsCode = token.SelectToken("odsCode").ToString()
+                OdsCode = token.SelectToken("odsCode").ToString(),
             };
         }
 
