@@ -9,9 +9,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class Order
     {
-        private readonly List<OrderItem> orderItems = new List<OrderItem>();
-        private readonly List<ServiceRecipient> serviceRecipients = new List<ServiceRecipient>();
-        private readonly List<ServiceInstanceItem> serviceInstanceItems = new List<ServiceInstanceItem>();
+        private readonly List<OrderItem> orderItems = new();
+        private readonly List<ServiceRecipient> serviceRecipients = new();
+        private readonly List<ServiceInstanceItem> serviceInstanceItems = new();
 
 #pragma warning disable 649
         private DateTime? _completed;

@@ -8,8 +8,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Validation
 {
     internal sealed class DefaultDeliveryDateValidator : IDefaultDeliveryDateValidator
     {
-        internal static readonly ErrorModel CommencementDateRequired = new ErrorModel(nameof(Order.CommencementDate) + "Required");
-        internal static readonly ErrorModel OutsideWindow = new ErrorModel(FieldName + "OutsideDeliveryWindow", FieldName);
+        internal static readonly ErrorModel CommencementDateRequired = new(nameof(Order.CommencementDate) + "Required");
+        internal static readonly ErrorModel OutsideWindow = new(FieldName + "OutsideDeliveryWindow", FieldName);
 
         private const string FieldName = nameof(DefaultDeliveryDateModel.DeliveryDate);
 

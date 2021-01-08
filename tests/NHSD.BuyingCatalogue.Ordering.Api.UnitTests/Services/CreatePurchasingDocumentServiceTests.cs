@@ -161,7 +161,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
         internal CreatePurchasingDocumentService CreatePurchasingDocumentService { get; }
 
-        public static CreatePurchasingDocumentServiceTestContext Setup() =>
-            new CreatePurchasingDocumentServiceTestContext();
+        public static CreatePurchasingDocumentServiceTestContext Setup() => new();
     }
 }

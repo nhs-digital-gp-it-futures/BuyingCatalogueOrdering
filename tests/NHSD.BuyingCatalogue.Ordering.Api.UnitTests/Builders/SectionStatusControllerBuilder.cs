@@ -1,5 +1,4 @@
 ﻿using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
@@ -12,10 +11,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         {
         }
 
-        internal static SectionStatusControllerBuilder Create()
-        {
-            return new SectionStatusControllerBuilder();
-        }
+        internal static SectionStatusControllerBuilder Create() => new();
 
         internal SectionStatusControllerBuilder WithOrderRepository(IOrderRepository orderRepository)
         {
@@ -23,9 +19,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
-        internal SectionStatusController Build()
-        {
-            return new SectionStatusController(_orderRepository);
-        }
+        internal SectionStatusController Build() => new(_orderRepository);
     }
 }

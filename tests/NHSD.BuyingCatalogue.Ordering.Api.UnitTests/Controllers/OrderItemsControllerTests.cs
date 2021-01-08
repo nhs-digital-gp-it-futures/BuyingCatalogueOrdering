@@ -105,8 +105,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var serviceRecipients = new List<OdsOrganisation>
             {
-                new OdsOrganisation("eu", "EU test"),
-                new OdsOrganisation("auz", null),
+                new("eu", "EU test"),
+                new("auz", null),
             };
 
             order.SetServiceRecipients(serviceRecipients, Guid.Empty, string.Empty);
@@ -842,7 +842,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 string detail = null,
                 string instance = null)
             {
-                return new ValidationProblemDetails(modelStateDictionary) { Status = 400 };
+                return new(modelStateDictionary) { Status = 400 };
             }
         }
     }
@@ -914,12 +914,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         internal static OrderItemsControllerTestContext Setup()
         {
-            return new OrderItemsControllerTestContext(Guid.NewGuid());
+            return new(Guid.NewGuid());
         }
 
         internal static OrderItemsControllerTestContext Setup(Guid primaryOrganisationId)
         {
-            return new OrderItemsControllerTestContext(primaryOrganisationId);
+            return new(primaryOrganisationId);
         }
     }
 }

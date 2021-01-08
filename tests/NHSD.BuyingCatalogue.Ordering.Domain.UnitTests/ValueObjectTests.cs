@@ -9,7 +9,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
     [TestFixture]
     public sealed class ValueObjectTests
     {
-        private Size _size1 = new Size(1, 2);
+        private Size _size1 = new(1, 2);
 
         [Test]
         public void GivenSameValuesShouldReturnTrue()

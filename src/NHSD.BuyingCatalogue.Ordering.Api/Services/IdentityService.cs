@@ -24,6 +24,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services
             return context.HttpContext.User.GetUserName();
         }
 
-        public IdentityUser GetUserInfo() => new IdentityUser(GetUserIdentity(), GetUserName());
+        public IdentityUser GetUserInfo() => new(GetUserIdentity(), GetUserName());
     }
 }

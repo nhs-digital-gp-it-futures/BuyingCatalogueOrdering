@@ -105,7 +105,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 
         private static ErrorDetails ErrorDetails(string propertyName, string error)
         {
-            return new ErrorDetails(propertyName + error, propertyName);
+            return new(propertyName + error, propertyName);
         }
 
         private static IReadOnlyList<ErrorDetails> NoErrors() => Array.Empty<ErrorDetails>();
@@ -141,7 +141,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
         private sealed class OrderItemIdValidator
         {
             private readonly HashSet<int> existingOrderItemIds;
-            private readonly HashSet<int> itemIds = new HashSet<int>();
+            private readonly HashSet<int> itemIds = new();
 
             internal OrderItemIdValidator(IEnumerable<OrderItem> orderItems)
             {

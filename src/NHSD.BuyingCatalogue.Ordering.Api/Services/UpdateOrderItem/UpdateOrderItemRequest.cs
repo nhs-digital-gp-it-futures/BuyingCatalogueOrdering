@@ -40,7 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem
 
         private static ArgumentException ModelPropertyIsNullException(string modelParamName, string propertyName)
         {
-            return new ArgumentException($"{modelParamName}.{propertyName} should not be null", modelParamName);
+            return new($"{modelParamName}.{propertyName} should not be null", modelParamName);
         }
     }
 }

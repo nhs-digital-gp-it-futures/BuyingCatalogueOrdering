@@ -40,8 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             created = DateTime.UtcNow;
         }
 
-        public static OrderItemBuilder Create() =>
-            new OrderItemBuilder();
+        public static OrderItemBuilder Create() => new();
 
         public OrderItemBuilder WithOrderItemId(int id)
         {

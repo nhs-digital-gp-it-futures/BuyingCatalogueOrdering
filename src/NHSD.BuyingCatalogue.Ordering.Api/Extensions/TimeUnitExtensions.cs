@@ -6,7 +6,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
     internal static class TimeUnitExtensions
     {
         internal static TimeUnitModel ToModel(this TimeUnit timeUnit) =>
-            new TimeUnitModel
+            new()
             {
                 Name = timeUnit.Name(),
                 Description = timeUnit.Description(),
