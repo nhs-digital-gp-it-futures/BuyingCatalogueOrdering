@@ -36,7 +36,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
                 FirstName = contact.FirstName,
                 LastName = contact.LastName,
                 EmailAddress = contact.Email,
-                TelephoneNumber = contact.Phone
+                TelephoneNumber = contact.Phone,
             };
 
             actual.Should().BeEquivalentTo(expected);
@@ -67,7 +67,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
                 FirstName = Guid.NewGuid().ToString(),
                 LastName = Guid.NewGuid().ToString(),
                 EmailAddress = Guid.NewGuid().ToString(),
-                TelephoneNumber = Guid.NewGuid().ToString()
+                TelephoneNumber = Guid.NewGuid().ToString(),
             };
 
             var actualContact = contact.FromModel(inputPrimaryContactModel);

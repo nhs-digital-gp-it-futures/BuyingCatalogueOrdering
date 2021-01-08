@@ -59,15 +59,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     Town = organisationAddress.Town,
                     County = organisationAddress.County,
                     Postcode = organisationAddress.Postcode,
-                    Country = organisationAddress.Country
+                    Country = organisationAddress.Country,
                 },
                 PrimaryContact = new PrimaryContactModel
                 {
                     FirstName = primaryContact.FirstName,
                     LastName = primaryContact.LastName,
                     EmailAddress = primaryContact.Email,
-                    TelephoneNumber = primaryContact.Phone
-                }
+                    TelephoneNumber = primaryContact.Phone,
+                },
             };
 
             return Ok(result);

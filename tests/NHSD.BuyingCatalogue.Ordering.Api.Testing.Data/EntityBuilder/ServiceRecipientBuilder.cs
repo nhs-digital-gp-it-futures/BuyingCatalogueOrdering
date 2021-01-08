@@ -12,10 +12,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
         {
         }
 
-        public static ServiceRecipientBuilder Create()
-        {
-            return new ServiceRecipientBuilder();
-        }
+        public static ServiceRecipientBuilder Create() => new();
 
         public ServiceRecipientBuilder WithOdsCode(string odsCode)
         {
@@ -37,11 +34,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
 
         public ServiceRecipientEntity Build()
         {
-            return new ServiceRecipientEntity
+            return new()
             {
                 OdsCode = _odsCode,
                 Name = _name,
-                OrderId = _orderId
+                OrderId = _orderId,
             };
         }
     }

@@ -90,7 +90,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                         orderPartyContact.LastName,
                         EmailAddress = orderPartyContact.Email,
                         TelephoneNumber = orderPartyContact.Phone,
-                    }
+                    },
                 },
                 orderEntity.CommencementDate,
                 Supplier = new
@@ -114,7 +114,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                         supplierContact.LastName,
                         EmailAddress = supplierContact.Email,
                         TelephoneNumber = supplierContact.Phone,
-                    }
+                    },
                 },
                 OrderItems = orderItems.Select(orderItem => new
                 {

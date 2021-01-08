@@ -42,7 +42,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             var actual = new OrderDescriptionTable
             {
-                Description = response.Value<string>("description")
+                Description = response.Value<string>("description"),
             };
 
             actual.Should().BeEquivalentTo(expected);

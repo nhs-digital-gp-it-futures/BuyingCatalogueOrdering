@@ -19,10 +19,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _phone = "0123456789";
         }
 
-        public static ContactBuilder Create()
-        {
-            return new ContactBuilder();
-        }
+        public static ContactBuilder Create() => new();
 
         public ContactBuilder WithContactId(int contactId)
         {
@@ -56,13 +53,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 
         public Contact Build()
         {
-            return new Contact
+            return new()
             {
                 ContactId = _contactId,
                 FirstName = _firstName,
                 LastName = _lastName,
                 Email = _email,
-                Phone = _phone
+                Phone = _phone,
             };
         }
     }

@@ -65,7 +65,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 Town = response.Value<string>("town"),
                 County = response.Value<string>("county"),
                 Postcode = response.Value<string>("postcode"),
-                Country = response.Value<string>("country")
+                Country = response.Value<string>("country"),
             };
 
             actual.Should().BeEquivalentTo(expected);

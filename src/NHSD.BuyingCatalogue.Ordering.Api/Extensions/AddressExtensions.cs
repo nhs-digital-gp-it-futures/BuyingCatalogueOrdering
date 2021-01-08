@@ -21,7 +21,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
                 Town = address.Town,
                 County = address.County,
                 Postcode = address.Postcode,
-                Country = address.Country
+                Country = address.Country,
             };
         }
 

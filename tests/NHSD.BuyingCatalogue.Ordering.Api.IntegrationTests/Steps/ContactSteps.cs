@@ -56,7 +56,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 FirstName = response.Value<string>("firstName"),
                 LastName = response.Value<string>("lastName"),
                 EmailAddress = response.Value<string>("emailAddress"),
-                TelephoneNumber = response.Value<string>("telephoneNumber")
+                TelephoneNumber = response.Value<string>("telephoneNumber"),
             };
 
             actual.Should().BeEquivalentTo(expected);

@@ -111,7 +111,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                             .Create()
                             .WithEstimationPeriod(TimeUnit.Invalid)
                             .Build()
-                }
+                },
             };
 
         public UpdateOrderItemRequest(

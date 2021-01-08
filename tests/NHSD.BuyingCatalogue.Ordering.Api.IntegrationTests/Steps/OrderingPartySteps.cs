@@ -134,7 +134,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var actual = new OrganisationTable
             {
                 Name = response.Value<string>("name"),
-                OdsCode = response.Value<string>("odsCode")
+                OdsCode = response.Value<string>("odsCode"),
             };
 
             actual.Should().BeEquivalentTo(expected);

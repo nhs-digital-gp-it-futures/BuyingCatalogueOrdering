@@ -154,7 +154,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         Name = "New Description",
                         OdsCode = "NewODS",
                         PrimaryContact = hasPrimaryContact ? new PrimaryContactModel() : null,
-                        Address = hasAddress ? new AddressModel() : null
+                        Address = hasAddress ? new AddressModel() : null,
                     });
             });
         }
@@ -178,7 +178,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         Name = "New Description",
                         OdsCode = "New",
                         PrimaryContact = new PrimaryContactModel(),
-                        Address = new AddressModel()
+                        Address = new AddressModel(),
                     });
 
             response.Should().BeOfType<NoContentResult>();
@@ -210,15 +210,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         Town = orderingPartyAddress.Town,
                         County = orderingPartyAddress.County,
                         Postcode = orderingPartyAddress.Postcode,
-                        Country = orderingPartyAddress.Country
+                        Country = orderingPartyAddress.Country,
                     },
                     PrimaryContact = !hasOrganisationContact ? null : new PrimaryContactModel
                     {
                         FirstName = repositoryOrder.OrganisationContact.FirstName,
                         LastName = repositoryOrder.OrganisationContact.LastName,
                         EmailAddress = repositoryOrder.OrganisationContact.Email,
-                        TelephoneNumber = repositoryOrder.OrganisationContact.Phone
-                    }
+                        TelephoneNumber = repositoryOrder.OrganisationContact.Phone,
+                    },
                 });
         }
 
@@ -235,15 +235,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     new Claim("Ordering", "Manage"),
                     new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
                     new Claim(ClaimTypes.Name, "Test User"),
-                    new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString())
+                    new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
                 }, "mock"));
 
                 OrderingPartyController = new OrderingPartyController(OrderRepositoryMock.Object)
                 {
                     ControllerContext = new ControllerContext
                     {
-                        HttpContext = new DefaultHttpContext { User = ClaimsPrincipal }
-                    }
+                        HttpContext = new DefaultHttpContext { User = ClaimsPrincipal },
+                    },
                 };
             }
 
@@ -257,10 +257,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             private ClaimsPrincipal ClaimsPrincipal { get; }
 
-            internal static OrderingPartyTestContext Setup()
-            {
-                return new OrderingPartyTestContext();
-            }
+            internal static OrderingPartyTestContext Setup() => new();
         }
     }
 }

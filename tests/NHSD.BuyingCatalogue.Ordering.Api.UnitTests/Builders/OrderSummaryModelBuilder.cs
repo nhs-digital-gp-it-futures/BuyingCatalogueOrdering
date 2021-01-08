@@ -24,10 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             _status = OrderStatus.Incomplete.Name;
         }
 
-        public static OrderSummaryModelBuilder Create()
-        {
-            return new OrderSummaryModelBuilder();
-        }
+        public static OrderSummaryModelBuilder Create() => new();
 
         public OrderSummaryModelBuilder WithOrderId(string orderId)
         {
@@ -55,14 +52,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 
         public OrderSummaryModel Build()
         {
-            return new OrderSummaryModel
+            return new()
             {
                 OrderId = _orderId,
                 Description = _description,
                 OrganisationId = _organisationId,
                 Sections = _sections,
                 SectionStatus = _sectionStatus,
-                Status = _status
+                Status = _status,
             };
         }
     }

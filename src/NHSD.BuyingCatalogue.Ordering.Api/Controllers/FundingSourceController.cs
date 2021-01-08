@@ -40,7 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             return new GetFundingSourceModel
             {
-                OnlyGMS = order.FundingSourceOnlyGMS
+                OnlyGMS = order.FundingSourceOnlyGMS,
             };
         }
 
