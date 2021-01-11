@@ -48,7 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var _ = new ServiceRecipientsSectionController(orderRepository, serviceRecipientRepository);
+                _ = new ServiceRecipientsSectionController(orderRepository, serviceRecipientRepository);
             });
         }
 
@@ -219,7 +219,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = ServiceRecipientsTestContext.Setup();
 
-            var lastUpdatedByName = "Some user";
+            const string lastUpdatedByName = "Some user";
             context.Order = OrderBuilder
                 .Create()
                 .WithLastUpdatedByName(lastUpdatedByName)

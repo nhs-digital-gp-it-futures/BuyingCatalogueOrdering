@@ -25,7 +25,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             Assert.Throws<ArgumentNullException>(() =>
             {
-                var _ = new OrderDescriptionController(null);
+                _ = new OrderDescriptionController(null);
             });
         }
 

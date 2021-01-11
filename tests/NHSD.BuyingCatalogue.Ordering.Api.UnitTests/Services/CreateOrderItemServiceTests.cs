@@ -442,8 +442,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             CreateOrderItemModel model,
             CreateOrderItemService service)
         {
-            static void ServiceRecipientsIsEmpty(string _, IEnumerable<ServiceRecipient> serviceRecipients)
+            static void ServiceRecipientsIsEmpty(string orderId, IEnumerable<ServiceRecipient> serviceRecipients)
             {
+                _ = orderId;
+
                 serviceRecipients.Should().BeEmpty();
             }
 
@@ -467,8 +469,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             CreateOrderItemSolutionRequest request,
             CreateOrderItemService service)
         {
-            void ServiceRecipientsIsEmpty(string _, IEnumerable<ServiceRecipient> serviceRecipients)
+            void ServiceRecipientsIsEmpty(string orderId, IEnumerable<ServiceRecipient> serviceRecipients)
             {
+                _ = orderId;
+
                 serviceRecipients.Should().Contain(request.ServiceRecipient);
             }
 

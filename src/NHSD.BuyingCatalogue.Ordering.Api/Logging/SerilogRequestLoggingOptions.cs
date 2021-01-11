@@ -8,8 +8,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Logging
     {
         internal const string HealthCheckEndpointDisplayName = "Health checks";
 
-        internal static LogEventLevel GetLevel(HttpContext httpContext, double _, Exception exception)
+        internal static LogEventLevel GetLevel(HttpContext httpContext, double elapsed, Exception exception)
         {
+            _ = elapsed;
+
             if (exception != null)
                 return LogEventLevel.Error;
 
