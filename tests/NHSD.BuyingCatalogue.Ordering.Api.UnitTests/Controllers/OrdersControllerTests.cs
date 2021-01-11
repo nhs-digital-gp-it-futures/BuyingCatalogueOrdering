@@ -59,7 +59,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = OrdersControllerTestContext.Setup();
 
             const string orderId = "C0000014-01";
-            context.Order = CreateGetTestData(orderId, Guid.NewGuid(), "ods").order;
+            context.Order = CreateGetTestData(orderId, Guid.NewGuid(), "ods").Order;
 
             var response = await context.OrdersController.GetAsync(orderId);
             response.Result.Should().BeOfType<ForbidResult>();
@@ -98,19 +98,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             string orderDescription)
         {
             var context = OrdersControllerTestContext.Setup();
-            var orders = new List<(Order order, OrderListItemModel expected)>
+            var orders = new List<(Order Order, OrderListItemModel Expected)>
             {
                 CreateOrderTestData(orderId, context.PrimaryOrganisationId, orderDescription),
             };
 
-            context.Orders = orders.Select(x => x.order);
+            context.Orders = orders.Select(x => x.Order);
 
             var controller = context.OrdersController;
 
             var result = await controller.GetAllAsync(context.PrimaryOrganisationId);
             var ordersResult = result.Value;
             ordersResult.Should().ContainSingle();
-            ordersResult.Should().BeEquivalentTo(orders.Select(x => x.expected));
+            ordersResult.Should().BeEquivalentTo(orders.Select(x => x.Expected));
         }
 
         [Test]
@@ -118,12 +118,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var otherOrganisationId = Guid.NewGuid();
             var context = OrdersControllerTestContext.Setup();
-            var orders = new List<(Order order, OrderListItemModel expected)>
+            var orders = new List<(Order Order, OrderListItemModel Expected)>
             {
                 CreateOrderTestData("C0000014-01", otherOrganisationId, "A description"),
             };
 
-            context.Orders = orders.Select(x => x.order);
+            context.Orders = orders.Select(x => x.Order);
 
             var controller = context.OrdersController;
 
@@ -137,20 +137,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = OrdersControllerTestContext.Setup();
 
-            var orders = new List<(Order order, OrderListItemModel expected)>
+            var orders = new List<(Order Order, OrderListItemModel Expected)>
             {
                 CreateOrderTestData("C0000014-01", context.PrimaryOrganisationId, "Some Description"),
                 CreateOrderTestData("C000012-01", context.PrimaryOrganisationId, "Another Description"),
             };
 
-            context.Orders = orders.Select(x => x.order);
+            context.Orders = orders.Select(x => x.Order);
 
             var controller = context.OrdersController;
 
             var result = await controller.GetAllAsync(context.PrimaryOrganisationId);
             var ordersResult = result.Value;
             ordersResult.Count.Should().Be(2);
-            ordersResult.Should().BeEquivalentTo(orders.Select(x => x.expected));
+            ordersResult.Should().BeEquivalentTo(orders.Select(x => x.Expected));
         }
 
         [Test]
@@ -689,7 +689,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             actual.Should().BeEquivalentTo(expected);
         }
 
-        private static (Order order, OrderListItemModel expectedOrder) CreateOrderTestData(
+        private static (Order Order, OrderListItemModel ExpectedOrder) CreateOrderTestData(
             string orderId,
             Guid organisationId,
             string description)
@@ -701,20 +701,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithDescription(description)
                 .Build();
 
-            return (order: repositoryOrder,
-                expectedOrder: new OrderListItemModel
-                {
-                    OrderId = repositoryOrder.OrderId,
-                    Description = repositoryOrder.Description.Value,
-                    Status = repositoryOrder.OrderStatus.Name,
-                    DateCreated = repositoryOrder.Created,
-                    LastUpdated = repositoryOrder.LastUpdated,
-                    LastUpdatedBy = repositoryOrder.LastUpdatedByName,
-                    OnlyGms = repositoryOrder.FundingSourceOnlyGMS,
-                });
+            return (repositoryOrder, new OrderListItemModel
+            {
+                OrderId = repositoryOrder.OrderId,
+                Description = repositoryOrder.Description.Value,
+                Status = repositoryOrder.OrderStatus.Name,
+                DateCreated = repositoryOrder.Created,
+                LastUpdated = repositoryOrder.LastUpdated,
+                LastUpdatedBy = repositoryOrder.LastUpdatedByName,
+                OnlyGms = repositoryOrder.FundingSourceOnlyGMS,
+            });
         }
 
-        private static (Order order, OrderSummaryModel expectedSummary) CreateOrderSummaryTestData(
+        private static (Order Order, OrderSummaryModel ExpectedSummary) CreateOrderSummaryTestData(
             string orderId,
             string description,
             Guid organisationId)
@@ -726,13 +725,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithOrganisationId(organisationId)
                 .Build();
 
-            return (order: repositoryOrder,
-                expectedSummary: new OrderSummaryModel
-                {
-                    OrderId = repositoryOrder.OrderId,
-                    OrganisationId = repositoryOrder.OrganisationId,
-                    Description = repositoryOrder.Description.Value,
-                    Sections = new List<SectionModel>
+            return (repositoryOrder, new OrderSummaryModel
+            {
+                OrderId = repositoryOrder.OrderId,
+                OrganisationId = repositoryOrder.OrganisationId,
+                Description = repositoryOrder.Description.Value,
+                Sections = new List<SectionModel>
                     {
                         SectionModel.Description.WithStatus(
                             string.IsNullOrWhiteSpace(repositoryOrder.Description.Value)
@@ -747,10 +745,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         SectionModel.AdditionalServices,
                         SectionModel.FundingSource,
                     },
-                });
+            });
         }
 
-        private static (Order order, OrderModel expectedOrder) CreateGetTestData(
+        private static (Order Order, OrderModel ExpectedOrder) CreateGetTestData(
             string orderId,
             Guid organisationId,
             string odsCode)
@@ -793,7 +791,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 orderItem,
                 GetServiceInstanceId(repositoryOrder.ServiceInstanceItems, orderItem));
 
-            return (order: repositoryOrder, expectedOrder: new OrderModel
+            return (repositoryOrder, new OrderModel
             {
                 Description = repositoryOrder.Description.Value,
                 OrderParty = new OrderingPartyModel

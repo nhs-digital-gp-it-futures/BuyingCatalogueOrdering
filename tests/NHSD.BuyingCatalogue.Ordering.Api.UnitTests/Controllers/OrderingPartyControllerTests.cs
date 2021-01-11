@@ -185,7 +185,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             response.Should().BeOfType<NoContentResult>();
         }
 
-        private static (Order order, OrderingPartyModel expectedOrderingParty) CreateOrderingPartyTestData(string orderId, Guid organisationId, bool hasOrganisationContact = true)
+        private static (Order Order, OrderingPartyModel ExpectedOrderingParty) CreateOrderingPartyTestData(
+            string orderId,
+            Guid organisationId,
+            bool hasOrganisationContact = true)
         {
             var repositoryOrder = OrderBuilder
                 .Create()
@@ -196,31 +199,30 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var orderingPartyAddress = repositoryOrder.OrganisationAddress;
 
-            return (order: repositoryOrder,
-                expectedOrderingParty: new OrderingPartyModel
+            return (repositoryOrder, new OrderingPartyModel
+            {
+                Name = repositoryOrder.OrganisationName,
+                OdsCode = repositoryOrder.OrganisationOdsCode,
+                Address = new AddressModel
                 {
-                    Name = repositoryOrder.OrganisationName,
-                    OdsCode = repositoryOrder.OrganisationOdsCode,
-                    Address = new AddressModel
-                    {
-                        Line1 = orderingPartyAddress.Line1,
-                        Line2 = orderingPartyAddress.Line2,
-                        Line3 = orderingPartyAddress.Line3,
-                        Line4 = orderingPartyAddress.Line4,
-                        Line5 = orderingPartyAddress.Line5,
-                        Town = orderingPartyAddress.Town,
-                        County = orderingPartyAddress.County,
-                        Postcode = orderingPartyAddress.Postcode,
-                        Country = orderingPartyAddress.Country,
-                    },
-                    PrimaryContact = !hasOrganisationContact ? null : new PrimaryContactModel
-                    {
-                        FirstName = repositoryOrder.OrganisationContact.FirstName,
-                        LastName = repositoryOrder.OrganisationContact.LastName,
-                        EmailAddress = repositoryOrder.OrganisationContact.Email,
-                        TelephoneNumber = repositoryOrder.OrganisationContact.Phone,
-                    },
-                });
+                    Line1 = orderingPartyAddress.Line1,
+                    Line2 = orderingPartyAddress.Line2,
+                    Line3 = orderingPartyAddress.Line3,
+                    Line4 = orderingPartyAddress.Line4,
+                    Line5 = orderingPartyAddress.Line5,
+                    Town = orderingPartyAddress.Town,
+                    County = orderingPartyAddress.County,
+                    Postcode = orderingPartyAddress.Postcode,
+                    Country = orderingPartyAddress.Country,
+                },
+                PrimaryContact = !hasOrganisationContact ? null : new PrimaryContactModel
+                {
+                    FirstName = repositoryOrder.OrganisationContact.FirstName,
+                    LastName = repositoryOrder.OrganisationContact.LastName,
+                    EmailAddress = repositoryOrder.OrganisationContact.Email,
+                    TelephoneNumber = repositoryOrder.OrganisationContact.Phone,
+                },
+            });
         }
 
         private sealed class OrderingPartyTestContext

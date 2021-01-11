@@ -218,7 +218,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             context.OrderRepositoryMock.Verify(x => x.UpdateOrderAsync(order), Times.Once);
         }
 
-        private static (Order order, OrderDescriptionModel expectedDescription) CreateOrderDescriptionTestData(
+        private static (Order Order, OrderDescriptionModel ExpectedDescription) CreateOrderDescriptionTestData(
             string orderId, OrderDescription description, Guid organisationId)
         {
             var repositoryOrder = OrderBuilder
@@ -228,8 +228,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithOrganisationId(organisationId)
                 .Build();
 
-            return (order: repositoryOrder,
-                expectedDescription: new OrderDescriptionModel { Description = repositoryOrder.Description.Value });
+            return (repositoryOrder, new OrderDescriptionModel { Description = repositoryOrder.Description.Value });
         }
 
         private sealed class OrderDescriptionTestContext
