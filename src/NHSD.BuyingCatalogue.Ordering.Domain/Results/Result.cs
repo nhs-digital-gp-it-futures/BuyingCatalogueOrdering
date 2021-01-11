@@ -79,7 +79,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Results
 
         public override bool Equals(object obj)
         {
-            return ReferenceEquals(this, obj) || obj is Result other && Equals(other);
+            return ReferenceEquals(this, obj) || (obj is Result other && Equals(other));
         }
 
         public override int GetHashCode()

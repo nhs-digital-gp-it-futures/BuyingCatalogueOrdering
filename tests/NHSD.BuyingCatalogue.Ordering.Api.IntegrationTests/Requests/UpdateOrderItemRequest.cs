@@ -180,15 +180,4 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             actual.Should().BeEquivalentTo(expected);
         }
     }
-
-    internal sealed class UpdateOrderItemRequestPayload
-    {
-        public DateTime? DeliveryDate { get; set; }
-
-        public int? Quantity { get; set; }
-
-        public TimeUnit? EstimationPeriod { get; set; }
-
-        public decimal? Price { get; set; }
-    }
 }

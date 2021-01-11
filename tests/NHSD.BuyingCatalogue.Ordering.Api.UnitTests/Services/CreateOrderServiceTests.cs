@@ -127,23 +127,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             actual.Should().Be(expected);
         }
-    }
 
-    internal sealed class CreateOrderServiceTestContext
-    {
-        private CreateOrderServiceTestContext()
+        private sealed class CreateOrderServiceTestContext
         {
-            OrderRepositoryMock = new Mock<IOrderRepository>();
-            OrderRepositoryMock.Setup(x => x.CreateOrderAsync(It.IsAny<Order>())).ReturnsAsync("OrderId");
-            CreateOrderService = new CreateOrderService(OrderRepositoryMock.Object);
+            private CreateOrderServiceTestContext()
+            {
+                OrderRepositoryMock = new Mock<IOrderRepository>();
+                OrderRepositoryMock.Setup(x => x.CreateOrderAsync(It.IsAny<Order>())).ReturnsAsync("OrderId");
+                CreateOrderService = new CreateOrderService(OrderRepositoryMock.Object);
+            }
+
+            internal Mock<IOrderRepository> OrderRepositoryMock { get; }
+
+            internal CreateOrderService CreateOrderService { get; }
+
+            public static CreateOrderServiceTestContext Setup() => new();
         }
-
-        internal Result OrderValidationResult { get; set; } = Result.Success();
-
-        internal Mock<IOrderRepository> OrderRepositoryMock { get; set; }
-
-        internal CreateOrderService CreateOrderService { get; }
-
-        public static CreateOrderServiceTestContext Setup() => new();
     }
 }

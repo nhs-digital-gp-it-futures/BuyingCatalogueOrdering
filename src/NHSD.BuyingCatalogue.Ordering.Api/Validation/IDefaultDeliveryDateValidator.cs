@@ -6,6 +6,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Validation
 {
     public interface IDefaultDeliveryDateValidator
     {
-        (bool, ErrorsModel) Validate(DefaultDeliveryDateModel defaultDeliveryDate, DateTime? commencementDate);
+        (bool IsValid, ErrorsModel Errors) Validate(
+            DefaultDeliveryDateModel defaultDeliveryDate,
+            DateTime? commencementDate);
     }
 }

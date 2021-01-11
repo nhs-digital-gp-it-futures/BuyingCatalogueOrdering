@@ -16,7 +16,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Results
         internal Result(bool isSuccess, IEnumerable<ErrorDetails> errors, T value)
         {
             IsSuccess = isSuccess;
-            Errors = new ReadOnlyCollection<ErrorDetails>(errors != null ? errors.ToList() : new List<ErrorDetails>());
+            Errors = new ReadOnlyCollection<ErrorDetails>(errors?.ToList() ?? new List<ErrorDetails>());
             Value = value;
         }
 
@@ -49,7 +49,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Results
 
         public override bool Equals(object obj)
         {
-            return ReferenceEquals(this, obj) || obj is Result<T> other && Equals(other);
+            return ReferenceEquals(this, obj) || (obj is Result<T> other && Equals(other));
         }
 
         public override int GetHashCode()
