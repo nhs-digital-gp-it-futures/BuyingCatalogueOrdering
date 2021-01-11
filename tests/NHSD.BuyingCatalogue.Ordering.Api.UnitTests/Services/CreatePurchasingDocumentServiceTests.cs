@@ -135,32 +135,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 .Should()
                 .BeEquivalentTo(new OdooOrderItem(order, item, odsOrganisation.Name));
         }
-    }
 
-    internal sealed class CreatePurchasingDocumentServiceTestContext
-    {
-        private CreatePurchasingDocumentServiceTestContext()
+        private sealed class CreatePurchasingDocumentServiceTestContext
         {
-            PatientCsvWriterMock = new Mock<ICsvStreamWriter<OdooPatientNumbersOrderItem>>();
-            PatientCsvWriterMock.Setup(x =>
-                x.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<OdooPatientNumbersOrderItem>>()));
+            private CreatePurchasingDocumentServiceTestContext()
+            {
+                PatientCsvWriterMock = new Mock<ICsvStreamWriter<OdooPatientNumbersOrderItem>>();
+                PatientCsvWriterMock.Setup(x =>
+                    x.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<OdooPatientNumbersOrderItem>>()));
 
-            PriceCsvWriterMock = new Mock<ICsvStreamWriter<OdooOrderItem>>();
-            PriceCsvWriterMock.Setup(x => x.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<OdooOrderItem>>()));
+                PriceCsvWriterMock = new Mock<ICsvStreamWriter<OdooOrderItem>>();
+                PriceCsvWriterMock.Setup(x => x.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<OdooOrderItem>>()));
 
-            CreatePurchasingDocumentService = CreatePurchasingDocumentServiceBuilder
-                .Create()
-                .WithPatientNumbersCsvWriter(PatientCsvWriterMock.Object)
-                .WithPriceTypeCsvWriter(PriceCsvWriterMock.Object)
-                .Build();
+                CreatePurchasingDocumentService = CreatePurchasingDocumentServiceBuilder
+                    .Create()
+                    .WithPatientNumbersCsvWriter(PatientCsvWriterMock.Object)
+                    .WithPriceTypeCsvWriter(PriceCsvWriterMock.Object)
+                    .Build();
+            }
+
+            internal Mock<ICsvStreamWriter<OdooPatientNumbersOrderItem>> PatientCsvWriterMock { get; }
+
+            internal Mock<ICsvStreamWriter<OdooOrderItem>> PriceCsvWriterMock { get; }
+
+            internal CreatePurchasingDocumentService CreatePurchasingDocumentService { get; }
+
+            public static CreatePurchasingDocumentServiceTestContext Setup() => new();
         }
-
-        internal Mock<ICsvStreamWriter<OdooPatientNumbersOrderItem>> PatientCsvWriterMock { get; }
-
-        internal Mock<ICsvStreamWriter<OdooOrderItem>> PriceCsvWriterMock { get; }
-
-        internal CreatePurchasingDocumentService CreatePurchasingDocumentService { get; }
-
-        public static CreatePurchasingDocumentServiceTestContext Setup() => new();
     }
 }

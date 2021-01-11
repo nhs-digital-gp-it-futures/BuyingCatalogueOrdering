@@ -18,7 +18,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Validation
         public DefaultDeliveryDateValidator(ValidationSettings settings) =>
             this.settings = settings;
 
-        public (bool, ErrorsModel) Validate(
+        public (bool IsValid, ErrorsModel Errors) Validate(
             DefaultDeliveryDateModel defaultDeliveryDate,
             DateTime? commencementDate)
         {

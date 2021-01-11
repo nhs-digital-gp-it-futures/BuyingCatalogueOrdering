@@ -842,82 +842,77 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 return new(modelStateDictionary) { Status = 400 };
             }
         }
-    }
 
-    internal sealed class OrderItemsControllerTestContext
-    {
-        private OrderItemsControllerTestContext(Guid primaryOrganisationId)
+        private sealed class OrderItemsControllerTestContext
         {
-            PrimaryOrganisationId = primaryOrganisationId;
-            Order = OrderBuilder
-                .Create()
-                .WithOrganisationId(PrimaryOrganisationId)
-                .Build();
+            private OrderItemsControllerTestContext(Guid primaryOrganisationId)
+            {
+                PrimaryOrganisationId = primaryOrganisationId;
+                Order = OrderBuilder
+                    .Create()
+                    .WithOrganisationId(PrimaryOrganisationId)
+                    .Build();
 
-            OrderRepositoryMock = new Mock<IOrderRepository>();
+                OrderRepositoryMock = new Mock<IOrderRepository>();
 
-            OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
-            OrderRepositoryMock.Setup(x => x.UpdateOrderAsync(It.IsAny<Order>())).Callback<Order>(x => Order = x);
+                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
+                OrderRepositoryMock.Setup(x => x.UpdateOrderAsync(It.IsAny<Order>())).Callback<Order>(x => Order = x);
 
-            UpdateOrderItemResult = Result.Success();
+                UpdateOrderItemResult = Result.Success();
 
-            UpdateOrderItemServiceMock = new Mock<IUpdateOrderItemService>();
-            UpdateOrderItemServiceMock.Setup(x => x.UpdateAsync(It.IsNotNull<UpdateOrderItemRequest>(), It.IsAny<CatalogueItemType>(), It.IsAny<ProvisioningType>()))
-                .ReturnsAsync(() => UpdateOrderItemResult);
-            NewOrderItemId = Result.Success(123);
+                UpdateOrderItemServiceMock = new Mock<IUpdateOrderItemService>();
+                UpdateOrderItemServiceMock.Setup(x => x.UpdateAsync(It.IsNotNull<UpdateOrderItemRequest>(), It.IsAny<CatalogueItemType>(), It.IsAny<ProvisioningType>()))
+                    .ReturnsAsync(() => UpdateOrderItemResult);
+                NewOrderItemId = Result.Success(123);
 
-            CreateOrderItemServiceMock = new Mock<ICreateOrderItemService>();
-            CreateOrderItemServiceMock.Setup(x => x.CreateAsync(It.IsNotNull<CreateOrderItemRequest>()))
-                .ReturnsAsync(() => NewOrderItemId);
+                CreateOrderItemServiceMock = new Mock<ICreateOrderItemService>();
+                CreateOrderItemServiceMock.Setup(x => x.CreateAsync(It.IsNotNull<CreateOrderItemRequest>()))
+                    .ReturnsAsync(() => NewOrderItemId);
 
-            ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
-                new[]
-                {
+                ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
+                    new[]
+                    {
                     new Claim("Ordering", "Manage"),
                     new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
                     new Claim(ClaimTypes.Name, "Test User"),
                     new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
-                },
-                "mock"));
+                    },
+                    "mock"));
 
-            OrderItemsController = OrderItemsControllerBuilder.Create()
-                .WithOrderRepository(OrderRepositoryMock.Object)
-                .WithUpdateOrderItemService(UpdateOrderItemServiceMock.Object)
-                .WithCreateOrderItemService(CreateOrderItemServiceMock.Object)
-                .Build();
+                OrderItemsController = OrderItemsControllerBuilder.Create()
+                    .WithOrderRepository(OrderRepositoryMock.Object)
+                    .WithUpdateOrderItemService(UpdateOrderItemServiceMock.Object)
+                    .WithCreateOrderItemService(CreateOrderItemServiceMock.Object)
+                    .Build();
 
-            OrderItemsController.ControllerContext = new ControllerContext
+                OrderItemsController.ControllerContext = new ControllerContext
+                {
+                    HttpContext = new DefaultHttpContext { User = ClaimsPrincipal },
+                };
+            }
+
+            internal Guid PrimaryOrganisationId { get; }
+
+            internal Mock<IOrderRepository> OrderRepositoryMock { get; }
+
+            internal Mock<ICreateOrderItemService> CreateOrderItemServiceMock { get; }
+
+            internal Result<int> NewOrderItemId { get; set; }
+
+            internal Order Order { get; set; }
+
+            internal OrderItemsController OrderItemsController { get; }
+
+            internal Mock<IUpdateOrderItemService> UpdateOrderItemServiceMock { get; }
+
+            internal Result UpdateOrderItemResult { get; set; }
+
+            private ClaimsPrincipal ClaimsPrincipal { get; }
+
+            internal static OrderItemsControllerTestContext Setup()
             {
-                HttpContext = new DefaultHttpContext { User = ClaimsPrincipal },
-            };
-        }
-
-        internal Guid PrimaryOrganisationId { get; }
-
-        internal Mock<IOrderRepository> OrderRepositoryMock { get; }
-
-        internal Mock<ICreateOrderItemService> CreateOrderItemServiceMock { get; }
-
-        internal Result<int> NewOrderItemId { get; set; }
-
-        internal Order Order { get; set; }
-
-        internal OrderItemsController OrderItemsController { get; set; }
-
-        internal Mock<IUpdateOrderItemService> UpdateOrderItemServiceMock { get; }
-
-        internal Result UpdateOrderItemResult { get; set; }
-
-        private ClaimsPrincipal ClaimsPrincipal { get; }
-
-        internal static OrderItemsControllerTestContext Setup()
-        {
-            return new(Guid.NewGuid());
-        }
-
-        internal static OrderItemsControllerTestContext Setup(Guid primaryOrganisationId)
-        {
-            return new(primaryOrganisationId);
+                return new(Guid.NewGuid());
+            }
         }
     }
 }

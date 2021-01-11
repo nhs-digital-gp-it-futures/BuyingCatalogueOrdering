@@ -228,18 +228,6 @@ dotnet_diagnostic.SA1503.severity = none
 # SA1401: Fields should be private
 dotnet_diagnostic.SA1401.severity = none
 
-# SA1402: File may only contain a single type
-dotnet_diagnostic.SA1402.severity = none
-
-# SA1407: Arithmetic expressions should declare precedence
-dotnet_diagnostic.SA1407.severity = none
-
-# SA1408: Conditional expressions should declare precedence
-dotnet_diagnostic.SA1408.severity = none
-
-# SA1414: Tuple types in signatures should have element names
-dotnet_diagnostic.SA1414.severity = none
-
 # SA1516: Elements should be separated by blank line
 dotnet_diagnostic.SA1516.severity = none
 
@@ -248,9 +236,6 @@ dotnet_diagnostic.SA1600.severity = none
 
 # SA1602: Enumeration items should be documented
 dotnet_diagnostic.SA1602.severity = none
-
-# SA1629: Documentation text should end with a period
-dotnet_diagnostic.SA1629.severity = none
 
 # SA1649: File name should match first type name
 dotnet_diagnostic.SA1649.severity = none
