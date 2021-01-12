@@ -96,14 +96,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             const string orderId = "C0000014-01";
 
-            var serviceRecipients = new List<(ServiceRecipient serviceRecipient, ServiceRecipientModel expectedModel)>
+            var serviceRecipients = new List<(ServiceRecipient ServiceRecipient, ServiceRecipientModel ExpectedModel)>
             {
                 CreateServiceRecipientData("ODS1", orderId, "name"),
             };
 
-            context.ServiceRecipients = serviceRecipients.Select(x => x.serviceRecipient).ToList();
+            context.ServiceRecipients = serviceRecipients.Select(x => x.ServiceRecipient).ToList();
 
-            var expectedList = serviceRecipients.Select(x => x.expectedModel);
+            var expectedList = serviceRecipients.Select(x => x.ExpectedModel);
 
             var expected = new ServiceRecipientsModel
             {
@@ -123,17 +123,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             context.Order = OrderBuilder.Create().WithOrderId(orderId).WithOrganisationId(context.PrimaryOrganisationId).Build();
 
-            var serviceRecipients = new List<(ServiceRecipient serviceRecipient, ServiceRecipientModel expectedModel)>
+            var serviceRecipients = new List<(ServiceRecipient ServiceRecipient, ServiceRecipientModel ExpectedModel)>
             {
                 CreateServiceRecipientData("ODS1", orderId, "Test"),
                 CreateServiceRecipientData("ODS2", orderId, "Service recipient"),
                 CreateServiceRecipientData("ODS3", orderId, "Data"),
             };
 
-            context.ServiceRecipients = serviceRecipients.Select(x => x.serviceRecipient).ToList();
+            context.ServiceRecipients = serviceRecipients.Select(x => x.ServiceRecipient).ToList();
             var expected = new ServiceRecipientsModel();
 
-            var expectedList = serviceRecipients.Select(x => x.expectedModel);
+            var expectedList = serviceRecipients.Select(x => x.ExpectedModel);
 
             expected.ServiceRecipients = expectedList.OrderBy(serviceRecipient => serviceRecipient.Name);
 
@@ -285,7 +285,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             context.ServiceRecipientRepositoryMock.Verify(x => x.UpdateAsync(expectedOrderId, It.IsAny<IEnumerable<ServiceRecipient>>()), Times.Once);
         }
 
-        private static (ServiceRecipient serviceRecipient, ServiceRecipientModel expectedModel)
+        private static (ServiceRecipient ServiceRecipient, ServiceRecipientModel ExpectedModel)
             CreateServiceRecipientData(string odsCode, string orderId, string name)
         {
             var serviceRecipient = ServiceRecipientBuilder
@@ -295,8 +295,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .WithName(name)
                 .Build();
 
-            return (serviceRecipient,
-                new ServiceRecipientModel { OdsCode = serviceRecipient.OdsCode, Name = serviceRecipient.Name });
+            return (serviceRecipient, new ServiceRecipientModel { OdsCode = serviceRecipient.OdsCode, Name = serviceRecipient.Name });
         }
 
         private sealed class ServiceRecipientsTestContext
