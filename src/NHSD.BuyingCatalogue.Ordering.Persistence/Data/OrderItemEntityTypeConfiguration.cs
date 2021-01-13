@@ -15,6 +15,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
             builder.HasKey(orderItem => orderItem.OrderItemId);
 
             builder.Property(orderItem => orderItem.OrderItemId)
+                .HasCamelCaseBackingField(nameof(OrderItem.OrderItemId))
                 .HasColumnName(nameof(OrderItem.OrderItemId))
                 .IsRequired();
 
@@ -87,10 +88,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 
             builder.Property(orderItem => orderItem.Created)
                 .HasColumnName(nameof(OrderItem.Created))
+                .HasCamelCaseBackingField(nameof(OrderItem.Created))
                 .IsRequired();
 
             builder.Property(orderItem => orderItem.LastUpdated)
                 .HasColumnName(nameof(OrderItem.LastUpdated))
+                .HasCamelCaseBackingField(nameof(OrderItem.LastUpdated))
                 .IsRequired();
         }
     }

@@ -13,9 +13,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         private readonly List<ServiceRecipient> serviceRecipients = new();
         private readonly List<ServiceInstanceItem> serviceInstanceItems = new();
 
-#pragma warning disable 649
-        private DateTime? _completed;
-#pragma warning restore 649
+        private DateTime? completed;
 
         private Order()
         {
@@ -48,24 +46,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public DateTime Created { get; set; }
 
-        /// <summary>
-        /// Gets the completed date and time.
-        /// </summary>
-        /// <remarks>
-        /// Do not need to convert this to an auto property as recommended by ReSharper.
-        /// ReSharper disable once ConvertToAutoProperty
-        /// </remarks>
-        public DateTime? Completed
-        {
-            get
-            {
-                return _completed;
-            }
-            private set
-            {
-                _completed = value;
-            }
-        }
+        // Backing field is initialized by EF Core (allowing property to be read-only)
+        // ReSharper disable once ConvertToAutoPropertyWithPrivateSetter
+        public DateTime? Completed => completed;
 
         public DateTime LastUpdated { get; set; }
 
@@ -254,7 +237,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 return Result.Failure(OrderErrors.OrderNotComplete());
 
             OrderStatus = OrderStatus.Complete;
-            Completed = DateTime.UtcNow;
+            completed = DateTime.UtcNow;
 
             SetLastUpdatedBy(lastUpdatedBy, lastUpdatedByName);
 

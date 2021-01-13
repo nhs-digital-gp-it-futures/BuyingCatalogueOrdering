@@ -216,9 +216,6 @@ dotnet_diagnostic.SA1204.severity = none
 # SA1214: Readonly fields should appear before non-readonly fields
 dotnet_diagnostic.SA1214.severity = none
 
-# SA1309: Field names should not begin with underscore
-dotnet_diagnostic.SA1309.severity = none
-
 # SA1633: File should have header
 dotnet_diagnostic.SA1633.severity = none
 

@@ -16,17 +16,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class SupplierSectionController : ControllerBase
     {
-        private readonly IOrderRepository _orderRepository;
+        private readonly IOrderRepository orderRepository;
 
         public SupplierSectionController(IOrderRepository orderRepository)
         {
-            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            this.orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
         }
 
         [HttpGet]
         public async Task<ActionResult<SupplierModel>> GetAsync(string orderId)
         {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            var order = await orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
             {
                 return NotFound();
@@ -58,7 +58,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 throw new ArgumentNullException(nameof(model));
             }
 
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            var order = await orderRepository.GetOrderByIdAsync(orderId);
 
             if (order is null)
             {
@@ -80,7 +80,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             var name = User.Identity.Name;
             order.SetLastUpdatedBy(User.GetUserId(), name);
 
-            await _orderRepository.UpdateOrderAsync(order);
+            await orderRepository.UpdateOrderAsync(order);
             return NoContent();
         }
     }

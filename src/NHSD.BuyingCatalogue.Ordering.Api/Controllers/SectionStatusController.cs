@@ -19,18 +19,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class SectionStatusController : ControllerBase
     {
-        private static readonly Dictionary<string, Action<Order>> _completeSectionActionsDictionary = new()
+        private static readonly Dictionary<string, Action<Order>> CompleteSectionActionsDictionary = new()
         {
             { SectionModel.CatalogueSolutions.Id, o => o.CatalogueSolutionsViewed = true },
             { SectionModel.AdditionalServices.Id, o => o.AdditionalServicesViewed = true },
             { SectionModel.AssociatedServices.Id, o => o.AssociatedServicesViewed = true },
         };
 
-        private readonly IOrderRepository _orderRepository;
+        private readonly IOrderRepository orderRepository;
 
         public SectionStatusController(IOrderRepository orderRepository)
         {
-            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            this.orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
         }
 
         [HttpPut]
@@ -43,7 +43,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 throw new ArgumentNullException(nameof(sectionStatus));
             }
 
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            var order = await orderRepository.GetOrderByIdAsync(orderId);
 
             if (order is null)
             {
@@ -56,11 +56,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            if (_completeSectionActionsDictionary.ContainsKey(sectionId))
+            if (CompleteSectionActionsDictionary.ContainsKey(sectionId))
             {
                 if (sectionStatus.Status == "complete")
                 {
-                    _completeSectionActionsDictionary[sectionId](order);
+                    CompleteSectionActionsDictionary[sectionId](order);
                 }
             }
             else
@@ -70,7 +70,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             order.SetLastUpdatedBy(User.GetUserId(), User.GetUserName());
 
-            await _orderRepository.UpdateOrderAsync(order);
+            await orderRepository.UpdateOrderAsync(order);
 
             return NoContent();
         }

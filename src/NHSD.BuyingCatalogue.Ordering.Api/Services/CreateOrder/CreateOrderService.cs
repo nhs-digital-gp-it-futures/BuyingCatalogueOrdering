@@ -9,11 +9,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
 {
     public sealed class CreateOrderService : ICreateOrderService
     {
-        private readonly IOrderRepository _orderRepository;
+        private readonly IOrderRepository orderRepository;
 
         public CreateOrderService(IOrderRepository orderRepository)
         {
-            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            this.orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
         }
 
         public async Task<Result<string>> CreateAsync(CreateOrderRequest createOrderRequest)
@@ -38,7 +38,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder
                 createOrderRequest.LastUpdatedById,
                 createOrderRequest.LastUpdatedByName);
 
-            var orderId = await _orderRepository.CreateOrderAsync(order);
+            var orderId = await orderRepository.CreateOrderAsync(order);
             return Result.Success(orderId);
         }
     }

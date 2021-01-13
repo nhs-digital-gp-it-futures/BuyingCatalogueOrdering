@@ -1,14 +1,22 @@
 ﻿using System;
+using JetBrains.Annotations;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class OrderItem : IEquatable<OrderItem>
     {
-#pragma warning disable 649
-        private readonly DateTime _created;
+#pragma warning disable IDE0044 // Add readonly modifier
 
-        private int _orderItemId;
-#pragma warning restore 649
+        // Cannot be read-only so that EF Core can set value
+        [UsedImplicitly]
+        private DateTime created;
+        private DateTime lastUpdated;
+
+        // Cannot be read-only so that EF Core can set value
+        [UsedImplicitly]
+        private int orderItemId;
+
+#pragma warning restore IDE0044 // Add readonly modifier
 
         public OrderItem(
             string odsCode,
@@ -51,31 +59,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             EstimationPeriod = estimationPeriod;
             DeliveryDate = deliveryDate;
             Price = price;
-            _created = DateTime.UtcNow;
-            _orderItemId = orderItemId;
+            this.orderItemId = orderItemId;
+
+            var now = DateTime.UtcNow;
+            created = now;
+            lastUpdated = now;
         }
 
         private OrderItem()
         {
         }
 
-        /// <summary>
-        /// Gets the unique ID for this instance.
-        /// </summary>
-        /// <remarks>
-        /// A private field (<see cref="_orderItemId"/>) is used here as EF core will set this value
-        /// when an <see cref="OrderItem"/> is persisted to the database. To mimic this functionality
-        /// in the unit tests use the name of this field to set it via reflection. Do not need to
-        /// convert this to an auto property as recommended by ReSharper.
-        /// ReSharper disable once ConvertToAutoProperty
-        /// </remarks>
-        public int OrderItemId
-        {
-            get
-            {
-                return _orderItemId;
-            }
-        }
+        // A private field is used here as EF core will set this value when an order item is persisted to the database.
+        // To mimic this functionality in the unit tests use the name of this field to set it via reflection.
+        // ReSharper disable once ConvertToAutoProperty
+        public int OrderItemId => orderItemId;
 
         public string OdsCode { get; }
 
@@ -105,22 +103,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public decimal? Price { get; private set; }
 
-        public DateTime LastUpdated { get; private set; }
+        // Backing field is set by EF Core (allowing property to be read-only)
+        // ReSharper disable once ConvertToAutoPropertyWithPrivateSetter
+        public DateTime LastUpdated => lastUpdated;
 
-        /// <summary>
-        /// Gets the created date and time for auditing purposes.
-        /// </summary>
-        /// <remarks>
-        /// Do not need to convert this to an auto property as recommended by ReSharper.
-        /// ReSharper disable once ConvertToAutoProperty
-        /// </remarks>
-        public DateTime Created
-        {
-            get
-            {
-                return _created;
-            }
-        }
+        // Backing field is set by EF Core (allowing property to be read-only)
+        // ReSharper disable once ConvertToAutoProperty
+        public DateTime Created => created;
 
         public CostType CostType =>
             CatalogueItemType.Equals(CatalogueItemType.AssociatedService) &&
@@ -195,7 +184,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 return;
 
             onPropertyChangedCallback?.Invoke();
-            LastUpdated = DateTime.UtcNow;
+            lastUpdated = DateTime.UtcNow;
             Updated = true;
         }
 
