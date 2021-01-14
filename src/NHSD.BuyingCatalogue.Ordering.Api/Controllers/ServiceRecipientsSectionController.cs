@@ -18,22 +18,22 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class ServiceRecipientsSectionController : ControllerBase
     {
-        private readonly IOrderRepository _orderRepository;
-        private readonly IServiceRecipientRepository _serviceRecipientRepository;
+        private readonly IOrderRepository orderRepository;
+        private readonly IServiceRecipientRepository serviceRecipientRepository;
 
         public ServiceRecipientsSectionController(
             IOrderRepository orderRepository,
             IServiceRecipientRepository serviceRecipientRepository)
         {
-            _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
-            _serviceRecipientRepository = serviceRecipientRepository ??
-                                          throw new ArgumentNullException(nameof(serviceRecipientRepository));
+            this.orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            this.serviceRecipientRepository = serviceRecipientRepository ??
+                throw new ArgumentNullException(nameof(serviceRecipientRepository));
         }
 
         [HttpGet]
         public async Task<ActionResult<ServiceRecipientsModel>> GetAllAsync(string orderId)
         {
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            var order = await orderRepository.GetOrderByIdAsync(orderId);
 
             if (order is null)
             {
@@ -47,8 +47,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            var serviceRecipients =
-                (await _serviceRecipientRepository.ListServiceRecipientsByOrderIdAsync(orderId)).ToList();
+            var serviceRecipients = (await serviceRecipientRepository.ListServiceRecipientsByOrderIdAsync(
+                orderId)).ToList();
 
             var recipientModelList = serviceRecipients
                 .Select(recipient => new ServiceRecipientModel
@@ -76,7 +76,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 throw new ArgumentNullException(nameof(model));
             }
 
-            var order = await _orderRepository.GetOrderByIdAsync(orderId);
+            var order = await orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
             {
                 return NotFound();
@@ -95,7 +95,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 Order = order,
             }).ToList();
 
-            await _serviceRecipientRepository.UpdateAsync(order.OrderId, serviceRecipients);
+            await serviceRecipientRepository.UpdateAsync(order.OrderId, serviceRecipients);
 
             if (serviceRecipients.Count is 0)
             {
@@ -105,7 +105,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             order.ServiceRecipientsViewed = true;
             order.SetLastUpdatedBy(User.GetUserId(), User.GetUserName());
 
-            await _orderRepository.UpdateOrderAsync(order);
+            await orderRepository.UpdateOrderAsync(order);
 
             return NoContent();
         }

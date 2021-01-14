@@ -7,7 +7,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Results
 {
     public sealed class Result : IEquatable<Result>
     {
-        private static readonly Result _success = new();
+        private static readonly Result SuccessfulResult = new();
 
         public bool IsSuccess { get; }
 
@@ -31,7 +31,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Results
 
         public static Result Success()
         {
-            return _success;
+            return SuccessfulResult;
         }
 
         public static Result<T> Success<T>(T value)

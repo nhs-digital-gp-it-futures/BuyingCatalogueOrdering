@@ -233,20 +233,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             order.Created = created;
             order.LastUpdated = lastUpdated;
 
-            SetField(order, "serviceInstanceItems", serviceInstanceItems);
+            Field.Set(order, nameof(Order.ServiceInstanceItems), serviceInstanceItems);
 
             if (completed is not null)
             {
-                SetField(order, "_completed", completed);
+                Field.Set(order, nameof(Order.Completed), completed);
             }
 
             return order;
-        }
-
-        private static void SetField(object obj, string fieldName, object value)
-        {
-            var fieldInfo = obj.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
-            fieldInfo?.SetValue(obj, value);
         }
     }
 }

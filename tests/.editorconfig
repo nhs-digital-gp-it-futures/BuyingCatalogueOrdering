@@ -43,3 +43,6 @@ dotnet_diagnostic.CA1826.severity = none
 
 # CA2234: Pass system uri objects instead of strings
 dotnet_diagnostic.CA2234.severity = none
+
+# SA1309: Field names should not begin with underscore
+dotnet_diagnostic.SA1309.severity = none

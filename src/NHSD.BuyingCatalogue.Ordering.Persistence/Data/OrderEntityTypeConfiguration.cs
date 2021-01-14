@@ -12,35 +12,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
             if (builder is null)
                 throw new ArgumentNullException(nameof(builder));
 
-            builder.Property(x => x.Description)
+            builder.Property(o => o.Description)
                 .HasColumnName("Description")
                 .HasConversion(
-                    input => input.Value,
-                    output => OrderDescription.Create(output).Value)
+                    orderDescription => orderDescription.Value,
+                    description => OrderDescription.Create(description).Value)
                 .IsRequired();
 
             builder.Property(o => o.OrganisationId)
                 .HasColumnName("OrganisationId")
                 .IsRequired();
 
-            builder.Property(x => x.OrderStatus)
-                .HasColumnName("OrderStatusId")
-                .HasConversion<int>();
-
-            builder.HasMany(x => x.OrderItems)
+            builder.HasMany(o => o.OrderItems)
                 .WithOne();
 
-            builder.HasMany(x => x.ServiceRecipients)
-                .WithOne(x => x.Order);
+            builder.HasMany(o => o.ServiceRecipients)
+                .WithOne(r => r.Order);
 
             builder
-                .Property(orderItem => orderItem.OrderStatus)
-                .HasConversion(input => input.Id, output => OrderStatus.FromId(output))
+                .Property(o => o.OrderStatus)
+                .HasConversion(status => status.Id, id => OrderStatus.FromId(id))
                 .HasColumnName("OrderStatusId");
 
             builder.HasQueryFilter(p => !p.IsDeleted);
 
-            builder.Property(order => order.Completed)
+            builder.Property(o => o.Completed)
+                .HasCamelCaseBackingField(nameof(Order.Completed))
                 .HasColumnName("Completed");
         }
     }

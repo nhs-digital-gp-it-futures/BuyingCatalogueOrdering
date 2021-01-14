@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
@@ -152,12 +151,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
 
             if (orderItemId.HasValue)
             {
-                var fieldInfo = orderItem.GetType().GetField("_orderItemId", BindingFlags.Instance | BindingFlags.NonPublic);
-                fieldInfo?.SetValue(orderItem, orderItemId.Value);
+                Field.Set(orderItem, nameof(OrderItem.OrderItemId), orderItemId);
             }
 
-            var createdFieldInfo = orderItem.GetType().GetField("_created", BindingFlags.Instance | BindingFlags.NonPublic);
-            createdFieldInfo?.SetValue(orderItem, created);
+            Field.Set(orderItem, nameof(OrderItem.Created), created);
 
             return orderItem;
         }
