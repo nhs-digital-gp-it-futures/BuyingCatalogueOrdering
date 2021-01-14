@@ -4,84 +4,84 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
 {
     public sealed class AddressBuilder
     {
-        private readonly int _addressId;
-        private string _line1;
-        private string _line2;
-        private string _line3;
-        private string _line4;
-        private string _line5;
-        private string _town;
-        private string _county;
-        private string _postcode;
-        private string _country;
+        private readonly int addressId;
+        private string line1;
+        private string line2;
+        private string line3;
+        private string line4;
+        private string line5;
+        private string town;
+        private string county;
+        private string postcode;
+        private string country;
 
         private AddressBuilder()
         {
-            _addressId = 321;
-            _line1 = "Address line 1";
-            _line2 = "Address line 2";
-            _line3 = "Address line 3";
-            _line4 = "Address line 4";
-            _line5 = "Address line 5";
-            _town = "Some town";
-            _county = "Some county";
-            _postcode = "Some postcode";
-            _country = "Some country";
+            addressId = 321;
+            line1 = "Address line 1";
+            line2 = "Address line 2";
+            line3 = "Address line 3";
+            line4 = "Address line 4";
+            line5 = "Address line 5";
+            town = "Some town";
+            county = "Some county";
+            postcode = "Some postcode";
+            country = "Some country";
         }
 
         public static AddressBuilder Create() => new();
 
-        public AddressBuilder WithLine1(string line1)
+        public AddressBuilder WithLine1(string line)
         {
-            _line1 = line1;
+            line1 = line;
             return this;
         }
 
-        public AddressBuilder WithLine2(string line2)
+        public AddressBuilder WithLine2(string line)
         {
-            _line2 = line2;
+            line2 = line;
             return this;
         }
 
-        public AddressBuilder WithLine3(string line3)
+        public AddressBuilder WithLine3(string line)
         {
-            _line3 = line3;
+            line3 = line;
             return this;
         }
 
-        public AddressBuilder WithLine4(string line4)
+        public AddressBuilder WithLine4(string line)
         {
-            _line4 = line4;
+            line4 = line;
             return this;
         }
 
-        public AddressBuilder WithLine5(string line5)
+        public AddressBuilder WithLine5(string line)
         {
-            _line5 = line5;
+            line5 = line;
             return this;
         }
 
-        public AddressBuilder WithTown(string town)
+        public AddressBuilder WithTown(string value)
         {
-            _town = town;
+            town = value;
             return this;
         }
 
-        public AddressBuilder WithCounty(string county)
+        public AddressBuilder WithCounty(string value)
         {
-            _county = county;
+            county = value;
             return this;
         }
 
-        public AddressBuilder WithPostcode(string postcode)
+        public AddressBuilder WithPostcode(string value)
         {
-            _postcode = postcode;
+            postcode = value;
             return this;
         }
 
-        public AddressBuilder WithCountry(string country)
+        public AddressBuilder WithCountry(string value)
         {
-            _country = country;
+            country = value;
             return this;
         }
 
@@ -89,16 +89,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
         {
             return new()
             {
-                AddressId = _addressId,
-                Line1 = _line1,
-                Line2 = _line2,
-                Line3 = _line3,
-                Line4 = _line4,
-                Line5 = _line5,
-                Town = _town,
-                County = _county,
-                Postcode = _postcode,
-                Country = _country,
+                AddressId = addressId,
+                Line1 = line1,
+                Line2 = line2,
+                Line3 = line3,
+                Line4 = line4,
+                Line5 = line5,
+                Town = town,
+                County = county,
+                Postcode = postcode,
+                Country = country,
             };
         }
     }

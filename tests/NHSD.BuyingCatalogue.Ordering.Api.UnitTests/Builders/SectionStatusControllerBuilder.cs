@@ -5,7 +5,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
     internal sealed class SectionStatusControllerBuilder
     {
-        private IOrderRepository _orderRepository;
+        private IOrderRepository orderRepository;
 
         private SectionStatusControllerBuilder()
         {
@@ -13,12 +13,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 
         internal static SectionStatusControllerBuilder Create() => new();
 
-        internal SectionStatusControllerBuilder WithOrderRepository(IOrderRepository orderRepository)
+        internal SectionStatusControllerBuilder WithOrderRepository(IOrderRepository repository)
         {
-            _orderRepository = orderRepository;
+            orderRepository = repository;
             return this;
         }
 
-        internal SectionStatusController Build() => new(_orderRepository);
+        internal SectionStatusController Build() => new(orderRepository);
     }
 }

@@ -9,12 +9,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
 {
     internal sealed class CompleteOrderServiceBuilder
     {
-        private IIdentityService _identityService;
-        private IOrderRepository _orderRepository;
-        private IEmailService _emailService;
-        private ICreatePurchasingDocumentService _createPurchasingDocumentService;
+        private IIdentityService identityService;
+        private IOrderRepository orderRepository;
+        private IEmailService emailService;
+        private ICreatePurchasingDocumentService createPurchasingDocumentService;
 
-        private PurchasingSettings _purchasingSettings;
+        private PurchasingSettings purchasingSettings;
 
         private CompleteOrderServiceBuilder()
         {
@@ -22,42 +22,42 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
 
         public static CompleteOrderServiceBuilder Create() => new();
 
-        public CompleteOrderServiceBuilder WithIdentityService(IIdentityService identityService)
+        public CompleteOrderServiceBuilder WithIdentityService(IIdentityService service)
         {
-            _identityService = identityService;
+            identityService = service;
             return this;
         }
 
-        public CompleteOrderServiceBuilder WithOrderRepository(IOrderRepository orderRepository)
+        public CompleteOrderServiceBuilder WithOrderRepository(IOrderRepository repository)
         {
-            _orderRepository = orderRepository;
+            orderRepository = repository;
             return this;
         }
 
-        public CompleteOrderServiceBuilder WithEmailService(IEmailService emailService)
+        public CompleteOrderServiceBuilder WithEmailService(IEmailService service)
         {
-            _emailService = emailService;
+            emailService = service;
             return this;
         }
 
         public CompleteOrderServiceBuilder WithCreatePurchasingDocumentService(
-            ICreatePurchasingDocumentService createPurchasingDocumentService)
+            ICreatePurchasingDocumentService service)
         {
-            _createPurchasingDocumentService = createPurchasingDocumentService;
+            createPurchasingDocumentService = service;
             return this;
         }
 
-        public CompleteOrderServiceBuilder WithPurchasingSettings(PurchasingSettings purchasingSettings)
+        public CompleteOrderServiceBuilder WithPurchasingSettings(PurchasingSettings settings)
         {
-            _purchasingSettings = purchasingSettings;
+            purchasingSettings = settings;
             return this;
         }
 
         public CompleteOrderService Build() => new(
-            _identityService,
-            _orderRepository,
-            _emailService,
-            _createPurchasingDocumentService,
-            _purchasingSettings);
+            identityService,
+            orderRepository,
+            emailService,
+            createPurchasingDocumentService,
+            purchasingSettings);
     }
 }

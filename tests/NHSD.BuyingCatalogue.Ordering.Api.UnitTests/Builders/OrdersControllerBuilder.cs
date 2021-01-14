@@ -7,10 +7,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
     internal sealed class OrdersControllerBuilder
     {
-        private IOrderRepository _orderRepository;
-        private IServiceRecipientRepository _serviceRecipientRepository;
-        private ICreateOrderService _createOrderService;
-        private ICompleteOrderService _completeOrderService;
+        private IOrderRepository orderRepository;
+        private IServiceRecipientRepository serviceRecipientRepository;
+        private ICreateOrderService createOrderService;
+        private ICompleteOrderService completeOrderService;
 
         private OrdersControllerBuilder()
         {
@@ -18,33 +18,33 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 
         internal static OrdersControllerBuilder Create() => new();
 
-        internal OrdersControllerBuilder WithOrderRepository(IOrderRepository orderRepository)
+        internal OrdersControllerBuilder WithOrderRepository(IOrderRepository repository)
         {
-            _orderRepository = orderRepository;
+            orderRepository = repository;
             return this;
         }
 
-        internal OrdersControllerBuilder WithServiceRecipientRepository(IServiceRecipientRepository serviceRecipientRepository)
+        internal OrdersControllerBuilder WithServiceRecipientRepository(IServiceRecipientRepository repository)
         {
-            _serviceRecipientRepository = serviceRecipientRepository;
+            serviceRecipientRepository = repository;
             return this;
         }
 
-        internal OrdersControllerBuilder WithCreateOrderService(ICreateOrderService createOrderService)
+        internal OrdersControllerBuilder WithCreateOrderService(ICreateOrderService service)
         {
-            _createOrderService = createOrderService;
+            createOrderService = service;
             return this;
         }
 
-        internal OrdersControllerBuilder WithCompleteOrderService(ICompleteOrderService completeOrderService)
+        internal OrdersControllerBuilder WithCompleteOrderService(ICompleteOrderService service)
         {
-            _completeOrderService = completeOrderService;
+            completeOrderService = service;
             return this;
         }
 
         internal OrdersController Build()
         {
-            return new(_orderRepository, _createOrderService, _serviceRecipientRepository, _completeOrderService);
+            return new(orderRepository, createOrderService, serviceRecipientRepository, completeOrderService);
         }
     }
 }

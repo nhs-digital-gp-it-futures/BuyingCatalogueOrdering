@@ -5,22 +5,22 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
     internal sealed class UpdateOrderItemModelBuilder
     {
-        private readonly DateTime? _deliveryDate;
-        private int? _quantity;
-        private readonly string _estimationPeriod;
-        private readonly decimal? _price;
+        private readonly DateTime? deliveryDate;
+        private int? quantity;
+        private readonly string estimationPeriod;
+        private readonly decimal? price;
 
         private UpdateOrderItemModelBuilder()
         {
-            _deliveryDate = DateTime.UtcNow;
-            _quantity = 123;
-            _estimationPeriod = "month";
-            _price = 25.1m;
+            deliveryDate = DateTime.UtcNow;
+            quantity = 123;
+            estimationPeriod = "month";
+            price = 25.1m;
         }
 
-        public UpdateOrderItemModelBuilder WithQuantity(int? quantity)
+        public UpdateOrderItemModelBuilder WithQuantity(int? number)
         {
-            _quantity = quantity;
+            quantity = number;
             return this;
         }
 
@@ -28,10 +28,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 
         public UpdateOrderItemModel BuildSolution() => new()
             {
-                DeliveryDate = _deliveryDate,
-                Quantity = _quantity,
-                EstimationPeriod = _estimationPeriod,
-                Price = _price,
+                DeliveryDate = deliveryDate,
+                Quantity = quantity,
+                EstimationPeriod = estimationPeriod,
+                Price = price,
             };
     }
 }
