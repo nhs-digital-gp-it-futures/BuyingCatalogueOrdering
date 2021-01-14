@@ -5,14 +5,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
 {
     internal sealed class OrderSummaryData
     {
-        public OrderEntity OrderEntity { get; }
-        public OrderItemEntity OrderItemEntities { get; }
-        public ServiceRecipientEntity ServiceRecipientEntity { get; set; }
-        public OrderItemEntity CatalogueSolutionEntity { get; set; }
-        public OrderItemEntity AdditionalServiceEntity { get; set; }
-        public OrderItemEntity AssociatedServiceEntity { get; set; }
-
-        public OrderSummaryData(OrderEntity orderEntity, ServiceRecipientEntity serviceRecipientEntity, OrderItemEntity catalogueSolutionEntity, OrderItemEntity additionalServiceEntity, OrderItemEntity associatedServiceEntity)
+        public OrderSummaryData(
+            OrderEntity orderEntity,
+            ServiceRecipientEntity serviceRecipientEntity,
+            OrderItemEntity catalogueSolutionEntity,
+            OrderItemEntity additionalServiceEntity,
+            OrderItemEntity associatedServiceEntity)
         {
             OrderEntity = orderEntity;
 
@@ -21,6 +19,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
             AdditionalServiceEntity = additionalServiceEntity;
             AssociatedServiceEntity = associatedServiceEntity;
         }
+
+        public OrderEntity OrderEntity { get; }
+
+        public OrderItemEntity OrderItemEntities { get; }
+
+        public ServiceRecipientEntity ServiceRecipientEntity { get; set; }
+
+        public OrderItemEntity CatalogueSolutionEntity { get; set; }
+
+        public OrderItemEntity AdditionalServiceEntity { get; set; }
+
+        public OrderItemEntity AssociatedServiceEntity { get; set; }
 
         public async Task InsertAsync(string connectionString)
         {
