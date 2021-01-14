@@ -9,11 +9,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 {
     internal sealed class GetOrderItemResponse : GetOrderItemResponseBase
     {
-        private readonly string _content;
+        private readonly string content;
 
         private GetOrderItemResponse(string content)
         {
-            _content = content ?? throw new ArgumentNullException(nameof(content));
+            this.content = content ?? throw new ArgumentNullException(nameof(content));
         }
 
         public static async Task<GetOrderItemResponse> CreateAsync(Response response)
@@ -26,7 +26,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
             OrderItemEntity orderItemEntity,
             ServiceRecipientEntity serviceRecipient)
         {
-            var actual = ReadOrderItem(JToken.Parse(_content));
+            var actual = ReadOrderItem(JToken.Parse(content));
 
             var expected = ConvertToExpectedBody(orderItemEntity, serviceRecipient);
             actual.Should().BeEquivalentTo(expected);

@@ -6,57 +6,57 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
 {
     public sealed class OrderEntityBuilder
     {
-        private string _orderId;
-        private string _description;
-        private Guid _organisationId;
-        private string _organisationName;
-        private string _organisationOdsCode;
-        private int? _organisationAddressId;
-        private int? _organisationBillingAddressId;
-        private int? _organisationContactId;
-        private OrderStatus _orderStatus;
-        private DateTime _lastUpdated;
-        private Guid _lastUpdatedBy;
-        private string _lastUpdatedByName;
-        private DateTime _created;
-        private DateTime? _completed;
-        private string _supplierId;
-        private string _supplierName;
-        private int? _supplierAddressId;
-        private int? _supplierContactId;
-        private DateTime? _commencementDate;
-        private bool _serviceRecipientsViewed;
-        private bool _catalogueSolutionsViewed;
-        private bool _additionalServicesViewed;
-        private bool _associatedServicesViewed;
-        private bool? _fundingSourceOnlyGms;
-        private bool _isDeleted;
+        private string orderId;
+        private string description;
+        private Guid organisationId;
+        private string organisationName;
+        private string organisationOdsCode;
+        private int? organisationAddressId;
+        private int? organisationBillingAddressId;
+        private int? organisationContactId;
+        private OrderStatus orderStatus;
+        private DateTime lastUpdated;
+        private Guid lastUpdatedBy;
+        private string lastUpdatedByName;
+        private DateTime created;
+        private DateTime? completed;
+        private string supplierId;
+        private string supplierName;
+        private int? supplierAddressId;
+        private int? supplierContactId;
+        private DateTime? commencementDate;
+        private bool serviceRecipientsViewed;
+        private bool catalogueSolutionsViewed;
+        private bool additionalServicesViewed;
+        private bool associatedServicesViewed;
+        private bool? fundingSourceOnlyGms;
+        private bool isDeleted;
 
         private OrderEntityBuilder()
         {
-            _orderId = null;
-            _description = "Some Description";
-            _organisationId = Guid.NewGuid();
-            _organisationName = null;
-            _organisationOdsCode = "test";
-            _organisationAddressId = null;
-            _organisationBillingAddressId = null;
-            _organisationContactId = null;
-            _orderStatus = 0;
-            _lastUpdated = DateTime.UtcNow;
-            _lastUpdatedBy = Guid.NewGuid();
-            _lastUpdatedByName = "Alice Smith";
-            _created = DateTime.UtcNow;
-            _supplierId = null;
-            _supplierName = null;
-            _supplierAddressId = null;
-            _supplierContactId = null;
-            _commencementDate = null;
-            _serviceRecipientsViewed = false;
-            _catalogueSolutionsViewed = false;
-            _additionalServicesViewed = false;
-            _fundingSourceOnlyGms = null;
-            _isDeleted = false;
+            orderId = null;
+            description = "Some Description";
+            organisationId = Guid.NewGuid();
+            organisationName = null;
+            organisationOdsCode = "test";
+            organisationAddressId = null;
+            organisationBillingAddressId = null;
+            organisationContactId = null;
+            orderStatus = 0;
+            lastUpdated = DateTime.UtcNow;
+            lastUpdatedBy = Guid.NewGuid();
+            lastUpdatedByName = "Alice Smith";
+            created = DateTime.UtcNow;
+            supplierId = null;
+            supplierName = null;
+            supplierAddressId = null;
+            supplierContactId = null;
+            commencementDate = null;
+            serviceRecipientsViewed = false;
+            catalogueSolutionsViewed = false;
+            additionalServicesViewed = false;
+            fundingSourceOnlyGms = null;
+            isDeleted = false;
         }
 
         public static OrderEntityBuilder Create()
@@ -64,153 +64,153 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
             return new();
         }
 
-        public OrderEntityBuilder WithOrderId(string orderId)
+        public OrderEntityBuilder WithOrderId(string id)
         {
-            _orderId = orderId;
+            orderId = id;
             return this;
         }
 
-        public OrderEntityBuilder WithDescription(string description)
+        public OrderEntityBuilder WithDescription(string value)
         {
-            _description = description;
+            description = value;
             return this;
         }
 
-        public OrderEntityBuilder WithOrganisationId(Guid organisationId)
+        public OrderEntityBuilder WithOrganisationId(Guid id)
         {
-            _organisationId = organisationId;
+            organisationId = id;
             return this;
         }
 
-        public OrderEntityBuilder WithOrganisationName(string organisationName)
+        public OrderEntityBuilder WithOrganisationName(string name)
         {
-            _organisationName = organisationName;
+            organisationName = name;
             return this;
         }
 
         public OrderEntityBuilder WithOrganisationOdsCode(string odsCode)
         {
-            _organisationOdsCode = odsCode;
+            organisationOdsCode = odsCode;
             return this;
         }
 
         public OrderEntityBuilder WithOrganisationAddressId(int? addressId)
         {
-            _organisationAddressId = addressId;
+            organisationAddressId = addressId;
             return this;
         }
 
         public OrderEntityBuilder WithOrganisationBillingAddressId(int? billingAddressId)
         {
-            _organisationBillingAddressId = billingAddressId;
+            organisationBillingAddressId = billingAddressId;
             return this;
         }
 
-        public OrderEntityBuilder WithOrganisationContactId(int? organisationContactId)
+        public OrderEntityBuilder WithOrganisationContactId(int? contactId)
         {
-            _organisationContactId = organisationContactId;
+            organisationContactId = contactId;
             return this;
         }
 
-        public OrderEntityBuilder WithOrderStatus(OrderStatus orderStatus)
+        public OrderEntityBuilder WithOrderStatus(OrderStatus status)
         {
-            _orderStatus = orderStatus;
+            orderStatus = status;
             return this;
         }
 
-        public OrderEntityBuilder WithLastUpdated(DateTime lastUpdated)
+        public OrderEntityBuilder WithLastUpdated(DateTime date)
         {
-            _lastUpdated = lastUpdated;
+            lastUpdated = date;
             return this;
         }
 
-        public OrderEntityBuilder WithLastUpdatedBy(Guid lastUpdatedBy)
+        public OrderEntityBuilder WithLastUpdatedBy(Guid userId)
         {
-            _lastUpdatedBy = lastUpdatedBy;
+            lastUpdatedBy = userId;
             return this;
         }
 
-        public OrderEntityBuilder WithLastUpdatedName(string lastUpdatedByName)
+        public OrderEntityBuilder WithLastUpdatedName(string userName)
         {
-            _lastUpdatedByName = lastUpdatedByName;
+            lastUpdatedByName = userName;
             return this;
         }
 
         public OrderEntityBuilder WithDateCreated(DateTime dateCreated)
         {
-            _created = dateCreated;
+            created = dateCreated;
             return this;
         }
 
-        public OrderEntityBuilder WithSupplierId(string supplierId)
+        public OrderEntityBuilder WithSupplierId(string id)
         {
-            _supplierId = supplierId;
+            supplierId = id;
             return this;
         }
 
-        public OrderEntityBuilder WithSupplierName(string supplierName)
+        public OrderEntityBuilder WithSupplierName(string name)
         {
-            _supplierName = supplierName;
+            supplierName = name;
             return this;
         }
 
-        public OrderEntityBuilder WithSupplierAddressId(int? supplierAddressId)
+        public OrderEntityBuilder WithSupplierAddressId(int? addressId)
         {
-            _supplierAddressId = supplierAddressId;
+            supplierAddressId = addressId;
             return this;
         }
 
-        public OrderEntityBuilder WithSupplierContactId(int? supplierContactId)
+        public OrderEntityBuilder WithSupplierContactId(int? contactId)
         {
-            _supplierContactId = supplierContactId;
+            supplierContactId = contactId;
             return this;
         }
 
-        public OrderEntityBuilder WithCommencementDate(DateTime? commencementDate)
+        public OrderEntityBuilder WithCommencementDate(DateTime? date)
         {
-            _commencementDate = commencementDate;
+            commencementDate = date;
             return this;
         }
 
-        public OrderEntityBuilder WithServiceRecipientsViewed(bool serviceRecipientsViewed)
+        public OrderEntityBuilder WithServiceRecipientsViewed(bool viewed)
         {
-            _serviceRecipientsViewed = serviceRecipientsViewed;
+            serviceRecipientsViewed = viewed;
             return this;
         }
 
-        public OrderEntityBuilder WithCatalogueSolutionsViewed(bool catalogueSolutionsViewed)
+        public OrderEntityBuilder WithCatalogueSolutionsViewed(bool viewed)
         {
-            _catalogueSolutionsViewed = catalogueSolutionsViewed;
+            catalogueSolutionsViewed = viewed;
             return this;
         }
 
-        public OrderEntityBuilder WithAdditionalServicesViewed(bool additionalServicesViewed)
+        public OrderEntityBuilder WithAdditionalServicesViewed(bool viewed)
         {
-            _additionalServicesViewed = additionalServicesViewed;
+            additionalServicesViewed = viewed;
             return this;
         }
 
-        public OrderEntityBuilder WithAssociatedServicesViewed(bool associatedServicesViewed)
+        public OrderEntityBuilder WithAssociatedServicesViewed(bool viewed)
         {
-            _associatedServicesViewed = associatedServicesViewed;
+            associatedServicesViewed = viewed;
             return this;
         }
 
-        public OrderEntityBuilder WithFundingSourceOnlyGms(bool? fundingSourceOnlyGms)
+        public OrderEntityBuilder WithFundingSourceOnlyGms(bool? onlyGms)
         {
-            _fundingSourceOnlyGms = fundingSourceOnlyGms;
+            fundingSourceOnlyGms = onlyGms;
             return this;
         }
 
-        public OrderEntityBuilder WithIsDeleted(bool isDeleted)
+        public OrderEntityBuilder WithIsDeleted(bool deleted)
         {
-            _isDeleted = isDeleted;
+            isDeleted = deleted;
             return this;
         }
 
         public OrderEntityBuilder WithDateCompleted(DateTime? dateCompleted)
         {
-            _completed = dateCompleted;
+            completed = dateCompleted;
             return this;
         }
 
@@ -218,31 +218,31 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
         {
             return new()
             {
-                OrderId = _orderId,
-                Description = _description,
-                OrganisationId = _organisationId,
-                OrganisationName = _organisationName,
-                OrganisationOdsCode = _organisationOdsCode,
-                OrganisationAddressId = _organisationAddressId,
-                OrganisationBillingAddressId = _organisationBillingAddressId,
-                OrganisationContactId = _organisationContactId,
-                OrderStatus = _orderStatus,
-                LastUpdated = _lastUpdated,
-                LastUpdatedBy = _lastUpdatedBy,
-                LastUpdatedByName = _lastUpdatedByName,
-                Created = _created,
-                SupplierId = _supplierId,
-                SupplierName = _supplierName,
-                SupplierAddressId = _supplierAddressId,
-                SupplierContactId = _supplierContactId,
-                CommencementDate = _commencementDate,
-                ServiceRecipientsViewed = _serviceRecipientsViewed,
-                CatalogueSolutionsViewed = _catalogueSolutionsViewed,
-                AdditionalServicesViewed = _additionalServicesViewed,
-                AssociatedServicesViewed = _associatedServicesViewed,
-                FundingSourceOnlyGMS = _fundingSourceOnlyGms,
-                IsDeleted = _isDeleted,
-                Completed = _completed,
+                OrderId = orderId,
+                Description = description,
+                OrganisationId = organisationId,
+                OrganisationName = organisationName,
+                OrganisationOdsCode = organisationOdsCode,
+                OrganisationAddressId = organisationAddressId,
+                OrganisationBillingAddressId = organisationBillingAddressId,
+                OrganisationContactId = organisationContactId,
+                OrderStatus = orderStatus,
+                LastUpdated = lastUpdated,
+                LastUpdatedBy = lastUpdatedBy,
+                LastUpdatedByName = lastUpdatedByName,
+                Created = created,
+                SupplierId = supplierId,
+                SupplierName = supplierName,
+                SupplierAddressId = supplierAddressId,
+                SupplierContactId = supplierContactId,
+                CommencementDate = commencementDate,
+                ServiceRecipientsViewed = serviceRecipientsViewed,
+                CatalogueSolutionsViewed = catalogueSolutionsViewed,
+                AdditionalServicesViewed = additionalServicesViewed,
+                AssociatedServicesViewed = associatedServicesViewed,
+                FundingSourceOnlyGms = fundingSourceOnlyGms,
+                IsDeleted = isDeleted,
+                Completed = completed,
             };
         }
     }

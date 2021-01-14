@@ -15,31 +15,31 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     [Binding]
     internal sealed class OrderSummarySteps
     {
-        private readonly Response _response;
-        private readonly Request _request;
+        private readonly Response response;
+        private readonly Request request;
 
-        private readonly string _orderSummaryUrl;
+        private readonly string orderSummaryUrl;
 
-        private OrderSummaryDataFactory _dataFactory;
+        private readonly OrderSummaryDataFactory dataFactory;
 
         public OrderSummarySteps(Response response, Request request, Settings settings, OrderSummaryDataFactory dataFactory)
         {
-            _response = response;
-            _request = request;
-            _orderSummaryUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/summary";
-            _dataFactory = dataFactory;
+            this.response = response;
+            this.request = request;
+            orderSummaryUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/summary";
+            this.dataFactory = dataFactory;
         }
 
         [Given(@"the user creates a new ""(.*)"" order with id (.*)")]
         public async Task GivenTheUserCreatesANewOrderWithOrderId(string datasetKey, string orderId)
         {
-            await _dataFactory.CreateData(datasetKey, orderId);
+            await dataFactory.CreateData(datasetKey, orderId);
         }
 
         [When(@"the user makes a request to retrieve the order summary with the ID (.*)")]
         public async Task WhenTheUserMakesARequestToRetrieveTheOrderSummaryWithTheId(string orderId)
         {
-            await _request.GetAsync(string.Format(_orderSummaryUrl, orderId));
+            await request.GetAsync(string.Format(orderSummaryUrl, orderId));
         }
 
         [Then(@"the order summary is returned with the following values")]
@@ -47,13 +47,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var expected = table.CreateSet<OrderSummaryTable>().FirstOrDefault();
 
-            var response = await _response.ReadBodyAsJsonAsync();
+            var jsonResponse = await response.ReadBodyAsJsonAsync();
 
             var actual = new OrderSummaryTable
             {
-                OrderId = response.Value<string>("orderId"),
-                OrganisationId = response.SelectToken("organisationId").ToObject<Guid>(),
-                Description = response.Value<string>("description"),
+                OrderId = jsonResponse.Value<string>("orderId"),
+                OrganisationId = jsonResponse.SelectToken("organisationId").ToObject<Guid>(),
+                Description = jsonResponse.Value<string>("description"),
             };
 
             actual.Should().BeEquivalentTo(expected);
@@ -64,9 +64,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var expected = table.CreateSet<SectionTable>();
 
-            var response = await _response.ReadBodyAsJsonAsync();
+            var jsonResponse = await response.ReadBodyAsJsonAsync();
 
-            var sections = response.SelectToken("sections");
+            var sections = jsonResponse.SelectToken("sections");
             Assert.IsNotNull(sections);
 
             var actual = new SectionsTable
@@ -80,9 +80,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Then(@"the order Section Status is (.*)")]
         public async Task ThenTheOrderSectionStatusIs(string expectedStatus)
         {
-            var response = await _response.ReadBodyAsJsonAsync();
+            var jsonResponse = await response.ReadBodyAsJsonAsync();
 
-            var actualSectionStatus = response.SelectToken("sectionStatus").ToString();
+            var actualSectionStatus = jsonResponse.SelectToken("sectionStatus").ToString();
             Assert.IsNotNull(actualSectionStatus);
 
             actualSectionStatus.Should().BeEquivalentTo(expectedStatus);

@@ -10,30 +10,30 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     [Binding]
     internal sealed class UpdateOrderItemSteps
     {
-        private readonly Request _request;
-        private readonly Settings _settings;
-        private readonly OrderContext _orderContext;
+        private readonly Request request;
+        private readonly Settings settings;
+        private readonly OrderContext orderContext;
 
-        private UpdateOrderItemRequest _updateOrderItemRequest;
+        private UpdateOrderItemRequest updateOrderItemRequest;
 
         public UpdateOrderItemSteps(
             Request request,
             Settings settings,
             OrderContext orderContext)
         {
-            _request = request;
-            _settings = settings;
-            _orderContext = orderContext;
+            this.request = request;
+            this.settings = settings;
+            this.orderContext = orderContext;
         }
 
         [Given(@"the user creates a request to change the order item \('(.*)'\) for the order with ID '(.*)'")]
         public void GivenTheUserCreatesARequestToChangeTheOrderItemForTheOrderWithId(string name, string orderId)
         {
-            var orderItemId = _orderContext.OrderItemReferenceList.GetByOrderCatalogueItemName(name).OrderItemId;
+            var orderItemId = orderContext.OrderItemReferenceList.GetByOrderCatalogueItemName(name).OrderItemId;
 
-            _updateOrderItemRequest = new UpdateOrderItemRequest(
-                _request,
-                _settings.OrderingApiBaseUrl,
+            updateOrderItemRequest = new UpdateOrderItemRequest(
+                request,
+                settings.OrderingApiBaseUrl,
                 orderId,
                 orderItemId);
         }
@@ -41,26 +41,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Given(@"the user enters the '(.*)' update order item request payload")]
         public void GivenTheUserEntersUpdateOrderItemRequestPayload(string payloadKey)
         {
-            _updateOrderItemRequest.SetPayload(payloadKey);
+            updateOrderItemRequest.SetPayload(payloadKey);
         }
 
         [When(@"the user sends the update order item request")]
         public async Task WhenTheUserSendsTheUpdateOrderItemRequest()
         {
-            await _updateOrderItemRequest.ExecuteAsync();
+            await updateOrderItemRequest.ExecuteAsync();
         }
 
         [Then(@"the order item is updated")]
         public async Task ThenTheOrderItemIsUpdated()
         {
-            var original = _orderContext.OrderItemReferenceList
-                .FindByOrderItemId(_updateOrderItemRequest.OrderItemId);
+            var original = orderContext.OrderItemReferenceList
+                .FindByOrderItemId(updateOrderItemRequest.OrderItemId);
 
             var orderItem = await OrderItemEntity.FetchByOrderItemId(
-                _settings.ConnectionString,
-                _updateOrderItemRequest.OrderItemId);
+                settings.ConnectionString,
+                updateOrderItemRequest.OrderItemId);
 
-            _updateOrderItemRequest.AssertPayload(orderItem, original);
+            updateOrderItemRequest.AssertPayload(orderItem, original);
         }
     }
 }

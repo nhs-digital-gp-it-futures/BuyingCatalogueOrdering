@@ -13,15 +13,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     [Binding]
     internal sealed class ContactSteps
     {
-        private readonly OrderContext _orderContext;
-        private readonly Response _response;
-        private readonly Settings _settings;
+        private readonly OrderContext orderContext;
+        private readonly Response response;
+        private readonly Settings settings;
 
         public ContactSteps(OrderContext orderContext, Response response, Settings settings)
         {
-            _orderContext = orderContext;
-            _response = response;
-            _settings = settings;
+            this.orderContext = orderContext;
+            this.response = response;
+            this.settings = settings;
         }
 
         [Given(@"Contacts exist")]
@@ -37,10 +37,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithPhone(contactItem.TelephoneNumber)
                     .Build();
 
-                var contactId = await contact.InsertAsync<int>(_settings.ConnectionString);
+                var contactId = await contact.InsertAsync<int>(settings.ConnectionString);
                 contact.ContactId = contactId;
 
-                _orderContext.ContactReferenceList.Add(contact);
+                orderContext.ContactReferenceList.Add(contact);
             }
         }
 
@@ -49,14 +49,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var expected = table.CreateSet<ContactTable>().FirstOrDefault();
 
-            var response = (await _response.ReadBodyAsJsonAsync()).SelectToken(section);
+            var contact = (await response.ReadBodyAsJsonAsync()).SelectToken(section);
 
             var actual = new
             {
-                FirstName = response.Value<string>("firstName"),
-                LastName = response.Value<string>("lastName"),
-                EmailAddress = response.Value<string>("emailAddress"),
-                TelephoneNumber = response.Value<string>("telephoneNumber"),
+                FirstName = contact.Value<string>("firstName"),
+                LastName = contact.Value<string>("lastName"),
+                EmailAddress = contact.Value<string>("emailAddress"),
+                TelephoneNumber = contact.Value<string>("telephoneNumber"),
             };
 
             actual.Should().BeEquivalentTo(expected);
@@ -65,8 +65,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private sealed class ContactTable
         {
             public string FirstName { get; set; }
+
             public string LastName { get; set; }
+
             public string EmailAddress { get; set; }
+
             public string TelephoneNumber { get; set; }
         }
     }

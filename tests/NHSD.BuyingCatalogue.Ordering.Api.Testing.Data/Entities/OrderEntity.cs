@@ -52,7 +52,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 
         public bool AssociatedServicesViewed { get; set; }
 
-        public bool? FundingSourceOnlyGMS { get; set; }
+        public bool? FundingSourceOnlyGms { get; set; }
 
         public bool IsDeleted { get; set; }
 

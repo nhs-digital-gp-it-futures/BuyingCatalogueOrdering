@@ -10,11 +10,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
 {
     internal sealed class OrderSummaryDataFactory
     {
-        private readonly Settings _setting;
+        private readonly Settings setting;
 
         internal OrderSummaryDataFactory(Settings setting)
         {
-            _setting = setting;
+            this.setting = setting;
         }
 
         public async Task CreateData(string key, string orderId)
@@ -55,7 +55,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                                 .WithCatalogueItemType(CatalogueItemType.AdditionalService)
                                 .Build())
                         .Build()
-                        .InsertAsync(_setting.ConnectionString)
+                        .InsertAsync(setting.ConnectionString)
                 },
                 {
                     "complete-with-1recipient-1associatedservice-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
@@ -73,7 +73,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                                 .WithCatalogueItemType(CatalogueItemType.AssociatedService)
                                 .Build())
                         .Build()
-                        .InsertAsync(_setting.ConnectionString)
+                        .InsertAsync(setting.ConnectionString)
                 },
                 {
                     "complete-with-0recipient-1associatedservice-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
@@ -85,7 +85,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                                 .WithCatalogueItemType(CatalogueItemType.AssociatedService)
                                 .Build())
                         .Build()
-                        .InsertAsync(_setting.ConnectionString)
+                        .InsertAsync(setting.ConnectionString)
                 },
                 {
                     "complete-with-1solution-1associatedservice-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
@@ -104,7 +104,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                                 .WithCatalogueItemType(CatalogueItemType.AssociatedService)
                                 .Build())
                         .Build()
-                        .InsertAsync(_setting.ConnectionString)
+                        .InsertAsync(setting.ConnectionString)
                 },
                 {
                     "complete-with-1solution-0associatedservice-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
@@ -116,7 +116,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                                 .WithCatalogueItemType(CatalogueItemType.Solution)
                                 .Build())
                         .Build()
-                        .InsertAsync(_setting.ConnectionString)
+                        .InsertAsync(setting.ConnectionString)
                 },
                 {
                     "funding-incomplete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
@@ -136,7 +136,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                                 .WithCatalogueItemType(CatalogueItemType.AssociatedService)
                                 .Build())
                         .Build()
-                        .InsertAsync(_setting.ConnectionString)
+                        .InsertAsync(setting.ConnectionString)
                 },
                 {
                     "incomplete-with-0recipient-0solution-0associatedservice-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
@@ -145,7 +145,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                         .WithAssociatedServicesViewed(false)
                         .WithAdditionalServiceViewed(false)
                         .Build()
-                        .InsertAsync(_setting.ConnectionString)
+                        .InsertAsync(setting.ConnectionString)
                 },
                 {
                     "incomplete-with-1recipient-0solution-0associatedservice-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
@@ -160,7 +160,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                                 .WithName("Service Recipient")
                                 .Build())
                         .Build()
-                        .InsertAsync(_setting.ConnectionString)
+                        .InsertAsync(setting.ConnectionString)
                 },
                 {
                     "incomplete-with-1recipient-1solution-0associatedservice-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
@@ -182,7 +182,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                                 .WithCatalogueItemType(CatalogueItemType.Solution)
                                 .Build())
                         .Build()
-                        .InsertAsync(_setting.ConnectionString)
+                        .InsertAsync(setting.ConnectionString)
                 },
                 {
                     "incomplete-with-1recipient-1solution-1additionalservice-0associatedservice-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
@@ -211,7 +211,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                             .WithCatalogueItemType(CatalogueItemType.AdditionalService)
                             .Build())
                         .Build()
-                        .InsertAsync(_setting.ConnectionString)
+                        .InsertAsync(setting.ConnectionString)
                 },
                 {
                     "incomplete-with-0recipient-0solution-1associatedservice-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
@@ -227,7 +227,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                                 .WithCatalogueItemType(CatalogueItemType.AssociatedService)
                                 .Build())
                         .Build()
-                        .InsertAsync(_setting.ConnectionString)
+                        .InsertAsync(setting.ConnectionString)
                 },
             };
     }

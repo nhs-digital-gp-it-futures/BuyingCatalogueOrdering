@@ -7,18 +7,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 {
     internal sealed class DeleteOrderRequest
     {
-        private readonly Request _request;
-        private readonly string _deleteOrderUrl;
+        private readonly Request request;
+        private readonly string deleteOrderUrl;
 
         public DeleteOrderRequest(
             Request request,
             string orderingApiBaseAddress,
             string orderId)
         {
-            _request = request ?? throw new ArgumentNullException(nameof(request));
+            this.request = request ?? throw new ArgumentNullException(nameof(request));
             OrderId = orderId ?? throw new ArgumentNullException(nameof(orderId));
 
-            _deleteOrderUrl =
+            deleteOrderUrl =
                 $"{orderingApiBaseAddress}/api/v1/orders/{orderId}";
         }
 
@@ -26,7 +26,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 
         public async Task<Response> ExecuteAsync()
         {
-            return await _request.DeleteAsync(_deleteOrderUrl);
+            return await request.DeleteAsync(deleteOrderUrl);
         }
     }
 }

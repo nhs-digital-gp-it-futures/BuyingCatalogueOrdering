@@ -8,11 +8,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 {
     internal sealed class GetFundingSourceResponse
     {
-        private readonly string _content;
+        private readonly string content;
 
         private GetFundingSourceResponse(string content)
         {
-            _content = content ?? throw new ArgumentNullException(nameof(content));
+            this.content = content ?? throw new ArgumentNullException(nameof(content));
         }
 
         public static async Task<GetFundingSourceResponse> CreateAsync(Response response)
@@ -23,7 +23,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 
         public void AssertBody(bool? expectedFundingSourceOnlyGms)
         {
-            var body = JToken.Parse(_content);
+            var body = JToken.Parse(content);
 
             var actual = body.Value<bool?>("onlyGMS");
 

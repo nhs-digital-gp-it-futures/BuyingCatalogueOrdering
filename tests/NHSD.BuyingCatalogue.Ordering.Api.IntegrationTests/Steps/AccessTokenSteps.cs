@@ -9,19 +9,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     [Binding]
     internal sealed class AccessTokenSteps
     {
-        private readonly ScenarioContext _context;
-        private readonly Settings _settings;
+        private readonly ScenarioContext context;
+        private readonly Settings settings;
 
         public AccessTokenSteps(ScenarioContext context, Settings settings)
         {
-            _context = context;
-            _settings = settings;
+            this.context = context;
+            this.settings = settings;
         }
 
         [Given(@"no user is logged in")]
         public void GivenNoAccessTokenIsAvailable()
         {
-            _context[ScenarioContextKeys.AccessToken] = null;
+            context[ScenarioContextKeys.AccessToken] = null;
         }
 
         [Given(@"the user is logged in with the (Buyer|Authority|Readonly-Buyer) role for organisation (.*)")]
@@ -29,7 +29,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var builder = new BearerTokenBuilder()
                 .WithSigningCertificate(EmbeddedResourceReader.GetCertificate())
-                .IssuedBy(_settings.Authority)
+                .IssuedBy(settings.Authority)
                 .ForSubject("7B195137-6A59-4854-B118-62B39A3101EF")
                 .WithClaim("client_id", "PasswordClient")
                 .WithClaim("preferred_username", "BobSmith@email.com")
@@ -60,7 +60,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             }
 
             var token = builder.BuildToken();
-            _context[ScenarioContextKeys.AccessToken] = token;
+            context[ScenarioContextKeys.AccessToken] = token;
         }
     }
 }

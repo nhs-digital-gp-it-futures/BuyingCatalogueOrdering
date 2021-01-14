@@ -8,17 +8,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
 {
     internal sealed class AddressReferenceList
     {
-        private readonly Dictionary<int, AddressEntity> _cache = new();
+        private readonly Dictionary<int, AddressEntity> cache = new();
 
         public IEnumerable<AddressEntity> GetAll() =>
-            _cache.Values;
+            cache.Values;
 
         public AddressEntity GetByAddressId(int? addressId)
         {
             if (addressId == null)
                 return null;
 
-            return _cache[addressId.Value];
+            return cache[addressId.Value];
         }
 
         public AddressEntity GetByPostcode(string postcode) =>
@@ -30,8 +30,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
         {
             int addressId = addressEntity.AddressId;
 
-            _cache.ContainsKey(addressId).Should().BeFalse();
-            _cache.Add(addressId, addressEntity);
+            cache.ContainsKey(addressId).Should().BeFalse();
+            cache.Add(addressId, addressEntity);
         }
     }
 }

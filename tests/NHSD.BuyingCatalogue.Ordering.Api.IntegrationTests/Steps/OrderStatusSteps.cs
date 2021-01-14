@@ -82,7 +82,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Then(@"all attachments use UTF8 encoding")]
-        public async Task ThenAllAttachmentsUseUTFEncoding()
+        public async Task ThenAllAttachmentsUseUtfEncoding()
         {
             var utf8Preamble = Encoding.UTF8.GetPreamble();
             var emails = await emailServerDriver.FindAllEmailsAsync();

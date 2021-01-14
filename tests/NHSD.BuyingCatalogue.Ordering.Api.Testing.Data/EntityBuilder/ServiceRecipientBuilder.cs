@@ -4,9 +4,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
 {
     public sealed class ServiceRecipientBuilder
     {
-        private string _odsCode;
-        private string _name;
-        private string _orderId;
+        private string odsCode;
+        private string name;
+        private string orderId;
 
         private ServiceRecipientBuilder()
         {
@@ -14,21 +14,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
 
         public static ServiceRecipientBuilder Create() => new();
 
-        public ServiceRecipientBuilder WithOdsCode(string odsCode)
+        public ServiceRecipientBuilder WithOdsCode(string code)
         {
-            _odsCode = odsCode;
+            odsCode = code;
             return this;
         }
 
-        public ServiceRecipientBuilder WithName(string name)
+        public ServiceRecipientBuilder WithName(string recipientName)
         {
-            _name = name;
+            name = recipientName;
             return this;
         }
 
-        public ServiceRecipientBuilder WithOrderId(string orderId)
+        public ServiceRecipientBuilder WithOrderId(string id)
         {
-            _orderId = orderId;
+            orderId = id;
             return this;
         }
 
@@ -36,9 +36,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
         {
             return new()
             {
-                OdsCode = _odsCode,
-                Name = _name,
-                OrderId = _orderId,
+                OdsCode = odsCode,
+                Name = name,
+                OrderId = orderId,
             };
         }
     }

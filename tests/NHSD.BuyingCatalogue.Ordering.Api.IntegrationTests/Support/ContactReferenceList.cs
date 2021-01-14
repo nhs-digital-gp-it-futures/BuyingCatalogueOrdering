@@ -8,17 +8,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
 {
     internal sealed class ContactReferenceList
     {
-        private readonly Dictionary<int, ContactEntity> _cache = new();
+        private readonly Dictionary<int, ContactEntity> cache = new();
 
         public IEnumerable<ContactEntity> GetAll() =>
-            _cache.Values;
+            cache.Values;
 
         public ContactEntity GetByContactId(int? contactId)
         {
             if (contactId == null)
                 return null;
 
-            return _cache[contactId.Value];
+            return cache[contactId.Value];
         }
 
         public ContactEntity GetByEmail(string email) =>
@@ -30,8 +30,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
         {
             int contactId = contactEntity.ContactId;
 
-            _cache.ContainsKey(contactId).Should().BeFalse();
-            _cache.Add(contactId, contactEntity);
+            cache.ContainsKey(contactId).Should().BeFalse();
+            cache.Add(contactId, contactEntity);
         }
     }
 }

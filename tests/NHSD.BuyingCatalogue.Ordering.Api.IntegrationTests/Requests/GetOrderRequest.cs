@@ -7,18 +7,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 {
     internal sealed class GetOrderRequest
     {
-        private readonly Request _request;
-        private readonly string _getOrderUrl;
+        private readonly Request request;
+        private readonly string getOrderUrl;
 
         public GetOrderRequest(
             Request request,
             string orderingApiBaseAddress,
             string orderId)
         {
-            _request = request ?? throw new ArgumentNullException(nameof(request));
+            this.request = request ?? throw new ArgumentNullException(nameof(request));
             OrderId = orderId ?? throw new ArgumentNullException(nameof(orderId));
 
-            _getOrderUrl =
+            getOrderUrl =
                 $"{orderingApiBaseAddress}/api/v1/orders/{orderId}";
         }
 
@@ -26,7 +26,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 
         public async Task<GetOrderResponse> ExecuteAsync()
         {
-            var response = await _request.GetAsync(_getOrderUrl);
+            var response = await request.GetAsync(getOrderUrl);
             return await GetOrderResponse.CreateAsync(response);
         }
     }

@@ -9,18 +9,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common
     [Binding]
     internal sealed class CommonSteps
     {
-        private readonly Response _response;
+        private readonly Response response;
 
         public CommonSteps(Response response)
         {
-            _response = response;
+            this.response = response;
         }
 
         [Then(@"a response with status code ([\d]+) is returned")]
         public void AResponseIsReturned(int code)
         {
-            _response.Should().NotBeNull();
-            _response.Result.StatusCode.Should().Be(code);
+            response.Should().NotBeNull();
+            response.Result.StatusCode.Should().Be(code);
         }
 
         [Then(@"the response contains the following errors")]
@@ -28,9 +28,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common
         {
             var expected = table.CreateSet<ResponseErrorsTable>();
 
-            var response = await _response.ReadBodyAsJsonAsync();
+            var jsonResponse = await response.ReadBodyAsJsonAsync();
 
-            var actual = response.SelectToken("errors").Select(x => new ResponseErrorsTable()
+            var actual = jsonResponse.SelectToken("errors").Select(x => new ResponseErrorsTable
             {
                 Id = x.Value<string>("id"),
                 Field = x.Value<string>("field"),
@@ -42,8 +42,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common
         [Then(@"the response contains no data")]
         public async Task TheResponseContainsNoData()
         {
-            var response = await _response.ReadBodyAsStringAsync();
-            response.Should().BeEmpty();
+            var jsonResponse = await response.ReadBodyAsStringAsync();
+            jsonResponse.Should().BeEmpty();
         }
 
         private sealed class ResponseErrorsTable

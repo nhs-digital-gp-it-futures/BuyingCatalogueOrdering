@@ -16,21 +16,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     [Binding]
     internal sealed class ServiceRecipientSteps
     {
-        private readonly Response _response;
-        private readonly Request _request;
-        private readonly Settings _settings;
-        private readonly OrderContext _orderContext;
+        private readonly Response response;
+        private readonly Request request;
+        private readonly Settings settings;
+        private readonly OrderContext orderContext;
 
-        private readonly string _serviceRecipientUrl;
+        private readonly string serviceRecipientUrl;
 
         public ServiceRecipientSteps(Response response, Request request, Settings settings, OrderContext orderContext)
         {
-            _response = response;
-            _request = request;
-            _settings = settings;
-            _orderContext = orderContext;
+            this.response = response;
+            this.request = request;
+            this.settings = settings;
+            this.orderContext = orderContext;
 
-            _serviceRecipientUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/service-recipients";
+            serviceRecipientUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/service-recipients";
         }
 
         [Given(@"Service Recipients exist")]
@@ -45,23 +45,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithOrderId(serviceRecipientItem.OrderId)
                     .Build();
 
-                await serviceRecipient.InsertAsync(_settings.ConnectionString);
+                await serviceRecipient.InsertAsync(settings.ConnectionString);
 
-                _orderContext.ServiceRecipientReferenceList.Add(serviceRecipient);
+                orderContext.ServiceRecipientReferenceList.Add(serviceRecipient);
             }
         }
 
         [When(@"the user makes a request to retrieve the service-recipients section with order ID (.*)")]
         public async Task WhenTheUserMakesARequestToRetrieveTheService_RecipientsSectionWithOrderID(string orderId)
         {
-            await _request.GetAsync(string.Format(_serviceRecipientUrl, orderId));
+            await request.GetAsync(string.Format(serviceRecipientUrl, orderId));
         }
 
         [When(@"the user makes a request to set the service-recipients section with order ID (.*)")]
         public async Task WhenTheUserMakesARequestToRetrieveTheService_RecipientsSectionWithOrderID(string orderId, Table table)
         {
             var payload = new ServiceRecipientsTable { ServiceRecipients = table.CreateSet<ServiceRecipientTable>() };
-            await _request.PutJsonAsync(string.Format(_serviceRecipientUrl, orderId), payload);
+            await request.PutJsonAsync(string.Format(serviceRecipientUrl, orderId), payload);
         }
 
         [Then(@"the service recipients are returned")]
@@ -69,7 +69,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var expected = table.CreateSet<ServiceRecipientTable>();
 
-            var serviceRecipients = (await _response.ReadBodyAsJsonAsync())
+            var serviceRecipients = (await response.ReadBodyAsJsonAsync())
                 .SelectToken("serviceRecipients").Select(CreateServiceRecipients);
 
             expected.Should().BeEquivalentTo(serviceRecipients, conf =>
@@ -80,7 +80,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public async Task ThenThePersistedServiceRecipientsAreReturned(Table table)
         {
             var expected = table.CreateSet<ServiceRecipientTable>();
-            var actual = await ServiceRecipientEntity.FetchAllServiceRecipients(_settings.ConnectionString);
+            var actual = await ServiceRecipientEntity.FetchAllServiceRecipients(settings.ConnectionString);
             expected.Should().BeEquivalentTo(actual);
         }
 
@@ -101,7 +101,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private sealed class ServiceRecipientTable
         {
             public string OdsCode { get; set; }
+
             public string Name { get; set; }
+
             public string OrderId { get; set; }
         }
     }

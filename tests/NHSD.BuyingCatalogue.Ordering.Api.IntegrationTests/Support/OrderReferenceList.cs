@@ -6,13 +6,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
 {
     internal sealed class OrderReferenceList
     {
-        private readonly Dictionary<string, OrderEntity> _cache = new();
+        private readonly Dictionary<string, OrderEntity> cache = new();
 
         public IEnumerable<OrderEntity> GetAll() =>
-            _cache.Values;
+            cache.Values;
 
         public OrderEntity GetByOrderId(string orderId) =>
-            _cache[orderId]
+            cache[orderId]
                 .Should()
                 .NotBeNull()
                 .And
@@ -23,8 +23,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
 
         public void Add(string orderId, OrderEntity entity)
         {
-            _cache.ContainsKey(orderId).Should().BeFalse();
-            _cache.Add(orderId, entity);
+            cache.ContainsKey(orderId).Should().BeFalse();
+            cache.Add(orderId, entity);
         }
     }
 }

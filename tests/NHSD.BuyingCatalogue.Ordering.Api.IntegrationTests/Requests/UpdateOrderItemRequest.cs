@@ -14,8 +14,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
     {
         private const int MaximumDeliveryDateOffsetDays = 1282;
 
-        private readonly Request _request;
-        private readonly string _createOrderItemUrl;
+        private readonly Request request;
+        private readonly string createOrderItemUrl;
 
         private static readonly IDictionary<string, Func<UpdateOrderItemRequestPayload>> PayloadFactory =
             new Dictionary<string, Func<UpdateOrderItemRequestPayload>>
@@ -123,11 +123,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             if (string.IsNullOrWhiteSpace(orderingApiBaseAddress))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(orderingApiBaseAddress));
 
-            _request = request ?? throw new ArgumentNullException(nameof(request));
+            this.request = request ?? throw new ArgumentNullException(nameof(request));
             OrderId = orderId ?? throw new ArgumentNullException(nameof(orderId));
             OrderItemId = orderItemId;
 
-            _createOrderItemUrl =
+            createOrderItemUrl =
                 $"{orderingApiBaseAddress}/api/v1/orders/{orderId}/order-items/{orderItemId}";
         }
 
@@ -139,7 +139,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 
         public async Task ExecuteAsync()
         {
-            await _request.PutJsonAsync(_createOrderItemUrl, new
+            await request.PutJsonAsync(createOrderItemUrl, new
             {
                 Payload.DeliveryDate,
                 Payload.Quantity,
