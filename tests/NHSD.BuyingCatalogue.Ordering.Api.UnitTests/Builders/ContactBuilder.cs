@@ -4,50 +4,50 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
     internal sealed class ContactBuilder
     {
-        private int _contactId;
-        private string _firstName;
-        private string _lastName;
-        private string _email;
-        private string _phone;
+        private int contactId;
+        private string firstName;
+        private string lastName;
+        private string email;
+        private string phone;
 
         private ContactBuilder()
         {
-            _contactId = 123;
-            _firstName = "Adam";
-            _lastName = "Smith";
-            _email = "adminsmith@email.com";
-            _phone = "0123456789";
+            contactId = 123;
+            firstName = "Adam";
+            lastName = "Smith";
+            email = "adminsmith@email.com";
+            phone = "0123456789";
         }
 
         public static ContactBuilder Create() => new();
 
-        public ContactBuilder WithContactId(int contactId)
+        public ContactBuilder WithContactId(int id)
         {
-            _contactId = contactId;
+            contactId = id;
             return this;
         }
 
-        public ContactBuilder WithFirstName(string firstName)
+        public ContactBuilder WithFirstName(string name)
         {
-            _firstName = firstName;
+            firstName = name;
             return this;
         }
 
-        public ContactBuilder WithLastName(string lastName)
+        public ContactBuilder WithLastName(string name)
         {
-            _lastName = lastName;
+            lastName = name;
             return this;
         }
 
-        public ContactBuilder WithEmail(string email)
+        public ContactBuilder WithEmail(string address)
         {
-            _email = email;
+            email = address;
             return this;
         }
 
-        public ContactBuilder WithPhone(string phone)
+        public ContactBuilder WithPhone(string number)
         {
-            _phone = phone;
+            phone = number;
             return this;
         }
 
@@ -55,11 +55,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         {
             return new()
             {
-                ContactId = _contactId,
-                FirstName = _firstName,
-                LastName = _lastName,
-                Email = _email,
-                Phone = _phone,
+                ContactId = contactId,
+                FirstName = firstName,
+                LastName = lastName,
+                Email = email,
+                Phone = phone,
             };
         }
     }

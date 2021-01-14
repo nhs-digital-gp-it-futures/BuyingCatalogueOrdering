@@ -7,46 +7,47 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
     internal sealed class OrderSummaryModelBuilder
     {
-        private string _orderId;
-        private readonly string _description;
-        private Guid _organisationId;
-        private IEnumerable<SectionModel> _sections;
-        private string _sectionStatus;
-        private readonly string _status;
+        private readonly string description;
+        private readonly string status;
+
+        private string orderId;
+        private Guid organisationId;
+        private IEnumerable<SectionModel> sections;
+        private string sectionStatus;
 
         private OrderSummaryModelBuilder()
         {
-            _orderId = "C000014-01";
-            _description = "Some Description";
-            _organisationId = Guid.NewGuid();
-            _sections = SectionModelListBuilder.Create().Build();
-            _sectionStatus = "incomplete";
-            _status = OrderStatus.Incomplete.Name;
+            orderId = "C000014-01";
+            description = "Some Description";
+            organisationId = Guid.NewGuid();
+            sections = SectionModelListBuilder.Create().Build();
+            sectionStatus = "incomplete";
+            status = OrderStatus.Incomplete.Name;
         }
 
         public static OrderSummaryModelBuilder Create() => new();
 
-        public OrderSummaryModelBuilder WithOrderId(string orderId)
+        public OrderSummaryModelBuilder WithOrderId(string id)
         {
-            _orderId = orderId;
+            orderId = id;
             return this;
         }
 
-        public OrderSummaryModelBuilder WithOrganisationId(Guid organisationId)
+        public OrderSummaryModelBuilder WithOrganisationId(Guid id)
         {
-            _organisationId = organisationId;
+            organisationId = id;
             return this;
         }
 
-        public OrderSummaryModelBuilder WithSections(IEnumerable<SectionModel> sections)
+        public OrderSummaryModelBuilder WithSections(IEnumerable<SectionModel> orderSections)
         {
-            _sections = sections;
+            sections = orderSections;
             return this;
         }
 
-        public OrderSummaryModelBuilder WithSectionStatus(string sectionStatus)
+        public OrderSummaryModelBuilder WithSectionStatus(string status)
         {
-            _sectionStatus = sectionStatus;
+            sectionStatus = status;
             return this;
         }
 
@@ -54,12 +55,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         {
             return new()
             {
-                OrderId = _orderId,
-                Description = _description,
-                OrganisationId = _organisationId,
-                Sections = _sections,
-                SectionStatus = _sectionStatus,
-                Status = _status,
+                OrderId = orderId,
+                Description = description,
+                OrganisationId = organisationId,
+                Sections = sections,
+                SectionStatus = sectionStatus,
+                Status = status,
             };
         }
     }

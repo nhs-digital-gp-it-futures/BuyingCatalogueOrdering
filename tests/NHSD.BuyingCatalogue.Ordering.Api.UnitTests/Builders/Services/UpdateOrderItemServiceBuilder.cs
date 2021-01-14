@@ -8,43 +8,43 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services
 {
     internal sealed class UpdateOrderItemServiceBuilder
     {
-        private IOrderRepository _orderRepository;
-        private IIdentityService _identityService;
-        private IUpdateOrderItemValidator _orderItemValidator;
+        private IOrderRepository orderRepository;
+        private IIdentityService identityService;
+        private IUpdateOrderItemValidator orderItemValidator;
 
         private UpdateOrderItemServiceBuilder()
         {
-            _orderRepository = Mock.Of<IOrderRepository>();
-            _identityService = Mock.Of<IIdentityService>();
-            _orderItemValidator = Mock.Of<IUpdateOrderItemValidator>();
+            orderRepository = Mock.Of<IOrderRepository>();
+            identityService = Mock.Of<IIdentityService>();
+            orderItemValidator = Mock.Of<IUpdateOrderItemValidator>();
         }
 
         public static UpdateOrderItemServiceBuilder Create() => new();
 
-        public UpdateOrderItemServiceBuilder WithOrderRepository(IOrderRepository orderRepository)
+        public UpdateOrderItemServiceBuilder WithOrderRepository(IOrderRepository repository)
         {
-            _orderRepository = orderRepository;
+            orderRepository = repository;
             return this;
         }
 
-        public UpdateOrderItemServiceBuilder WithIdentityService(IIdentityService identityService)
+        public UpdateOrderItemServiceBuilder WithIdentityService(IIdentityService service)
         {
-            _identityService = identityService;
+            identityService = service;
             return this;
         }
 
-        public UpdateOrderItemServiceBuilder WithOrderItemValidator(IUpdateOrderItemValidator orderItemValidator)
+        public UpdateOrderItemServiceBuilder WithOrderItemValidator(IUpdateOrderItemValidator validator)
         {
-            _orderItemValidator = orderItemValidator;
+            orderItemValidator = validator;
             return this;
         }
 
         public UpdateOrderItemService Build()
         {
             return new(
-                _orderRepository,
-                _identityService,
-                _orderItemValidator);
+                orderRepository,
+                identityService,
+                orderItemValidator);
         }
     }
 }

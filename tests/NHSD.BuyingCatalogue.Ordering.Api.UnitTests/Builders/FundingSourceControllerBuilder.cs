@@ -7,29 +7,29 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
     internal sealed class FundingSourceControllerBuilder
     {
-        private IOrderRepository _orderRepository;
-        private ControllerContext _controllerContext;
+        private IOrderRepository orderRepository;
+        private ControllerContext controllerContext;
 
         public FundingSourceControllerBuilder()
         {
-            _orderRepository = Mock.Of<IOrderRepository>();
-            _controllerContext = null;
+            orderRepository = Mock.Of<IOrderRepository>();
+            controllerContext = null;
         }
 
         public static FundingSourceControllerBuilder Create() => new();
 
-        public FundingSourceControllerBuilder WithOrderRepository(IOrderRepository orderRepository)
+        public FundingSourceControllerBuilder WithOrderRepository(IOrderRepository repository)
         {
-            _orderRepository = orderRepository;
+            orderRepository = repository;
             return this;
         }
 
-        public FundingSourceControllerBuilder WithControllerContext(ControllerContext controllerContext)
+        public FundingSourceControllerBuilder WithControllerContext(ControllerContext context)
         {
-            _controllerContext = controllerContext;
+            controllerContext = context;
             return this;
         }
 
-        public FundingSourceController Build() => new(_orderRepository) { ControllerContext = _controllerContext };
+        public FundingSourceController Build() => new(orderRepository) { ControllerContext = controllerContext };
     }
 }

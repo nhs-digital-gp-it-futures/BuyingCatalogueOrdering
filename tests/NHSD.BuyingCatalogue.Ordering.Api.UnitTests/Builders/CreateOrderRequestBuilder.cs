@@ -5,11 +5,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
     internal sealed class CreateOrderRequestBuilder
     {
-        private readonly CreateOrderRequest _createOrderRequest;
+        private readonly CreateOrderRequest createOrderRequest;
 
         private CreateOrderRequestBuilder()
         {
-            _createOrderRequest = new CreateOrderRequest
+            createOrderRequest = new CreateOrderRequest
             {
                 Description = "Some Description",
                 OrganisationId = Guid.NewGuid(),
@@ -22,16 +22,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 
         internal CreateOrderRequestBuilder WithDescription(string description)
         {
-            _createOrderRequest.Description = description;
+            createOrderRequest.Description = description;
             return this;
         }
 
         internal CreateOrderRequestBuilder WithOrganisationId(Guid organisationId)
         {
-            _createOrderRequest.OrganisationId = organisationId;
+            createOrderRequest.OrganisationId = organisationId;
             return this;
         }
 
-        internal CreateOrderRequest Build() => _createOrderRequest;
+        internal CreateOrderRequest Build() => createOrderRequest;
     }
 }

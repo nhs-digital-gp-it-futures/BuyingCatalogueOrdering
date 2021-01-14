@@ -5,96 +5,96 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
     internal sealed class SectionModelListBuilder
     {
-        private SectionModel _description;
-        private SectionModel _orderingParty;
-        private SectionModel _supplier;
-        private SectionModel _commencementDate;
-        private SectionModel _associatedServices;
-        private SectionModel _serviceRecipients;
-        private SectionModel _catalogueSolutions;
-        private SectionModel _additionalServices;
-        private SectionModel _fundingSource;
+        private SectionModel description;
+        private SectionModel orderingParty;
+        private SectionModel supplier;
+        private SectionModel commencementDate;
+        private SectionModel associatedServices;
+        private SectionModel serviceRecipients;
+        private SectionModel catalogueSolutions;
+        private SectionModel additionalServices;
+        private SectionModel fundingSource;
 
         private SectionModelListBuilder()
         {
-            _description = SectionModel.Description;
-            _orderingParty = SectionModel.OrderingParty;
-            _supplier = SectionModel.Supplier;
-            _commencementDate = SectionModel.CommencementDate;
-            _associatedServices = SectionModel.AssociatedServices.WithCount(0);
-            _serviceRecipients = SectionModel.ServiceRecipients.WithCount(0);
-            _catalogueSolutions = SectionModel.CatalogueSolutions.WithCount(0);
-            _additionalServices = SectionModel.AdditionalServices.WithCount(0);
-            _fundingSource = SectionModel.FundingSource;
+            description = SectionModel.Description;
+            orderingParty = SectionModel.OrderingParty;
+            supplier = SectionModel.Supplier;
+            commencementDate = SectionModel.CommencementDate;
+            associatedServices = SectionModel.AssociatedServices.WithCount(0);
+            serviceRecipients = SectionModel.ServiceRecipients.WithCount(0);
+            catalogueSolutions = SectionModel.CatalogueSolutions.WithCount(0);
+            additionalServices = SectionModel.AdditionalServices.WithCount(0);
+            fundingSource = SectionModel.FundingSource;
         }
 
         public static SectionModelListBuilder Create() => new();
 
-        public SectionModelListBuilder WithDescription(SectionModel description)
+        public SectionModelListBuilder WithDescription(SectionModel descriptionSection)
         {
-            _description = description;
+            description = descriptionSection;
             return this;
         }
 
-        public SectionModelListBuilder WithOrderingParty(SectionModel orderingParty)
+        public SectionModelListBuilder WithOrderingParty(SectionModel orderingPartySection)
         {
-            _orderingParty = orderingParty;
+            orderingParty = orderingPartySection;
             return this;
         }
 
-        public SectionModelListBuilder WithSupplier(SectionModel supplier)
+        public SectionModelListBuilder WithSupplier(SectionModel supplierSection)
         {
-            _supplier = supplier;
+            supplier = supplierSection;
             return this;
         }
 
-        public SectionModelListBuilder WithCommencementDate(SectionModel commencementDate)
+        public SectionModelListBuilder WithCommencementDate(SectionModel commencementDateSection)
         {
-            _commencementDate = commencementDate;
+            commencementDate = commencementDateSection;
             return this;
         }
 
-        public SectionModelListBuilder WithServiceRecipients(SectionModel serviceRecipients)
+        public SectionModelListBuilder WithServiceRecipients(SectionModel serviceRecipientsSection)
         {
-            _serviceRecipients = serviceRecipients;
+            serviceRecipients = serviceRecipientsSection;
             return this;
         }
 
-        public SectionModelListBuilder WithAdditionalServices(SectionModel additionalServices)
+        public SectionModelListBuilder WithAdditionalServices(SectionModel additionalServicesSection)
         {
-            _additionalServices = additionalServices;
+            additionalServices = additionalServicesSection;
             return this;
         }
 
-        public SectionModelListBuilder WithCatalogueSolutions(SectionModel catalogueSolutions)
+        public SectionModelListBuilder WithCatalogueSolutions(SectionModel catalogueSolutionsSection)
         {
-            _catalogueSolutions = catalogueSolutions;
+            catalogueSolutions = catalogueSolutionsSection;
             return this;
         }
 
-        public SectionModelListBuilder WithAssociatedServices(SectionModel associatedServices)
+        public SectionModelListBuilder WithAssociatedServices(SectionModel associatedServicesSection)
         {
-            _associatedServices = associatedServices;
+            associatedServices = associatedServicesSection;
             return this;
         }
 
-        public SectionModelListBuilder WithFundingSource(SectionModel fundingSource)
+        public SectionModelListBuilder WithFundingSource(SectionModel fundingSourceSection)
         {
-            _fundingSource = fundingSource;
+            fundingSource = fundingSourceSection;
             return this;
         }
 
         public IEnumerable<SectionModel> Build()
         {
-            yield return _description;
-            yield return _orderingParty;
-            yield return _supplier;
-            yield return _commencementDate;
-            yield return _associatedServices;
-            yield return _serviceRecipients;
-            yield return _catalogueSolutions;
-            yield return _additionalServices;
-            yield return _fundingSource;
+            yield return description;
+            yield return orderingParty;
+            yield return supplier;
+            yield return commencementDate;
+            yield return associatedServices;
+            yield return serviceRecipients;
+            yield return catalogueSolutions;
+            yield return additionalServices;
+            yield return fundingSource;
         }
     }
 }
