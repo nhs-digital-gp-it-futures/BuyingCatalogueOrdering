@@ -12,20 +12,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     [Binding]
     internal sealed class GetOrderItemSteps
     {
-        private readonly Request _request;
-        private readonly Settings _settings;
-        private readonly OrderContext _orderContext;
-        private GetOrderItemRequest _getOrderItemRequest;
-        private GetOrderItemResponse _getOrderItemResponse;
+        private readonly Request request;
+        private readonly Settings settings;
+        private readonly OrderContext orderContext;
+        private GetOrderItemRequest getOrderItemRequest;
+        private GetOrderItemResponse getOrderItemResponse;
 
         public GetOrderItemSteps(
             Request request,
             Settings settings,
             OrderContext orderContext)
         {
-            _request = request ?? throw new ArgumentNullException(nameof(request));
-            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-            _orderContext = orderContext ?? throw new ArgumentNullException(nameof(orderContext));
+            this.request = request ?? throw new ArgumentNullException(nameof(request));
+            this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            this.orderContext = orderContext ?? throw new ArgumentNullException(nameof(orderContext));
         }
 
         [Given(@"the user creates a request to retrieve an order item with catalogue item name '(.*)' and order ID '(.*)'")]
@@ -33,11 +33,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             string catalogueSolutionName,
             string orderId)
         {
-            var orderItem = _orderContext.OrderItemReferenceList.GetByOrderCatalogueItemName(catalogueSolutionName);
+            var orderItem = orderContext.OrderItemReferenceList.GetByOrderCatalogueItemName(catalogueSolutionName);
 
-            _getOrderItemRequest = new GetOrderItemRequest(
-                _request,
-                _settings.OrderingApiBaseUrl,
+            getOrderItemRequest = new GetOrderItemRequest(
+                request,
+                settings.OrderingApiBaseUrl,
                 orderId,
                 orderItem.OrderItemId);
         }
@@ -45,11 +45,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Given(@"the user creates a request to retrieve an order item that does not exist")]
         public void GivenTheUserCreatesARequestToRetrieveAnOrderItemThatDoesNotExist()
         {
-            var order = _orderContext.OrderReferenceList.GetAll().First();
+            var order = orderContext.OrderReferenceList.GetAll().First();
 
-            _getOrderItemRequest = new GetOrderItemRequest(
-                _request,
-                _settings.OrderingApiBaseUrl,
+            getOrderItemRequest = new GetOrderItemRequest(
+                request,
+                settings.OrderingApiBaseUrl,
                 order.OrderId,
                 999);
         }
@@ -57,11 +57,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Given(@"the user creates a request to retrieve an order item for an order that does not exist")]
         public void GivenTheUserCreatesARequestToRetrieveAnOrderItemForAnOrderThatDoesNotExist()
         {
-            var orderItem = _orderContext.OrderItemReferenceList.GetAll().First();
+            var orderItem = orderContext.OrderItemReferenceList.GetAll().First();
 
-            _getOrderItemRequest = new GetOrderItemRequest(
-                _request,
-                _settings.OrderingApiBaseUrl,
+            getOrderItemRequest = new GetOrderItemRequest(
+                request,
+                settings.OrderingApiBaseUrl,
                 Guid.NewGuid().ToString(),
                 orderItem.OrderItemId);
         }
@@ -69,19 +69,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [When(@"the user sends the retrieve an order item request")]
         public async Task WhenTheUserSendsTheRetrieveAnOrderItemRequest()
         {
-            _getOrderItemResponse = await _getOrderItemRequest.ExecuteAsync();
+            getOrderItemResponse = await getOrderItemRequest.ExecuteAsync();
         }
 
         [Then(@"the response contains the expected order item")]
         public void ThenTheResponseContainsTheExpectedOrderItem()
         {
-            var orderItem = _orderContext
-                .OrderItemReferenceList.FindByOrderItemId(_getOrderItemRequest.OrderItemId);
+            var orderItem = orderContext
+                .OrderItemReferenceList.FindByOrderItemId(getOrderItemRequest.OrderItemId);
 
-            var serviceRecipient = _orderContext
-                .ServiceRecipientReferenceList.Get(_getOrderItemRequest.OrderId, orderItem.OdsCode);
+            var serviceRecipient = orderContext
+                .ServiceRecipientReferenceList.Get(getOrderItemRequest.OrderId, orderItem.OdsCode);
 
-            _getOrderItemResponse.AssertBody(orderItem, serviceRecipient);
+            getOrderItemResponse.AssertBody(orderItem, serviceRecipient);
         }
     }
 }

@@ -6,8 +6,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 {
     internal sealed class GetOrderItemsRequest
     {
-        private readonly Request _request;
-        private readonly string _getOrderItemUrl;
+        private readonly Request request;
+        private readonly string getOrderItemUrl;
 
         public GetOrderItemsRequest(
             Request request,
@@ -15,15 +15,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             string orderId,
             string catalogueItemType)
         {
-            _request = request;
+            this.request = request;
             OrderId = orderId;
             CatalogueItemType = catalogueItemType;
 
-            _getOrderItemUrl = $"{orderingApiBaseAddress}/api/v1/orders/{orderId}/order-items";
+            getOrderItemUrl = $"{orderingApiBaseAddress}/api/v1/orders/{orderId}/order-items";
 
             if (!string.IsNullOrWhiteSpace(CatalogueItemType))
             {
-                _getOrderItemUrl += $"?catalogueItemType={CatalogueItemType}";
+                getOrderItemUrl += $"?catalogueItemType={CatalogueItemType}";
             }
         }
 
@@ -33,7 +33,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 
         public async Task<GetOrderItemsResponse> ExecuteAsync()
         {
-            var response = await _request.GetAsync(_getOrderItemUrl);
+            var response = await request.GetAsync(getOrderItemUrl);
             return new GetOrderItemsResponse(response);
         }
     }

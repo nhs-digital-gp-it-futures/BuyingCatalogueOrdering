@@ -6,42 +6,42 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
 {
     internal sealed class UpdateOrderItemRequestPayloadBuilder
     {
-        private DateTime? _deliveryDate;
-        private TimeUnit? _estimationPeriod;
-        private decimal? _price;
-        private int? _quantity;
+        private DateTime? deliveryDate;
+        private TimeUnit? estimationPeriod;
+        private decimal? price;
+        private int? quantity;
 
         private UpdateOrderItemRequestPayloadBuilder()
         {
-            _deliveryDate = new DateTime(2021, 1, 1);
-            _estimationPeriod = TimeUnit.Month;
-            _price = 100.0m;
-            _quantity = 100;
+            deliveryDate = new DateTime(2021, 1, 1);
+            estimationPeriod = TimeUnit.Month;
+            price = 100.0m;
+            quantity = 100;
         }
 
         public static UpdateOrderItemRequestPayloadBuilder Create() => new();
 
-        public UpdateOrderItemRequestPayloadBuilder WithDeliveryDate(DateTime? deliveryDate)
+        public UpdateOrderItemRequestPayloadBuilder WithDeliveryDate(DateTime? date)
         {
-            _deliveryDate = deliveryDate;
+            deliveryDate = date;
             return this;
         }
 
-        public UpdateOrderItemRequestPayloadBuilder WithEstimationPeriod(TimeUnit? estimationPeriod)
+        public UpdateOrderItemRequestPayloadBuilder WithEstimationPeriod(TimeUnit? period)
         {
-            _estimationPeriod = estimationPeriod;
+            estimationPeriod = period;
             return this;
         }
 
-        public UpdateOrderItemRequestPayloadBuilder WithPrice(decimal? price)
+        public UpdateOrderItemRequestPayloadBuilder WithPrice(decimal? cost)
         {
-            _price = price;
+            price = cost;
             return this;
         }
 
-        public UpdateOrderItemRequestPayloadBuilder WithQuantity(int? quantity)
+        public UpdateOrderItemRequestPayloadBuilder WithQuantity(int? number)
         {
-            _quantity = quantity;
+            quantity = number;
             return this;
         }
 
@@ -49,10 +49,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
         {
             return new()
             {
-                DeliveryDate = _deliveryDate,
-                EstimationPeriod = _estimationPeriod,
-                Price = _price,
-                Quantity = _quantity,
+                DeliveryDate = deliveryDate,
+                EstimationPeriod = estimationPeriod,
+                Price = price,
+                Quantity = quantity,
             };
         }
     }

@@ -4,11 +4,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
 {
     public sealed class ContactEntityBuilder
     {
-        private readonly ContactEntity _contactEntity;
+        private readonly ContactEntity contactEntity;
 
         public ContactEntityBuilder()
         {
-            _contactEntity = new ContactEntity();
+            contactEntity = new ContactEntity();
         }
 
         public static ContactEntityBuilder Create()
@@ -18,31 +18,31 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
 
         public ContactEntityBuilder WithFirstName(string firstName)
         {
-            _contactEntity.FirstName = firstName;
+            contactEntity.FirstName = firstName;
             return this;
         }
 
         public ContactEntityBuilder WithLastName(string lastName)
         {
-            _contactEntity.LastName = lastName;
+            contactEntity.LastName = lastName;
             return this;
         }
 
         public ContactEntityBuilder WithEmail(string email)
         {
-            _contactEntity.Email = email;
+            contactEntity.Email = email;
             return this;
         }
 
         public ContactEntityBuilder WithPhone(string phone)
         {
-            _contactEntity.Phone = phone;
+            contactEntity.Phone = phone;
             return this;
         }
 
         public ContactEntity Build()
         {
-            return _contactEntity;
+            return contactEntity;
         }
     }
 }

@@ -10,40 +10,40 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     [Binding]
     internal class FundingSourceSteps
     {
-        private readonly Request _request;
-        private readonly Settings _settings;
+        private readonly Request request;
+        private readonly Settings settings;
 
-        private UpdateFundingSourceRequest _fundingSourceRequest;
+        private UpdateFundingSourceRequest fundingSourceRequest;
 
         public FundingSourceSteps(Request request, Settings settings)
         {
-            _request = request;
-            _settings = settings;
+            this.request = request;
+            this.settings = settings;
         }
 
         [Given(@"the user creates a request to update the funding source for the order with ID '(.*)'")]
         public void GivenTheUserCreatesARequestToUpdateFundingSourceForOrderWithId(string orderId)
         {
-            _fundingSourceRequest = new UpdateFundingSourceRequest(_request, _settings.OrderingApiBaseUrl, orderId);
+            fundingSourceRequest = new UpdateFundingSourceRequest(request, settings.OrderingApiBaseUrl, orderId);
         }
 
         [Given(@"the user enters the '(.*)' update funding source request payload")]
         public void GivenTheUserEntersPayload(string payloadTypeKey)
         {
-            _fundingSourceRequest.SetPayload(payloadTypeKey);
+            fundingSourceRequest.SetPayload(payloadTypeKey);
         }
 
         [When(@"the user sends the update funding source request")]
         public async Task WhenTheUserSendsTheRequest()
         {
-            await _fundingSourceRequest.ExecuteAsync();
+            await fundingSourceRequest.ExecuteAsync();
         }
 
         [Then(@"the funding source is set correctly")]
         public async Task ThenTheExpectedCatalogueSolutionOrderItemIsCreated()
         {
-            var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, _fundingSourceRequest.OrderId);
-            order.FundingSourceOnlyGMS.Should().Be(_fundingSourceRequest.Payload.OnlyGMS);
+            var order = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, fundingSourceRequest.OrderId);
+            order.FundingSourceOnlyGms.Should().Be(fundingSourceRequest.Payload.OnlyGms);
         }
     }
 }

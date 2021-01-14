@@ -9,8 +9,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 {
     internal class UpdateOrderStatusRequest
     {
-        private readonly Request _request;
-        private readonly string _updateOrderStatusUrl;
+        private readonly Request request;
+        private readonly string updateOrderStatusUrl;
 
         public string OrderId { get; set; }
 
@@ -26,10 +26,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 
         public UpdateOrderStatusRequest(Request request, string orderingApiBaseAddress, string orderId)
         {
-            _request = request ?? throw new ArgumentNullException(nameof(request));
+            this.request = request ?? throw new ArgumentNullException(nameof(request));
             OrderId = orderId ?? throw new ArgumentNullException(nameof(orderId));
 
-            _updateOrderStatusUrl =
+            updateOrderStatusUrl =
                 $"{orderingApiBaseAddress}/api/v1/orders/{orderId}/status";
         }
 
@@ -46,7 +46,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 
         public async Task ExecuteAsync()
         {
-            await _request.PutJsonAsync(_updateOrderStatusUrl, Payload);
+            await request.PutJsonAsync(updateOrderStatusUrl, Payload);
         }
     }
 }

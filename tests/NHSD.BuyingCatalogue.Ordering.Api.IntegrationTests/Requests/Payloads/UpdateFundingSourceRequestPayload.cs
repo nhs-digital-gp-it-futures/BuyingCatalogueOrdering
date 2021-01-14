@@ -2,6 +2,6 @@
 {
     internal sealed class UpdateFundingSourceRequestPayload
     {
-        public bool? OnlyGMS { get; set; }
+        public bool? OnlyGms { get; set; }
     }
 }

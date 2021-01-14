@@ -13,12 +13,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     [Binding]
     internal sealed class SupplierSectionSteps
     {
-        private readonly ScenarioContext _context;
-        private readonly Request _request;
-        private readonly Response _response;
-        private readonly Settings _settings;
+        private readonly ScenarioContext context;
+        private readonly Request request;
+        private readonly Response response;
+        private readonly Settings settings;
 
-        private readonly string _orderSupplierSectionUrl;
+        private readonly string orderSupplierSectionUrl;
 
         public SupplierSectionSteps(
             ScenarioContext context,
@@ -26,29 +26,29 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             Response response,
             Settings settings)
         {
-            _context = context;
-            _request = request;
-            _response = response;
-            _settings = settings;
+            this.context = context;
+            this.request = request;
+            this.response = response;
+            this.settings = settings;
 
-            _orderSupplierSectionUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/supplier";
+            orderSupplierSectionUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/supplier";
         }
 
         [When(@"the user makes a request to retrieve the order supplier section with the ID (.*)")]
         public async Task WhenTheUserMakesARequestToRetrieveTheOrderSupplierSectionWithId(string orderId)
         {
-            await _request.GetAsync(string.Format(_orderSupplierSectionUrl, orderId));
+            await request.GetAsync(string.Format(orderSupplierSectionUrl, orderId));
         }
 
         [Then(@"the response contains the following supplier details")]
         public async Task ThenTheResponseContainsTheFollowingSupplierDetails(Table table)
         {
-            var response = await _response.ReadBodyAsJsonAsync();
+            var jsonResponse = await response.ReadBodyAsJsonAsync();
 
             var actual = new SupplierSectionTable
             {
-                SupplierId = response.Value<string>("supplierId"),
-                SupplierName = response.Value<string>("name"),
+                SupplierId = jsonResponse.Value<string>("supplierId"),
+                SupplierName = jsonResponse.Value<string>("name"),
             };
 
             var expected = table.CreateInstance<SupplierSectionTable>();
@@ -58,9 +58,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Then(@"the response contains the following primary supplier contact details")]
         public async Task ThenTheResponseContainsTheFollowingSupplierContactDetails(Table table)
         {
-            var response = await _response.ReadBodyAsJsonAsync();
+            var jsonResponse = await response.ReadBodyAsJsonAsync();
 
-            var primaryContactResponse = response.SelectToken("primaryContact");
+            var primaryContactResponse = jsonResponse.SelectToken("primaryContact");
             Assert.IsNotNull(primaryContactResponse);
 
             var actual = new SupplierContactTable
@@ -78,9 +78,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Then(@"the response contains the following supplier address")]
         public async Task ThenTheResponseContainsTheFollowingSupplierAddress(Table table)
         {
-            var response = await _response.ReadBodyAsJsonAsync();
+            var jsonResponse = await response.ReadBodyAsJsonAsync();
 
-            var address = response.SelectToken("address");
+            var address = jsonResponse.SelectToken("address");
             Assert.IsNotNull(address);
 
             var actual = new SupplierAddressTable
@@ -105,8 +105,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var supplierTable = table.CreateInstance<SupplierSectionTable>();
 
-            _context.TryGetValue(ScenarioContextKeys.SupplierAddress, out var address);
-            _context.TryGetValue(ScenarioContextKeys.SupplierContact, out var contact);
+            context.TryGetValue(ScenarioContextKeys.SupplierAddress, out var address);
+            context.TryGetValue(ScenarioContextKeys.SupplierContact, out var contact);
 
             var data = new
             {
@@ -116,13 +116,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 PrimaryContact = contact,
             };
 
-            await _request.PutJsonAsync(string.Format(_orderSupplierSectionUrl, orderId), data);
+            await request.PutJsonAsync(string.Format(orderSupplierSectionUrl, orderId), data);
         }
 
         [When(@"the user makes a request to update the supplier with order ID (.*) with no model")]
         public async Task WhenTheUserMakesARequestToUpdateTheSupplierWithOrderIdWithNoModel(string orderId)
         {
-            await _request.PutJsonAsync(string.Format(_orderSupplierSectionUrl, orderId), null);
+            await request.PutJsonAsync(string.Format(orderSupplierSectionUrl, orderId), null);
         }
 
         [Then(@"the supplier address for order (.*) is")]
@@ -130,10 +130,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var address = table.CreateInstance<SupplierAddressTable>();
 
-            var addressId = (int)(await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId))
+            var addressId = (int)(await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId))
                 .SupplierAddressId;
 
-            var actual = await AddressEntity.FetchAddressById(_settings.ConnectionString, addressId);
+            var actual = await AddressEntity.FetchAddressById(settings.ConnectionString, addressId);
 
             actual.Should().BeEquivalentTo(address);
         }
@@ -143,10 +143,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var contact = table.CreateInstance<SupplierContactTable>();
 
-            var contactId = (int)(await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId))
+            var contactId = (int)(await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId))
                 .SupplierContactId;
 
-            var actual = await ContactEntity.FetchContactById(_settings.ConnectionString, contactId);
+            var actual = await ContactEntity.FetchContactById(settings.ConnectionString, contactId);
             actual.Should().BeEquivalentTo(contact);
         }
 
@@ -155,7 +155,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var supplier = table.CreateInstance<SupplierSectionTable>();
 
-            var order = await OrderEntity.FetchOrderByOrderId(_settings.ConnectionString, orderId);
+            var order = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);
 
             var actual = new { order.SupplierId, order.SupplierName };
             actual.Should().BeEquivalentTo(supplier);
@@ -165,14 +165,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public void WhenTheUserWantsToUpdateTheSupplierAddressSection(Table table)
         {
             var address = table.CreateInstance<SupplierAddressTable>();
-            _context[ScenarioContextKeys.SupplierAddress] = address;
+            context[ScenarioContextKeys.SupplierAddress] = address;
         }
 
         [Given(@"the user wants to update the supplier contact section")]
         public void WhenTheUserWantsToUpdateTheSectionForTheContact(Table table)
         {
             var contact = table.CreateInstance<ContactTable>();
-            _context[ScenarioContextKeys.SupplierContact] = contact;
+            context[ScenarioContextKeys.SupplierContact] = contact;
         }
 
         private sealed class SupplierSectionTable
@@ -196,21 +196,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private sealed class ContactTable
         {
             public string FirstName { get; set; }
+
             public string LastName { get; set; }
+
             public string EmailAddress { get; set; }
+
             public string TelephoneNumber { get; set; }
         }
 
         private sealed class SupplierAddressTable
         {
             public string Line1 { get; set; }
+
             public string Line2 { get; set; }
+
             public string Line3 { get; set; }
+
             public string Line4 { get; set; }
+
             public string Line5 { get; set; }
+
             public string Town { get; set; }
+
             public string County { get; set; }
+
             public string Postcode { get; set; }
+
             public string Country { get; set; }
         }
     }

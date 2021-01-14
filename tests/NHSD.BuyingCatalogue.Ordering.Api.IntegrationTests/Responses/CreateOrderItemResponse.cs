@@ -5,15 +5,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 {
     internal sealed class CreateOrderItemResponse
     {
-        private readonly Response _response;
+        private readonly Response response;
 
         public CreateOrderItemResponse(
             Response response)
         {
-            _response = response;
+            this.response = response;
         }
 
         public async Task<int?> GetOrderItemIdAsync() =>
-            (await _response.ReadBodyAsJsonAsync()).Value<int>("orderItemId");
+            (await response.ReadBodyAsJsonAsync()).Value<int>("orderItemId");
     }
 }

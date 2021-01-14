@@ -7,16 +7,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
 {
     internal sealed class OrderSummaryDataBuilder
     {
-        private OrderEntity _orderEntity;
-        private ServiceRecipientEntity _serviceRecipientEntity;
-        private OrderItemEntity _catalogueSolutionEntity;
-        private OrderItemEntity _associatedServiceEntity;
-        private OrderItemEntity _additionalServiceEntity;
-        private bool _serviceRecipientsViewed = true;
-        private bool _additionalServicesViewed = true;
-        private bool _associatedServicesViewed = true;
-        private bool _catalogueSolutionsViewed = true;
-        private bool? _fundingSource = true;
+        private OrderEntity orderEntity;
+        private ServiceRecipientEntity serviceRecipientEntity;
+        private OrderItemEntity catalogueSolutionEntity;
+        private OrderItemEntity associatedServiceEntity;
+        private OrderItemEntity additionalServiceEntity;
+        private bool serviceRecipientsViewed = true;
+        private bool additionalServicesViewed = true;
+        private bool associatedServicesViewed = true;
+        private bool catalogueSolutionsViewed = true;
+        private bool? fundingSource = true;
 
         private OrderSummaryDataBuilder(string orderId = "C000016-01")
         {
@@ -36,78 +36,78 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
 
         public static OrderSummaryDataBuilder Create(string orderId = "C000016-01") => new(orderId);
 
-        public OrderSummaryDataBuilder WithOrderEntity(OrderEntity orderEntity)
+        public OrderSummaryDataBuilder WithOrderEntity(OrderEntity entity)
         {
-            _orderEntity = orderEntity;
+            orderEntity = entity;
             return this;
         }
 
         public OrderSummaryDataBuilder WithServiceRecipientViewed(bool viewed)
         {
-            _serviceRecipientsViewed = viewed;
+            serviceRecipientsViewed = viewed;
             return this;
         }
 
         public OrderSummaryDataBuilder WithAdditionalServiceViewed(bool viewed)
         {
-            _additionalServicesViewed = viewed;
+            additionalServicesViewed = viewed;
             return this;
         }
 
         public OrderSummaryDataBuilder WithAssociatedServicesViewed(bool viewed)
         {
-            _associatedServicesViewed = viewed;
+            associatedServicesViewed = viewed;
             return this;
         }
 
         public OrderSummaryDataBuilder WithCatalogueSolutionsViewed(bool viewed)
         {
-            _catalogueSolutionsViewed = viewed;
+            catalogueSolutionsViewed = viewed;
             return this;
         }
 
         public OrderSummaryDataBuilder WithFundingSourceOnlyGMS(bool? funded)
         {
-            _fundingSource = funded;
+            fundingSource = funded;
             return this;
         }
 
-        public OrderSummaryDataBuilder WithCatalogueSolutionEntity(OrderItemEntity catalogueSolutionEntity)
+        public OrderSummaryDataBuilder WithCatalogueSolutionEntity(OrderItemEntity entity)
         {
-            _catalogueSolutionEntity = catalogueSolutionEntity;
+            catalogueSolutionEntity = entity;
             return this;
         }
 
-        public OrderSummaryDataBuilder WithServiceRecipientEntity(ServiceRecipientEntity serviceRecipientEntity)
+        public OrderSummaryDataBuilder WithServiceRecipientEntity(ServiceRecipientEntity entity)
         {
-            _serviceRecipientEntity = serviceRecipientEntity;
+            serviceRecipientEntity = entity;
             return this;
         }
 
-        public OrderSummaryDataBuilder WithAdditionalServicesEntity(OrderItemEntity additionalServiceEntity)
+        public OrderSummaryDataBuilder WithAdditionalServicesEntity(OrderItemEntity entity)
         {
-            _additionalServiceEntity = additionalServiceEntity;
+            additionalServiceEntity = entity;
             return this;
         }
 
-        public OrderSummaryDataBuilder WithAssociatedServicesEntity(OrderItemEntity associatedServicesEntity)
+        public OrderSummaryDataBuilder WithAssociatedServicesEntity(OrderItemEntity entity)
         {
-            _associatedServiceEntity = associatedServicesEntity;
+            associatedServiceEntity = entity;
             return this;
         }
 
         public OrderSummaryData Build()
         {
-            if (_orderEntity != null)
+            if (orderEntity != null)
             {
-                _orderEntity.ServiceRecipientsViewed = _serviceRecipientsViewed;
-                _orderEntity.AdditionalServicesViewed = _additionalServicesViewed;
-                _orderEntity.AssociatedServicesViewed = _associatedServicesViewed;
-                _orderEntity.CatalogueSolutionsViewed = _catalogueSolutionsViewed;
-                _orderEntity.FundingSourceOnlyGMS = _fundingSource;
+                orderEntity.ServiceRecipientsViewed = serviceRecipientsViewed;
+                orderEntity.AdditionalServicesViewed = additionalServicesViewed;
+                orderEntity.AssociatedServicesViewed = associatedServicesViewed;
+                orderEntity.CatalogueSolutionsViewed = catalogueSolutionsViewed;
+                orderEntity.FundingSourceOnlyGms = fundingSource;
             }
 
-            return new OrderSummaryData(_orderEntity, _serviceRecipientEntity, _catalogueSolutionEntity, _additionalServiceEntity, _associatedServiceEntity);
+            return new OrderSummaryData(orderEntity, serviceRecipientEntity, catalogueSolutionEntity, additionalServiceEntity, associatedServiceEntity);
         }
     }
 }

@@ -14,14 +14,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
     [Binding]
     public sealed class IntegrationHook
     {
-        private readonly IObjectContainer _objectContainer;
-        private readonly OrderingApiHealthCheck _orderingApiHealthCheck;
-        private static bool _firstScenario = true;
+        private readonly IObjectContainer objectContainer;
+        private readonly OrderingApiHealthCheck orderingApiHealthCheck;
+        private static bool firstScenario = true;
 
         public IntegrationHook(IObjectContainer objectContainer, OrderingApiHealthCheck orderingApiHealthCheck)
         {
-            _objectContainer = objectContainer ?? throw new ArgumentNullException(nameof(objectContainer));
-            _orderingApiHealthCheck = orderingApiHealthCheck;
+            this.objectContainer = objectContainer ?? throw new ArgumentNullException(nameof(objectContainer));
+            this.orderingApiHealthCheck = orderingApiHealthCheck;
         }
 
         [BeforeScenario]
@@ -30,10 +30,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
             RegisterTestConfiguration();
             RegisterCustomValueRetrievers();
 
-            if (_firstScenario)
+            if (firstScenario)
             {
-                _firstScenario = false;
-                await _orderingApiHealthCheck.AwaitApiRunningAsync(_objectContainer.Resolve<Settings>());
+                firstScenario = false;
+                await orderingApiHealthCheck.AwaitApiRunningAsync(objectContainer.Resolve<Settings>());
             }
 
             await ResetDatabaseAsync();
@@ -52,8 +52,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
                 .AddEnvironmentVariables()
                 .Build();
 
-            _objectContainer.RegisterInstanceAs<IConfiguration>(configurationBuilder);
-            _objectContainer.RegisterInstanceAs(
+            objectContainer.RegisterInstanceAs<IConfiguration>(configurationBuilder);
+            objectContainer.RegisterInstanceAs(
                 new EmailServerDriverSettings(configurationBuilder.GetValue<Uri>("SmtpServerApiBaseUrl")));
         }
 
@@ -67,11 +67,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
         }
 
         private async Task ResetDatabaseAsync() =>
-            await IntegrationDatabase.ResetAsync(_objectContainer.Resolve<IConfiguration>());
+            await IntegrationDatabase.ResetAsync(objectContainer.Resolve<IConfiguration>());
 
         private async Task DeleteAllSentEmailsAsync()
         {
-            var emailServerDriver = _objectContainer.Resolve<EmailServerDriver>();
+            var emailServerDriver = objectContainer.Resolve<EmailServerDriver>();
             await emailServerDriver.ClearAllEmailsAsync();
         }
     }

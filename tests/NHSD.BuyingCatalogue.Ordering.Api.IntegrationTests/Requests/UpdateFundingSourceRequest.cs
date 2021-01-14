@@ -9,8 +9,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 {
     internal class UpdateFundingSourceRequest
     {
-        private readonly Request _request;
-        private readonly string _updateFundingSourceUrl;
+        private readonly Request request;
+        private readonly string updateFundingSourceUrl;
 
         public string OrderId { get; set; }
 
@@ -18,9 +18,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 
         protected IDictionary<string, Func<UpdateFundingSourceRequestPayload>> payloadFactory = new Dictionary<string, Func<UpdateFundingSourceRequestPayload>>
         {
-            { "funding-source-true", () => new UpdateFundingSourceRequestPayload { OnlyGMS = true } },
-            { "funding-source-false", () => new UpdateFundingSourceRequestPayload { OnlyGMS = false } },
-            { "funding-source-missing", () => new UpdateFundingSourceRequestPayload { OnlyGMS = null } },
+            { "funding-source-true", () => new UpdateFundingSourceRequestPayload { OnlyGms = true } },
+            { "funding-source-false", () => new UpdateFundingSourceRequestPayload { OnlyGms = false } },
+            { "funding-source-missing", () => new UpdateFundingSourceRequestPayload { OnlyGms = null } },
         };
 
         public UpdateFundingSourceRequest(
@@ -28,10 +28,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             string orderingApiBaseAddress,
             string orderId)
         {
-            _request = request ?? throw new ArgumentNullException(nameof(request));
+            this.request = request ?? throw new ArgumentNullException(nameof(request));
             OrderId = orderId ?? throw new ArgumentNullException(nameof(orderId));
 
-            _updateFundingSourceUrl =
+            updateFundingSourceUrl =
                 $"{orderingApiBaseAddress}/api/v1/orders/{orderId}/funding-source";
         }
 
@@ -48,7 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 
         public async Task ExecuteAsync()
         {
-            await _request.PutJsonAsync(_updateFundingSourceUrl, Payload);
+            await request.PutJsonAsync(updateFundingSourceUrl, Payload);
         }
     }
 }

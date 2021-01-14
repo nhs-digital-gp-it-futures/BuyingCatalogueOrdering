@@ -111,7 +111,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Then(@"each order item has the expected service instance ID as follows")]
-        public async Task ThenEachOrderItemHasTheExpectedServiceInstanceIDAsFollows(Table table)
+        public async Task ThenEachOrderItemHasTheExpectedServiceInstanceIdAsFollows(Table table)
         {
             var expected = table.CreateSet<ServiceInstanceItem>();
             await getOrderItemsResponse.AssertServiceInstanceIdAsync(expected);

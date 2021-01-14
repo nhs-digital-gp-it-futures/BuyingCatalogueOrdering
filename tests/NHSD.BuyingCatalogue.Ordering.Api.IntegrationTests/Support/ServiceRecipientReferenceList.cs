@@ -8,25 +8,25 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
 {
     internal sealed class ServiceRecipientReferenceList
     {
-        private readonly Dictionary<string, ServiceRecipientEntity> _cache = new();
+        private readonly Dictionary<string, ServiceRecipientEntity> cache = new();
 
         public void Add(ServiceRecipientEntity entity)
         {
             string key = GenerateKey(entity.OrderId, entity.OdsCode);
-            _cache.ContainsKey(key).Should().BeFalse();
-            _cache.Add(key, entity);
+            cache.ContainsKey(key).Should().BeFalse();
+            cache.Add(key, entity);
         }
 
         public IEnumerable<ServiceRecipientEntity> FindByOrderId(string orderId) =>
-            _cache.Values.Where(x => string.Equals(x.OrderId, orderId, StringComparison.OrdinalIgnoreCase));
+            cache.Values.Where(x => string.Equals(x.OrderId, orderId, StringComparison.OrdinalIgnoreCase));
 
         public ServiceRecipientEntity Get(string orderId, string odsCode)
         {
             string key = GenerateKey(orderId, odsCode);
-            return _cache[key];
+            return cache[key];
         }
 
-        private string GenerateKey(string orderId, string odsCode)
+        private static string GenerateKey(string orderId, string odsCode)
         {
             return $"{orderId?.ToUpperInvariant()}_{odsCode?.ToUpperInvariant()}";
         }
