@@ -222,12 +222,6 @@ dotnet_diagnostic.SA1633.severity = none
 # SA1503: Braces should not be omitted
 dotnet_diagnostic.SA1503.severity = none
 
-# SA1401: Fields should be private
-dotnet_diagnostic.SA1401.severity = none
-
-# SA1516: Elements should be separated by blank line
-dotnet_diagnostic.SA1516.severity = none
-
 # SA1600: Elements should be documented
 dotnet_diagnostic.SA1600.severity = none
 

@@ -12,11 +12,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
         private readonly Request request;
         private readonly string updateFundingSourceUrl;
 
-        public string OrderId { get; set; }
-
-        public UpdateFundingSourceRequestPayload Payload { get; private set; }
-
-        protected IDictionary<string, Func<UpdateFundingSourceRequestPayload>> payloadFactory = new Dictionary<string, Func<UpdateFundingSourceRequestPayload>>
+        private readonly Dictionary<string, Func<UpdateFundingSourceRequestPayload>> payloadFactory = new()
         {
             { "funding-source-true", () => new UpdateFundingSourceRequestPayload { OnlyGms = true } },
             { "funding-source-false", () => new UpdateFundingSourceRequestPayload { OnlyGms = false } },
@@ -34,6 +30,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             updateFundingSourceUrl =
                 $"{orderingApiBaseAddress}/api/v1/orders/{orderId}/funding-source";
         }
+
+        public string OrderId { get; set; }
+
+        public UpdateFundingSourceRequestPayload Payload { get; private set; }
 
         public void SetPayload(string key)
         {

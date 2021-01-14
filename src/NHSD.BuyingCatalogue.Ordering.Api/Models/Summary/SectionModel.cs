@@ -4,15 +4,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models.Summary
 {
     public sealed class SectionModel
     {
-        internal static SectionModel Description => new("description", "complete");
-        internal static SectionModel OrderingParty => new("ordering-party");
-        internal static SectionModel Supplier => new("supplier");
-        internal static SectionModel CommencementDate => new("commencement-date");
-        internal static SectionModel AssociatedServices => new("associated-services");
-        internal static SectionModel ServiceRecipients => new("service-recipients");
-        internal static SectionModel CatalogueSolutions => new("catalogue-solutions");
-        internal static SectionModel AdditionalServices => new("additional-services");
-        internal static SectionModel FundingSource => new("funding-source");
+        private SectionModel(string id, string status = "incomplete")
+        {
+            Id = id ?? throw new ArgumentNullException(nameof(id));
+            Status = status ?? throw new ArgumentNullException(nameof(status));
+        }
 
         public string Id { get; }
 
@@ -20,11 +16,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models.Summary
 
         public int? Count { get; private set; }
 
-        private SectionModel(string id, string status = "incomplete")
-        {
-            Id = id ?? throw new ArgumentNullException(nameof(id));
-            Status = status ?? throw new ArgumentNullException(nameof(status));
-        }
+        internal static SectionModel Description => new("description", "complete");
+
+        internal static SectionModel OrderingParty => new("ordering-party");
+
+        internal static SectionModel Supplier => new("supplier");
+
+        internal static SectionModel CommencementDate => new("commencement-date");
+
+        internal static SectionModel AssociatedServices => new("associated-services");
+
+        internal static SectionModel ServiceRecipients => new("service-recipients");
+
+        internal static SectionModel CatalogueSolutions => new("catalogue-solutions");
+
+        internal static SectionModel AdditionalServices => new("additional-services");
+
+        internal static SectionModel FundingSource => new("funding-source");
 
         public SectionModel WithStatus(string status)
         {

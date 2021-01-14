@@ -12,11 +12,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
         private readonly Request request;
         private readonly string updateOrderStatusUrl;
 
-        public string OrderId { get; set; }
-
-        public UpdateOrderStatusRequestPayload Payload { get; private set; }
-
-        protected IDictionary<string, Func<UpdateOrderStatusRequestPayload>> payloadFactory = new Dictionary<string, Func<UpdateOrderStatusRequestPayload>>
+        private readonly Dictionary<string, Func<UpdateOrderStatusRequestPayload>> payloadFactory = new()
         {
             { "order-status-complete", () => new UpdateOrderStatusRequestPayload { Status = "Complete" } },
             { "order-status-incomplete", () => new UpdateOrderStatusRequestPayload { Status = "Incomplete" } },
@@ -32,6 +28,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             updateOrderStatusUrl =
                 $"{orderingApiBaseAddress}/api/v1/orders/{orderId}/status";
         }
+
+        public string OrderId { get; set; }
+
+        public UpdateOrderStatusRequestPayload Payload { get; private set; }
 
         public void SetPayload(string key)
         {
