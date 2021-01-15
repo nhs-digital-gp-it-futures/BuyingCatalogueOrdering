@@ -45,7 +45,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var expected = table.CreateSet<CommencementDateTable>().FirstOrDefault();
 
-            var apiReponse = await this.response.ReadBodyAsJsonAsync();
+            var apiReponse = await response.ReadBodyAsJsonAsync();
 
             var actual = new CommencementDateTable
             {
