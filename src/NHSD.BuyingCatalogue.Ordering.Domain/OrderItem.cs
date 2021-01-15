@@ -10,6 +10,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         // Cannot be read-only so that EF Core can set value
         [UsedImplicitly]
         private DateTime created;
+
         private DateTime lastUpdated;
 
         // Cannot be read-only so that EF Core can set value

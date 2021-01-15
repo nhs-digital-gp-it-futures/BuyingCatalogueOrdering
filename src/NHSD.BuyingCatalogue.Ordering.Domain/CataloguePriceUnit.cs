@@ -6,10 +6,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class CataloguePriceUnit : ValueObject
     {
-        public string Name { get; }
-
-        public string Description { get; }
-
         private CataloguePriceUnit()
         {
         }
@@ -22,6 +18,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             Name = name;
             Description = description;
         }
+
+        public string Name { get; }
+
+        public string Description { get; }
 
         public static CataloguePriceUnit Create(string name, string description)
         {

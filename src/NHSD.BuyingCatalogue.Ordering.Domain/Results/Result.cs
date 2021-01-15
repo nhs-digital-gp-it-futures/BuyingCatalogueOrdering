@@ -9,10 +9,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Results
     {
         private static readonly Result SuccessfulResult = new();
 
-        public bool IsSuccess { get; }
-
-        public IReadOnlyCollection<ErrorDetails> Errors { get; }
-
         private Result()
             : this(true, Enumerable.Empty<ErrorDetails>())
         {
@@ -28,6 +24,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Results
             IsSuccess = isSuccess;
             Errors = new ReadOnlyCollection<ErrorDetails>(errors != null ? errors.ToList() : new List<ErrorDetails>());
         }
+
+        public bool IsSuccess { get; }
+
+        public IReadOnlyCollection<ErrorDetails> Errors { get; }
 
         public static Result Success()
         {
@@ -59,17 +59,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Results
             return new(false, errors, default);
         }
 
-        private static bool AreErrorsEqual(IEnumerable<ErrorDetails> first, IEnumerable<ErrorDetails> second)
-        {
-            if (first is null)
-                return second is null;
-
-            if (second is null)
-                return false;
-
-            return first.SequenceEqual(second);
-        }
-
         public bool Equals(Result other)
         {
             return other is object
@@ -85,6 +74,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Results
         public override int GetHashCode()
         {
             return HashCode.Combine(IsSuccess, Errors);
+        }
+
+        private static bool AreErrorsEqual(IEnumerable<ErrorDetails> first, IEnumerable<ErrorDetails> second)
+        {
+            if (first is null)
+                return second is null;
+
+            if (second is null)
+                return false;
+
+            return first.SequenceEqual(second);
         }
     }
 }

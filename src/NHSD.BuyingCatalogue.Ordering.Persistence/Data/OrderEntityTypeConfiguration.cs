@@ -29,16 +29,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
             builder.HasMany(o => o.ServiceRecipients)
                 .WithOne(r => r.Order);
 
-            builder
-                .Property(o => o.OrderStatus)
+            builder.Property(o => o.OrderStatus)
                 .HasConversion(status => status.Id, id => OrderStatus.FromId(id))
                 .HasColumnName("OrderStatusId");
 
-            builder.HasQueryFilter(p => !p.IsDeleted);
+            builder.Property(o => o.FundingSourceOnlyGms)
+                .HasColumnName("FundingSourceOnlyGMS");
 
             builder.Property(o => o.Completed)
                 .HasCamelCaseBackingField(nameof(Order.Completed))
                 .HasColumnName("Completed");
+
+            builder.HasQueryFilter(p => !p.IsDeleted);
         }
     }
 }

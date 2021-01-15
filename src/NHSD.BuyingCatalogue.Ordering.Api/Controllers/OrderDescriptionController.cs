@@ -52,7 +52,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpPut]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult> UpdateAsync([FromRoute][Required]string orderId, [FromBody][Required] OrderDescriptionModel model)
+        public async Task<ActionResult> UpdateAsync(string orderId, OrderDescriptionModel model)
         {
             if (model is null)
             {

@@ -11,9 +11,9 @@
             ServiceRecipientReferenceList = new ServiceRecipientReferenceList();
         }
 
-        public AddressReferenceList AddressReferenceList { get;  }
+        public AddressReferenceList AddressReferenceList { get; }
 
-        public ContactReferenceList ContactReferenceList { get;  }
+        public ContactReferenceList ContactReferenceList { get; }
 
         public OrderReferenceList OrderReferenceList { get; }
 

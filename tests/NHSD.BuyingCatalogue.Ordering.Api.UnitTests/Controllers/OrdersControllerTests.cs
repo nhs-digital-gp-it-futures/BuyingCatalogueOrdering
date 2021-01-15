@@ -709,7 +709,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 DateCreated = repositoryOrder.Created,
                 LastUpdated = repositoryOrder.LastUpdated,
                 LastUpdatedBy = repositoryOrder.LastUpdatedByName,
-                OnlyGms = repositoryOrder.FundingSourceOnlyGMS,
+                OnlyGms = repositoryOrder.FundingSourceOnlyGms,
             });
         }
 

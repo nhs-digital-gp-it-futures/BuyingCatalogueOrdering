@@ -32,10 +32,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         [Test]
         public void GivenNullComparisonShouldReturnFalse()
         {
-            ValueObject size2 = null;
-            size1.Equals(size2).Should().BeFalse();
-            (size1 == size2).Should().BeFalse();
-            (size2 == size1).Should().BeFalse();
+            size1.Equals(null).Should().BeFalse();
+            (size1 == null).Should().BeFalse();
         }
 
         [Test]

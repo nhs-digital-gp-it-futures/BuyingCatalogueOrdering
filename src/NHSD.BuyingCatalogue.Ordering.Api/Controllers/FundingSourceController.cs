@@ -40,7 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             return new GetFundingSourceModel
             {
-                OnlyGMS = order.FundingSourceOnlyGMS,
+                OnlyGms = order.FundingSourceOnlyGms,
             };
         }
 
@@ -65,7 +65,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            order.FundingSourceOnlyGMS = model.OnlyGMS;
+            order.FundingSourceOnlyGms = model.OnlyGms;
 
             var name = User.Identity.Name;
             order.SetLastUpdatedBy(User.GetUserId(), name);

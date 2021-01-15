@@ -17,11 +17,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
             this.setting = setting;
         }
 
-        public async Task CreateData(string key, string orderId)
-        {
-            await DataFactory[key](orderId);
-        }
-
         public IDictionary<string, Func<string, Task>> DataFactory =>
             new Dictionary<string, Func<string, Task>>
             {
@@ -230,5 +225,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                         .InsertAsync(setting.ConnectionString)
                 },
             };
+
+        public async Task CreateData(string key, string orderId)
+        {
+            await DataFactory[key](orderId);
+        }
     }
 }

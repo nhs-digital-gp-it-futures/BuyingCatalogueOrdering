@@ -69,8 +69,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var expected = table.CreateSet<ServiceRecipientTable>();
 
-            var serviceRecipients = (await response.ReadBodyAsJsonAsync())
-                .SelectToken("serviceRecipients").Select(CreateServiceRecipients);
+            var jsonBody = await response.ReadBodyAsJsonAsync();
+            var serviceRecipients = jsonBody?.SelectToken("serviceRecipients")?.Select(CreateServiceRecipients);
 
             expected.Should().BeEquivalentTo(serviceRecipients, conf =>
                 conf.Excluding(x => x.OrderId).WithStrictOrdering());
@@ -84,11 +84,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             expected.Should().BeEquivalentTo(actual);
         }
 
-        private sealed class ServiceRecipientsTable
-        {
-            public IEnumerable<ServiceRecipientTable> ServiceRecipients { get; set; }
-        }
-
         private static ServiceRecipientTable CreateServiceRecipients(JToken token)
         {
             return new()
@@ -96,6 +91,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 Name = token.SelectToken("name").ToString(),
                 OdsCode = token.SelectToken("odsCode").ToString(),
             };
+        }
+
+        private sealed class ServiceRecipientsTable
+        {
+            public IEnumerable<ServiceRecipientTable> ServiceRecipients { get; set; }
         }
 
         private sealed class ServiceRecipientTable

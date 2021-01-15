@@ -33,7 +33,7 @@ Scenario: 2. Validate funding source
     Then a response with status code 400 is returned
     And the response contains the following errors
         | id              | field   |
-        | OnlyGMSRequired | OnlyGMS |
+        | OnlyGMSRequired | OnlyGms |
 
 @5437
 Scenario: 3. If a user is not authorised, then they cannot update the orders funding source

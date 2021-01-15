@@ -17,7 +17,6 @@ using NUnit.Framework;
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
-
     [Parallelizable(ParallelScope.All)]
     internal sealed class SupplierSectionControllerTests
     {
@@ -249,13 +248,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             internal Guid PrimaryOrganisationId { get; set; }
 
-            private ClaimsPrincipal ClaimsPrincipal { get; }
-
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
 
             internal Order Order { get; set; }
 
             internal SupplierSectionController SupplierSectionController { get; }
+
+            private ClaimsPrincipal ClaimsPrincipal { get; }
 
             internal static SupplierSectionControllerTestContext Setup() => new();
         }

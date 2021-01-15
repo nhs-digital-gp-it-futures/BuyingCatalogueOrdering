@@ -210,7 +210,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
         [Test]
         [OrderingAutoData]
-        [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Frozen date required for successful validation")]
         public static void Validate_Create_Solution_AllValid_ReturnsNoErrors(
             [Frozen] DateTime date,
             CreateOrderItemSolutionRequest request,

@@ -33,7 +33,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
                          OrderId
                     FROM dbo.ServiceRecipient;";
 
-            return await SqlRunner.QueryAsync<ServiceRecipientEntity>(connectionString, @sql);
+            return await SqlRunner.QueryAsync<ServiceRecipientEntity>(connectionString, sql);
         }
     }
 }

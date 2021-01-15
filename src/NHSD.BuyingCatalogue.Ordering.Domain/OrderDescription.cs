@@ -7,8 +7,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class OrderDescription : ValueObject
     {
-        public string Value { get; }
-
         private OrderDescription()
         {
         }
@@ -18,6 +16,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         {
             Value = value;
         }
+
+        public string Value { get; }
 
         public static Result<OrderDescription> Create(string description)
         {

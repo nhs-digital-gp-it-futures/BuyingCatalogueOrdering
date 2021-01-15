@@ -39,7 +39,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
 
             public object Create(object request, ISpecimenContext context)
             {
-                if (!(request is ParameterInfo pi))
+                if (request is not ParameterInfo pi)
                     return new NoSpecimen();
 
                 if (IsOdsCodeParameter(pi))

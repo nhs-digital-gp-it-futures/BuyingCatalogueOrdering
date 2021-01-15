@@ -204,18 +204,6 @@ dotnet_diagnostic.SA1101.severity = none
 # SA1200: Using directives should be placed correctly
 dotnet_diagnostic.SA1200.severity = none
 
-# SA1201: Elements should appear in the correct order
-dotnet_diagnostic.SA1201.severity = none
-
-# SA1202: Elements should be ordered by access
-dotnet_diagnostic.SA1202.severity = none
-
-# SA1204: Static elements should appear before instance elements
-dotnet_diagnostic.SA1204.severity = none
-
-# SA1214: Readonly fields should appear before non-readonly fields
-dotnet_diagnostic.SA1214.severity = none
-
 # SA1633: File should have header
 dotnet_diagnostic.SA1633.severity = none
 

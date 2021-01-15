@@ -19,22 +19,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             = new()
             {
                 {
-                    "catalogue solution", (request, url, orderId) => new CreateCatalogueSolutionOrderItemRequest(
-                        request,
-                        url,
-                        orderId)
+                    "catalogue solution",
+                    (request, url, orderId) => new CreateCatalogueSolutionOrderItemRequest(request, url, orderId)
                 },
                 {
-                    "additional service", (request, url, orderId) => new CreateAdditionalServiceOrderItemRequest(
-                        request,
-                        url,
-                        orderId)
+                    "additional service",
+                    (request, url, orderId) => new CreateAdditionalServiceOrderItemRequest(request, url, orderId)
                 },
                 {
-                    "associated service", (request, url, orderId) => new CreateAssociatedServiceOrderItemRequest(
-                        request,
-                        url,
-                        orderId)
+                    "associated service",
+                    (request, url, orderId) => new CreateAssociatedServiceOrderItemRequest(request, url, orderId)
                 },
             };
 

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using NHSD.BuyingCatalogue.Ordering.Api.Models;
+﻿using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
@@ -7,7 +6,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 {
     public abstract class CreateOrderItemRequest : UpdateOrderItemRequest
     {
-        [SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "model is validated by base constructor")]
         protected CreateOrderItemRequest(Order order, CreateOrderItemModel model, CatalogueItemType itemType)
             : base(order, model)
         {

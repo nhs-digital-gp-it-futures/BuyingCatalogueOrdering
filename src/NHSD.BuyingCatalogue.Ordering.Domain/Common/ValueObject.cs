@@ -9,10 +9,36 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Common
     public abstract class ValueObject
     {
         /// <summary>
-        /// Gets a list of values of this instance to be used for equality.
+        /// Determines whether the specified objects are equal.
         /// </summary>
-        /// <returns>A list of values of this instance to be used for equality.</returns>
-        protected abstract IEnumerable<object> GetEqualityComponents();
+        /// <param name="a">The first object.</param>
+        /// <param name="b">The second object.</param>
+        /// <returns>true if the specified objects are equal; otherwise, false.</returns>
+        public static bool operator ==(ValueObject a, ValueObject b)
+        {
+            if (ReferenceEquals(a, null) && ReferenceEquals(b, null))
+            {
+                return true;
+            }
+
+            if (ReferenceEquals(a, null) || ReferenceEquals(b, null))
+            {
+                return false;
+            }
+
+            return a.Equals(b);
+        }
+
+        /// <summary>
+        /// Determines whether the specified objects are not equal.
+        /// </summary>
+        /// <param name="a">The first object.</param>
+        /// <param name="b">The second object.</param>
+        /// <returns>true if the specified objects are not equal; otherwise, false.</returns>
+        public static bool operator !=(ValueObject a, ValueObject b)
+        {
+            return !(a == b);
+        }
 
         /// <summary>
         /// Determines whether the specified object is equal to the current object.
@@ -46,35 +72,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Common
         }
 
         /// <summary>
-        /// Determines whether the specified objects are equal.
+        /// Gets a list of values of this instance to be used for equality.
         /// </summary>
-        /// <param name="a">The first object.</param>
-        /// <param name="b">The second object.</param>
-        /// <returns>true if the specified objects are equal; otherwise, false.</returns>
-        public static bool operator ==(ValueObject a, ValueObject b)
-        {
-            if (ReferenceEquals(a, null) && ReferenceEquals(b, null))
-            {
-                return true;
-            }
-
-            if (ReferenceEquals(a, null) || ReferenceEquals(b, null))
-            {
-                return false;
-            }
-
-            return a.Equals(b);
-        }
-
-        /// <summary>
-        /// Determines whether the specified objects are not equal.
-        /// </summary>
-        /// <param name="a">The first object.</param>
-        /// <param name="b">The second object.</param>
-        /// <returns>true if the specified objects are not equal; otherwise, false.</returns>
-        public static bool operator !=(ValueObject a, ValueObject b)
-        {
-            return !(a == b);
-        }
+        /// <returns>A list of values of this instance to be used for equality.</returns>
+        protected abstract IEnumerable<object> GetEqualityComponents();
     }
 }

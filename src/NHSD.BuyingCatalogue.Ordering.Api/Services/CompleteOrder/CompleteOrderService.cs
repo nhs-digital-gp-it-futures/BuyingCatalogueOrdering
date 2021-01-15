@@ -48,7 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
 
             await orderRepository.UpdateOrderAsync(order);
 
-            if (!order.FundingSourceOnlyGMS.GetValueOrDefault())
+            if (!order.FundingSourceOnlyGms.GetValueOrDefault())
                 return Result.Success();
 
             await using var priceTypeStream = new MemoryStream();

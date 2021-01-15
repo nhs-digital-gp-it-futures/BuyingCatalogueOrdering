@@ -14,9 +14,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
     [Binding]
     public sealed class IntegrationHook
     {
+        private static bool firstScenario = true;
         private readonly IObjectContainer objectContainer;
         private readonly OrderingApiHealthCheck orderingApiHealthCheck;
-        private static bool firstScenario = true;
 
         public IntegrationHook(IObjectContainer objectContainer, OrderingApiHealthCheck orderingApiHealthCheck)
         {
