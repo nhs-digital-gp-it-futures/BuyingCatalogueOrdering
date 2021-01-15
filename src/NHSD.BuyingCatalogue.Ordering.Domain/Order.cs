@@ -78,7 +78,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public bool AssociatedServicesViewed { get; set; }
 
-        public bool? FundingSourceOnlyGMS { get; set; }
+        public bool? FundingSourceOnlyGms { get; set; }
 
         public bool IsDeleted { get; set; }
 
@@ -205,7 +205,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public bool CanComplete()
         {
-            if (!FundingSourceOnlyGMS.HasValue)
+            if (!FundingSourceOnlyGms.HasValue)
                 return false;
 
             int serviceRecipientsCount = ServiceRecipients.Count;

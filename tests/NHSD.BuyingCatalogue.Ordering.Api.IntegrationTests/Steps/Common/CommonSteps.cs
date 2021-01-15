@@ -30,7 +30,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common
 
             var jsonResponse = await response.ReadBodyAsJsonAsync();
 
-            var actual = jsonResponse.SelectToken("errors").Select(x => new ResponseErrorsTable
+            var actual = jsonResponse?.SelectToken("errors")?.Select(x => new ResponseErrorsTable
             {
                 Id = x.Value<string>("id"),
                 Field = x.Value<string>("field"),

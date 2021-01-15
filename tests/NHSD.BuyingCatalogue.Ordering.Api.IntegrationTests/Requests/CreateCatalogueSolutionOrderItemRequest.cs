@@ -11,6 +11,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
     {
         private const int MaximumDeliveryDateOffsetDays = 1282;
 
+        public CreateCatalogueSolutionOrderItemRequest(
+            Request request,
+            string orderingApiBaseAddress,
+            string orderId)
+            : base(request, orderingApiBaseAddress, orderId)
+        {
+        }
+
         protected override IDictionary<string, Func<CreateOrderItemRequestPayload>> PayloadFactory => new Dictionary<string, Func<CreateOrderItemRequestPayload>>
         {
             { "complete", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().Build() },
@@ -55,13 +63,5 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             { "patient", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithProvisioningType(ProvisioningType.Patient).WithEstimationPeriod(null).Build() },
             { "declarative", () => CreateOrderItemRequestPayloadBuilder.CreateSolution().WithProvisioningType(ProvisioningType.Declarative).WithEstimationPeriod(null).Build() },
         };
-
-        public CreateCatalogueSolutionOrderItemRequest(
-            Request request,
-            string orderingApiBaseAddress,
-            string orderId)
-            : base(request, orderingApiBaseAddress, orderId)
-        {
-        }
     }
 }

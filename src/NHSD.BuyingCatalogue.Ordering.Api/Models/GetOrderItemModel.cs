@@ -14,10 +14,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
             OrderItemId = orderItem.OrderItemId;
             ServiceRecipient = serviceRecipient != null
                 ? new ServiceRecipientModel
-                    {
-                        OdsCode = serviceRecipient.OdsCode,
-                        Name = serviceRecipient.Name,
-                    }
+                {
+                    OdsCode = serviceRecipient.OdsCode,
+                    Name = serviceRecipient.Name,
+                }
                 : null;
             CatalogueItemType = orderItem.CatalogueItemType.ToString();
             CatalogueItemName = orderItem.CatalogueItemName;

@@ -9,6 +9,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 {
     internal sealed class CreateAdditionalServiceOrderItemRequest : CreateOrderItemBaseRequest
     {
+        public CreateAdditionalServiceOrderItemRequest(
+            Request request,
+            string orderingApiBaseAddress,
+            string orderId)
+            : base(request, orderingApiBaseAddress, orderId)
+        {
+        }
+
         protected override IDictionary<string, Func<CreateOrderItemRequestPayload>> PayloadFactory => new Dictionary<string, Func<CreateOrderItemRequestPayload>>
         {
             { "complete", () => CreateOrderItemRequestPayloadBuilder.CreateAdditionalService().Build() },
@@ -52,13 +60,5 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             { "patient", () => CreateOrderItemRequestPayloadBuilder.CreateAdditionalService().WithProvisioningType(ProvisioningType.Patient).WithEstimationPeriod(null).Build() },
             { "declarative", () => CreateOrderItemRequestPayloadBuilder.CreateAdditionalService().WithProvisioningType(ProvisioningType.Declarative).WithEstimationPeriod(null).Build() },
         };
-
-        public CreateAdditionalServiceOrderItemRequest(
-            Request request,
-            string orderingApiBaseAddress,
-            string orderId)
-            : base(request, orderingApiBaseAddress, orderId)
-        {
-        }
     }
 }

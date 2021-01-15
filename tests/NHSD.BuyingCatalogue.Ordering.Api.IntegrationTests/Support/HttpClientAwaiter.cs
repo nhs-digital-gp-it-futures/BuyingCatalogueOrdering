@@ -8,7 +8,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
     {
         public static async Task<bool> WaitForGetAsync(string address, TimeSpan testTimeout)
         {
-            using (var httpClient = new HttpClient() { Timeout = TimeSpan.FromSeconds(1) })
+            using (var httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(1) })
             {
                 DateTime startTime = DateTime.UtcNow;
                 while (DateTime.UtcNow - startTime < testTimeout)

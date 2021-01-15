@@ -1,7 +1,10 @@
-﻿namespace NHSD.BuyingCatalogue.Ordering.Api.Models
+﻿using System.Text.Json.Serialization;
+
+namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
     public sealed class GetFundingSourceModel
     {
-        public bool? OnlyGMS { get; set; }
+        [JsonPropertyName("onlyGMS")]
+        public bool? OnlyGms { get; set; }
     }
 }

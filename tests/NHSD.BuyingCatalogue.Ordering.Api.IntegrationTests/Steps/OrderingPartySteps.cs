@@ -28,46 +28,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             orderingPartyUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/ordering-party";
         }
 
-        private static OrganisationPartyPayload GetOrganisationPartyPayloadByOrderId(ScenarioContext context, string orderId)
-        {
-            if (context is null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            if (orderId == null)
-                return null;
-
-            var payloadDictionary =
-                context.Get<IDictionary<string, OrganisationPartyPayload>>(ScenarioContextKeys.OrganisationPayloadDictionary, new Dictionary<string, OrganisationPartyPayload>());
-
-            if (payloadDictionary.TryGetValue(orderId, out var payload))
-                return payload;
-
-            return null;
-        }
-
-        private static void SetOrganisationPartyPayloadByOrderId(ScenarioContext context, string orderId, OrganisationPartyPayload payload)
-        {
-            if (context is null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            if (payload == null)
-                return;
-
-            var payloadDictionary =
-                context.Get<IDictionary<string, OrganisationPartyPayload>>(ScenarioContextKeys.OrganisationPayloadDictionary, new Dictionary<string, OrganisationPartyPayload>());
-
-            payloadDictionary[orderId] = payload;
-
-            if (!context.ContainsKey(ScenarioContextKeys.OrganisationPayloadDictionary))
-            {
-                context.Add(ScenarioContextKeys.OrganisationPayloadDictionary, payloadDictionary);
-            }
-        }
-
         [Given(@"an order party update request exist for order ID (.*)")]
         public void GivenAnOrderPartyUpdateRequestExistForOrderId(string orderId)
         {
@@ -138,6 +98,46 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             };
 
             actual.Should().BeEquivalentTo(expected);
+        }
+
+        private static OrganisationPartyPayload GetOrganisationPartyPayloadByOrderId(ScenarioContext context, string orderId)
+        {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            if (orderId == null)
+                return null;
+
+            var payloadDictionary =
+                context.Get<IDictionary<string, OrganisationPartyPayload>>(ScenarioContextKeys.OrganisationPayloadDictionary, new Dictionary<string, OrganisationPartyPayload>());
+
+            if (payloadDictionary.TryGetValue(orderId, out var payload))
+                return payload;
+
+            return null;
+        }
+
+        private static void SetOrganisationPartyPayloadByOrderId(ScenarioContext context, string orderId, OrganisationPartyPayload payload)
+        {
+            if (context is null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            if (payload == null)
+                return;
+
+            var payloadDictionary =
+                context.Get<IDictionary<string, OrganisationPartyPayload>>(ScenarioContextKeys.OrganisationPayloadDictionary, new Dictionary<string, OrganisationPartyPayload>());
+
+            payloadDictionary[orderId] = payload;
+
+            if (!context.ContainsKey(ScenarioContextKeys.OrganisationPayloadDictionary))
+            {
+                context.Add(ScenarioContextKeys.OrganisationPayloadDictionary, payloadDictionary);
+            }
         }
 
         private sealed class OrganisationTable

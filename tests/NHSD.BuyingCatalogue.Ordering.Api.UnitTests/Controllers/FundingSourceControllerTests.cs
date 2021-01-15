@@ -71,7 +71,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var expected = new GetFundingSourceModel
             {
-                OnlyGMS = context.Order.FundingSourceOnlyGMS,
+                OnlyGms = context.Order.FundingSourceOnlyGms,
             };
 
             actual.Value.Should().BeEquivalentTo(expected);
@@ -127,14 +127,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var organisationId = Guid.NewGuid();
             const string orderId = "C0000014-01";
             var context = FundingSourceControllerTestContext.Setup(organisationId);
-            var model = new UpdateFundingSourceModel { OnlyGMS = fundingSource };
+            var model = new UpdateFundingSourceModel { OnlyGms = fundingSource };
 
             var response = await context.Controller.PutFundingSourceAsync(orderId, model);
             response.Should().BeEquivalentTo(new NoContentResult());
 
             context.OrderRepositoryMock.Verify(x =>
                 x.UpdateOrderAsync(It.Is<Order>(
-                    y => y.FundingSourceOnlyGMS == fundingSource)));
+                    y => y.FundingSourceOnlyGms == fundingSource)));
         }
 
         [Test]
@@ -143,7 +143,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var organisationId = Guid.NewGuid();
             const string orderId = "C0000014-01";
             var context = FundingSourceControllerTestContext.Setup(organisationId);
-            var model = new UpdateFundingSourceModel { OnlyGMS = true };
+            var model = new UpdateFundingSourceModel { OnlyGms = true };
 
             var response = await context.Controller.PutFundingSourceAsync(orderId, model);
             response.Should().BeEquivalentTo(new NoContentResult());
@@ -198,13 +198,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             internal Guid PrimaryOrganisationId { get; set; }
 
-            private ClaimsPrincipal ClaimsPrincipal { get; }
-
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
 
             internal FundingSourceController Controller { get; }
 
             internal Order Order { get; set; }
+
+            private ClaimsPrincipal ClaimsPrincipal { get; }
 
             internal static FundingSourceControllerTestContext Setup()
             {

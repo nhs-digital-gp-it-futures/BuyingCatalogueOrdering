@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
@@ -229,7 +228,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             order.ServiceRecipientsViewed = serviceRecipientsViewed;
             order.CatalogueSolutionsViewed = catalogueSolutionsViewed;
             order.AssociatedServicesViewed = associatedServicesViewed;
-            order.FundingSourceOnlyGMS = fundingSourceOnlyGms;
+            order.FundingSourceOnlyGms = fundingSourceOnlyGms;
             order.Created = created;
             order.LastUpdated = lastUpdated;
 

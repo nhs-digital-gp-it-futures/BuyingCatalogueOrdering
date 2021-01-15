@@ -19,9 +19,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public string Name { get; }
 
-        internal static IEnumerable<OrderStatus> List() =>
-            new[] { Complete, Incomplete };
-
         public static OrderStatus FromId(int id) =>
             List().SingleOrDefault(item => id == item.Id);
 
@@ -49,5 +46,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         public override bool Equals(object obj) => Equals(obj as OrderStatus);
 
         public override int GetHashCode() => Id;
+
+        internal static IEnumerable<OrderStatus> List() => new[] { Complete, Incomplete };
     }
 }

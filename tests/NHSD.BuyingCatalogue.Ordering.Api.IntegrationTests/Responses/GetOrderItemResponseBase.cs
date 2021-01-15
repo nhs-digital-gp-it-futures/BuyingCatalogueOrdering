@@ -7,6 +7,41 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 {
     internal abstract class GetOrderItemResponseBase
     {
+        protected static object ConvertToExpectedBody(
+            OrderItemEntity orderItemEntity,
+            ServiceRecipientEntity serviceRecipient)
+        {
+            return new
+            {
+                orderItemEntity.OrderItemId,
+                orderItemEntity.CatalogueItemId,
+                orderItemEntity.CatalogueItemType,
+                orderItemEntity.CatalogueItemName,
+                orderItemEntity.CurrencyCode,
+                orderItemEntity.DeliveryDate,
+                EstimationPeriod = orderItemEntity.EstimationPeriod?.ToString(),
+                ItemUnit = new
+                {
+                    Name = orderItemEntity.PricingUnitName,
+                    Description = orderItemEntity.PricingUnitDescription,
+                },
+                orderItemEntity.Price,
+                orderItemEntity.ProvisioningType,
+                orderItemEntity.Quantity,
+                ServiceRecipient = new
+                {
+                    orderItemEntity.OdsCode,
+                    serviceRecipient.Name,
+                },
+                TimeUnit = orderItemEntity.TimeUnit is null ? null : new
+                {
+                    Name = orderItemEntity.TimeUnit.ToString().ToLower(),
+                    Description = orderItemEntity.TimeUnit?.ToDescription(),
+                },
+                Type = orderItemEntity.CataloguePriceType,
+            };
+        }
+
         protected object ReadOrderItem(JToken responseBody)
         {
             return new
@@ -88,41 +123,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
             }
 
             return serviceRecipient;
-        }
-
-        protected static object ConvertToExpectedBody(
-            OrderItemEntity orderItemEntity,
-            ServiceRecipientEntity serviceRecipient)
-        {
-            return new
-            {
-                orderItemEntity.OrderItemId,
-                orderItemEntity.CatalogueItemId,
-                orderItemEntity.CatalogueItemType,
-                orderItemEntity.CatalogueItemName,
-                orderItemEntity.CurrencyCode,
-                orderItemEntity.DeliveryDate,
-                EstimationPeriod = orderItemEntity.EstimationPeriod?.ToString(),
-                ItemUnit = new
-                {
-                    Name = orderItemEntity.PricingUnitName,
-                    Description = orderItemEntity.PricingUnitDescription,
-                },
-                orderItemEntity.Price,
-                orderItemEntity.ProvisioningType,
-                orderItemEntity.Quantity,
-                ServiceRecipient = new
-                {
-                    orderItemEntity.OdsCode,
-                    serviceRecipient.Name,
-                },
-                TimeUnit = orderItemEntity.TimeUnit is null ? null : new
-                {
-                    Name = orderItemEntity.TimeUnit.ToString().ToLower(),
-                    Description = orderItemEntity.TimeUnit?.ToDescription(),
-                },
-                Type = orderItemEntity.CataloguePriceType,
-            };
         }
     }
 }

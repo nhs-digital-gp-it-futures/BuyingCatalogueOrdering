@@ -7,12 +7,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Results
 {
     public sealed class Result<T> : IEquatable<Result<T>>
     {
-        public bool IsSuccess { get; }
-
-        public IReadOnlyCollection<ErrorDetails> Errors { get; }
-
-        public T Value { get; }
-
         internal Result(bool isSuccess, IEnumerable<ErrorDetails> errors, T value)
         {
             IsSuccess = isSuccess;
@@ -20,23 +14,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Results
             Value = value;
         }
 
+        public bool IsSuccess { get; }
+
+        public IReadOnlyCollection<ErrorDetails> Errors { get; }
+
+        public T Value { get; }
+
         public Result ToResult()
         {
             if (IsSuccess)
                 return Result.Success();
 
             return Result.Failure(Errors);
-        }
-
-        private static bool AreErrorsEqual(IEnumerable<ErrorDetails> first, IEnumerable<ErrorDetails> second)
-        {
-            if (first is null)
-                return second is null;
-
-            if (second is null)
-                return false;
-
-            return first.SequenceEqual(second);
         }
 
         public bool Equals(Result<T> other)
@@ -55,6 +44,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Results
         public override int GetHashCode()
         {
             return HashCode.Combine(IsSuccess, Errors, Value);
+        }
+
+        private static bool AreErrorsEqual(IEnumerable<ErrorDetails> first, IEnumerable<ErrorDetails> second)
+        {
+            if (first is null)
+                return second is null;
+
+            if (second is null)
+                return false;
+
+            return first.SequenceEqual(second);
         }
     }
 }

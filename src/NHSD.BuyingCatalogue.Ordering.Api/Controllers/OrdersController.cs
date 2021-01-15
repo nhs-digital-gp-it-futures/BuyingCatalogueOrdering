@@ -147,7 +147,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 DateCreated = order.Created,
                 DateCompleted = order.Completed,
                 Status = order.OrderStatus.Name,
-                OnlyGms = order.FundingSourceOnlyGMS,
+                OnlyGms = order.FundingSourceOnlyGms,
             }).ToList();
 
             return orderModelResult;

@@ -14,9 +14,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
     {
         private const int MaximumDeliveryDateOffsetDays = 1282;
 
-        private readonly Request request;
-        private readonly string createOrderItemUrl;
-
         private static readonly IDictionary<string, Func<UpdateOrderItemRequestPayload>> PayloadFactory =
             new Dictionary<string, Func<UpdateOrderItemRequestPayload>>
             {
@@ -113,6 +110,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                             .Build()
                 },
             };
+
+        private readonly Request request;
+        private readonly string createOrderItemUrl;
 
         public UpdateOrderItemRequest(
             Request request,

@@ -8,8 +8,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class OrderOrganisationId : ValueObject
     {
-        public Guid Value { get; }
-
         private OrderOrganisationId()
         {
         }
@@ -19,6 +17,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         {
             Value = value;
         }
+
+        public Guid Value { get; }
 
         public static Result<Guid> Create(Guid organisationId)
         {
