@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -37,7 +38,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [When(@"the user makes a request to retrieve the order commencement date section with the ID (.*)")]
         public async Task WhenAGetRequestIsMadeForAnOrdersCommencementDateWithOrderId(string orderId)
         {
-            await request.GetAsync(string.Format(orderCommencementDateUrl, orderId));
+            await request.GetAsync(string.Format(CultureInfo.InvariantCulture, orderCommencementDateUrl, orderId));
         }
 
         [Then(@"the order commencement date is returned")]
@@ -86,7 +87,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 .BeTrue("Commencement Date should have been set via the 'Given the user sets the commencement date' steps");
             var date = context["CommencementDate"] as DateTime?;
             await request.PutJsonAsync(
-                string.Format(orderCommencementDateUrl, orderId),
+                string.Format(CultureInfo.InvariantCulture, orderCommencementDateUrl, orderId),
                 new { commencementDate = date });
         }
 

@@ -72,8 +72,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 serviceRecipients);
         }
 
-        [Then(@"the get order response contains a yearly value of (.*) for order item with name '(.*)'")]
-        public void ThenTheGetOrderResponseContainsYearlyValue(decimal amount, string orderItemName)
+        [Then(@"the get order response contains a yearly value of (.*)")]
+        public void ThenTheGetOrderResponseContainsYearlyValue(decimal amount)
         {
             getOrderResponse.AssertOrderItemCost(amount);
         }

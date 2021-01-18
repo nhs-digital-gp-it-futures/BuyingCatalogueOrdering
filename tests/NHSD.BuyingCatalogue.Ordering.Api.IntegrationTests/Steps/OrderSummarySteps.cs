@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -39,7 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [When(@"the user makes a request to retrieve the order summary with the ID (.*)")]
         public async Task WhenTheUserMakesARequestToRetrieveTheOrderSummaryWithTheId(string orderId)
         {
-            await request.GetAsync(string.Format(orderSummaryUrl, orderId));
+            await request.GetAsync(string.Format(CultureInfo.InvariantCulture, orderSummaryUrl, orderId));
         }
 
         [Then(@"the order summary is returned with the following values")]

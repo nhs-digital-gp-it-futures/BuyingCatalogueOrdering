@@ -210,6 +210,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
         [Test]
         [OrderingAutoData]
+        [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Frozen date required for test")]
+        [SuppressMessage("Usage", "CA1801:Review unused parameters", Justification = "Frozen date required for test")]
         public static void Validate_Create_Solution_AllValid_ReturnsNoErrors(
             [Frozen] DateTime date,
             CreateOrderItemSolutionRequest request,
@@ -258,7 +260,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             result.Should().NotBeNull();
             result.Success.Should().BeFalse();
             result.Errors.Should().HaveCount(1);
-            result.Errors.First().Should().Be(expected);
+            result.Errors[0].Should().Be(expected);
         }
 
         [Test]
@@ -279,7 +281,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             result.Should().NotBeNull();
             result.Success.Should().BeFalse();
             result.Errors.Should().HaveCount(1);
-            result.Errors.First().Should().Be(expected);
+            result.Errors[0].Should().Be(expected);
         }
 
         [Test]
@@ -299,7 +301,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             result.Should().NotBeNull();
             result.Success.Should().BeFalse();
             result.Errors.Should().HaveCount(1);
-            result.Errors.First().Should().Be(expected);
+            result.Errors[0].Should().Be(expected);
         }
 
         [Test]

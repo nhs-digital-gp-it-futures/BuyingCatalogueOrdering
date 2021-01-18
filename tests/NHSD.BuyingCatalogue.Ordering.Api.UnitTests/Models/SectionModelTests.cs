@@ -7,7 +7,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    public sealed class SectionModelTests
+    internal sealed class SectionModelTests
     {
         [Test]
         public void Description_ReturnsExpected()

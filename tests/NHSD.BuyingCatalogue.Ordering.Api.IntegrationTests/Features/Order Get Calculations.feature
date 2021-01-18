@@ -25,7 +25,7 @@ Scenario: 1. Verify the price calculations for Catalogue Solution order types
     Given the user creates a request to retrieve the details of an order by ID 'C000014-01'
     When the user sends the get order request
     Then a response with status code 200 is returned
-    And the get order response contains a yearly value of <Total> for order item with name 'Sol1'
+    And the get order response contains a yearly value of <Total>
 
     Examples:
         | ProvisioningType | TimeUnit | Price | Quantity | EstimationPeriod | Total |

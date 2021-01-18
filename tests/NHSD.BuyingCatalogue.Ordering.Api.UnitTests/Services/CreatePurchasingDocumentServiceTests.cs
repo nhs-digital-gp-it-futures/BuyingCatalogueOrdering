@@ -130,10 +130,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             actualOrderItems.Should().NotBeNull();
             actualOrderItems.Should().HaveCount(1);
-            actualOrderItems
-                .First()
-                .Should()
-                .BeEquivalentTo(new OdooOrderItem(order, item, odsOrganisation.Name));
+            actualOrderItems[0].Should().BeEquivalentTo(new OdooOrderItem(order, item, odsOrganisation.Name));
         }
 
         private sealed class CreatePurchasingDocumentServiceTestContext

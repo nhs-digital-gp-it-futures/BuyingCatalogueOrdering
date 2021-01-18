@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -112,7 +113,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [When(@"a GET request is made for a list of orders with organisationId (.*)")]
         public async Task WhenAGetRequestIsMadeForOrders(Guid organisationId)
         {
-            await request.GetAsync(string.Format(orderOrganisationsUrl, organisationId));
+            await request.GetAsync(string.Format(CultureInfo.InvariantCulture, orderOrganisationsUrl, organisationId));
         }
 
         [Then(@"the orders list is returned with the following values")]

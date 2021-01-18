@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Globalization;
+using System.Threading.Tasks;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
@@ -37,7 +38,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [When(@"the user makes a request to retrieve the order supplier section with the ID (.*)")]
         public async Task WhenTheUserMakesARequestToRetrieveTheOrderSupplierSectionWithId(string orderId)
         {
-            await request.GetAsync(string.Format(orderSupplierSectionUrl, orderId));
+            await request.GetAsync(string.Format(CultureInfo.InvariantCulture, orderSupplierSectionUrl, orderId));
         }
 
         [Then(@"the response contains the following supplier details")]
@@ -116,13 +117,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 PrimaryContact = contact,
             };
 
-            await request.PutJsonAsync(string.Format(orderSupplierSectionUrl, orderId), data);
+            await request.PutJsonAsync(
+                string.Format(CultureInfo.InvariantCulture, orderSupplierSectionUrl, orderId),
+                data);
         }
 
         [When(@"the user makes a request to update the supplier with order ID (.*) with no model")]
         public async Task WhenTheUserMakesARequestToUpdateTheSupplierWithOrderIdWithNoModel(string orderId)
         {
-            await request.PutJsonAsync(string.Format(orderSupplierSectionUrl, orderId), null);
+            await request.PutJsonAsync(
+                string.Format(CultureInfo.InvariantCulture, orderSupplierSectionUrl, orderId),
+                null);
         }
 
         [Then(@"the supplier address for order (.*) is")]

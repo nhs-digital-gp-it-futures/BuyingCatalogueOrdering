@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
-using TechTalk.SpecFlow;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
 {
-    [Binding]
-    public sealed class OrderingApiHealthCheck
+    internal static class OrderingApiHealthCheck
     {
-        internal async Task AwaitApiRunningAsync(Settings settings)
+        internal static async Task AwaitApiRunningAsync(Settings settings)
         {
             var baseUrl = settings.OrderingApiBaseUrl;
             TimeSpan testTimeOut = TimeSpan.FromSeconds(settings.OrderingApiHealthCheckTimeout);
@@ -17,7 +15,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
             await AwaitApiRunningAsync($"{baseUrl}/health/ready", testTimeOut);
         }
 
-        internal async Task AwaitApiRunningAsync(string url, TimeSpan testTimeOut)
+        internal static async Task AwaitApiRunningAsync(string url, TimeSpan testTimeOut)
         {
             var started = await HttpClientAwaiter.WaitForGetAsync(url, testTimeOut);
             if (!started)

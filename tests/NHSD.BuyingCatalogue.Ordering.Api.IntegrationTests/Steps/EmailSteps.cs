@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using JetBrains.Annotations;
 using NHSD.BuyingCatalogue.EmailClient.IntegrationTesting.Data;
 using NHSD.BuyingCatalogue.EmailClient.IntegrationTesting.Drivers;
 using TechTalk.SpecFlow;
@@ -48,7 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 expectedContents.Subject,
             };
 
-            var actual = (await emailServerDriver.FindAllEmailsAsync()).First();
+            var actual = (await emailServerDriver.FindAllEmailsAsync())[0];
 
             actual.Should().BeEquivalentTo(expected, conf => conf.IncludingAllDeclaredProperties());
         }
@@ -58,12 +58,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var expected = table.CreateSet<Attachments>();
 
-            var actual = (await emailServerDriver.FindAllEmailsAsync()).First().Attachments;
+            var actual = (await emailServerDriver.FindAllEmailsAsync())[0].Attachments;
             actual.Select(x => x.FileName).Should().BeEquivalentTo(expected.Select(x => x.Filename));
         }
 
-        [SuppressMessage("ReSharper", "ClassNeverInstantiated.Local", Justification = "Instantiated by SpecFlow")]
-        [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local", Justification = "Used by SpecFlow")]
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class EmailContentsTable
         {
             public string FromAddress { get; init; }
@@ -79,8 +78,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string Text { get; init; }
         }
 
-        [SuppressMessage("ReSharper", "ClassNeverInstantiated.Local", Justification = "Instantiated by SpecFlow")]
-        [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Local", Justification = "Used by SpecFlow")]
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class Attachments
         {
             public string Filename { get; init; }

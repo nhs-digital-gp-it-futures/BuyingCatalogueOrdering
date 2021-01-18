@@ -75,7 +75,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         {
             var actual = await service.CreateAsync(createOrderItemRequest);
 
-            var expected = order.OrderItems.First().OrderItemId;
+            var expected = order.OrderItems[0].OrderItemId;
             actual.Should().Be(Result.Success(expected));
         }
 
@@ -95,7 +95,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             await service.CreateAsync(createOrderItemRequest);
 
-            var actual = order.OrderItems.First();
+            var actual = order.OrderItems[0];
 
             actual.Should().BeEquivalentTo(new
             {
@@ -132,7 +132,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             await service.CreateAsync(createOrderItemRequest);
 
-            var actual = order.OrderItems.First();
+            var actual = order.OrderItems[0];
 
             actual.Should().BeEquivalentTo(new
             {
@@ -170,7 +170,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             await service.CreateAsync(createOrderItemRequest);
 
-            var actual = order.OrderItems.First();
+            var actual = order.OrderItems[0];
 
             actual.Should().BeEquivalentTo(new
             {
@@ -253,7 +253,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             await service.CreateAsync(createOrderItemRequest);
 
-            var orderItem = order.OrderItems.First();
+            var orderItem = order.OrderItems[0];
 
             orderItem.EstimationPeriod.Should().Be(expectedEstimationPeriod);
         }
@@ -279,7 +279,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             await service.CreateAsync(createOrderItemRequest);
 
-            var orderItem = order.OrderItems.First();
+            var orderItem = order.OrderItems[0];
 
             orderItem.EstimationPeriod.Should().Be(expectedEstimationPeriod);
         }
@@ -305,7 +305,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             await service.CreateAsync(createOrderItemRequest);
 
-            var orderItem = order.OrderItems.First();
+            var orderItem = order.OrderItems[0];
 
             orderItem.EstimationPeriod.Should().Be(expectedEstimationPeriod);
         }
