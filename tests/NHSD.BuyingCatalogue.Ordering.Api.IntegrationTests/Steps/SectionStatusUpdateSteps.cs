@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Globalization;
+using System.Threading.Tasks;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
@@ -24,7 +25,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public async Task WhenTheUserMakesARequestToRetrieveTheOrderSummaryWithTheId(string orderId, string sectionId)
         {
             var payload = new { Status = "complete" };
-            await request.PutJsonAsync(string.Format(sectionStatusUpdateUrl, orderId, sectionId), payload);
+            await request.PutJsonAsync(string.Format(CultureInfo.InvariantCulture, sectionStatusUpdateUrl, orderId, sectionId), payload);
         }
 
         [Then(@"the order with ID (.*) has catalogue solutions viewed set to (.*)")]

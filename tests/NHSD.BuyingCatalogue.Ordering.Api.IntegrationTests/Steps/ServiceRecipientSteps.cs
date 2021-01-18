@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -54,14 +55,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [When(@"the user makes a request to retrieve the service-recipients section with order ID (.*)")]
         public async Task WhenTheUserMakesARequestToRetrieveTheService_RecipientsSectionWithOrderID(string orderId)
         {
-            await request.GetAsync(string.Format(serviceRecipientUrl, orderId));
+            await request.GetAsync(string.Format(CultureInfo.InvariantCulture, serviceRecipientUrl, orderId));
         }
 
         [When(@"the user makes a request to set the service-recipients section with order ID (.*)")]
         public async Task WhenTheUserMakesARequestToRetrieveTheService_RecipientsSectionWithOrderID(string orderId, Table table)
         {
             var payload = new ServiceRecipientsTable { ServiceRecipients = table.CreateSet<ServiceRecipientTable>() };
-            await request.PutJsonAsync(string.Format(serviceRecipientUrl, orderId), payload);
+            await request.PutJsonAsync(string.Format(CultureInfo.InvariantCulture, serviceRecipientUrl, orderId), payload);
         }
 
         [Then(@"the service recipients are returned")]

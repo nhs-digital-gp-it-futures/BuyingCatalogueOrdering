@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json.Linq;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Data;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
@@ -7,6 +8,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 {
     internal abstract class GetOrderItemResponseBase
     {
+        [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Lower required for test")]
         protected static object ConvertToExpectedBody(
             OrderItemEntity orderItemEntity,
             ServiceRecipientEntity serviceRecipient)
@@ -35,14 +37,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 },
                 TimeUnit = orderItemEntity.TimeUnit is null ? null : new
                 {
-                    Name = orderItemEntity.TimeUnit.ToString().ToLower(),
+                    Name = orderItemEntity.TimeUnit.ToString()?.ToLowerInvariant(),
                     Description = orderItemEntity.TimeUnit?.ToDescription(),
                 },
                 Type = orderItemEntity.CataloguePriceType,
             };
         }
 
-        protected object ReadOrderItem(JToken responseBody)
+        protected static object ReadOrderItem(JToken responseBody)
         {
             return new
             {

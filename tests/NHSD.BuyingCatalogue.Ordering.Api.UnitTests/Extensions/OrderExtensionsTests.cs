@@ -10,7 +10,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    public sealed class OrderExtensionsTests
+    internal sealed class OrderExtensionsTests
     {
         [Test]
         public void IsSupplierSectionComplete_HasPrimaryContact_ReturnsTrue()
@@ -154,20 +154,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
             actual.Should().BeFalse();
         }
 
-        [TestCase(null, false, false, false, 0, false, false, false)]
-        [TestCase(true, true, true, true, 1, true, false, true)]
-        [TestCase(true, true, true, true, 1, true, true, true)]
-        [TestCase(true, true, true, true, 0, false, true, true)]
-        [TestCase(true, true, true, true, 1, false, true, true)]
-        [TestCase(true, true, false, false, 1, false, false, false)]
-        [TestCase(true, true, false, true, 1, true, false, false)]
-        [TestCase(true, false, true, false, 0, false, true, false)]
+        [TestCase(null, false, false, false, false, false, false)]
+        [TestCase(true, true, true, true, true, false, true)]
+        [TestCase(true, true, true, true, true, true, true)]
+        [TestCase(true, true, true, true, false, true, true)]
+        [TestCase(true, true, true, true, false, true, true)]
+        [TestCase(true, true, false, false, false, false, false)]
+        [TestCase(true, true, false, true, true, false, false)]
+        [TestCase(true, false, true, false, false, true, false)]
         public void IsSectionStatusCompleteComplete_whenCalled_ReturnsCorrectResult(
             bool? fundingComplete,
             bool recipientViewed,
             bool associatedViewed,
             bool solutionViewed,
-            int recipientCount,
             bool hasSolution,
             bool hasAssociated,
             bool expectedResult)

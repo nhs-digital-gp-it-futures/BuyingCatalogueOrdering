@@ -1,8 +1,10 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
+using NUnit.Framework;
 using TechTalk.SpecFlow;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
@@ -23,9 +25,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [When(@"the dependency health-check endpoint is hit for API")]
         public async Task WhenTheHealthCheckEndpointIsHit()
         {
-            var baseUrl = context["orderingBaseUrl"];
+            var baseUrl = context["orderingBaseUrl"]?.ToString();
+            Assert.NotNull(baseUrl);
+
             using var client = new HttpClient();
-            response.Result = await client.GetAsync($"{baseUrl}/health/ready");
+            response.Result = await client.GetAsync(new Uri(new Uri(baseUrl), "/health/ready"));
         }
 
         [Then(@"the response will be (Healthy|Degraded|Unhealthy)")]

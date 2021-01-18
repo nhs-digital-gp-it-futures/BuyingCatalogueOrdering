@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
@@ -30,7 +31,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [When(@"the user makes a request to retrieve the order description section with the ID (.*)")]
         public async Task WhenAGetRequestIsMadeForAnOrdersDescriptionWithOrderId(string orderId)
         {
-            await request.GetAsync(string.Format(orderDescriptionUrl, orderId));
+            await request.GetAsync(string.Format(CultureInfo.InvariantCulture, orderDescriptionUrl, orderId));
         }
 
         [Then(@"the order description is returned")]
@@ -53,13 +54,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var data = table.CreateInstance<OrderDescriptionTable>();
 
-            await request.PutJsonAsync(string.Format(orderDescriptionUrl, orderId), data);
+            await request.PutJsonAsync(string.Format(CultureInfo.InvariantCulture, orderDescriptionUrl, orderId), data);
         }
 
         [When(@"the user makes a request to update the description with the ID (.*) with no model")]
         public async Task WhenTheUserMakesARequestToUpdateTheDescriptionWithOrderIdWithNoModel(string orderId)
         {
-            await request.PutJsonAsync(string.Format(orderDescriptionUrl, orderId), null);
+            await request.PutJsonAsync(string.Format(CultureInfo.InvariantCulture, orderDescriptionUrl, orderId), null);
         }
 
         [Then(@"the order description for order with id (.*) is set to")]

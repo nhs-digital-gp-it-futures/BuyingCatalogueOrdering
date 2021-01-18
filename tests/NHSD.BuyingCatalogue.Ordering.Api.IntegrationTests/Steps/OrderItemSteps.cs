@@ -144,7 +144,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             public string CataloguePriceUnitDescription { get; set; } = "per patient";
 
-            public TimeUnit? PriceTimeUnit { get; set; } = null;
+            public TimeUnit? PriceTimeUnit { get; set; }
 
             public string CurrencyCode { get; set; } = "GBP";
 

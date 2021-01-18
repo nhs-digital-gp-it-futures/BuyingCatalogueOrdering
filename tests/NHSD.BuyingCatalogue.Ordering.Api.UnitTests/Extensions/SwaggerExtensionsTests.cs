@@ -9,7 +9,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    public sealed class SwaggerExtensionsTests
+    internal sealed class SwaggerExtensionsTests
     {
         [TestCase(false, true)]
         [TestCase(true, false)]

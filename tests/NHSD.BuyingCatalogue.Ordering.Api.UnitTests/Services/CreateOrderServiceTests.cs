@@ -15,7 +15,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    public sealed class CreateOrderServiceTests
+    internal sealed class CreateOrderServiceTests
     {
         [Test]
         public void Constructor_NullOrderRepository_ThrowsException()

@@ -16,12 +16,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
     {
         private static bool firstScenario = true;
         private readonly IObjectContainer objectContainer;
-        private readonly OrderingApiHealthCheck orderingApiHealthCheck;
 
-        public IntegrationHook(IObjectContainer objectContainer, OrderingApiHealthCheck orderingApiHealthCheck)
+        public IntegrationHook(IObjectContainer objectContainer)
         {
             this.objectContainer = objectContainer ?? throw new ArgumentNullException(nameof(objectContainer));
-            this.orderingApiHealthCheck = orderingApiHealthCheck;
         }
 
         [BeforeScenario]
@@ -33,7 +31,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
             if (firstScenario)
             {
                 firstScenario = false;
-                await orderingApiHealthCheck.AwaitApiRunningAsync(objectContainer.Resolve<Settings>());
+                await OrderingApiHealthCheck.AwaitApiRunningAsync(objectContainer.Resolve<Settings>());
             }
 
             await ResetDatabaseAsync();

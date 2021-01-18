@@ -55,7 +55,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public async Task ThenTheOrderStatusIsSetCorrectly()
         {
             var order = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, updateOrderStatusRequest.OrderId);
-            Enum.TryParse<OrderStatus>(updateOrderStatusRequest.Payload.Status, out var orderStatus);
+            var orderStatus = Enum.Parse<OrderStatus>(updateOrderStatusRequest.Payload.Status);
 
             order.OrderStatus.Should().Be(orderStatus);
         }
@@ -71,7 +71,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public async Task ThenTheAttachmentContainsTheFollowingData(string csvFile, Table table)
         {
             var emails = await emailServerDriver.FindAllEmailsAsync();
-            var email = emails.First();
+            var email = emails[0];
             var attachment = email.Attachments.First(a => a.FileName.Contains(Path.ChangeExtension(csvFile, ".csv"), StringComparison.OrdinalIgnoreCase));
             using var attachmentReader = new StreamReader(new MemoryStream(attachment.AttachmentData.ToArray()));
 
