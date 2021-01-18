@@ -6,10 +6,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class OrderStatusTests
+    internal static class OrderStatusTests
     {
         [Test]
-        public void List_ReturnsExpectedList()
+        public static void List_ReturnsExpectedList()
         {
             var actual = OrderStatus.List();
 
@@ -23,7 +23,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void FromId_OrderStatusId_ReturnsExpectedType()
+        public static void FromId_OrderStatusId_ReturnsExpectedType()
         {
             var actual = OrderStatus.FromId(1);
 
@@ -31,7 +31,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void FromId_UnknownOrderStatusId_ReturnsNull()
+        public static void FromId_UnknownOrderStatusId_ReturnsNull()
         {
             var actual = OrderStatus.FromId(10);
             actual.Should().BeNull();
@@ -39,8 +39,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
         [TestCase("Complete")]
         [TestCase("complete")]
-        [TestCase("comPLete")]
-        public void FromName_OrderStatusName_ReturnsExpectedType(string orderStatusName)
+        [TestCase("COMPLETE")]
+        public static void FromName_OrderStatusName_ReturnsExpectedType(string orderStatusName)
         {
             var actual = OrderStatus.FromName(orderStatusName);
 
@@ -51,7 +51,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         [TestCase("")]
         [TestCase("     ")]
         [TestCase("Unknown")]
-        public void FromName_InvalidOrderStatusName_ReturnsNull(string orderStatusName)
+        public static void FromName_InvalidOrderStatusName_ReturnsNull(string orderStatusName)
         {
             var actual = OrderStatus.FromName(orderStatusName);
             actual.Should().BeNull();
@@ -59,20 +59,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
         [TestCase(null)]
         [TestCase("InvalidType")]
-        public void Equals_ComparisonObject_AreNotEqual(object comparisonObject)
+        public static void Equals_ComparisonObject_AreNotEqual(object comparisonObject)
         {
             OrderStatus.Incomplete.Equals(comparisonObject).Should().BeFalse();
         }
 
         [Test]
-        public void Equals_Same_AreEqual()
+        public static void Equals_Same_AreEqual()
         {
             var instance = OrderStatus.Incomplete;
             instance.Equals(instance).Should().BeTrue();
         }
 
         [Test]
-        public void Equals_Different_AreNotEqual()
+        public static void Equals_Different_AreNotEqual()
         {
             var instance = OrderStatus.Incomplete;
             var comparisonObject = OrderStatus.Complete;

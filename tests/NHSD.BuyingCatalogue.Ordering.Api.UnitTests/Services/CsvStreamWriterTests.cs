@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using CsvHelper.Configuration;
 using FluentAssertions;
+using JetBrains.Annotations;
 using Microsoft.VisualBasic.FileIO;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument;
 using NUnit.Framework;
@@ -75,11 +77,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
         private sealed class CsvHeaderContent
         {
-            public string Name { get; set; }
+            public string Name { get; init; }
 
-            public DateTime? Created { get; set; }
+            public DateTime? Created { get; init; }
         }
 
+        [UsedImplicitly]
+        [SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated by CsvHelper")]
         private sealed class CsvHeaderContentMap : ClassMap<CsvHeaderContent>
         {
             public CsvHeaderContentMap()

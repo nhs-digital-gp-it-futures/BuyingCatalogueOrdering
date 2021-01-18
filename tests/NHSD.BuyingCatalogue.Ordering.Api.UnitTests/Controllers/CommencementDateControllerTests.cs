@@ -16,10 +16,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class CommencementDateControllerTests
+    internal static class CommencementDateControllerTests
     {
         [Test]
-        public async Task Update_ValidDateTime_UpdatesAndReturnsNoContent()
+        public static async Task Update_ValidDateTime_UpdatesAndReturnsNoContent()
         {
             var context = CommencementDateControllerTestContext.Setup();
             var model = new CommencementDateModel { CommencementDate = DateTime.Now };
@@ -29,14 +29,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public void Update_NullModel_ThrowsException()
+        public static void Update_NullModel_ThrowsException()
         {
             var context = CommencementDateControllerTestContext.Setup();
             Assert.ThrowsAsync<ArgumentNullException>(async () => await context.Controller.Update("myOrder", null));
         }
 
         [Test]
-        public void Update_NullDateTime_ThrowsException()
+        public static void Update_NullDateTime_ThrowsException()
         {
             var context = CommencementDateControllerTestContext.Setup();
             var model = new CommencementDateModel { CommencementDate = null };
@@ -44,7 +44,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task Update_UserHasDifferentPrimaryOrganisationId_ReturnsForbidden()
+        public static async Task Update_UserHasDifferentPrimaryOrganisationId_ReturnsForbidden()
         {
             var context = CommencementDateControllerTestContext.Setup();
             context.Order = OrderBuilder
@@ -58,7 +58,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task Update_NoOrderFound_ReturnsNotFound()
+        public static async Task Update_NoOrderFound_ReturnsNotFound()
         {
             var context = CommencementDateControllerTestContext.Setup();
             context.Order = null;
@@ -69,21 +69,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [TestCase("01/20/2012")]
         [TestCase(null)]
-        public async Task GetAsync_WithCommencementDate_ReturnsOkResult(DateTime? commencementDate)
+        public static async Task GetAsync_WithCommencementDate_ReturnsOkResult(DateTime? commencementDate)
         {
             var context = CommencementDateControllerTestContext.Setup();
             context.Order.CommencementDate = commencementDate;
-            var result = await context.Controller.GetAsync("myOrder");
-            result.Should().BeOfType<OkObjectResult>();
 
-            var okResult = result as OkObjectResult;
-            okResult.Value.Should().BeOfType<CommencementDateModel>();
-            var model = okResult.Value as CommencementDateModel;
-            model.CommencementDate.Should().Be(context.Order.CommencementDate);
+            var result = await context.Controller.GetAsync("myOrder");
+
+            result.Should().BeOfType<OkObjectResult>();
+            result.As<OkObjectResult>().Value.Should().BeOfType<CommencementDateModel>();
+            result.As<OkObjectResult>().Value.As<CommencementDateModel>()
+                .CommencementDate.Should().Be(context.Order.CommencementDate);
         }
 
         [Test]
-        public async Task GetAsync_OrderNotFound_ReturnsNotFound()
+        public static async Task GetAsync_OrderNotFound_ReturnsNotFound()
         {
             var context = CommencementDateControllerTestContext.Setup();
             context.Order = null;
@@ -92,7 +92,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
+        public static async Task GetAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
         {
             var context = CommencementDateControllerTestContext.Setup();
             context.Order = OrderBuilder
@@ -106,7 +106,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public void Ctor_NullRepository_ThrowsException()
+        public static void Constructor_NullRepository_ThrowsException()
         {
             Assert.Throws<ArgumentNullException>(() => _ = new CommencementDateController(null));
         }
@@ -142,15 +142,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 };
             }
 
-            internal Guid PrimaryOrganisationId { get; }
-
-            internal ClaimsPrincipal ClaimsPrincipal { get; }
-
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
 
             internal Order Order { get; set; }
 
             internal CommencementDateController Controller { get; }
+
+            private Guid PrimaryOrganisationId { get; }
+
+            private ClaimsPrincipal ClaimsPrincipal { get; }
 
             internal static CommencementDateControllerTestContext Setup() => new();
         }

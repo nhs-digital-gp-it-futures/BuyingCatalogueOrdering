@@ -17,10 +17,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class FundingSourceControllerTests
+    internal static class FundingSourceControllerTests
     {
         [Test]
-        public void Constructor_NullOrderRepository_ThrowsArgumentNullException()
+        public static void Constructor_NullOrderRepository_ThrowsArgumentNullException()
         {
             var builder = FundingSourceControllerBuilder.Create()
                 .WithOrderRepository(null);
@@ -29,9 +29,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetAsync_OrderDoesNotExist_ReturnsNotFound()
+        public static async Task GetAsync_OrderDoesNotExist_ReturnsNotFound()
         {
-            const string orderId = "DOESNOTEXIST";
+            const string orderId = "DoesNotExist";
             var context = FundingSourceControllerTestContext.Setup();
             context.Order = null;
 
@@ -41,7 +41,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetAsync_DifferentOrganisationId_ForbiddenReturned()
+        public static async Task GetAsync_DifferentOrganisationId_ForbiddenReturned()
         {
             const string orderId = "C0000014-01";
             var context = FundingSourceControllerTestContext.Setup();
@@ -57,7 +57,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetAsync_OrderExists_FundingSourceDetailsReturned()
+        public static async Task GetAsync_OrderExists_FundingSourceDetailsReturned()
         {
             const string orderId = "C0000014-01";
             var context = FundingSourceControllerTestContext.Setup();
@@ -78,7 +78,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetAsync_GetOrderByIdAsync_CalledOnce()
+        public static async Task GetAsync_GetOrderByIdAsync_CalledOnce()
         {
             const string orderId = "C0000014-01";
             var context = FundingSourceControllerTestContext.Setup();
@@ -89,14 +89,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public void Put_NullModel_ThrowsException()
+        public static void Put_NullModel_ThrowsException()
         {
             var context = FundingSourceControllerTestContext.Setup();
             Assert.ThrowsAsync<ArgumentNullException>(() => context.Controller.PutFundingSourceAsync("123", null));
         }
 
         [Test]
-        public async Task Put_OtherOrganisationId_ReturnsForbidResult()
+        public static async Task Put_OtherOrganisationId_ReturnsForbidResult()
         {
             var organisationId = Guid.NewGuid();
             const string orderId = "C0000014-01";
@@ -109,7 +109,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task Put_NullOrderReturned_ReturnsNotFound()
+        public static async Task Put_NullOrderReturned_ReturnsNotFound()
         {
             var organisationId = Guid.NewGuid();
             const string orderId = "C0000014-01";
@@ -122,7 +122,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [TestCase(false)]
         [TestCase(true)]
-        public async Task Put_AllValid_CallsUpdateOnOrderRepository(bool fundingSource)
+        public static async Task Put_AllValid_CallsUpdateOnOrderRepository(bool fundingSource)
         {
             var organisationId = Guid.NewGuid();
             const string orderId = "C0000014-01";
@@ -138,7 +138,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task Put_AllValid_UpdatesLastUpdated()
+        public static async Task Put_AllValid_UpdatesLastUpdated()
         {
             var organisationId = Guid.NewGuid();
             const string orderId = "C0000014-01";

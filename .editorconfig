@@ -183,9 +183,6 @@ csharp_preserve_single_line_blocks = true
 # Code Analysis Severity      #
 ###############################
 
-# CA1303: Do not pass literals as localized parameters
-dotnet_diagnostic.CA1303.severity = none
-
 # CA1008: Enums should have zero value (to be re-enabled at a later date)
 dotnet_diagnostic.CA1008.severity = none
 

@@ -1,0 +1,10 @@
+# To learn more about .editorconfig see https://aka.ms/editorconfigdocs
+
+###############################
+# Code Analysis Severity      #
+###############################
+
+[*.cs]
+
+# CA1812: Avoid uninstantiated internal classes (typically instantiated by BoDI)
+dotnet_diagnostic.CA1812.severity = none

@@ -97,6 +97,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             request.CurrencyCode.Should().Be(model.CurrencyCode);
         }
 
+        [SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated by AutoFixture")]
         public sealed class TestOrderItemRequest : CreateOrderItemRequest
         {
             public TestOrderItemRequest(Order order, CreateOrderItemModel model, CatalogueItemType itemType)

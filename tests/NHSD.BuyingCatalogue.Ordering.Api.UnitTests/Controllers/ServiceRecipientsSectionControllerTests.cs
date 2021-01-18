@@ -19,7 +19,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class ServiceRecipientsSectionControllerTests
+    internal static class ServiceRecipientsSectionControllerTests
     {
         private static ServiceRecipientsModel DefaultServiceRecipientsModel
         {
@@ -35,7 +35,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [TestCase(false, true)]
         [TestCase(true, false)]
         [TestCase(false, false)]
-        public void Ctor_NullRepository_Throws(bool hasOrderRepository, bool hasServiceRepository)
+        public static void Constructor_NullRepository_Throws(bool hasOrderRepository, bool hasServiceRepository)
         {
             var context = ServiceRecipientsTestContext.Setup();
             var orderRepository = context.OrderRepositoryMock.Object;
@@ -54,7 +54,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [TestCase(null)]
         [TestCase("INVALID")]
-        public async Task GetAllAsync_OrderDoesNotExist_ReturnsNotFound(string orderId)
+        public static async Task GetAllAsync_OrderDoesNotExist_ReturnsNotFound(string orderId)
         {
             var context = ServiceRecipientsTestContext.Setup();
             context.Order = null;
@@ -64,7 +64,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetAllAsync_OrganisationIdDoesNotMatch_ReturnsForbidden()
+        public static async Task GetAllAsync_OrganisationIdDoesNotMatch_ReturnsForbidden()
         {
             var context = ServiceRecipientsTestContext.Setup();
             context.Order = OrderBuilder
@@ -77,7 +77,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetAllAsync_NoServiceRecipient_ReturnsEmptyList()
+        public static async Task GetAllAsync_NoServiceRecipient_ReturnsEmptyList()
         {
             var context = ServiceRecipientsTestContext.Setup();
             var expected = new ServiceRecipientsModel
@@ -90,7 +90,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetAllAsync_SingleServiceRecipient_ReturnsTheRecipient()
+        public static async Task GetAllAsync_SingleServiceRecipient_ReturnsTheRecipient()
         {
             var context = ServiceRecipientsTestContext.Setup();
 
@@ -115,7 +115,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetAllAsync_MultipleServiceRecipientsMatch_ReturnsAllTheOrdersServicesRecipients()
+        public static async Task GetAllAsync_MultipleServiceRecipientsMatch_ReturnsAllTheOrdersServicesRecipients()
         {
             var context = ServiceRecipientsTestContext.Setup();
 
@@ -142,7 +142,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetAllAsync_VerifyRepositoryMethods_CalledOnce()
+        public static async Task GetAllAsync_VerifyRepositoryMethods_CalledOnce()
         {
             var context = ServiceRecipientsTestContext.Setup();
 
@@ -154,7 +154,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [TestCase(null)]
         [TestCase("INVALID")]
-        public async Task UpdateAsync_OrderDoesNotExist_ReturnsNotFound(string orderId)
+        public static async Task UpdateAsync_OrderDoesNotExist_ReturnsNotFound(string orderId)
         {
             var context = ServiceRecipientsTestContext.Setup();
             context.Order = null;
@@ -164,7 +164,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task UpdateAsync_OrganisationIdDoesNotMatch_ReturnsForbidden()
+        public static async Task UpdateAsync_OrganisationIdDoesNotMatch_ReturnsForbidden()
         {
             var context = ServiceRecipientsTestContext.Setup();
             context.Order = OrderBuilder
@@ -177,7 +177,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task UpdateAsync_DefaultServiceRecipient_ServiceRecipientViewedIsTrue()
+        public static async Task UpdateAsync_DefaultServiceRecipient_ServiceRecipientViewedIsTrue()
         {
             var context = ServiceRecipientsTestContext.Setup();
 
@@ -195,7 +195,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task UpdateAsync_DefaultServiceRecipient_LastUpdatedByChanged()
+        public static async Task UpdateAsync_DefaultServiceRecipient_LastUpdatedByChanged()
         {
             var context = ServiceRecipientsTestContext.Setup();
 
@@ -215,7 +215,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task UpdateAsync_DefaultServiceRecipient_LastUpdatedByNameChanged()
+        public static async Task UpdateAsync_DefaultServiceRecipient_LastUpdatedByNameChanged()
         {
             var context = ServiceRecipientsTestContext.Setup();
 
@@ -235,7 +235,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task UpdateAsync_NoServiceRecipients_SetsCatalogueSolutionsViewedFalse()
+        public static async Task UpdateAsync_NoServiceRecipients_SetsCatalogueSolutionsViewedFalse()
         {
             var context = ServiceRecipientsTestContext.Setup();
             context.Order = OrderBuilder
@@ -253,7 +253,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task UpdateAsync_OrderRepository_UpdateOrderAsyncCalledOnce()
+        public static async Task UpdateAsync_OrderRepository_UpdateOrderAsyncCalledOnce()
         {
             var context = ServiceRecipientsTestContext.Setup();
 
@@ -264,7 +264,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task UpdateAsync_OrderRepository_GetOrderByIdAsyncCalledOnce()
+        public static async Task UpdateAsync_OrderRepository_GetOrderByIdAsyncCalledOnce()
         {
             var context = ServiceRecipientsTestContext.Setup();
 
@@ -275,7 +275,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task UpdateAsync_ServiceRecipientRepository_UpdateAsyncCalledOnce()
+        public static async Task UpdateAsync_ServiceRecipientRepository_UpdateAsyncCalledOnce()
         {
             var context = ServiceRecipientsTestContext.Setup();
 

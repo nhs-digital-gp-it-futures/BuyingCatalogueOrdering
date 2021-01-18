@@ -17,19 +17,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class OrderingPartyControllerTests
+    internal static class OrderingPartyControllerTests
     {
         [Test]
-        public void Constructor_Null_NullException()
+        public static void Constructor_Null_NullException()
         {
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                _ = new OrderingPartyController(null);
-            });
+            Assert.Throws<ArgumentNullException>(() => _ = new OrderingPartyController(null));
         }
 
         [Test]
-        public async Task GetAsync_OrderIdDoesNotExist_ReturnsNotFound()
+        public static async Task GetAsync_OrderIdDoesNotExist_ReturnsNotFound()
         {
             var context = OrderingPartyTestContext.Setup();
 
@@ -41,7 +38,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetAsync_WrongOrganisationId_ReturnsForbidden()
+        public static async Task GetAsync_WrongOrganisationId_ReturnsForbidden()
         {
             var context = OrderingPartyTestContext.Setup();
 
@@ -58,7 +55,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetAsync_EmptyOrderingParty_ReturnsEmptyResult()
+        public static async Task GetAsync_EmptyOrderingParty_ReturnsEmptyResult()
         {
             const string orderId = "C0000014-01";
             var context = OrderingPartyTestContext.Setup();
@@ -75,7 +72,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetAsync_OrderIdExists_ReturnsTheOrderingParty()
+        public static async Task GetAsync_OrderIdExists_ReturnsTheOrderingParty()
         {
             const string orderId = "C0000014-01";
             var context = OrderingPartyTestContext.Setup();
@@ -93,7 +90,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetAsync_GetOrderById_CalledOnce()
+        public static async Task GetAsync_GetOrderById_CalledOnce()
         {
             var context = OrderingPartyTestContext.Setup();
 
@@ -106,7 +103,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [TestCase(null)]
         [TestCase("INVALID")]
-        public async Task UpdateAsync_OrderIdDoesNotExist_ReturnNotFound(string orderId)
+        public static async Task UpdateAsync_OrderIdDoesNotExist_ReturnNotFound(string orderId)
         {
             var context = OrderingPartyTestContext.Setup();
 
@@ -119,7 +116,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public void UpdateAsync_ModelIsNull_ThrowsNullArgumentException()
+        public static void UpdateAsync_ModelIsNull_ThrowsNullArgumentException()
         {
             static async Task GetOrderingPartyWithModelModel()
             {
@@ -135,7 +132,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [TestCase(false, true)]
         [TestCase(true, false)]
         [TestCase(false, false)]
-        public void UpdateAsync_NullAddressOrContact_ThrowsNullArgumentException(bool hasPrimaryContact, bool hasAddress)
+        public static void UpdateAsync_NullAddressOrContact_ThrowsNullArgumentException(bool hasPrimaryContact, bool hasAddress)
         {
             const string orderId = "C0000014-01";
             var context = OrderingPartyTestContext.Setup();
@@ -161,7 +158,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task UpdateAsync_UpdateIsValid_ReturnsNoContent()
+        public static async Task UpdateAsync_UpdateIsValid_ReturnsNoContent()
         {
             const string orderId = "C0000014-01";
             var context = OrderingPartyTestContext.Setup();
