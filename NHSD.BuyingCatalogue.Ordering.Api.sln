@@ -17,9 +17,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{2ADEB1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{152C5610-E85A-46DE-876D-3D372B198BE5}"
-	ProjectSection(SolutionItems) = preProject
-		tests\.editorconfig = tests\.editorconfig
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHSD.BuyingCatalogue.Ordering.Api.UnitTests", "tests\NHSD.BuyingCatalogue.Ordering.Api.UnitTests\NHSD.BuyingCatalogue.Ordering.Api.UnitTests.csproj", "{35A62F97-B61C-4135-9A0C-6520C649C2E3}"
 EndProject

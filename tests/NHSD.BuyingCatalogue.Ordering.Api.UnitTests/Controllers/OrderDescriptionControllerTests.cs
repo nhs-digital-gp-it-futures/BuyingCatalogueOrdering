@@ -18,10 +18,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class OrderDescriptionControllerTests
+    internal static class OrderDescriptionControllerTests
     {
         [Test]
-        public void Constructor_NullRepository_Throws()
+        public static void Constructor_NullRepository_Throws()
         {
             Assert.Throws<ArgumentNullException>(() =>
             {
@@ -30,7 +30,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task Get_OrderIdDoesNotExist_ReturnsNotFound()
+        public static async Task Get_OrderIdDoesNotExist_ReturnsNotFound()
         {
             var context = OrderDescriptionTestContext.Setup();
 
@@ -42,7 +42,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task Get_OrderIdExists_ReturnsTheOrdersDescription()
+        public static async Task Get_OrderIdExists_ReturnsTheOrdersDescription()
         {
             const string orderId = "C0000014-01";
             var context = OrderDescriptionTestContext.Setup();
@@ -63,7 +63,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task Get_OtherOrganisationId_ReturnsForbidden()
+        public static async Task Get_OtherOrganisationId_ReturnsForbidden()
         {
             const string orderId = "C0000014-01";
             var context = OrderDescriptionTestContext.Setup();
@@ -82,7 +82,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task Get_OrderById_CalledOnce()
+        public static async Task Get_OrderById_CalledOnce()
         {
             var context = OrderDescriptionTestContext.Setup();
 
@@ -95,7 +95,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [TestCase(null)]
         [TestCase("INVALID")]
-        public async Task UpdateAsync_OrderIdDoesNotExist_ReturnNotFound(string orderId)
+        public static async Task UpdateAsync_OrderIdDoesNotExist_ReturnNotFound(string orderId)
         {
             var context = OrderDescriptionTestContext.Setup();
 
@@ -108,7 +108,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public void UpdateAsync_ModelIsNull_ThrowsNullArgumentException()
+        public static void UpdateAsync_ModelIsNull_ThrowsNullArgumentException()
         {
             static async Task GetOrderDescriptionWithNullModel()
             {
@@ -122,7 +122,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task UpdateAsync_ValidationError_ReturnsBadRequest()
+        public static async Task UpdateAsync_ValidationError_ReturnsBadRequest()
         {
             const string orderId = "C0000014-01";
             const string description = null;
@@ -148,7 +148,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task UpdateAsync_UpdatedDescriptionIsValid_ReturnsNoContent()
+        public static async Task UpdateAsync_UpdatedDescriptionIsValid_ReturnsNoContent()
         {
             const string orderId = "C0000014-01";
             var context = OrderDescriptionTestContext.Setup();
@@ -170,7 +170,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task UpdateAsync_OtherOrganisationId_ReturnsForbidden()
+        public static async Task UpdateAsync_OtherOrganisationId_ReturnsForbidden()
         {
             const string orderId = "C0000014-01";
             var context = OrderDescriptionTestContext.Setup();
@@ -192,7 +192,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task UpdateAsync_UpdateAndGet_CalledOnce()
+        public static async Task UpdateAsync_UpdateAndGet_CalledOnce()
         {
             const string orderId = "C0000014-01";
             var newDescription = OrderDescription.Create("New Description").Value;
@@ -260,13 +260,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             internal Guid PrimaryOrganisationId { get; }
 
-            internal ClaimsPrincipal ClaimsPrincipal { get; }
-
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
 
             internal Order Order { get; set; }
 
             internal OrderDescriptionController OrderDescriptionController { get; }
+
+            private ClaimsPrincipal ClaimsPrincipal { get; }
 
             internal static OrderDescriptionTestContext Setup()
             {

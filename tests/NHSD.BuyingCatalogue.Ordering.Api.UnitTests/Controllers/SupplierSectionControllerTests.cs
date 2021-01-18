@@ -18,16 +18,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class SupplierSectionControllerTests
+    internal static class SupplierSectionControllerTests
     {
         [Test]
-        public void Constructor_NullRepository_Throws()
+        public static void Constructor_NullRepository_Throws()
         {
             Assert.Throws<ArgumentNullException>(() => _ = new SupplierSectionController(null));
         }
 
         [Test]
-        public async Task GetAsync_OrderIdDoesNotExists_NotFoundReturned()
+        public static async Task GetAsync_OrderIdDoesNotExists_NotFoundReturned()
         {
             const string orderId = "C0000014-01";
 
@@ -40,7 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetAsync_OrderIdExists_SupplierSectionDetailsReturned()
+        public static async Task GetAsync_OrderIdExists_SupplierSectionDetailsReturned()
         {
             const string orderId = "C0000014-01";
             const string supplierId = "1234";
@@ -80,7 +80,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetAsync_DifferentOrganisationId_ForbiddenReturned()
+        public static async Task GetAsync_DifferentOrganisationId_ForbiddenReturned()
         {
             const string orderId = "C0000014-01";
             var context = SupplierSectionControllerTestContext.Setup();
@@ -99,7 +99,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task GetAsync_GetOrderByIdAsync_CalledOnce()
+        public static async Task GetAsync_GetOrderByIdAsync_CalledOnce()
         {
             var context = SupplierSectionControllerTestContext.Setup();
 
@@ -113,7 +113,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [TestCase(null)]
         [TestCase("INVALID")]
-        public async Task UpdateAsync_OrderIdDoesNotExist_ReturnNotFound(string orderId)
+        public static async Task UpdateAsync_OrderIdDoesNotExist_ReturnNotFound(string orderId)
         {
             var context = SupplierSectionControllerTestContext.Setup();
 
@@ -126,7 +126,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public void UpdateAsync_ModelIsNull_ThrowsNullArgumentException()
+        public static void UpdateAsync_ModelIsNull_ThrowsNullArgumentException()
         {
             static async Task GetSupplierSectionWithNullModel()
             {
@@ -142,7 +142,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [TestCase(false, true)]
         [TestCase(true, false)]
         [TestCase(false, false)]
-        public void UpdateAsync_NullAddressOrContact_ThrowsNullArgumentException(bool hasPrimaryContact, bool hasAddress)
+        public static void UpdateAsync_NullAddressOrContact_ThrowsNullArgumentException(bool hasPrimaryContact, bool hasAddress)
         {
             const string orderId = "C0000014-01";
             const string supplierId = "1234";
@@ -184,7 +184,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public async Task UpdateAsync_UpdateIsValid_ReturnsNoContent()
+        public static async Task UpdateAsync_UpdateIsValid_ReturnsNoContent()
         {
             const string orderId = "C0000014-01";
             const string supplierId = "1234";

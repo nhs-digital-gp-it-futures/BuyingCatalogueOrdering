@@ -6,12 +6,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class OrderDescriptionTests
+    internal static class OrderDescriptionTests
     {
         [TestCase(null)]
         [TestCase("")]
         [TestCase(" ")]
-        public void Create_DescriptionIsNullOrWhitespace_ReturnsFailureResult(string description)
+        public static void Create_DescriptionIsNullOrWhitespace_ReturnsFailureResult(string description)
         {
             var isValid = OrderDescription.Create(description);
 
@@ -20,7 +20,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void Create_DescriptionExceedsMaxLength_ReturnsFailureResult()
+        public static void Create_DescriptionExceedsMaxLength_ReturnsFailureResult()
         {
             var isValid = OrderDescription.Create(new string('a', 101));
 
@@ -29,7 +29,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public void Create_DescriptionIsValid_ReturnsSuccessResult()
+        public static void Create_DescriptionIsValid_ReturnsSuccessResult()
         {
             var isValid = OrderDescription.Create("New Description");
 
