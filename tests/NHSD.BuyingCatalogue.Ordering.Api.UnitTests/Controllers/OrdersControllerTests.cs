@@ -927,7 +927,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             }
         }
 
-        private class SummaryModelSectionTestCaseData
+        private sealed class SummaryModelSectionTestCaseData
         {
             internal static IEnumerable<TestCaseData> OrderDescriptionSectionStatusCases
             {

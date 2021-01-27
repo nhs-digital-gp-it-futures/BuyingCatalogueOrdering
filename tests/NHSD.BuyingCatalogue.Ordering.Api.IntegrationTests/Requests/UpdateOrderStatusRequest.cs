@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 {
-    internal class UpdateOrderStatusRequest
+    internal sealed class UpdateOrderStatusRequest
     {
         private readonly Request request;
         private readonly string updateOrderStatusUrl;

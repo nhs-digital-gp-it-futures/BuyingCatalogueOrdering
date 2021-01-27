@@ -8,7 +8,7 @@ using TechTalk.SpecFlow;
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 {
     [Binding]
-    internal class FundingSourceSteps
+    internal sealed class FundingSourceSteps
     {
         private readonly Request request;
         private readonly Settings settings;

@@ -38,21 +38,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
         [Test]
         [SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "Test of null equality")]
-        [SuppressMessage("ReSharper", "ExpressionIsAlwaysNull", Justification = "Test of null equality")]
         public void GivenTwoNullsShouldReturnTrue()
         {
             size1 = null;
-            ValueObject size2 = null;
-            (size1 == size2).Should().BeTrue();
+            (size1 == null).Should().BeTrue();
         }
 
         [Test]
         public void GivenInvalidObjectTypeShouldReturnFalse()
         {
+            // ReSharper disable once SuspiciousTypeConversion.Global
             size1.Equals("Yo Heave Ho").Should().BeFalse();
         }
 
-        private class Size : ValueObject
+        private sealed class Size : ValueObject
         {
             public Size(int width, int height)
             {

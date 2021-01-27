@@ -7,7 +7,7 @@ using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
 {
-    public class DefaultDeliveryDateRepository : IDefaultDeliveryDateRepository
+    public sealed class DefaultDeliveryDateRepository : IDefaultDeliveryDateRepository
     {
         private readonly ApplicationDbContext context;
 
