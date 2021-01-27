@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
 {
-    internal class UpdateFundingSourceRequest
+    internal sealed class UpdateFundingSourceRequest
     {
         private readonly Request request;
         private readonly string updateFundingSourceUrl;

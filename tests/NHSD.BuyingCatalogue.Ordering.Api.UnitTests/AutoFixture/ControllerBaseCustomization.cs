@@ -21,7 +21,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
                     new ControllerBaseRequestSpecification()));
         }
 
-        private class ControllerBaseSpecimenCommand : ISpecimenCommand
+        private sealed class ControllerBaseSpecimenCommand : ISpecimenCommand
         {
             public void Execute(object specimen, ISpecimenContext context)
             {
@@ -67,7 +67,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
             }
         }
 
-        private class ControllerBaseRequestSpecification : IRequestSpecification
+        private sealed class ControllerBaseRequestSpecification : IRequestSpecification
         {
             public bool IsSatisfiedBy(object request) =>
                 request is Type type && typeof(ControllerBase).IsAssignableFrom(type);

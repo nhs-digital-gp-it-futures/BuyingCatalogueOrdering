@@ -67,7 +67,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
             }
         }
 
-        private class EnumValueByPropertyNameSpecimenBuilder<TEnum> : EnumValueByNameSpecimenBuilder<TEnum, PropertyInfo>
+        private sealed class EnumValueByPropertyNameSpecimenBuilder<TEnum> : EnumValueByNameSpecimenBuilder<TEnum, PropertyInfo>
             where TEnum : struct, Enum
         {
             internal EnumValueByPropertyNameSpecimenBuilder()
@@ -86,7 +86,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
             }
         }
 
-        private class EnumValueByParameterNameSpecimenBuilder<TEnum> : EnumValueByNameSpecimenBuilder<TEnum, ParameterInfo>
+        private sealed class EnumValueByParameterNameSpecimenBuilder<TEnum> : EnumValueByNameSpecimenBuilder<TEnum, ParameterInfo>
             where TEnum : struct, Enum
         {
             internal EnumValueByParameterNameSpecimenBuilder()
