@@ -21,7 +21,7 @@ Background:
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @7580
-Scenario: 1. Get an order item
+Scenario: Get an order item
     Given the user creates a request to retrieve an order item with catalogue item name '<ItemName>' and order ID 'C000014-01'
     When the user sends the retrieve an order item request
     Then a response with status code 200 is returned
@@ -33,45 +33,45 @@ Scenario: 1. Get an order item
         | Item 3   |
 
 @8122
-Scenario: 2. Get an order item from a deleted order
+Scenario: Get an order item from a deleted order
     Given the user creates a request to retrieve an order item with catalogue item name 'Item 4' and order ID 'C000014-02'
     When the user sends the retrieve an order item request
     Then a response with status code 404 is returned
 
 @7580
-Scenario: 3. Get an order item for an order that does not exist
+Scenario: Get an order item for an order that does not exist
     Given the user creates a request to retrieve an order item that does not exist
     When the user sends the retrieve an order item request
     Then a response with status code 404 is returned
 
 @7580
-Scenario: 4. Get an order item that does not exist
+Scenario: Get an order item that does not exist
     Given the user creates a request to retrieve an order item for an order that does not exist
     When the user sends the retrieve an order item request
     Then a response with status code 404 is returned
 
 @7580
-Scenario: 5. Get an order item by a user who is not authorised
+Scenario: Get an order item by a user who is not authorised
     Given no user is logged in
     And the user creates a request to retrieve an order item with catalogue item name 'Item 1' and order ID 'C000014-01'
     When the user sends the retrieve an order item request
     Then a response with status code 401 is returned
 
-Scenario: 6. Get an order item by a non buyer user
+Scenario: Get an order item by a non buyer user
     Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
     And the user creates a request to retrieve an order item with catalogue item name 'Item 1' and order ID 'C000014-01'
     When the user sends the retrieve an order item request
     Then a response with status code 403 is returned
 
 @7580
-Scenario: 7. Get an order item by a user who belongs to a different organisation
+Scenario: Get an order item by a user who belongs to a different organisation
     Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
     And the user creates a request to retrieve an order item with catalogue item name 'Item 1' and order ID 'C000014-01'
     When the user sends the retrieve an order item request
     Then a response with status code 403 is returned
 
 @7580
-Scenario: 8. Get an order item when the database is down
+Scenario: Get an order item when the database is down
     Given the call to the database will fail
     And the user creates a request to retrieve an order item with catalogue item name 'Item 1' and order ID 'C000014-01'
     When the user sends the retrieve an order item request

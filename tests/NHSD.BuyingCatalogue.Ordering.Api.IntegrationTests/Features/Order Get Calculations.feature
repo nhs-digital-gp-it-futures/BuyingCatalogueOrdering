@@ -18,7 +18,7 @@ Background:
         | C000014-01 | eu      | EU Test |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
-Scenario: 1. Verify the price calculations for Catalogue Solution order types
+Scenario: Verify the price calculations for Catalogue Solution order types
     Given Order items exist
         | OrderId    | CatalogueItemId | CatalogueItemName | CatalogueItemType | OdsCode | CataloguePriceUnitDescription | Price   | ProvisioningType   | Quantity   | EstimationPeriod   | PriceTimeUnit |
         | C000014-01 | Cat Item 1      | Sol1              | Solution          | eu      | Desc                          | <Price> | <ProvisioningType> | <Quantity> | <EstimationPeriod> | <TimeUnit>    |
@@ -36,7 +36,7 @@ Scenario: 1. Verify the price calculations for Catalogue Solution order types
         | Declarative      | Month    | 1     | 10       | Null             | 120   |
         | Patient          | Year     | 1     | 10       | Null             | 10    |
 
-Scenario: 2. Verify the price calculations for an order with multiple order items
+Scenario: Verify the price calculations for an order with multiple order items
     Given Order items exist
         | OrderId    | CatalogueItemId | CatalogueItemName | CatalogueItemType   | OdsCode | CataloguePriceUnitDescription | Price   | ProvisioningType   | Quantity   | EstimationPeriod   | PriceTimeUnit |
         | C000014-01 | Cat Item 1      | Sol1              | <CatalogueItemType> | eu      | Desc                          | <Price> | <ProvisioningType> | <Quantity> | <EstimationPeriod> | <TimeUnit>    |

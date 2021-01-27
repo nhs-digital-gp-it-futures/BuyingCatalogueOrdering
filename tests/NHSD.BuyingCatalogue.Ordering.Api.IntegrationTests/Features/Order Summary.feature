@@ -10,7 +10,7 @@ Background:
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @5321
-Scenario: 1. Get the order summary
+Scenario: Get the order summary
     When the user makes a request to retrieve the order summary with the ID C000014-01
     Then a response with status code 200 is returned
     And the order summary is returned with the following values
@@ -29,7 +29,7 @@ Scenario: 1. Get the order summary
         | funding-source      | incomplete |       |
 
 @4619
-Scenario: 2. Get the order summary when the order has a primary ordering party contact
+Scenario: Get the order summary when the order has a primary ordering party contact
     Given Contacts exist
         | FirstName | LastName | EmailAddress            | TelephoneNumber |
         | Fred      | Robinson | Fred.robinson@email.com | 12312543212     |
@@ -51,7 +51,7 @@ Scenario: 2. Get the order summary when the order has a primary ordering party c
         | funding-source      | incomplete |       |
 
 @4619
-Scenario: 3. Get the order summary when the order has a primary supplier contact
+Scenario: Get the order summary when the order has a primary supplier contact
     Given Contacts exist
         | FirstName | LastName | EmailAddress            | TelephoneNumber |
         | Fred      | Robinson | Fred.robinson@email.com | 12312543212     |
@@ -73,7 +73,7 @@ Scenario: 3. Get the order summary when the order has a primary supplier contact
         | funding-source      | incomplete |       |
 
 @4619
-Scenario: 4. Get the order summary when the order has a commencement date
+Scenario: Get the order summary when the order has a commencement date
     Given Orders exist
         | OrderId    | Description   | OrganisationId                       | CommencementDate |
         | C000015-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | 31/05/2020       |
@@ -92,7 +92,7 @@ Scenario: 4. Get the order summary when the order has a commencement date
         | funding-source      | incomplete |       |
 
 @5115
-Scenario: 5. Get the order summary after a section has been viewed
+Scenario: Get the order summary after a section has been viewed
     Given Orders exist
         | OrderId    | Description   | OrganisationId                       | ServiceRecipientsViewed     | AdditionalServicesViewed     | CatalogueSolutionsViewed     | AssociatedServicesViewed     | FundingSourceOnlyGMS      |
         | C000015-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | <service-recipients-viewed> | <additional-services-viewed> | <catalogue-solutions-viewed> | <associated-services-viewed> | <funding-source-only-gms> |
@@ -119,7 +119,7 @@ Scenario: 5. Get the order summary after a section has been viewed
         | False                     | False                      | False                      | False                      | True                    | incomplete                | incomplete                 | incomplete                 | incomplete                 | complete              |
 
 @4629
-Scenario: 6. Get the order summary that includes a list of service recipients
+Scenario: Get the order summary that includes a list of service recipients
     Given Orders exist
         | OrderId    | Description   | OrganisationId                       | ServiceRecipientsViewed |
         | C000016-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                    |
@@ -142,7 +142,7 @@ Scenario: 6. Get the order summary that includes a list of service recipients
         | funding-source      | incomplete |       |
 
 @5123
-Scenario: 7. Get the order summary that includes a list of Catalogue Solutions
+Scenario: Get the order summary that includes a list of Catalogue Solutions
     Given Orders exist
         | OrderId    | Description   | OrganisationId                       | CatalogueSolutionsViewed |
         | C000016-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                     |
@@ -169,7 +169,7 @@ Scenario: 7. Get the order summary that includes a list of Catalogue Solutions
         | funding-source      | incomplete |       |
 
 @5115
-Scenario: 8. Get the order summary that includes a list of associated services
+Scenario: Get the order summary that includes a list of associated services
     Given Orders exist
         | OrderId    | Description   | OrganisationId                       | AssociatedServicesViewed |
         | C000016-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                     |
@@ -195,7 +195,7 @@ Scenario: 8. Get the order summary that includes a list of associated services
         | funding-source      | incomplete |       |
 
 @5115
-Scenario: 9. Get the order summary that includes a list of additional services
+Scenario: Get the order summary that includes a list of additional services
     Given Orders exist
         | OrderId    | Description   | OrganisationId                       | AdditionalServicesViewed |
         | C000016-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                     |

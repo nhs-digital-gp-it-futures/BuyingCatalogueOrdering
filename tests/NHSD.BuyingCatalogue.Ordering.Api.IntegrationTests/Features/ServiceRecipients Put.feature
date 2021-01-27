@@ -14,7 +14,7 @@ Background:
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @7412
-Scenario: 1. the user selects service recipients when no other recipients exist
+Scenario: the user selects service recipients when no other recipients exist
     When the user makes a request to set the service-recipients section with order ID C000014-01
         | OdsCode | Name                |
         | Ods3    | Service Recipients  |
@@ -27,7 +27,7 @@ Scenario: 1. the user selects service recipients when no other recipients exist
         | C000014-02 | Ods2    | Another Name        |
 
 @7412
-Scenario: 2. the user selects service recipients excluding an existing recipient
+Scenario: the user selects service recipients excluding an existing recipient
     Given Service Recipients exist
         | OdsCode | Name               | OrderId    |
         | Ods3    | Service Recipients | C000014-01 |
@@ -41,7 +41,7 @@ Scenario: 2. the user selects service recipients excluding an existing recipient
         | C000014-02 | Ods2    | Another Name        |
 
 @7412
-Scenario: 3. the user selects service recipients including an existing recipient
+Scenario: the user selects service recipients including an existing recipient
     Given Service Recipients exist
         | OdsCode | Name               | OrderId    |
         | Ods3    | Service Recipients | C000014-01 |
@@ -57,7 +57,7 @@ Scenario: 3. the user selects service recipients including an existing recipient
         | C000014-02 | Ods2    | Another Name        |
 
 @7412
-Scenario: 4. the user selects no services recipients all recipients are removed
+Scenario: the user selects no services recipients all recipients are removed
     Given Service Recipients exist
         | OdsCode | Name               | OrderId    |
         | Ods3    | Service Recipients | C000014-01 |
@@ -70,7 +70,7 @@ Scenario: 4. the user selects no services recipients all recipients are removed
     And the order with ID C000014-01 has catalogue solutions viewed set to false
 
 @7412
-Scenario: 5. the user selects service recipients and the order is updated with the users details
+Scenario: the user selects service recipients and the order is updated with the users details
     Given Orders exist
         | OrderId    | Description      | OrganisationId                       | LastUpdatedByName | LastUpdatedBy                        |
         | C000014-03 | Some Description | 4af62b99-638c-4247-875e-965239cd0c48 | OldUserName       | 3e66fe27-2115-4de5-ae75-03aca134610d |
@@ -88,7 +88,7 @@ Scenario: 5. the user selects service recipients and the order is updated with t
     And the order with orderId C000014-03 has LastUpdated time present and it is the current time
 
 @5350
-Scenario: 6. the user selects service recipients where ods codes are shared across orders
+Scenario: the user selects service recipients where ods codes are shared across orders
     When the user makes a request to set the service-recipients section with order ID C000014-01
         | OdsCode | Name                   |
         | Ods2    | Description C000014-01 | 
@@ -99,7 +99,7 @@ Scenario: 6. the user selects service recipients where ods codes are shared acro
         | C000014-02 | Ods2    | Another Name           |
 
 @5350
-Scenario: 7. the user selects service recipients any removed recipients are only removed from the selected order
+Scenario: the user selects service recipients any removed recipients are only removed from the selected order
     Given Service Recipients exist
         | OdsCode | Name         | OrderId    |
         | Ods2    | Another Name | C000014-01 |
@@ -113,14 +113,14 @@ Scenario: 7. the user selects service recipients any removed recipients are only
         | C000014-02 | Ods2    | Another Name           |
 
 @7412
-Scenario: 8. If an order does not exist, return not found
+Scenario: If an order does not exist, return not found
     When the user makes a request to set the service-recipients section with order ID INVALID
         | OdsCode | Name         |
         | Ods2    | Another Name |
     Then a response with status code 404 is returned
 
 @7412
-Scenario: 9. If a user is not authorised then they cannot access the service recipients section
+Scenario: If a user is not authorised then they cannot access the service recipients section
     Given no user is logged in
     When the user makes a request to set the service-recipients section with order ID C000014-02
         | OdsCode | Name         |

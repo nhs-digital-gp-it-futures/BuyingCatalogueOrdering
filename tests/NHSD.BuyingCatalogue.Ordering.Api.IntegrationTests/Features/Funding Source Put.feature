@@ -10,7 +10,7 @@ Background:
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @5437
-Scenario: 1. Update funding source
+Scenario: Update funding source
     Given the user creates a request to update the funding source for the order with ID 'C000014-01'
     And the user enters the '<FundingSourcePayload>' update funding source request payload
     When the user sends the update funding source request
@@ -26,7 +26,7 @@ Examples:
     | funding-source-false |
 
 @5437
-Scenario: 2. Validate funding source
+Scenario: Validate funding source
     Given the user creates a request to update the funding source for the order with ID 'C000014-01'
     And the user enters the 'funding-source-missing' update funding source request payload
     When the user sends the update funding source request
@@ -36,7 +36,7 @@ Scenario: 2. Validate funding source
         | OnlyGMSRequired | OnlyGms |
 
 @5437
-Scenario: 3. If a user is not authorised, then they cannot update the orders funding source
+Scenario: If a user is not authorised, then they cannot update the orders funding source
     Given no user is logged in
     Given the user creates a request to update the funding source for the order with ID 'C000014-01'
     And the user enters the 'funding-source-true' update funding source request payload
@@ -44,7 +44,7 @@ Scenario: 3. If a user is not authorised, then they cannot update the orders fun
     Then a response with status code 401 is returned
 
 @5437
-Scenario: 4. A non buyer user cannot update an orders funding source
+Scenario: A non buyer user cannot update an orders funding source
     Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
     Given the user creates a request to update the funding source for the order with ID 'C000014-01'
     And the user enters the 'funding-source-true' update funding source request payload
@@ -52,7 +52,7 @@ Scenario: 4. A non buyer user cannot update an orders funding source
     Then a response with status code 403 is returned
 
 @5437
-Scenario: 5. A buyer user cannot update an orders funding source for an organisation they don't belong to
+Scenario: A buyer user cannot update an orders funding source for an organisation they don't belong to
     Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
     Given the user creates a request to update the funding source for the order with ID 'C000014-01'
     And the user enters the 'funding-source-true' update funding source request payload
@@ -60,7 +60,7 @@ Scenario: 5. A buyer user cannot update an orders funding source for an organisa
     Then a response with status code 403 is returned
 
 @5437
-Scenario: 6. A user with read only permissions, cannot update an orders funding source
+Scenario: A user with read only permissions, cannot update an orders funding source
     Given the user is logged in with the Readonly-Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
     Given the user creates a request to update the funding source for the order with ID 'C000014-01'
     And the user enters the 'funding-source-true' update funding source request payload
@@ -68,7 +68,7 @@ Scenario: 6. A user with read only permissions, cannot update an orders funding 
     Then a response with status code 403 is returned
 
 @5437
-Scenario: 7. Service Failure
+Scenario: Service Failure
     Given the call to the database will fail
     Given the user creates a request to update the funding source for the order with ID 'C000014-01'
     And the user enters the 'funding-source-true' update funding source request payload

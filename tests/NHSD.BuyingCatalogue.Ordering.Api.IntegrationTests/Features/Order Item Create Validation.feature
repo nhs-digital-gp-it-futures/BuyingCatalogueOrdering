@@ -13,7 +13,7 @@ Background:
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @7840
-Scenario: 1. Create catalogue solution order item with missing required field
+Scenario: Create catalogue solution order item with missing required field
     Given the user creates a request to add a new catalogue solution order item to the order with ID 'C000014-01'
     And the user enters the '<payload-type>' create order item request payload
     When the user sends the create order item request
@@ -60,7 +60,7 @@ Scenario: 1. Create catalogue solution order item with missing required field
         | greater-than-max-price            | PriceLessThanMax                           | Price             |
 
 @7840
-Scenario: 2. Create additional service order item with missing required field
+Scenario: Create additional service order item with missing required field
     Given the user creates a request to add a new additional service order item to the order with ID 'C000014-01'
     And the user enters the '<payload-type>' create order item request payload
     When the user sends the create order item request
@@ -106,7 +106,7 @@ Scenario: 2. Create additional service order item with missing required field
         | greater-than-max-price            | PriceLessThanMax                           | Price               |
 
 @7840
-Scenario: 3. Create associated service order item with missing required field
+Scenario: Create associated service order item with missing required field
     Given the user creates a request to add a new associated service order item to the order with ID 'C000014-01'
     And the user enters the '<payload-type>' create order item request payload
     When the user sends the create order item request
