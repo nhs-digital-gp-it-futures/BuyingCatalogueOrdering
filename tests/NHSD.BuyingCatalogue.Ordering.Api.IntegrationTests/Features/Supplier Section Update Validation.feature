@@ -16,7 +16,7 @@ Background:
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @4621
-Scenario: 1. Updating a supplier section with not filling in required fields produces the relavent error message
+Scenario: Updating a supplier section with not filling in required fields produces the relavent error message
     Given the user wants to update the supplier address section
         | Line1     | Line2      | Line3       | Line4          | Line5           | Town         | County  | Postcode | Country        |
         | New Line1 | Lower Flat | Rocks Close | Larger Village | Massive Village | Another Town | N Yorks | YO11 1AP | United Kingdom |
@@ -35,7 +35,7 @@ Scenario: 1. Updating a supplier section with not filling in required fields pro
         | TelephoneNumberRequired | TelephoneNumber |
 
 @4621
-Scenario: 2. Updating a supplier section, and exceeding the maxLength fields, produces the relavent error message
+Scenario: Updating a supplier section, and exceeding the maxLength fields, produces the relavent error message
     Given the user wants to update the supplier address section
         | Line1     | Line2      | Line3       | Line4          | Line5           | Town         | County  | Postcode | Country        |
         | New Line1 | Lower Flat | Rocks Close | Larger Village | Massive Village | Another Town | N Yorks | YO11 1AP | United Kingdom |
@@ -54,7 +54,7 @@ Scenario: 2. Updating a supplier section, and exceeding the maxLength fields, pr
         | TelephoneNumberTooLong | TelephoneNumber |
 
 @4621
-Scenario: 3. Updating a supplier section, and not providing a correct email address format, produces the relavent error message
+Scenario: Updating a supplier section, and not providing a correct email address format, produces the relavent error message
     Given the user wants to update the supplier address section
         | Line1     | Line2      | Line3       | Line4          | Line5           | Town         | County  | Postcode | Country        |
         | New Line1 | Lower Flat | Rocks Close | Larger Village | Massive Village | Another Town | N Yorks | YO11 1AP | United Kingdom |

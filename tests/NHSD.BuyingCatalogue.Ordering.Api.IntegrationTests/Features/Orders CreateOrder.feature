@@ -7,7 +7,7 @@ Background:
     Given the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @6739
-Scenario: 1. A user can create a order and data is persisted to the database;
+Scenario: A user can create a order and data is persisted to the database;
     When a POST request is made to create an order
         | OrganisationId                       | Description                         |
         | 4af62b99-638c-4247-875e-965239cd0c48 | This is an order for organisation 2 |
@@ -19,7 +19,7 @@ Scenario: 1. A user can create a order and data is persisted to the database;
     And the order with orderId C010000-01 has Created time present and it is the current time
 
 @6739
-Scenario: 2. A user creates an order when existing orders are present, The order is created with a incremented orderId
+Scenario: A user creates an order when existing orders are present, The order is created with a incremented orderId
     Given Orders exist
         | OrderId    | Description      | Created    | LastUpdated | LastUpdatedBy                        | OrganisationId                       |
         | C000014-01 | Some Description | 11/05/2020 | 11/05/2020  | 335392e4-4bb1-413b-9de5-36a85c9c0422 | 4af62b99-638c-4247-875e-965239cd0c48 |
@@ -35,7 +35,7 @@ Scenario: 2. A user creates an order when existing orders are present, The order
     And the order with orderId C000015-01 has Created time present and it is the current time
 
 @6739
-Scenario: 3. A user creates mutiple orders and order id is incremented multiple times returned;
+Scenario: A user creates mutiple orders and order id is incremented multiple times returned;
     Given Orders exist
         | OrderId    | Description      | Created    | LastUpdated | LastUpdatedBy                        | OrganisationId                       |
         | C000014-01 | Some Description | 11/05/2020 | 11/05/2020  | 335392e4-4bb1-413b-9de5-36a85c9c0422 | 4af62b99-638c-4247-875e-965239cd0c48 |
@@ -49,7 +49,7 @@ Scenario: 3. A user creates mutiple orders and order id is incremented multiple 
     And a create order response is returned with the OrderId C000016-01
 
 @6739
-Scenario: 4. A user can create a order when no orders exist and a defualt OrderId is returned;
+Scenario: A user can create a order when no orders exist and a defualt OrderId is returned;
     When a POST request is made to create an order
         | OrganisationId                       | Description                         |
         | 4af62b99-638c-4247-875e-965239cd0c48 | This is an order for organisation 2 |
@@ -57,14 +57,14 @@ Scenario: 4. A user can create a order when no orders exist and a defualt OrderI
     And a create order response is returned with the OrderId C010000-01
 
 @6739
-Scenario: 5. A user creates an order without specifing an Organisation Id a Status Code of 403 is returned
+Scenario: A user creates an order without specifing an Organisation Id a Status Code of 403 is returned
     When a POST request is made to create an order
         | Description                         |
         | This is an order for organisation 2 |
     Then a response with status code 403 is returned
 
 @6739
-Scenario: 6. A user create an order without specifing a description a Status Code of 400 is returned
+Scenario: A user create an order without specifing a description a Status Code of 400 is returned
     When a POST request is made to create an order
         | OrganisationId                       |
         | 4af62b99-638c-4247-875e-965239cd0c48 |
@@ -74,7 +74,7 @@ Scenario: 6. A user create an order without specifing a description a Status Cod
         | OrderDescriptionRequired | Description |
 
 @6739
-Scenario: 7. A user attempts to create a order with a description that is too long, a Status Code of 400 is returned;
+Scenario: A user attempts to create a order with a description that is too long, a Status Code of 400 is returned;
     When a POST request is made to create an order
         | OrganisationId                       | Description              |
         | 4af62b99-638c-4247-875e-965239cd0c48 | #A string of length 101# |
@@ -84,7 +84,7 @@ Scenario: 7. A user attempts to create a order with a description that is too lo
         | OrderDescriptionTooLong | Description |
 
 @6739
-Scenario: 8. If a user is not authorised, then they cannot create the order
+Scenario: If a user is not authorised, then they cannot create the order
     Given no user is logged in
     When a POST request is made to create an order
         | OrganisationId                       | Description                         |
@@ -92,7 +92,7 @@ Scenario: 8. If a user is not authorised, then they cannot create the order
     Then a response with status code 401 is returned
 
 @6739
-Scenario: 9. A non buyer user cannot create an order
+Scenario: A non buyer user cannot create an order
     Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
     When a POST request is made to create an order
         | OrganisationId                       | Description                         |

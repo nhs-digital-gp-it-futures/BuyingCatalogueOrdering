@@ -10,7 +10,7 @@ Background:
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @5124
-Scenario: 1. Set a section to be completed
+Scenario: Set a section to be completed
     When the user makes a request to complete order section with order Id C000014-01 section Id <section-id>
     Then a response with status code 204 is returned
     And the order with ID C000014-01 has additional services viewed set to <additional-services-viewed>
@@ -28,30 +28,30 @@ Scenario: 1. Set a section to be completed
         | associated-services | False                      | False                      | True                       |
 
 @5124
-Scenario: 2. A non existent orderId returns not found
+Scenario: A non existent orderId returns not found
     When the user makes a request to complete order section with order Id INVALID section Id catalogue-solutions
     Then a response with status code 404 is returned
 
 @5124
-Scenario: 3. If a user is not authorised then they cannot update the order section viewed status
+Scenario: If a user is not authorised then they cannot update the order section viewed status
     Given no user is logged in
     When the user makes a request to complete order section with order Id C000014-01 section Id catalogue-solutions
     Then a response with status code 401 is returned
 
 @5124
-Scenario: 4. A non buyer user cannot update the order section viewed status
+Scenario: A non buyer user cannot update the order section viewed status
     Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
     When the user makes a request to complete order section with order Id C000014-01 section Id catalogue-solutions
     Then a response with status code 403 is returned
 
 @5124
-Scenario: 5. A buyer user cannot update the order section viwed status for an organisation they don't belong to
+Scenario: A buyer user cannot update the order section viwed status for an organisation they don't belong to
     Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
     When the user makes a request to complete order section with order Id C000014-01 section Id catalogue-solutions
     Then a response with status code 403 is returned
 
 @5124
-Scenario: 6. Service Failure
+Scenario: Service Failure
     Given the call to the database will fail
     When the user makes a request to complete order section with order Id C000014-01 section Id catalogue-solutions
     Then a response with status code 500 is returned

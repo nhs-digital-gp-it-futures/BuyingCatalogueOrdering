@@ -19,7 +19,7 @@ Background:
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @7840
-Scenario: 1. Update an order item
+Scenario: Update an order item
     Given the user creates a request to change the order item ('Order Item 1') for the order with ID 'C000014-01'
     And the user enters the '<payload-type>' update order item request payload
     When the user sends the update order item request
@@ -39,7 +39,7 @@ Scenario: 1. Update an order item
         | Order Item 3 | low-boundary  |
 
 @7840
-Scenario: 2. Update an order item that is not on demand does not update the estimation period
+Scenario: Update an order item that is not on demand does not update the estimation period
     Given the user creates a request to change the order item ('Order Item 2') for the order with ID 'C000014-01'
     And the user enters the 'missing-estimation-period' update order item request payload
     When the user sends the update order item request
@@ -47,7 +47,7 @@ Scenario: 2. Update an order item that is not on demand does not update the esti
     And the order item is updated
 
 @7840
-Scenario: 3. Update a order item and the order audit information is updated
+Scenario: Update a order item and the order audit information is updated
     Given the user creates a request to change the order item ('Order Item 1') for the order with ID 'C000014-01'
     And the user enters the 'complete' update order item request payload
     When the user sends the update order item request
@@ -56,14 +56,14 @@ Scenario: 3. Update a order item and the order audit information is updated
         | 7b195137-6a59-4854-b118-62b39a3101ef | Bob Smith         |
 
 @7840
-Scenario: 4. Update a order item with invalid order ID should return not found
+Scenario: Update a order item with invalid order ID should return not found
     Given the user creates a request to change the order item ('Order Item 1') for the order with ID 'INVALID'
     And the user enters the 'complete' update order item request payload
     When the user sends the update order item request
     Then a response with status code 404 is returned
 
 @7840
-Scenario: 5. If a user is not authorised then they cannot update a order item
+Scenario: If a user is not authorised then they cannot update a order item
     Given no user is logged in
     And the user creates a request to change the order item ('Order Item 1') for the order with ID 'C000014-01'
     And the user enters the 'complete' update order item request payload
@@ -71,7 +71,7 @@ Scenario: 5. If a user is not authorised then they cannot update a order item
     Then a response with status code 401 is returned
 
 @7840
-Scenario: 6. A non buyer user cannot update a order item
+Scenario: A non buyer user cannot update a order item
     Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
     And the user creates a request to change the order item ('Order Item 1') for the order with ID 'C000014-01'
     And the user enters the 'complete' update order item request payload
@@ -79,7 +79,7 @@ Scenario: 6. A non buyer user cannot update a order item
     Then a response with status code 403 is returned
 
 @7840
-Scenario: 7. A buyer user cannot update a order item for an organisation they don't belong to
+Scenario: A buyer user cannot update a order item for an organisation they don't belong to
     Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
     And the user creates a request to change the order item ('Order Item 1') for the order with ID 'C000014-01'
     And the user enters the 'complete' update order item request payload
@@ -87,7 +87,7 @@ Scenario: 7. A buyer user cannot update a order item for an organisation they do
     Then a response with status code 403 is returned
 
 @7840
-Scenario: 8. Service Failure
+Scenario: Service Failure
     Given the call to the database will fail
     And the user creates a request to change the order item ('Order Item 1') for the order with ID 'C000014-01'
     And the user enters the 'complete' update order item request payload

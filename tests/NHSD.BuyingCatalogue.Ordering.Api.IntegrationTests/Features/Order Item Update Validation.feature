@@ -17,7 +17,7 @@ Background:
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @7840
-Scenario: 1. Update a catalogue solution order item with missing values
+Scenario: Update a catalogue solution order item with missing values
     Given the user creates a request to change the order item ('Order Item 1') for the order with ID 'C000014-01'
     And the user enters the '<payload-type>' update order item request payload
     When the user sends the update order item request
@@ -41,7 +41,7 @@ Scenario: 1. Update a catalogue solution order item with missing values
         
 
 @7840
-Scenario: 2. Update an additional service order item with missing values
+Scenario: Update an additional service order item with missing values
     Given the user creates a request to change the order item ('Order Item 2') for the order with ID 'C000014-01'
     And the user enters the '<payload-type>' update order item request payload
     When the user sends the update order item request

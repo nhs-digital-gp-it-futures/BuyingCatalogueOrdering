@@ -16,7 +16,7 @@ Background:
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @4621
-Scenario: 1. Updating a ordering party with not filling in required fields produces the relavent error message
+Scenario: Updating a ordering party with not filling in required fields produces the relavent error message
     Given an order party update request exist for order ID C000014-01
     And the update request for order ID C000014-01 has a contact
         | FirstName | LastName | EmailAddress | TelephoneNumber |
@@ -36,7 +36,7 @@ Scenario: 1. Updating a ordering party with not filling in required fields produ
         | TelephoneNumberRequired | TelephoneNumber |
 
 @4621
-Scenario: 2. Updating a ordering party, and exceeding the maxLength fields, produces the relavent error message
+Scenario: Updating a ordering party, and exceeding the maxLength fields, produces the relavent error message
     Given an order party update request exist for order ID C000014-01
     And the update request for order ID C000014-01 has a contact
         | FirstName                | LastName                 | EmailAddress                  | TelephoneNumber         |
@@ -56,7 +56,7 @@ Scenario: 2. Updating a ordering party, and exceeding the maxLength fields, prod
         | TelephoneNumberTooLong | TelephoneNumber |
 
 @4621
-Scenario: 3. Updating a ordering party, and not providing a correct email address format, produces the relavent error message
+Scenario: Updating a ordering party, and not providing a correct email address format, produces the relavent error message
     Given an order party update request exist for order ID C000014-01
     And the update request for order ID C000014-01 has a contact
         | FirstName | LastName | EmailAddress   | TelephoneNumber |

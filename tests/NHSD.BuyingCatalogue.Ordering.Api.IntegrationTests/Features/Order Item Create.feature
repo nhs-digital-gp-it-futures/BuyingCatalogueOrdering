@@ -13,7 +13,7 @@ Background:
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @7840
-Scenario: 1. Create order item
+Scenario: Create order item
     Given the user creates a request to add a new <ItemType> order item to the order with ID 'C000014-01'
     And the user enters the 'complete' create order item request payload
     When the user sends the create order item request
@@ -26,7 +26,7 @@ Scenario: 1. Create order item
         | associated service |
 
 @7840
-Scenario: 2. Create order item and the new order item ID is returned
+Scenario: Create order item and the new order item ID is returned
     Given the user creates a request to add a new <ItemType> order item to the order with ID 'C000014-01'
     And the user enters the 'complete' create order item request payload
     When the user sends the create order item request
@@ -38,7 +38,7 @@ Scenario: 2. Create order item and the new order item ID is returned
         | associated service |
 
 @7840
-Scenario: 3. Create order item and the order audit information is updated
+Scenario: Create order item and the order audit information is updated
     Given the user creates a request to add a new <ItemType> order item to the order with ID 'C000014-01'
     And the user enters the 'complete' create order item request payload
     When the user sends the create order item request
@@ -52,7 +52,7 @@ Scenario: 3. Create order item and the order audit information is updated
         | associated service |
 
 @7840
-Scenario: 4. Create order item with invalid order ID
+Scenario: Create order item with invalid order ID
     Given the user creates a request to add a new <ItemType> order item to the order with ID 'INVALID'
     And the user enters the 'complete' create order item request payload
     When the user sends the create order item request
@@ -64,7 +64,7 @@ Scenario: 4. Create order item with invalid order ID
         | associated service |
 
 @7840
-Scenario: 5. If a user is not authorised then they cannot create an order item
+Scenario: If a user is not authorised then they cannot create an order item
     Given no user is logged in
     And the user creates a request to add a new <ItemType> order item to the order with ID 'C000014-01'
     And the user enters the 'complete' create order item request payload
@@ -77,7 +77,7 @@ Scenario: 5. If a user is not authorised then they cannot create an order item
         | associated service |
 
 @7840
-Scenario: 6. A non buyer user cannot create an order item
+Scenario: A non buyer user cannot create an order item
     Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
     And the user creates a request to add a new <ItemType> order item to the order with ID 'C000014-01'
     And the user enters the 'complete' create order item request payload
@@ -90,7 +90,7 @@ Scenario: 6. A non buyer user cannot create an order item
         | associated service |
 
 @7840
-Scenario: 7. A buyer user cannot create an order item for an organisation they don't belong to
+Scenario: A buyer user cannot create an order item for an organisation they don't belong to
     Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
     And the user creates a request to add a new <ItemType> order item to the order with ID 'C000014-01'
     And the user enters the 'complete' create order item request payload
@@ -103,7 +103,7 @@ Scenario: 7. A buyer user cannot create an order item for an organisation they d
         | associated service |
 
 @7840
-Scenario: 8. Service Failure
+Scenario: Service Failure
     Given the call to the database will fail
     And the user creates a request to add a new <ItemType> order item to the order with ID 'C000014-01'
     And the user enters the 'complete' create order item request payload
@@ -116,7 +116,7 @@ Scenario: 8. Service Failure
         | associated service |
 
 @7840
-Scenario: 9. Create catalogue solution order item and the catalogue solution order section should be marked as complete
+Scenario: Create catalogue solution order item and the catalogue solution order section should be marked as complete
     And the user creates a request to add a new catalogue solution order item to the order with ID 'C000014-01'
     And the user enters the 'complete' create order item request payload
     When the user sends the create order item request

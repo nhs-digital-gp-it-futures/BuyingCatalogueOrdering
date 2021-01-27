@@ -16,7 +16,7 @@ Background:
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @7412
-Scenario: 1. Get the service recipients from an exisiting ordering ID
+Scenario: Get the service recipients from an exisiting ordering ID
     When the user makes a request to retrieve the service-recipients section with order ID C000014-01
     Then a response with status code 200 is returned
     And the service recipients are returned
@@ -25,30 +25,30 @@ Scenario: 1. Get the service recipients from an exisiting ordering ID
         | Ods1    | Updated Service Recipient |
 
 @7412
-Scenario: 2. If an order does not exist, return not found
+Scenario: If an order does not exist, return not found
     When the user makes a request to retrieve the service-recipients section with order ID INVALID
     Then a response with status code 404 is returned
 
 @7412
-Scenario: 3. If a user is not authorised then they cannot access the service recipients section
+Scenario: If a user is not authorised then they cannot access the service recipients section
     Given no user is logged in
     When the user makes a request to retrieve the service-recipients section with order ID C000014-01
     Then a response with status code 401 is returned
 
 @7412
-Scenario: 4. A non buyer user cannot access the service recipients section
+Scenario: A non buyer user cannot access the service recipients section
     Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
     When the user makes a request to retrieve the service-recipients section with order ID C000014-01
     Then a response with status code 403 is returned
 
 @7412
-Scenario: 5. A buyer user cannot access the service recipients section for an organisation they don't belong to
+Scenario: A buyer user cannot access the service recipients section for an organisation they don't belong to
     Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
     When the user makes a request to retrieve the service-recipients section with order ID C000014-01
     Then a response with status code 403 is returned
 
 @7412
-Scenario: 6. Service Failure
+Scenario: Service Failure
     Given the call to the database will fail
     When the user makes a request to retrieve the service-recipients section with order ID C000014-01
     Then a response with status code 500 is returned
