@@ -22,8 +22,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 
         internal static Contact FromModel(this Contact contact, PrimaryContactModel model)
         {
-            if (contact is null)
-                contact = new Contact();
+            contact ??= new Contact();
 
             if (model is null)
                 throw new ArgumentNullException(nameof(model));

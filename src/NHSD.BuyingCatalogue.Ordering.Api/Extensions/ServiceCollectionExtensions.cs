@@ -31,7 +31,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
                     new[] { HealthCheckTags.Ready },
                     TimeSpan.FromSeconds(10));
 
-            if (smtpSettings != null)
+            if (smtpSettings is not null)
             {
                 healthChecksBuilder.AddSmtpHealthCheck(
                     smtp =>

@@ -81,7 +81,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
         private sealed class OrderDescriptionTable
         {
-            public string Description { get; set; }
+            public string Description { get; init; }
         }
     }
 }

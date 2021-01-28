@@ -113,7 +113,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 
         private async Task UpdateServiceRecipients(string orderId, IEnumerable<CreateOrderItemRequest> requests)
         {
-            var serviceRecipients = requests.Select(r => r.ServiceRecipient).Where(r => r != null).Distinct();
+            var serviceRecipients = requests.Select(r => r.ServiceRecipient).Where(r => r is not null).Distinct();
             await serviceRecipientRepository.UpdateWithoutSavingAsync(orderId, serviceRecipients);
         }
     }

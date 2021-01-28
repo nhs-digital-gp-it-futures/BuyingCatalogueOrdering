@@ -26,12 +26,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 return Result.Failure<OrderDescription>(OrderErrors.OrderDescriptionRequired());
             }
 
-            if (description.Length > 100)
-            {
-                return Result.Failure<OrderDescription>(OrderErrors.OrderDescriptionTooLong());
-            }
-
-            return Result.Success(new OrderDescription(description));
+            return description.Length > 100
+                ? Result.Failure<OrderDescription>(OrderErrors.OrderDescriptionTooLong())
+                : Result.Success(new OrderDescription(description));
         }
 
         protected override IEnumerable<object> GetEqualityComponents()

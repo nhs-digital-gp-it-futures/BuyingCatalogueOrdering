@@ -22,7 +22,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Results
         private Result(bool isSuccess, IEnumerable<ErrorDetails> errors)
         {
             IsSuccess = isSuccess;
-            Errors = new ReadOnlyCollection<ErrorDetails>(errors != null ? errors.ToList() : new List<ErrorDetails>());
+            Errors = new ReadOnlyCollection<ErrorDetails>(errors?.ToList() ?? new List<ErrorDetails>());
         }
 
         public bool IsSuccess { get; }
@@ -61,7 +61,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Results
 
         public bool Equals(Result other)
         {
-            return other is object
+            return other is not null
                 && IsSuccess == other.IsSuccess
                 && AreErrorsEqual(Errors, other.Errors);
         }
@@ -81,10 +81,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Results
             if (first is null)
                 return second is null;
 
-            if (second is null)
-                return false;
-
-            return first.SequenceEqual(second);
+            return second is not null && first.SequenceEqual(second);
         }
     }
 }

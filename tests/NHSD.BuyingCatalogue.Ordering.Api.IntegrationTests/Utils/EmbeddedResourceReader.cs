@@ -12,7 +12,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
             using var certificateStream =
                 typeof(EmbeddedResourceReader).Assembly.GetManifestResourceStream(resourceName);
 
-            if (certificateStream == null)
+            if (certificateStream is null)
             {
                 return null;
             }

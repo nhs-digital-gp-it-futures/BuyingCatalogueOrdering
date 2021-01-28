@@ -22,8 +22,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
 
         public OrderEntity OrderEntity { get; }
 
-        public OrderItemEntity OrderItemEntities { get; }
-
         public ServiceRecipientEntity ServiceRecipientEntity { get; set; }
 
         public OrderItemEntity CatalogueSolutionEntity { get; set; }
@@ -36,22 +34,22 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
         {
             await OrderEntity.InsertAsync(connectionString);
 
-            if (ServiceRecipientEntity != null)
+            if (ServiceRecipientEntity is not null)
             {
                 await ServiceRecipientEntity.InsertAsync(connectionString);
             }
 
-            if (CatalogueSolutionEntity != null)
+            if (CatalogueSolutionEntity is not null)
             {
                 await CatalogueSolutionEntity.InsertAsync(connectionString);
             }
 
-            if (AdditionalServiceEntity != null)
+            if (AdditionalServiceEntity is not null)
             {
                 await AdditionalServiceEntity.InsertAsync(connectionString);
             }
 
-            if (AssociatedServiceEntity != null)
+            if (AssociatedServiceEntity is not null)
             {
                 await AssociatedServiceEntity.InsertAsync(connectionString);
             }

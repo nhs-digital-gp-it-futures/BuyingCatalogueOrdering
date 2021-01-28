@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using JetBrains.Annotations;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
@@ -117,46 +118,48 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await getOrderItemsResponse.AssertServiceInstanceIdAsync(expected);
         }
 
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class ServiceInstanceItem
         {
-            public int OrderItemId { get; set; }
+            public int OrderItemId { get; init; }
 
-            public string ServiceInstanceId { get; set; }
+            public string ServiceInstanceId { get; init; }
         }
 
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class OrderItemTable
         {
-            public string OrderId { get; set; }
+            public string OrderId { get; init; }
 
-            public string OdsCode { get; set; }
+            public string OdsCode { get; init; }
 
-            public string CatalogueItemId { get; set; } = "100001-001";
+            public string CatalogueItemId { get; init; } = "100001-001";
 
-            public string ParentCatalogueItemId { get; set; }
+            public string ParentCatalogueItemId { get; init; }
 
-            public CatalogueItemType CatalogueItemType { get; set; }
+            public CatalogueItemType CatalogueItemType { get; init; }
 
-            public string CatalogueItemName { get; set; } = Guid.NewGuid().ToString();
+            public string CatalogueItemName { get; init; } = Guid.NewGuid().ToString();
 
-            public ProvisioningType ProvisioningType { get; set; } = ProvisioningType.OnDemand;
+            public ProvisioningType ProvisioningType { get; init; } = ProvisioningType.OnDemand;
 
-            public string CataloguePriceUnitName { get; set; } = "patient";
+            public string CataloguePriceUnitName { get; init; } = "patient";
 
-            public string CataloguePriceUnitDescription { get; set; } = "per patient";
+            public string CataloguePriceUnitDescription { get; init; } = "per patient";
 
-            public TimeUnit? PriceTimeUnit { get; set; }
+            public TimeUnit? PriceTimeUnit { get; init; }
 
-            public string CurrencyCode { get; set; } = "GBP";
+            public string CurrencyCode { get; init; } = "GBP";
 
-            public int Quantity { get; private set; } = 1;
+            public int Quantity { get; init; } = 1;
 
-            public TimeUnit? EstimationPeriod { get; set; } = TimeUnit.Month;
+            public TimeUnit? EstimationPeriod { get; init; } = TimeUnit.Month;
 
-            public DateTime? DeliveryDate { get; set; }
+            public DateTime? DeliveryDate { get; init; }
 
-            public decimal? Price { get; set; }
+            public decimal? Price { get; init; }
 
-            public DateTime? Created { get; set; }
+            public DateTime? Created { get; init; }
         }
     }
 }

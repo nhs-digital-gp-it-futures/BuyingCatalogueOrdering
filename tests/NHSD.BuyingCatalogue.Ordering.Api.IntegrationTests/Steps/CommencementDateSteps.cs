@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using JetBrains.Annotations;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
@@ -46,11 +47,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var expected = table.CreateSet<CommencementDateTable>().FirstOrDefault();
 
-            var apiReponse = await response.ReadBodyAsJsonAsync();
+            var apiResponse = await response.ReadBodyAsJsonAsync();
 
             var actual = new CommencementDateTable
             {
-                CommencementDate = apiReponse.Value<DateTime?>("commencementDate"),
+                CommencementDate = apiResponse.Value<DateTime?>("commencementDate"),
             };
 
             actual.Should().BeEquivalentTo(expected);
@@ -95,29 +96,30 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public async Task ThenTheOrderDescriptionForOrderWithIdIsSetToToday(string orderId)
         {
             var actual = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);
-            actual.CommencementDate.HasValue.Should().BeTrue();
-            actual.CommencementDate.Value.Date.Should().Be(DateTime.Today.Date);
+
+            actual.CommencementDate?.Date.Should().Be(DateTime.Today.Date);
         }
 
         [Then(@"the order commencement date for order with id (.*) is set to ([0-9]+) days in the future")]
         public async Task ThenTheOrderDescriptionForOrderWithIdIsSetToDaysInTheFuture(string orderId, int days)
         {
             var actual = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);
-            actual.CommencementDate.HasValue.Should().BeTrue();
-            actual.CommencementDate.Value.Date.Should().Be(DateTime.Today.Date + TimeSpan.FromDays(days));
+
+            actual.CommencementDate?.Date.Should().Be(DateTime.Today.Date + TimeSpan.FromDays(days));
         }
 
         [Then(@"the order commencement date for order with id (.*) is set to ([0-9]+) days in the past")]
         public async Task ThenTheOrderDescriptionForOrderWithIdIsSetToDaysAgo(string orderId, int days)
         {
             var actual = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);
-            actual.CommencementDate.HasValue.Should().BeTrue();
-            actual.CommencementDate.Value.Date.Should().Be(DateTime.Today.Date - TimeSpan.FromDays(days));
+
+            actual.CommencementDate?.Date.Should().Be(DateTime.Today.Date - TimeSpan.FromDays(days));
         }
 
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class CommencementDateTable
         {
-            public DateTime? CommencementDate { get; set; }
+            public DateTime? CommencementDate { get; init; }
         }
     }
 }

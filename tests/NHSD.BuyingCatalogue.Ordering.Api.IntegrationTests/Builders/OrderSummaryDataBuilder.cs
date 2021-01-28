@@ -98,14 +98,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Builders
 
         public OrderSummaryData Build()
         {
-            if (orderEntity != null)
+            if (orderEntity is null)
             {
-                orderEntity.ServiceRecipientsViewed = serviceRecipientsViewed;
-                orderEntity.AdditionalServicesViewed = additionalServicesViewed;
-                orderEntity.AssociatedServicesViewed = associatedServicesViewed;
-                orderEntity.CatalogueSolutionsViewed = catalogueSolutionsViewed;
-                orderEntity.FundingSourceOnlyGms = fundingSource;
+                return new OrderSummaryData(
+                    orderEntity,
+                    serviceRecipientEntity,
+                    catalogueSolutionEntity,
+                    additionalServiceEntity,
+                    associatedServiceEntity);
             }
+
+            orderEntity.ServiceRecipientsViewed = serviceRecipientsViewed;
+            orderEntity.AdditionalServicesViewed = additionalServicesViewed;
+            orderEntity.AssociatedServicesViewed = associatedServicesViewed;
+            orderEntity.CatalogueSolutionsViewed = catalogueSolutionsViewed;
+            orderEntity.FundingSourceOnlyGms = fundingSource;
 
             return new OrderSummaryData(orderEntity, serviceRecipientEntity, catalogueSolutionEntity, additionalServiceEntity, associatedServiceEntity);
         }

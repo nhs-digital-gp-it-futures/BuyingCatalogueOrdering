@@ -2,6 +2,6 @@
 {
     internal sealed class UpdateOrderStatusRequestPayload
     {
-        public string Status { get; set; }
+        public string Status { get; init; }
     }
 }

@@ -182,52 +182,52 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
         private sealed class SupplierSectionTable
         {
-            public string SupplierId { get; set; }
+            public string SupplierId { get; init; }
 
-            public string SupplierName { get; set; }
+            public string SupplierName { get; init; }
         }
 
         private sealed class SupplierContactTable
         {
-            public string FirstName { get; set; }
+            public string FirstName { get; init; }
 
-            public string LastName { get; set; }
+            public string LastName { get; init; }
 
-            public string Email { get; set; }
+            public string Email { get; init; }
 
-            public string Phone { get; set; }
+            public string Phone { get; init; }
         }
 
         private sealed class ContactTable
         {
-            public string FirstName { get; set; }
+            public string FirstName { get; init; }
 
-            public string LastName { get; set; }
+            public string LastName { get; init; }
 
-            public string EmailAddress { get; set; }
+            public string EmailAddress { get; init; }
 
-            public string TelephoneNumber { get; set; }
+            public string TelephoneNumber { get; init; }
         }
 
         private sealed class SupplierAddressTable
         {
-            public string Line1 { get; set; }
+            public string Line1 { get; init; }
 
-            public string Line2 { get; set; }
+            public string Line2 { get; init; }
 
-            public string Line3 { get; set; }
+            public string Line3 { get; init; }
 
-            public string Line4 { get; set; }
+            public string Line4 { get; init; }
 
-            public string Line5 { get; set; }
+            public string Line5 { get; init; }
 
-            public string Town { get; set; }
+            public string Town { get; init; }
 
-            public string County { get; set; }
+            public string County { get; init; }
 
-            public string Postcode { get; set; }
+            public string Postcode { get; init; }
 
-            public string Country { get; set; }
+            public string Country { get; init; }
         }
     }
 }

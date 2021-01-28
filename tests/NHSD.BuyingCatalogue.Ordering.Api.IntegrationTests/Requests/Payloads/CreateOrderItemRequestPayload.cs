@@ -9,43 +9,43 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests.Payloads
 
         public bool HasOrderItemId => OrderItemId.HasValue;
 
-        public bool HasServiceRecipient { get; set; }
+        public bool HasServiceRecipient { get; init; }
 
-        public bool HasItemUnit { get; set; }
+        public bool HasItemUnit { get; init; }
 
-        public bool HasTimeUnit { get; set; }
+        public bool HasTimeUnit { get; init; }
 
         public string OdsCode { get; set; }
 
-        public string CatalogueItemId { get; set; }
+        public string CatalogueItemId { get; init; }
 
         public string CatalogueItemName { get; set; }
 
-        public string CatalogueSolutionId { get; set; }
+        public string CatalogueSolutionId { get; init; }
 
-        public DateTime? DeliveryDate { get; set; }
+        public DateTime? DeliveryDate { get; init; }
 
-        public int? Quantity { get; set; }
+        public int? Quantity { get; init; }
 
-        public TimeUnit? EstimationPeriod { get; set; }
+        public TimeUnit? EstimationPeriod { get; init; }
 
-        public CatalogueItemType? CatalogueItemType { get; set; }
+        public CatalogueItemType? CatalogueItemType { get; init; }
 
-        public ProvisioningType? ProvisioningType { get; set; }
+        public ProvisioningType? ProvisioningType { get; init; }
 
-        public CataloguePriceType? CataloguePriceType { get; set; }
+        public CataloguePriceType? CataloguePriceType { get; init; }
 
-        public string CurrencyCode { get; set; }
+        public string CurrencyCode { get; init; }
 
-        public string ItemUnitName { get; set; }
+        public string ItemUnitName { get; init; }
 
-        public string ItemUnitNameDescription { get; set; }
+        public string ItemUnitNameDescription { get; init; }
 
-        public string TimeUnitName { get; set; }
+        public string TimeUnitName { get; init; }
 
-        public string TimeUnitDescription { get; set; }
+        public string TimeUnitDescription { get; init; }
 
-        public decimal? Price { get; set; }
+        public decimal? Price { get; init; }
 
         public string ServiceRecipientName { get; set; }
     }

@@ -70,7 +70,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
             object itemUnit = null;
 
             var itemUnitToken = responseBody.SelectToken("itemUnit");
-            if (itemUnitToken != null)
+            if (itemUnitToken is not null)
             {
                 itemUnit = new
                 {
@@ -85,12 +85,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
         private static object ReadEstimationPeriod(JToken responseBody)
         {
             var timeUnitToken = responseBody.Value<string>("estimationPeriod");
-            if (timeUnitToken != null)
-            {
-                return Enum.Parse<TimeUnit>(timeUnitToken, true).ToString();
-            }
-
-            return null;
+            return timeUnitToken is not null ? Enum.Parse<TimeUnit>(timeUnitToken, true).ToString() : null;
         }
 
         private static object ReadTimeUnit(JToken responseBody)
@@ -98,7 +93,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
             object timeUnit = null;
 
             var timeUnitToken = responseBody.SelectToken("timeUnit");
-            if (timeUnitToken != null)
+            if (timeUnitToken is not null)
             {
                 timeUnit = new
                 {
@@ -115,7 +110,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
             object serviceRecipient = null;
 
             var serviceRecipientToken = responseBody.SelectToken("serviceRecipient");
-            if (serviceRecipientToken != null)
+            if (serviceRecipientToken is not null)
             {
                 serviceRecipient = new
                 {

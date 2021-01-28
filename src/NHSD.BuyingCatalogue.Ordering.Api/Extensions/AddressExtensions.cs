@@ -27,8 +27,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 
         internal static Address FromModel(this Address address, AddressModel model)
         {
-            if (address is null)
-                address = new Address();
+            address ??= new Address();
 
             if (model is null)
                 throw new ArgumentNullException(nameof(model));

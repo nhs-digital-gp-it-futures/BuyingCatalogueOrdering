@@ -6,52 +6,37 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
     {
         public static bool IsOrderingPartySectionComplete(this Order order)
         {
-            return order?.OrganisationContact != null;
+            return order?.OrganisationContact is not null;
         }
 
         public static bool IsSupplierSectionComplete(this Order order)
         {
-            return order?.SupplierContact != null;
+            return order?.SupplierContact is not null;
         }
 
         public static bool IsCommencementDateSectionComplete(this Order order)
         {
-            return order?.CommencementDate != null;
+            return order?.CommencementDate is not null;
         }
 
         public static bool IsServiceRecipientsSectionComplete(this Order order)
         {
-            if (order == null)
-            {
-                return false;
-            }
-
-            return order.ServiceRecipientsViewed;
+            return order is not null && order.ServiceRecipientsViewed;
         }
 
         public static bool IsCatalogueSolutionsSectionComplete(this Order order)
         {
-            if (order == null)
-            {
-                return false;
-            }
-
-            return order.CatalogueSolutionsViewed;
+            return order is not null && order.CatalogueSolutionsViewed;
         }
 
         public static bool IsAdditionalServicesSectionComplete(this Order order)
         {
-            if (order is null)
-            {
-                return false;
-            }
-
-            return order.AdditionalServicesViewed;
+            return order is not null && order.AdditionalServicesViewed;
         }
 
         public static bool IsFundingSourceComplete(this Order order)
         {
-            return order?.FundingSourceOnlyGms != null;
+            return order?.FundingSourceOnlyGms is not null;
         }
 
         public static bool IsAssociatedServicesSectionComplete(this Order order)
@@ -60,6 +45,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
         }
 
         public static bool IsSectionStatusComplete(this Order order) =>
-            order != null && order.CanComplete();
+            order is not null && order.CanComplete();
     }
 }
