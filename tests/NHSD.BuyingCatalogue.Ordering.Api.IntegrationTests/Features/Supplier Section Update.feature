@@ -99,7 +99,7 @@ Scenario: A buyer user cannot update a supplier section for an organisation they
 
 @4621
 Scenario: A user with read only permissions cannot update a supplier section
-    Given the user is logged in with the Readonly-Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
+    Given the user is logged in with the Read-only Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
     When the user makes a request to update the supplier with order ID C000014-01
         | SupplierId | SupplierName     |
         | Sup3       | Updated Supplier |

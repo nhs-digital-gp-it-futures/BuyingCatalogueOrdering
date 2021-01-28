@@ -33,9 +33,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Given(@"the user creates a new ""(.*)"" order with id (.*)")]
-        public async Task GivenTheUserCreatesANewOrderWithOrderId(string datasetKey, string orderId)
+        public async Task GivenTheUserCreatesANewOrderWithOrderId(string dataSetKey, string orderId)
         {
-            await dataFactory.CreateData(datasetKey, orderId);
+            await dataFactory.CreateData(dataSetKey, orderId);
         }
 
         [When(@"the user makes a request to retrieve the order summary with the ID (.*)")]

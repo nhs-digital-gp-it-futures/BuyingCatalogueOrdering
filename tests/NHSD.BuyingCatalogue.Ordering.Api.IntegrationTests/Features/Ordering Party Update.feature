@@ -106,7 +106,7 @@ Scenario: A buyer user cannot update the ordering-party for an organisation they
 
 @4616
 Scenario: A user with read only permissions, cannot update an ordering-party
-    Given the user is logged in with the Readonly-Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
+    Given the user is logged in with the Read-only Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
     And an order party update request exist for order ID C000014-01
     And the order party update request for order ID C000014-01 has a Name of TestCare Center
     When the user makes a request to update the order party on the order with the ID C000014-01

@@ -43,6 +43,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             result.Errors.Should().BeSameAs(errors);
         }
 
+        // ReSharper disable once IdentifierTypo
         [Test]
         [OrderingAutoData]
         public static void Constructor_Params_ValidationResult_InitializesErrors(

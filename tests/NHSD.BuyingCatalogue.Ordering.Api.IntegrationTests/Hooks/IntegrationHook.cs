@@ -45,6 +45,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Hooks
 
         public void RegisterTestConfiguration()
         {
+            // ReSharper disable once StringLiteralTypo
             var configurationBuilder = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()

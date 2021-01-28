@@ -5,7 +5,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class OrderItem : IEquatable<OrderItem>
     {
-#pragma warning disable IDE0044 // Add readonly modifier
+#pragma warning disable IDE0044 // Add read-only modifier
 
         // Cannot be read-only so that EF Core can set value
         [UsedImplicitly]
@@ -17,7 +17,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         [UsedImplicitly]
         private int orderItemId;
 
-#pragma warning restore IDE0044 // Add readonly modifier
+#pragma warning restore IDE0044 // Add read-only modifier
 
         public OrderItem(
             string odsCode,

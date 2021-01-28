@@ -114,6 +114,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 
                 operation.Security = new List<OpenApiSecurityRequirement>
                 {
+                    // ReSharper disable once StringLiteralTypo
                     new() { [oAuthScheme] = new[] { "orderingapi" } },
                 };
             }
