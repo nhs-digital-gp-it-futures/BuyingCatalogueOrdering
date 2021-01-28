@@ -143,10 +143,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public override int GetHashCode()
         {
-            if (!IsTransient())
-                return OrderItemId;
-
-            return base.GetHashCode();
+            return !IsTransient() ? OrderItemId : base.GetHashCode();
         }
 
         internal void UpdateFrom(OrderItem updatedItem)
@@ -168,13 +165,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         {
             bool changed = !Equals(DeliveryDate, deliveryDate);
             changed = changed || !Equals(Quantity, quantity);
-            changed = changed || (estimationPeriod != null && !Equals(EstimationPeriod, estimationPeriod));
+            changed = changed || (estimationPeriod is not null && !Equals(EstimationPeriod, estimationPeriod));
             changed = changed || !Equals(Price, price);
 
             DeliveryDate = deliveryDate;
             Quantity = quantity;
 
-            if (estimationPeriod != null)
+            if (estimationPeriod is not null)
             {
                 EstimationPeriod = estimationPeriod;
             }

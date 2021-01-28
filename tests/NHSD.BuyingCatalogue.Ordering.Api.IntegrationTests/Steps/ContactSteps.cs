@@ -64,13 +64,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
         private sealed class ContactTable
         {
-            public string FirstName { get; set; }
+            public string FirstName { get; init; }
 
-            public string LastName { get; set; }
+            public string LastName { get; init; }
 
-            public string EmailAddress { get; set; }
+            public string EmailAddress { get; init; }
 
-            public string TelephoneNumber { get; set; }
+            public string TelephoneNumber { get; init; }
         }
     }
 }

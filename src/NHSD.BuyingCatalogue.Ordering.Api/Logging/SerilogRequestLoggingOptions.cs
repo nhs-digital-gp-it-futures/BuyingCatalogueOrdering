@@ -12,10 +12,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Logging
         {
             _ = elapsed;
 
-            if (exception != null)
+            if (exception is not null)
                 return LogEventLevel.Error;
 
-            if (httpContext == null || httpContext.Response.StatusCode > 499)
+            if (httpContext is null || httpContext.Response.StatusCode > 499)
                 return LogEventLevel.Error;
 
             return IsHealthCheck(httpContext)
@@ -27,7 +27,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Logging
         {
             var endpoint = httpContext.GetEndpoint();
 
-            return endpoint != null && string.Equals(
+            return endpoint is not null && string.Equals(
                 endpoint.DisplayName,
                 HealthCheckEndpointDisplayName,
                 StringComparison.OrdinalIgnoreCase);

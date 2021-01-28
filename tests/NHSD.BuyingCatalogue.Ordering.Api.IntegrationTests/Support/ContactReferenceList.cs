@@ -15,10 +15,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
 
         public ContactEntity GetByContactId(int? contactId)
         {
-            if (contactId == null)
-                return null;
-
-            return cache[contactId.Value];
+            return contactId is null ? null : cache[contactId.Value];
         }
 
         public ContactEntity GetByEmail(string email) =>

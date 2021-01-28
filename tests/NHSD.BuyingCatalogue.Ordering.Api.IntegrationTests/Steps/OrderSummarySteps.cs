@@ -91,25 +91,25 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
         private sealed class OrderSummaryTable
         {
-            public string OrderId { get; set; }
+            public string OrderId { get; init; }
 
-            public Guid OrganisationId { get; set; }
+            public Guid OrganisationId { get; init; }
 
-            public string Description { get; set; }
+            public string Description { get; init; }
         }
 
         private sealed class SectionsTable
         {
-            public IEnumerable<SectionTable> Sections { get; set; }
+            public IEnumerable<SectionTable> Sections { get; init; }
         }
 
         private sealed class SectionTable
         {
-            public string Id { get; set; }
+            public string Id { get; init; }
 
-            public string Status { get; set; }
+            public string Status { get; init; }
 
-            public int? Count { get; set; }
+            public int? Count { get; init; }
         }
     }
 }

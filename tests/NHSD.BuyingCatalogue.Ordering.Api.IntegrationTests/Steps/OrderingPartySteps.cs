@@ -107,16 +107,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (orderId == null)
+            if (orderId is null)
                 return null;
 
             var payloadDictionary =
                 context.Get<IDictionary<string, OrganisationPartyPayload>>(ScenarioContextKeys.OrganisationPayloadDictionary, new Dictionary<string, OrganisationPartyPayload>());
 
-            if (payloadDictionary.TryGetValue(orderId, out var payload))
-                return payload;
-
-            return null;
+            return payloadDictionary.TryGetValue(orderId, out var payload) ? payload : null;
         }
 
         private static void SetOrganisationPartyPayloadByOrderId(ScenarioContext context, string orderId, OrganisationPartyPayload payload)
@@ -126,7 +123,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (payload == null)
+            if (payload is null)
                 return;
 
             var payloadDictionary =
@@ -142,9 +139,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
         private sealed class OrganisationTable
         {
-            public string Name { get; set; }
+            public string Name { get; init; }
 
-            public string OdsCode { get; set; }
+            public string OdsCode { get; init; }
         }
 
         private sealed class OrganisationPartyPayload

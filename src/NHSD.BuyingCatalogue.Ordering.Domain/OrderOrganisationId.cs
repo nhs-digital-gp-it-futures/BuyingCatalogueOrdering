@@ -22,12 +22,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public static Result<Guid> Create(Guid organisationId)
         {
-            if (organisationId == Guid.Empty)
-            {
-                return Result.Failure<Guid>(OrderErrors.OrderOrganisationIdRequired());
-            }
-
-            return Result.Success(organisationId);
+            return organisationId == Guid.Empty
+                ? Result.Failure<Guid>(OrderErrors.OrderOrganisationIdRequired())
+                : Result.Success(organisationId);
         }
 
         protected override IEnumerable<object> GetEqualityComponents()

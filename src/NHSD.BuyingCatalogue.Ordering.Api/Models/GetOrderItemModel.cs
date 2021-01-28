@@ -12,7 +12,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
                 throw new ArgumentNullException(nameof(orderItem));
 
             OrderItemId = orderItem.OrderItemId;
-            ServiceRecipient = serviceRecipient != null
+            ServiceRecipient = serviceRecipient is not null
                 ? new ServiceRecipientModel
                 {
                     OdsCode = serviceRecipient.OdsCode,

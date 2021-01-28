@@ -33,7 +33,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 
         public static async Task<ContactEntity> FetchContactById(string connectionString, int? contactId)
         {
-            if (contactId == null)
+            if (contactId is null)
             {
                 return null;
             }

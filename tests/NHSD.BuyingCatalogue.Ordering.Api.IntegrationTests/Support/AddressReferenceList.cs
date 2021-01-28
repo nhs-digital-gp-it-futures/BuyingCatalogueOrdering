@@ -15,10 +15,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
 
         public AddressEntity GetByAddressId(int? addressId)
         {
-            if (addressId == null)
-                return null;
-
-            return cache[addressId.Value];
+            return addressId is null ? null : cache[addressId.Value];
         }
 
         public AddressEntity GetByPostcode(string postcode) =>

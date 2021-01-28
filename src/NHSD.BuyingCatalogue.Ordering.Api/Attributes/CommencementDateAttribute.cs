@@ -28,12 +28,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Attributes
 
             var commencementDate = (DateTime)value;
 
-            if (commencementDate.ToUniversalTime() <= DateTime.UtcNow.AddDays(Days))
-            {
-                return new ValidationResult(ErrorMessage);
-            }
-
-            return ValidationResult.Success;
+            return commencementDate.ToUniversalTime() <= DateTime.UtcNow.AddDays(Days)
+                ? new ValidationResult(ErrorMessage)
+                : ValidationResult.Success;
         }
     }
 }

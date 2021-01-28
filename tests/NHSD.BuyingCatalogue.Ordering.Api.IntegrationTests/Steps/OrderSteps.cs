@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using JetBrains.Annotations;
 using Newtonsoft.Json.Linq;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
@@ -195,74 +196,76 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             };
         }
 
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class GetOrdersTable
         {
-            public string OrderId { get; set; }
+            public string OrderId { get; init; }
 
-            public string Description { get; set; }
+            public string Description { get; init; }
 
-            public string Status { get; set; }
+            public string Status { get; init; }
 
-            public DateTime Created { get; set; }
+            public DateTime Created { get; init; }
 
-            public DateTime LastUpdated { get; set; }
+            public DateTime LastUpdated { get; init; }
 
-            public string LastUpdatedByName { get; set; }
+            public string LastUpdatedByName { get; init; }
 
-            public bool? FundingSourceOnlyGms { get; set; }
+            public bool? FundingSourceOnlyGms { get; init; }
         }
 
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class OrdersTable
         {
-            public string OrderId { get; set; }
+            public string OrderId { get; init; }
 
-            public string Description { get; set; }
+            public string Description { get; init; }
 
-            public Guid OrganisationId { get; set; }
+            public Guid OrganisationId { get; init; }
 
-            public string OrganisationName { get; set; }
+            public string OrganisationName { get; init; }
 
-            public string OrganisationOdsCode { get; set; } = "test";
+            public string OrganisationOdsCode { get; init; } = "test";
 
-            public string OrganisationAddressPostcode { get; set; }
+            public string OrganisationAddressPostcode { get; init; }
 
-            public string OrganisationContactEmail { get; set; }
+            public string OrganisationContactEmail { get; init; }
 
-            public int? OrganisationBillingAddressId { get; set; }
+            public int? OrganisationBillingAddressId { get; init; }
 
-            public OrderStatus OrderStatus { get; set; } = OrderStatus.Complete;
+            public OrderStatus OrderStatus { get; init; } = OrderStatus.Complete;
 
-            public DateTime Created { get; set; }
+            public DateTime Created { get; init; }
 
-            public Guid LastUpdatedBy { get; set; }
+            public Guid LastUpdatedBy { get; init; }
 
-            public string LastUpdatedByName { get; set; }
+            public string LastUpdatedByName { get; init; }
 
-            public DateTime LastUpdated { get; set; }
+            public DateTime LastUpdated { get; init; }
 
-            public string SupplierId { get; set; }
+            public string SupplierId { get; init; }
 
-            public string SupplierName { get; set; }
+            public string SupplierName { get; init; }
 
-            public string SupplierAddressPostcode { get; set; }
+            public string SupplierAddressPostcode { get; init; }
 
-            public string SupplierContactEmail { get; set; }
+            public string SupplierContactEmail { get; init; }
 
-            public DateTime? CommencementDate { get; set; }
+            public DateTime? CommencementDate { get; init; }
 
-            public bool ServiceRecipientsViewed { get; set; }
+            public bool ServiceRecipientsViewed { get; init; }
 
-            public bool CatalogueSolutionsViewed { get; set; }
+            public bool CatalogueSolutionsViewed { get; init; }
 
-            public bool AdditionalServicesViewed { get; set; }
+            public bool AdditionalServicesViewed { get; init; }
 
-            public bool AssociatedServicesViewed { get; set; }
+            public bool AssociatedServicesViewed { get; init; }
 
-            public bool? FundingSourceOnlyGms { get; set; }
+            public bool? FundingSourceOnlyGms { get; init; }
 
-            public bool IsDeleted { get; set; }
+            public bool IsDeleted { get; init; }
 
-            public DateTime? Completed { get; set; }
+            public DateTime? Completed { get; init; }
         }
     }
 }

@@ -20,20 +20,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Results
 
         public T Value { get; }
 
-        public Result ToResult()
-        {
-            if (IsSuccess)
-                return Result.Success();
-
-            return Result.Failure(Errors);
-        }
-
         public bool Equals(Result<T> other)
         {
-            return other is object
-                   && IsSuccess == other.IsSuccess
-                   && AreErrorsEqual(Errors, other.Errors)
-                   && Equals(Value, other.Value);
+            return other is not null
+               && IsSuccess == other.IsSuccess
+               && AreErrorsEqual(Errors, other.Errors)
+               && Equals(Value, other.Value);
         }
 
         public override bool Equals(object obj)
@@ -51,10 +43,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.Results
             if (first is null)
                 return second is null;
 
-            if (second is null)
-                return false;
-
-            return first.SequenceEqual(second);
+            return second is not null && first.SequenceEqual(second);
         }
     }
 }

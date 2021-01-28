@@ -39,7 +39,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
 
         public async Task UpdateWithoutSavingAsync(string orderId, IEnumerable<ServiceRecipient> recipientsUpdates)
         {
-            if (recipientsUpdates == null)
+            if (recipientsUpdates is null)
             {
                 throw new ArgumentNullException(nameof(recipientsUpdates));
             }
@@ -59,7 +59,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
                 var updateServiceRecipientsToAdd = updateServiceRecipients.Except(noChangeServiceRecipients);
 
                 context.ServiceRecipient.RemoveRange(existingServiceRecipientsToRemove);
-                context.ServiceRecipient.AddRange(updateServiceRecipientsToAdd);
+                await context.ServiceRecipient.AddRangeAsync(updateServiceRecipientsToAdd);
             }
         }
 

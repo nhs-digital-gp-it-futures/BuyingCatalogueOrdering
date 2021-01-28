@@ -808,7 +808,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                         orderItem,
                         serviceRecipientDictionary[orderItem.OdsCode]));
 
-            if (catalogueItemTypeFilter != null)
+            if (catalogueItemTypeFilter is not null)
             {
                 items = items.Where(x =>
                     x.CatalogueItemType.Equals(catalogueItemTypeFilter, StringComparison.OrdinalIgnoreCase));

@@ -25,10 +25,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
         {
             public void Execute(object specimen, ISpecimenContext context)
             {
-                if (specimen == null)
+                if (specimen is null)
                     throw new ArgumentNullException(nameof(specimen));
 
-                if (context == null)
+                if (context is null)
                     throw new ArgumentNullException(nameof(context));
 
                 if (specimen is ControllerBase controller)

@@ -96,16 +96,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
         private sealed class ServiceRecipientsTable
         {
-            public IEnumerable<ServiceRecipientTable> ServiceRecipients { get; set; }
+            public IEnumerable<ServiceRecipientTable> ServiceRecipients { get; init; }
         }
 
         private sealed class ServiceRecipientTable
         {
-            public string OdsCode { get; set; }
+            public string OdsCode { get; init; }
 
-            public string Name { get; set; }
+            public string Name { get; init; }
 
-            public string OrderId { get; set; }
+            public string OrderId { get; init; }
         }
     }
 }

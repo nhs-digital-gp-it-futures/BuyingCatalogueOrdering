@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using JetBrains.Annotations;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 
@@ -46,11 +47,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common
             jsonResponse.Should().BeEmpty();
         }
 
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class ResponseErrorsTable
         {
-            public string Id { get; set; }
+            public string Id { get; init; }
 
-            public string Field { get; set; }
+            public string Field { get; init; }
         }
     }
 }

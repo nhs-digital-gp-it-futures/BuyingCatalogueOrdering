@@ -53,7 +53,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 
         public static async Task<AddressEntity> FetchAddressById(string connectionString, int? addressId)
         {
-            if (addressId == null)
+            if (addressId is null)
             {
                 return null;
             }

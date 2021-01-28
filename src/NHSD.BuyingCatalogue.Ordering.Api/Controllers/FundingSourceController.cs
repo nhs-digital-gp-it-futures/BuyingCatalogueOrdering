@@ -48,7 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<ActionResult> PutFundingSourceAsync(string orderId, UpdateFundingSourceModel model)
         {
-            if (model == null)
+            if (model is null)
             {
                 throw new ArgumentNullException(nameof(model));
             }

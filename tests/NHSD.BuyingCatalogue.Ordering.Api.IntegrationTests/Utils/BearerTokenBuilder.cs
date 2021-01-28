@@ -49,7 +49,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
                 throw new ArgumentException("Subject cannot be null or empty", nameof(subject));
             }
 
-            if (claims.FirstOrDefault(claim => claim.Type == "sub") == null)
+            if (claims.FirstOrDefault(claim => claim.Type == "sub") is null)
             {
                 claims.Add(new Claim("sub", subject));
             }
@@ -94,7 +94,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
 
         public string BuildToken()
         {
-            if (signingCertificate == null)
+            if (signingCertificate is null)
             {
                 throw new InvalidOperationException(
                     "You must specify an X509 certificate to use for signing the JWT Token");

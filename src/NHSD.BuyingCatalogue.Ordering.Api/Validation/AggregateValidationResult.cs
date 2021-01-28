@@ -16,7 +16,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Validation
 
         public void AddValidationResult(ValidationResult result, int index)
         {
-            if (result == null)
+            if (result is null)
                 throw new ArgumentNullException(nameof(result));
 
             if (result.Success)

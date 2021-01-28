@@ -81,7 +81,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         public void IsServiceRecipientsSectionComplete_ServiceRecipientsViewed_ReturnsTrue()
         {
             var order = OrderBuilder.Create().WithServiceRecipientsViewed(true).Build();
-            var actual = OrderExtensions.IsServiceRecipientsSectionComplete(order);
+            var actual = order.IsServiceRecipientsSectionComplete();
             actual.Should().BeTrue();
         }
 
@@ -89,7 +89,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         public void IsServiceRecipientsSectionComplete_ServiceRecipientsViewedFalse_ReturnsFalse()
         {
             var order = OrderBuilder.Create().WithServiceRecipientsViewed(false).Build();
-            var actual = OrderExtensions.IsServiceRecipientsSectionComplete(order);
+            var actual = order.IsServiceRecipientsSectionComplete();
             actual.Should().BeFalse();
         }
 
@@ -104,7 +104,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         public void IsCatalogueSolutionsSectionComplete_CatalogueSolutionsViewed_ReturnsTrue()
         {
             var order = OrderBuilder.Create().WithCatalogueSolutionsViewed(true).Build();
-            var actual = OrderExtensions.IsCatalogueSolutionsSectionComplete(order);
+            var actual = order.IsCatalogueSolutionsSectionComplete();
             actual.Should().BeTrue();
         }
 
@@ -112,7 +112,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         public void IsCatalogueSolutionsSectionComplete_CatalogueSolutionsNotViewed_ReturnsFalse()
         {
             var order = OrderBuilder.Create().WithCatalogueSolutionsViewed(false).Build();
-            var actual = OrderExtensions.IsCatalogueSolutionsSectionComplete(order);
+            var actual = order.IsCatalogueSolutionsSectionComplete();
             actual.Should().BeFalse();
         }
 
@@ -136,7 +136,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         public void IsFundingSourceComplete_OrderFundingViewed_ReturnsTrue()
         {
             var order = OrderBuilder.Create().WithFundingSourceOnlyGms(true).Build();
-            var actual = OrderExtensions.IsFundingSourceComplete(order);
+            var actual = order.IsFundingSourceComplete();
             actual.Should().BeTrue();
         }
 
