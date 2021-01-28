@@ -17,7 +17,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
 
         internal static async Task AwaitApiRunningAsync(string url, TimeSpan testTimeOut)
         {
-            var started = await HttpClientAwaiter.WaitForGetAsync(url, testTimeOut);
+            var started = await AwaitHttpClient.WaitForGetAsync(url, testTimeOut);
             if (!started)
             {
                 throw new TimeoutException($"Start Ordering API failed, could not get a successful health status from '{url}' after trying for '{testTimeOut}'");

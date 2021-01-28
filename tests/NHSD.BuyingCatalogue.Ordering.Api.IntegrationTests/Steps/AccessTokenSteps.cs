@@ -24,7 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             context[ScenarioContextKeys.AccessToken] = null;
         }
 
-        [Given(@"the user is logged in with the (Buyer|Authority|Readonly-Buyer) role for organisation (.*)")]
+        [Given(@"the user is logged in with the (Buyer|Authority|Read-only Buyer) role for organisation (.*)")]
         public void TheUserIsLoggedInWithRoleForOrganisation(string role, string organisationId)
         {
             var builder = new BearerTokenBuilder()
@@ -44,7 +44,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 .WithClaim(ClaimTypes.Name, "Test User")
                 .WithClaim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString());
 
-            if (role.Equals("Readonly-Buyer", StringComparison.OrdinalIgnoreCase))
+            if (role.Equals("Read-only Buyer", StringComparison.OrdinalIgnoreCase))
             {
                 builder.WithClaim("Ordering", "view");
             }

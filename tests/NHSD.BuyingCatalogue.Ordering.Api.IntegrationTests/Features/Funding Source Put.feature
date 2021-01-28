@@ -61,7 +61,7 @@ Scenario: A buyer user cannot update an orders funding source for an organisatio
 
 @5437
 Scenario: A user with read only permissions, cannot update an orders funding source
-    Given the user is logged in with the Readonly-Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
+    Given the user is logged in with the Read-only Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
     Given the user creates a request to update the funding source for the order with ID 'C000014-01'
     And the user enters the 'funding-source-true' update funding source request payload
     When the user sends the update funding source request

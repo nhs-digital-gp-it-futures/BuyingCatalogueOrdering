@@ -20,7 +20,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
             ""device_authorization_endpoint"": ""http://localhost:8070/identity/connect/deviceauthorization""
         }";
 
-        private const string JwksJson = @"{ ""keys"": [
+        private const string WebKeySet = @"{ ""keys"": [
             {
                 ""kty"": ""RSA"",
                 ""use"": ""sig"",
@@ -40,7 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
             options = options ?? throw new ArgumentNullException(nameof(options));
 
             options.Configuration = new OpenIdConnectConfiguration(OpenIdConfiguration);
-            options.TokenValidationParameters.IssuerSigningKeys = new JsonWebKeySet(JwksJson).GetSigningKeys();
+            options.TokenValidationParameters.IssuerSigningKeys = new JsonWebKeySet(WebKeySet).GetSigningKeys();
         }
     }
 }

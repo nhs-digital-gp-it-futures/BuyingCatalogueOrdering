@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
 {
-    public static class HttpClientAwaiter
+    public static class AwaitHttpClient
     {
         public static async Task<bool> WaitForGetAsync(string address, TimeSpan testTimeout)
         {

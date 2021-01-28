@@ -65,7 +65,7 @@ Scenario: A non buyer user cannot set a default delivery date
 
 @8952
 Scenario: A user with read only permissions cannot set a default delivery date
-    Given the user is logged in with the Readonly-Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
+    Given the user is logged in with the Read-only Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
     And the user sets the default delivery date using the following details
         | OrderId    | CatalogueItemId | PriceId | DeliveryDate |
         | C000014-02 | 10001-001       | 1       | 31/10/2020   |
