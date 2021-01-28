@@ -26,7 +26,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             get
             {
                 var service = ServiceRecipientsModelBuilder.Create()
-                    .WithServiceRecipientModel(ServiceRecipientModelBuilder.Create().Build())
+                    .WithServiceRecipientModel(new ServiceRecipientModel { Name = "Some Name", OdsCode = "Ods1" })
                     .Build();
                 return service;
             }

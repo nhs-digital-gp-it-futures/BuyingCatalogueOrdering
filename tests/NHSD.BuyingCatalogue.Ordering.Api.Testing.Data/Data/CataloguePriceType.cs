@@ -4,6 +4,5 @@
     {
         Invalid = 0,
         Flat = 1,
-        Tiered = 2,
     }
 }

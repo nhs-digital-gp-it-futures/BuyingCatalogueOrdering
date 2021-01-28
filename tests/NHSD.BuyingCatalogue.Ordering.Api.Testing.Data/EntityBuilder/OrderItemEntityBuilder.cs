@@ -7,6 +7,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
     public sealed class OrderItemEntityBuilder
     {
         private readonly DateTime lastUpdated;
+        private readonly string pricingUnitTierName;
+
         private int orderItemId;
         private string orderId;
         private string odsCode;
@@ -21,7 +23,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
         private CataloguePriceType cataloguePriceType;
         private string currencyCode;
         private TimeUnit? timeUnit;
-        private string pricingUnitTierName;
         private string pricingUnitName;
         private string pricingUnitDescription;
         private decimal? price;
@@ -203,12 +204,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
         public OrderItemEntityBuilder WithTimeUnit(TimeUnit? unit)
         {
             timeUnit = unit;
-            return this;
-        }
-
-        public OrderItemEntityBuilder WithPricingUnitTierName(string tierName)
-        {
-            pricingUnitTierName = tierName;
             return this;
         }
 

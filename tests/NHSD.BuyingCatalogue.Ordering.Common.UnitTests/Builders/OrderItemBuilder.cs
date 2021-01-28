@@ -5,13 +5,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
 {
     public sealed class OrderItemBuilder
     {
+        private readonly CataloguePriceType cataloguePriceType;
+
         private int? orderItemId;
         private string odsCode;
         private string catalogueItemId;
         private CatalogueItemType catalogueItemType;
         private string catalogueItemName;
         private ProvisioningType provisioningType;
-        private CataloguePriceType cataloguePriceType;
         private CataloguePriceUnit cataloguePriceUnit;
         private TimeUnit? priceTimeUnit;
         private string currencyCode;
@@ -74,12 +75,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
         public OrderItemBuilder WithProvisioningType(ProvisioningType type)
         {
             provisioningType = type;
-            return this;
-        }
-
-        public OrderItemBuilder WithCataloguePriceType(CataloguePriceType priceType)
-        {
-            cataloguePriceType = priceType;
             return this;
         }
 
