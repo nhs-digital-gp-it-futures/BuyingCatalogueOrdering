@@ -14,21 +14,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
     {
         public void Customize(IFixture fixture)
         {
-            fixture.Customize<CreateOrderItemModel>(c => new EnumValueByPropertyNameSpecimenBuilder<CatalogueItemType>());
-            fixture.Customize<CreateOrderItemModel>(c => new EnumValueByPropertyNameSpecimenBuilder<CataloguePriceType>(nameof(CreateOrderItemModel.Type)));
-            fixture.Customize<CreateOrderItemModel>(c => new EnumValueByPropertyNameSpecimenBuilder<ProvisioningType>());
-            fixture.Customize<CreateOrderItemModel>(c => new EnumValueByPropertyNameSpecimenBuilder<TimeUnit>(
+            fixture.Customize<CreateOrderItemModel>(_ => new EnumValueByPropertyNameSpecimenBuilder<CatalogueItemType>());
+            fixture.Customize<CreateOrderItemModel>(_ => new EnumValueByPropertyNameSpecimenBuilder<CataloguePriceType>(nameof(CreateOrderItemModel.Type)));
+            fixture.Customize<CreateOrderItemModel>(_ => new EnumValueByPropertyNameSpecimenBuilder<ProvisioningType>());
+            fixture.Customize<CreateOrderItemModel>(_ => new EnumValueByPropertyNameSpecimenBuilder<TimeUnit>(
                 nameof(CreateOrderItemModel.EstimationPeriod),
                 e => e.AsString(EnumFormat.DisplayName)));
 
-            fixture.Customize<CreateOrderItemRequest>(c => new EnumValueByParameterNameSpecimenBuilder<CatalogueItemType>());
-            fixture.Customize<CreateOrderItemRequest>(c => new EnumValueByParameterNameSpecimenBuilder<CataloguePriceType>());
-            fixture.Customize<CreateOrderItemRequest>(c => new EnumValueByParameterNameSpecimenBuilder<ProvisioningType>());
+            fixture.Customize<CreateOrderItemRequest>(_ => new EnumValueByParameterNameSpecimenBuilder<CatalogueItemType>());
+            fixture.Customize<CreateOrderItemRequest>(_ => new EnumValueByParameterNameSpecimenBuilder<CataloguePriceType>());
+            fixture.Customize<CreateOrderItemRequest>(_ => new EnumValueByParameterNameSpecimenBuilder<ProvisioningType>());
 
             var estimationPeriodNameBuilder = new EnumValueByParameterNameSpecimenBuilder<TimeUnit>("estimationPeriodName", e => e.AsString(EnumFormat.DisplayName));
 
-            fixture.Customize<CreateOrderItemRequest>(c => estimationPeriodNameBuilder);
-            fixture.Customize<UpdateOrderItemRequest>(c => estimationPeriodNameBuilder);
+            fixture.Customize<CreateOrderItemRequest>(_ => estimationPeriodNameBuilder);
+            fixture.Customize<UpdateOrderItemRequest>(_ => estimationPeriodNameBuilder);
         }
 
         private abstract class EnumValueByNameSpecimenBuilder<TEnum, TInfo> : ISpecimenBuilder

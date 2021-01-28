@@ -45,9 +45,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
             return this;
         }
 
-        public OrderSummaryModelBuilder WithSectionStatus(string status)
+        public OrderSummaryModelBuilder WithSectionStatus(string statusValue)
         {
-            sectionStatus = status;
+            sectionStatus = statusValue;
             return this;
         }
 

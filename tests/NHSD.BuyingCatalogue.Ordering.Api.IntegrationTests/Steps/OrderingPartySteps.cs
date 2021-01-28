@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using JetBrains.Annotations;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
@@ -50,7 +51,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Given(@"the order party update request for order ID (.*) has a Name of (.*)")]
-        public void GivenTheOrderPartyUpdateRequestForOrderIdHasANameOfTestCareCenter(string orderId, string name)
+        public void GivenTheOrderPartyUpdateRequestForOrderIdHasANameOf(string orderId, string name)
         {
             var payload = GetOrganisationPartyPayloadByOrderId(context, orderId);
 
@@ -58,7 +59,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Given(@"the order party update request for order ID (.*) has a OdsCode of (.*)")]
-        public void GivenTheOrderPartyUpdateRequestForOrderIdHasAOrganisationOdsCodeOfTestCareOds(string orderId, string odsCode)
+        public void GivenTheOrderPartyUpdateRequestForOrderIdHasAOrganisationOdsCodeOfTestCareOds(
+            string orderId,
+            string odsCode)
         {
             var payload = GetOrganisationPartyPayloadByOrderId(context, orderId);
 
@@ -100,7 +103,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected);
         }
 
-        private static OrganisationPartyPayload GetOrganisationPartyPayloadByOrderId(ScenarioContext context, string orderId)
+        private static OrganisationPartyPayload GetOrganisationPartyPayloadByOrderId(
+            ScenarioContext context,
+            string orderId)
         {
             if (context is null)
             {
@@ -110,13 +115,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             if (orderId is null)
                 return null;
 
-            var payloadDictionary =
-                context.Get<IDictionary<string, OrganisationPartyPayload>>(ScenarioContextKeys.OrganisationPayloadDictionary, new Dictionary<string, OrganisationPartyPayload>());
+            var payloadDictionary = context.Get<IDictionary<string, OrganisationPartyPayload>>(
+                ScenarioContextKeys.OrganisationPayloadDictionary,
+                new Dictionary<string, OrganisationPartyPayload>());
 
             return payloadDictionary.TryGetValue(orderId, out var payload) ? payload : null;
         }
 
-        private static void SetOrganisationPartyPayloadByOrderId(ScenarioContext context, string orderId, OrganisationPartyPayload payload)
+        private static void SetOrganisationPartyPayloadByOrderId(
+            ScenarioContext context,
+            string orderId,
+            OrganisationPartyPayload payload)
         {
             if (context is null)
             {
@@ -126,8 +135,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             if (payload is null)
                 return;
 
-            var payloadDictionary =
-                context.Get<IDictionary<string, OrganisationPartyPayload>>(ScenarioContextKeys.OrganisationPayloadDictionary, new Dictionary<string, OrganisationPartyPayload>());
+            var payloadDictionary = context.Get<IDictionary<string, OrganisationPartyPayload>>(
+                ScenarioContextKeys.OrganisationPayloadDictionary,
+                new Dictionary<string, OrganisationPartyPayload>());
 
             payloadDictionary[orderId] = payload;
 
@@ -137,6 +147,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             }
         }
 
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class OrganisationTable
         {
             public string Name { get; init; }
@@ -144,6 +155,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string OdsCode { get; init; }
         }
 
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class OrganisationPartyPayload
         {
             public string Name { get; set; }
@@ -155,36 +167,38 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public ContactPayload PrimaryContact { get; set; }
         }
 
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class AddressPayload
         {
-            public string Line1 { get; set; }
+            public string Line1 { get; init; }
 
-            public string Line2 { get; set; }
+            public string Line2 { get; init; }
 
-            public string Line3 { get; set; }
+            public string Line3 { get; init; }
 
-            public string Line4 { get; set; }
+            public string Line4 { get; init; }
 
-            public string Line5 { get; set; }
+            public string Line5 { get; init; }
 
-            public string Town { get; set; }
+            public string Town { get; init; }
 
-            public string County { get; set; }
+            public string County { get; init; }
 
-            public string Postcode { get; set; }
+            public string Postcode { get; init; }
 
-            public string Country { get; set; }
+            public string Country { get; init; }
         }
 
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class ContactPayload
         {
-            public string FirstName { get; set; }
+            public string FirstName { get; init; }
 
-            public string LastName { get; set; }
+            public string LastName { get; init; }
 
-            public string EmailAddress { get; set; }
+            public string EmailAddress { get; init; }
 
-            public string TelephoneNumber { get; set; }
+            public string TelephoneNumber { get; init; }
         }
     }
 }

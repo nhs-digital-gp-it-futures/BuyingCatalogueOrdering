@@ -571,7 +571,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public static void CalculateTotalOwnershipCost_RecurringAndOneOff_ReturnsTotalOwershipCost()
+        public static void CalculateTotalOwnershipCost_RecurringAndOneOff_ReturnsTotalOwnershipCost()
         {
             const int orderItemId1 = 1;
             const int orderItemId2 = 2;

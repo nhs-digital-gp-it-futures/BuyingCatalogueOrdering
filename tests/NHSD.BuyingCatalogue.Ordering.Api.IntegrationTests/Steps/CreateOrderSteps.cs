@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using FluentAssertions;
+using JetBrains.Annotations;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using TechTalk.SpecFlow;
@@ -39,11 +40,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             orderId.Should().Be(responseOrderId);
         }
 
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class CreateOrderPayload
         {
-            public Guid OrganisationId { get; set; }
+            public Guid OrganisationId { get; init; }
 
-            public string Description { get; set; }
+            public string Description { get; init; }
         }
     }
 }

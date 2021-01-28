@@ -21,8 +21,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
             fixture.Customize<GetOrderItemModel>(c => c.OmitAutoProperties());
             fixture.Customize<TimeUnitModel>(c => c.FromFactory(() => CreateTimeUnitModel(fixture)).OmitAutoProperties());
 
-            fixture.Customize<CreateOrderItemService>(c => new MockIdentityServiceSpecimenBuilder());
-            fixture.Customize<CreateOrderItemService>(c => new MockCreateOrderItemValidatorSpecimenBuilder());
+            fixture.Customize<CreateOrderItemService>(_ => new MockIdentityServiceSpecimenBuilder());
+            fixture.Customize<CreateOrderItemService>(_ => new MockCreateOrderItemValidatorSpecimenBuilder());
         }
 
         private static TimeUnitModel CreateTimeUnitModel(ISpecimenBuilder fixture)

@@ -18,7 +18,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
         public override void Customize(IFixture fixture)
         {
             fixture.Inject(organization);
-            fixture.Customize<OrderItem>(c => new SingleServiceRecipientSpecimenBuilder(organization));
+            fixture.Customize<OrderItem>(_ => new SingleServiceRecipientSpecimenBuilder(organization));
 
             base.Customize(fixture);
         }

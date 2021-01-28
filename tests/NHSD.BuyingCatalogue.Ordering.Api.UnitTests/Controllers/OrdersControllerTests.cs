@@ -35,7 +35,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
     internal static class OrdersControllerTests
     {
         [Test]
-        public static void Contructors_VerifyGuardClauses()
+        public static void Constructors_VerifyGuardClauses()
         {
             var fixture = new Fixture().Customize(new AutoMoqCustomization());
             var assertion = new GuardClauseAssertion(fixture);
@@ -884,8 +884,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 };
             }
 
-            internal StatusModel IncompleteOrderStatusModel { get; } = new() { Status = "incomplete" };
-
             internal StatusModel CompleteOrderStatusModel { get; } = new() { Status = "complete" };
 
             internal string Name { get; }
@@ -1376,7 +1374,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                             .WithOrganisationId(organisationId)
                             .WithCatalogueSolutionsViewed(true)
                             .WithServiceRecipientsViewed(true)
-                            .WithServiceRecipient("ODS1", "Recip1")
+                            .WithServiceRecipient("ODS1", "Recipient1")
                             .WithAssociatedServicesViewed(true)
                             .WithOrderItem(OrderItemBuilder.Create().WithCatalogueItemType(CatalogueItemType.AssociatedService).Build())
                             .WithFundingSourceOnlyGms(true)

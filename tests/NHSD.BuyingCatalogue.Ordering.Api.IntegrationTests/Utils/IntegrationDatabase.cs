@@ -10,8 +10,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
     {
         public static async Task ResetAsync(IConfiguration config)
         {
-            using IDbConnection databaseConnection = new SqlConnection(config.GetConnectionString("OrderingDbAdminConnectionString"));
+            using IDbConnection databaseConnection = new SqlConnection(
+                config.GetConnectionString("OrderingDbAdminConnectionString"));
+
             await databaseConnection.ExecuteAsync("GRANT CONNECT TO [NHSD-ORDAPI];");
+
+            // ReSharper disable StringLiteralTypo
             await databaseConnection.ExecuteAsync("ALTER ROLE db_datareader ADD MEMBER [NHSD-ORDAPI];");
             await databaseConnection.ExecuteAsync("ALTER ROLE db_datawriter ADD MEMBER [NHSD-ORDAPI];");
             await databaseConnection.ExecuteAsync("DELETE FROM dbo.OrderItem;");
@@ -20,17 +24,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
             await databaseConnection.ExecuteAsync("DELETE FROM dbo.[Address];");
             await databaseConnection.ExecuteAsync("DELETE FROM dbo.Contact;");
             await databaseConnection.ExecuteAsync("DBCC CHECKIDENT ('dbo.OrderItem', RESEED, 0);");
+
+            // ReSharper restore StringLiteralTypo
         }
 
         public static async Task RemoveReadRoleAsync(string connectionString)
         {
             using IDbConnection databaseConnection = new SqlConnection(connectionString);
+
+            // ReSharper disable once StringLiteralTypo
             await databaseConnection.ExecuteAsync("ALTER ROLE db_datareader DROP MEMBER [NHSD-ORDAPI];");
         }
 
         public static async Task RemoveWriteRoleAsync(string connectionString)
         {
             using IDbConnection databaseConnection = new SqlConnection(connectionString);
+
+            // ReSharper disable once StringLiteralTypo
             await databaseConnection.ExecuteAsync("ALTER ROLE db_datawriter DROP MEMBER [NHSD-ORDAPI];");
         }
 

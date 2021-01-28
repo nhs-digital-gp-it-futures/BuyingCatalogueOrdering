@@ -53,7 +53,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                         .InsertAsync(setting.ConnectionString)
                 },
                 {
-                    "complete-with-1recipient-1associatedservice-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
+                    "complete-with-1-recipient-1-associated-service-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
                         .WithServiceRecipientEntity(
                             ServiceRecipientBuilder.Create()
                                 .WithOrderId(orderId)
@@ -71,7 +71,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                         .InsertAsync(setting.ConnectionString)
                 },
                 {
-                    "complete-with-0recipient-1associatedservice-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
+                    "complete-with-0-recipient-1-associated-service-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
                         .WithAssociatedServicesEntity(
                             OrderItemEntityBuilder.Create()
                                 .WithOrderId(orderId)
@@ -83,7 +83,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                         .InsertAsync(setting.ConnectionString)
                 },
                 {
-                    "complete-with-1solution-1associatedservice-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
+                    "complete-with-1-solution-1-associated-service-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
                         .WithCatalogueSolutionEntity(
                             OrderItemEntityBuilder.Create()
                                 .WithOrderId(orderId)
@@ -102,7 +102,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                         .InsertAsync(setting.ConnectionString)
                 },
                 {
-                    "complete-with-1solution-0associatedservice-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
+                    "complete-with-1-solution-0-associated-service-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
                         .WithCatalogueSolutionEntity(
                             OrderItemEntityBuilder.Create()
                                 .WithOrderId(orderId)
@@ -134,7 +134,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                         .InsertAsync(setting.ConnectionString)
                 },
                 {
-                    "incomplete-with-0recipient-0solution-0associatedservice-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
+                    "incomplete-with-0-recipient-0-solution-0-associated-service-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
                         .WithServiceRecipientViewed(false)
                         .WithCatalogueSolutionsViewed(false)
                         .WithAssociatedServicesViewed(false)
@@ -143,7 +143,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                         .InsertAsync(setting.ConnectionString)
                 },
                 {
-                    "incomplete-with-1recipient-0solution-0associatedservice-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
+                    "incomplete-with-1-recipient-0-solution-0-associated-service-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
                         .WithServiceRecipientViewed(true)
                         .WithCatalogueSolutionsViewed(false)
                         .WithAssociatedServicesViewed(false)
@@ -158,7 +158,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                         .InsertAsync(setting.ConnectionString)
                 },
                 {
-                    "incomplete-with-1recipient-1solution-0associatedservice-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
+                    "incomplete-with-1-recipient-1-solution-0-associated-service-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
                         .WithServiceRecipientViewed(true)
                         .WithCatalogueSolutionsViewed(true)
                         .WithAssociatedServicesViewed(false)
@@ -180,7 +180,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                         .InsertAsync(setting.ConnectionString)
                 },
                 {
-                    "incomplete-with-1recipient-1solution-1additionalservice-0associatedservice-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
+                    "incomplete-with-1-recipient-1-solution-1-additional-service-0-associated-service-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
                         .WithServiceRecipientViewed(true)
                         .WithCatalogueSolutionsViewed(true)
                         .WithAssociatedServicesViewed(false)
@@ -209,7 +209,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support
                         .InsertAsync(setting.ConnectionString)
                 },
                 {
-                    "incomplete-with-0recipient-0solution-1associatedservice-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
+                    "incomplete-with-0-recipient-0-solution-1-associated-service-funding-complete", async orderId => await OrderSummaryDataBuilder.Create(orderId)
                         .WithServiceRecipientViewed(false)
                         .WithCatalogueSolutionsViewed(false)
                         .WithAdditionalServiceViewed(false)

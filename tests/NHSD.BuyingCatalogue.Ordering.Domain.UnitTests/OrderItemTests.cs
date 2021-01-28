@@ -407,7 +407,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public static void CalculateCost_WithNoPriceTypeOrEstimationPeriod_PriceIsPriceTimesQuanitiy()
+        public static void CalculateCost_WithNoPriceTypeOrEstimationPeriod_PriceIsPriceTimesQuantity()
         {
             const int price = 26;
             const int quantity = 13;

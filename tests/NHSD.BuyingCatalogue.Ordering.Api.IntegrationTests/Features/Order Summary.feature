@@ -231,18 +231,18 @@ Scenario:10. Get the order section status is set when conditions are met
     And the order Section Status is <SectionStatus>
 
     Examples: OrderData
-        | OrderId    | OrderDataKey                                                                                | SectionStatus |
-        | C000016-01 | complete                                                                                    | complete      |
-        | C000016-01 | complete-with-1recipient-1associatedservice-funding-complete                                | complete      |
-        | C000017-01 | complete-with-0recipient-1associatedservice-funding-complete                                | complete      |
-        | C000018-01 | complete-with-1solution-1associatedservice-funding-complete                                 | complete      |
-        | C000019-01 | complete-with-1solution-0associatedservice-funding-complete                                 | complete      |
-        | C000020-01 | funding-incomplete                                                                          | incomplete    |
-        | C000021-01 | incomplete-with-0recipient-0solution-0associatedservice-funding-complete                    | incomplete    |
-        | C000022-01 | incomplete-with-1recipient-0solution-0associatedservice-funding-complete                    | incomplete    |
-        | C000023-01 | incomplete-with-1recipient-1solution-0associatedservice-funding-complete                    | incomplete    |
-        | C000025-01 | incomplete-with-0recipient-0solution-1associatedservice-funding-complete                    | incomplete    |
-        | C000024-01 | incomplete-with-1recipient-1solution-1additionalservice-0associatedservice-funding-complete | incomplete    |
+        | OrderId    | OrderDataKey                                                                                      | SectionStatus |
+        | C000016-01 | complete                                                                                          | complete      |
+        | C000016-01 | complete-with-1-recipient-1-associated-service-funding-complete                                   | complete      |
+        | C000017-01 | complete-with-0-recipient-1-associated-service-funding-complete                                   | complete      |
+        | C000018-01 | complete-with-1-solution-1-associated-service-funding-complete                                    | complete      |
+        | C000019-01 | complete-with-1-solution-0-associated-service-funding-complete                                    | complete      |
+        | C000020-01 | funding-incomplete                                                                                | incomplete    |
+        | C000021-01 | incomplete-with-0-recipient-0-solution-0-associated-service-funding-complete                      | incomplete    |
+        | C000022-01 | incomplete-with-1-recipient-0-solution-0-associated-service-funding-complete                      | incomplete    |
+        | C000023-01 | incomplete-with-1-recipient-1-solution-0-associated-service-funding-complete                      | incomplete    |
+        | C000025-01 | incomplete-with-0-recipient-0-solution-1-associated-service-funding-complete                      | incomplete    |
+        | C000024-01 | incomplete-with-1-recipient-1-solution-1-additional-service-0-associated-service-funding-complete | incomplete    |
 
 @5321
 Scenario: 11. If the order ID does not exist, return not found

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using JetBrains.Annotations;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
@@ -103,6 +104,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public IEnumerable<SectionTable> Sections { get; init; }
         }
 
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class SectionTable
         {
             public string Id { get; init; }
