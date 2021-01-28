@@ -67,7 +67,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 .WithOrganisationId(request.OrganisationId)
                 .Build();
 
-            context.OrderRepositoryMock.Verify(x => x.CreateOrderAsync(It.Is<Order>(
+            context.OrderRepositoryMock.Verify(r => r.CreateOrderAsync(It.Is<Order>(
                 actual => actual.OrganisationId == expected.OrganisationId && actual.Description == expected.Description)));
         }
 
@@ -133,7 +133,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             private CreateOrderServiceTestContext()
             {
                 OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(x => x.CreateOrderAsync(It.IsAny<Order>())).ReturnsAsync("OrderId");
+                OrderRepositoryMock.Setup(r => r.CreateOrderAsync(It.IsAny<Order>())).ReturnsAsync("OrderId");
                 CreateOrderService = new CreateOrderService(OrderRepositoryMock.Object);
             }
 

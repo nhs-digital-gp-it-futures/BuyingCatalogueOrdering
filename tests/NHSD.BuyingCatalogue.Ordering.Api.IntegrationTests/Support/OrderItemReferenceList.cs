@@ -29,10 +29,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
             cache.Add(catalogueItemName, entity);
         }
 
-        public IEnumerable<OrderItemEntity> FindByOrderId(string orderId) => cache.Values.Where(x =>
-            string.Equals(x.OrderId, orderId, StringComparison.OrdinalIgnoreCase));
+        public IEnumerable<OrderItemEntity> FindByOrderId(string orderId) => cache.Values.Where(i =>
+            string.Equals(i.OrderId, orderId, StringComparison.OrdinalIgnoreCase));
 
         public OrderItemEntity FindByOrderItemId(int? orderItemId) =>
-            cache.Values.SingleOrDefault(x => x.OrderItemId == orderItemId.GetValueOrDefault());
+            cache.Values.SingleOrDefault(i => i.OrderItemId == orderItemId.GetValueOrDefault());
     }
 }

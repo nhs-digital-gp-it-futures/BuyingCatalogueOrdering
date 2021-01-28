@@ -179,7 +179,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 s => s.CreatePatientNumbersCsvAsync(
                     It.IsAny<Stream>(),
                     It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))),
-                Times.Never);
+                Times.Never());
         }
 
         [TestCase(false, false)]
@@ -209,7 +209,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                 s => s.CreateCsvAsync(
                     It.IsAny<Stream>(),
                     It.Is<Order>(order => order.Equals(context.CompleteOrderRequest.Order))),
-                Times.Never);
+                Times.Never());
         }
 
         internal sealed class CompleteOrderServiceTestContext
@@ -246,18 +246,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
                         .Build());
 
                 OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(x => x.UpdateOrderAsync(It.IsAny<Order>()))
-                    .Callback<Order>(x => UpdateOrder = x);
+                OrderRepositoryMock
+                    .Setup(r => r.UpdateOrderAsync(It.IsAny<Order>()))
+                    .Callback<Order>(o => UpdateOrder = o);
 
                 IdentityServiceMock = new Mock<IIdentityService>();
                 IdentityServiceMock.Setup(identityService => identityService.GetUserIdentity()).Returns(() => UserId);
                 IdentityServiceMock.Setup(identityService => identityService.GetUserName()).Returns(() => UserName);
 
                 EmailServiceMock = new Mock<IEmailService>();
-                EmailServiceMock.Setup(x => x.SendEmailAsync(It.IsAny<EmailMessage>()));
+                EmailServiceMock.Setup(s => s.SendEmailAsync(It.IsAny<EmailMessage>()));
                 CreatePurchaseDocumentServiceMock = new Mock<ICreatePurchasingDocumentService>();
-                CreatePurchaseDocumentServiceMock.Setup(x =>
-                    x.CreatePatientNumbersCsvAsync(It.IsAny<Stream>(), It.IsAny<Order>()));
+                CreatePurchaseDocumentServiceMock.Setup(s =>
+                    s.CreatePatientNumbersCsvAsync(It.IsAny<Stream>(), It.IsAny<Order>()));
 
                 CompleteOrderService = CompleteOrderServiceBuilder
                     .Create()

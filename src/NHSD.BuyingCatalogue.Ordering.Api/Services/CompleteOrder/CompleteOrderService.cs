@@ -70,9 +70,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
                 new($"{callOffAgreementId}_{orderingPartyId}_Full.csv", priceTypeStream),
             };
 
-            var patientNumbers = order.OrderItems.Where(x =>
-                x.ProvisioningType.Equals(ProvisioningType.Patient) &&
-                !x.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
+            var patientNumbers = order.OrderItems.Where(i =>
+                i.ProvisioningType.Equals(ProvisioningType.Patient) &&
+                !i.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
 
             if (order.OrderItems.Count.Equals(patientNumbers.Count()))
             {

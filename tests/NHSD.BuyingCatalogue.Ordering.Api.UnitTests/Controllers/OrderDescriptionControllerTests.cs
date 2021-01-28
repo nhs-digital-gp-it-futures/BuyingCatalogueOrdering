@@ -90,7 +90,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             await controller.GetAsync(string.Empty);
 
-            context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(string.Empty), Times.Once);
+            context.OrderRepositoryMock.Verify(r => r.GetOrderByIdAsync(string.Empty));
         }
 
         [TestCase(null)]
@@ -142,7 +142,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var isValid = OrderDescription.Create(description);
             var expected =
-                new BadRequestObjectResult(new ErrorsModel(isValid.Errors.Select(x => new ErrorModel(x.Id, x.Field))));
+                new BadRequestObjectResult(new ErrorsModel(isValid.Errors.Select(d => new ErrorModel(d.Id, d.Field))));
 
             response.Should().BeEquivalentTo(expected);
         }
@@ -214,8 +214,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             order.SetDescription(newDescription);
 
-            context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(orderId), Times.Once);
-            context.OrderRepositoryMock.Verify(x => x.UpdateOrderAsync(order), Times.Once);
+            context.OrderRepositoryMock.Verify(r => r.GetOrderByIdAsync(orderId));
+            context.OrderRepositoryMock.Verify(r => r.UpdateOrderAsync(order));
         }
 
         private static (Order Order, OrderDescriptionModel ExpectedDescription) CreateOrderDescriptionTestData(
@@ -238,7 +238,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 PrimaryOrganisationId = Guid.NewGuid();
 
                 OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
+                OrderRepositoryMock.Setup(r => r.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
                     new[]
                     {

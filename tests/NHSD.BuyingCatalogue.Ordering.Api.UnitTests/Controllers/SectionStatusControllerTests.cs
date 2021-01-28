@@ -127,12 +127,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 OrderRepositoryMock = new Mock<IOrderRepository>();
 
                 Orders = new List<Order>();
-                OrderRepositoryMock.Setup(x => x.ListOrdersByOrganisationIdAsync(It.IsAny<Guid>()))
+                OrderRepositoryMock
+                    .Setup(r => r.ListOrdersByOrganisationIdAsync(It.IsAny<Guid>()))
                     .ReturnsAsync(() => Orders);
 
-                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
+                OrderRepositoryMock.Setup(r => r.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
 
-                OrderRepositoryMock.Setup(x => x.UpdateOrderAsync(It.IsAny<Order>()));
+                OrderRepositoryMock.Setup(r => r.UpdateOrderAsync(It.IsAny<Order>()));
 
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
                     new[]

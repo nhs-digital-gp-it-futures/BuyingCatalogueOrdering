@@ -109,7 +109,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public decimal CalculateCostPerYear(CostType costType)
         {
-            return orderItems.Where(x => x.CostType == costType).Sum(y => y.CalculateTotalCostPerYear());
+            return orderItems.Where(i => i.CostType == costType).Sum(i => i.CalculateTotalCostPerYear());
         }
 
         public decimal CalculateTotalOwnershipCost()

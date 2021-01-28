@@ -18,7 +18,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support
         }
 
         public IEnumerable<ServiceRecipientEntity> FindByOrderId(string orderId) =>
-            cache.Values.Where(x => string.Equals(x.OrderId, orderId, StringComparison.OrdinalIgnoreCase));
+            cache.Values.Where(r => string.Equals(r.OrderId, orderId, StringComparison.OrdinalIgnoreCase));
 
         public ServiceRecipientEntity Get(string orderId, string odsCode)
         {

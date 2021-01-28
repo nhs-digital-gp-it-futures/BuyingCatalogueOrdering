@@ -21,7 +21,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
         public async Task<IEnumerable<ServiceRecipient>> ListServiceRecipientsByOrderIdAsync(string orderId)
         {
             return await context.ServiceRecipient
-                .Include(x => x.Order)
+                .Include(r => r.Order)
                 .Where(s => s.Order.OrderId == orderId).ToListAsync();
         }
 
@@ -33,7 +33,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Repositories
             }
 
             return await context.ServiceRecipient
-                .Where(x => x.Order.OrderId == orderId)
+                .Where(r => r.Order.OrderId == orderId)
                 .CountAsync();
         }
 

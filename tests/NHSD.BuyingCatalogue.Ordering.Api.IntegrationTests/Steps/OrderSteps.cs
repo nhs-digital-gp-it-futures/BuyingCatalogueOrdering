@@ -156,7 +156,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var order = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);
             var actual = await ContactEntity.FetchContactById(settings.ConnectionString, order.OrganisationContactId);
 
-            actual.Should().BeEquivalentTo(expected, options => options.Excluding(x => x.ContactId));
+            actual.Should().BeEquivalentTo(expected, options => options.Excluding(c => c.ContactId));
         }
 
         [Then(@"the order with orderId (.*) is updated and has a Organisation Address with data")]

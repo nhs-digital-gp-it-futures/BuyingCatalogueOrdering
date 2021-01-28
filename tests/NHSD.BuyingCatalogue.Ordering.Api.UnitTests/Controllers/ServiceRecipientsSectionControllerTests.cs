@@ -101,9 +101,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 CreateServiceRecipientData("ODS1", orderId, "name"),
             };
 
-            context.ServiceRecipients = serviceRecipients.Select(x => x.ServiceRecipient).ToList();
+            context.ServiceRecipients = serviceRecipients.Select(r => r.ServiceRecipient).ToList();
 
-            var expectedList = serviceRecipients.Select(x => x.ExpectedModel);
+            var expectedList = serviceRecipients.Select(t => t.ExpectedModel);
 
             var expected = new ServiceRecipientsModel
             {
@@ -130,10 +130,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 CreateServiceRecipientData("ODS3", orderId, "Data"),
             };
 
-            context.ServiceRecipients = serviceRecipients.Select(x => x.ServiceRecipient).ToList();
+            context.ServiceRecipients = serviceRecipients.Select(t => t.ServiceRecipient).ToList();
             var expected = new ServiceRecipientsModel();
 
-            var expectedList = serviceRecipients.Select(x => x.ExpectedModel);
+            var expectedList = serviceRecipients.Select(t => t.ExpectedModel);
 
             expected.ServiceRecipients = expectedList.OrderBy(serviceRecipient => serviceRecipient.Name);
 
@@ -260,7 +260,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var expectedOrder = context.Order;
             await context.Controller.UpdateAsync(expectedOrder.OrderId, DefaultServiceRecipientsModel);
 
-            context.OrderRepositoryMock.Verify(x => x.UpdateOrderAsync(expectedOrder), Times.Once);
+            context.OrderRepositoryMock.Verify(r => r.UpdateOrderAsync(expectedOrder));
         }
 
         [Test]
@@ -271,7 +271,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             string expectedOrderId = context.Order.OrderId;
             await context.Controller.UpdateAsync(expectedOrderId, DefaultServiceRecipientsModel);
 
-            context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(expectedOrderId), Times.Once);
+            context.OrderRepositoryMock.Verify(r => r.GetOrderByIdAsync(expectedOrderId));
         }
 
         [Test]
@@ -282,7 +282,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             string expectedOrderId = context.Order.OrderId;
             await context.Controller.UpdateAsync(expectedOrderId, DefaultServiceRecipientsModel);
 
-            context.ServiceRecipientRepositoryMock.Verify(x => x.UpdateAsync(expectedOrderId, It.IsAny<IEnumerable<ServiceRecipient>>()), Times.Once);
+            context.ServiceRecipientRepositoryMock.Verify(
+                r => r.UpdateAsync(expectedOrderId, It.IsAny<IEnumerable<ServiceRecipient>>()));
         }
 
         private static (ServiceRecipient ServiceRecipient, ServiceRecipientModel ExpectedModel)
@@ -311,11 +312,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     .Build();
 
                 OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
+                OrderRepositoryMock.Setup(r => r.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
 
                 ServiceRecipientRepositoryMock = new Mock<IServiceRecipientRepository>();
                 ServiceRecipients = new List<ServiceRecipient>();
-                ServiceRecipientRepositoryMock.Setup(x => x.ListServiceRecipientsByOrderIdAsync(It.IsAny<string>()))
+                ServiceRecipientRepositoryMock.Setup(r => r.ListServiceRecipientsByOrderIdAsync(It.IsAny<string>()))
                     .ReturnsAsync(() => ServiceRecipients);
 
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(

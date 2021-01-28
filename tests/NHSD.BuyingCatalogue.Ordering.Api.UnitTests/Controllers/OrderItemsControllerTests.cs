@@ -251,7 +251,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             string orderId = context.Order.OrderId;
             await context.OrderItemsController.GetAsync(orderId, orderItem.OrderItemId);
 
-            context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(orderId), Times.Once);
+            context.OrderRepositoryMock.Verify(r => r.GetOrderByIdAsync(orderId));
         }
 
         [Test]
@@ -431,7 +431,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             await context.OrderItemsController.CreateOrderItemAsync(orderId, createModel);
 
-            context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(orderId), Times.Once);
+            context.OrderRepositoryMock.Verify(r => r.GetOrderByIdAsync(orderId));
         }
 
         [Test]
@@ -637,7 +637,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             await context.OrderItemsController.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
 
-            context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(orderId), Times.Once);
+            context.OrderRepositoryMock.Verify(r => r.GetOrderByIdAsync(orderId));
         }
 
         [Test]
@@ -799,7 +799,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             string catalogueItemTypeFilter,
             IEnumerable<ServiceRecipient> serviceRecipients)
         {
-            var serviceRecipientDictionary = serviceRecipients.ToDictionary(x => x.OdsCode);
+            var serviceRecipientDictionary = serviceRecipients.ToDictionary(r => r.OdsCode);
 
             var items = orderItems
                 .OrderBy(orderItem => orderItem.Created)
@@ -810,8 +810,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             if (catalogueItemTypeFilter is not null)
             {
-                items = items.Where(x =>
-                    x.CatalogueItemType.Equals(catalogueItemTypeFilter, StringComparison.OrdinalIgnoreCase));
+                items = items.Where(m =>
+                    m.CatalogueItemType.Equals(catalogueItemTypeFilter, StringComparison.OrdinalIgnoreCase));
             }
 
             return items;
@@ -855,18 +855,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
                 OrderRepositoryMock = new Mock<IOrderRepository>();
 
-                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
-                OrderRepositoryMock.Setup(x => x.UpdateOrderAsync(It.IsAny<Order>())).Callback<Order>(x => Order = x);
+                OrderRepositoryMock.Setup(r => r.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
+                OrderRepositoryMock.Setup(r => r.UpdateOrderAsync(It.IsAny<Order>())).Callback<Order>(o => Order = o);
 
                 UpdateOrderItemResult = Result.Success();
 
                 UpdateOrderItemServiceMock = new Mock<IUpdateOrderItemService>();
-                UpdateOrderItemServiceMock.Setup(x => x.UpdateAsync(It.IsNotNull<UpdateOrderItemRequest>(), It.IsAny<CatalogueItemType>(), It.IsAny<ProvisioningType>()))
+                UpdateOrderItemServiceMock
+                    .Setup(s => s.UpdateAsync(It.IsNotNull<UpdateOrderItemRequest>(), It.IsAny<CatalogueItemType>(), It.IsAny<ProvisioningType>()))
                     .ReturnsAsync(() => UpdateOrderItemResult);
+
                 NewOrderItemId = Result.Success(123);
 
                 CreateOrderItemServiceMock = new Mock<ICreateOrderItemService>();
-                CreateOrderItemServiceMock.Setup(x => x.CreateAsync(It.IsNotNull<CreateOrderItemRequest>()))
+                CreateOrderItemServiceMock
+                    .Setup(s => s.CreateAsync(It.IsNotNull<CreateOrderItemRequest>()))
                     .ReturnsAsync(() => NewOrderItemId);
 
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(

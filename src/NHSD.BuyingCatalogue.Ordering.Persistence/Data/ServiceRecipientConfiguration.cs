@@ -12,7 +12,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
             if (builder is null)
                 throw new ArgumentNullException(nameof(builder));
 
-            builder.HasKey(x => new { x.OrderId, x.OdsCode });
+            builder.HasKey(r => new { r.OrderId, r.OdsCode });
         }
     }
 }

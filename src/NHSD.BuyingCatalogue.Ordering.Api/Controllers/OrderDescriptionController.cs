@@ -75,7 +75,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             if (!isValid.IsSuccess)
             {
-                return BadRequest(new ErrorsModel(isValid.Errors.Select(x => new ErrorModel(x.Id, x.Field))));
+                return BadRequest(new ErrorsModel(isValid.Errors.Select(d => new ErrorModel(d.Id, d.Field))));
             }
 
             order.SetDescription(isValid.Value);

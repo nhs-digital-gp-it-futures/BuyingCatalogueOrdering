@@ -88,8 +88,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         {
             public CsvHeaderContentMap()
             {
-                Map(x => x.Name).Index(0).Name("Name");
-                Map(x => x.Created).Index(1).Name("Created Date");
+                Map(c => c.Name).Index(0).Name("Name");
+                Map(c => c.Created).Index(1).Name("Created Date");
             }
         }
     }
