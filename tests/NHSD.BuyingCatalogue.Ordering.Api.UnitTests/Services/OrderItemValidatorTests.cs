@@ -272,7 +272,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             OrderItemValidator validator)
         {
             var expected = new ErrorDetails("DeliveryDateOutsideDeliveryWindow", "DeliveryDate");
-            model.DeliveryDate = order.CommencementDate.Value.AddDays(settings.MaxDeliveryDateOffsetInDays + 1);
+            model.DeliveryDate = order.CommencementDate?.AddDays(settings.MaxDeliveryDateOffsetInDays + 1);
 
             var request = new CreateOrderItemSolutionRequest(order, model);
 
@@ -292,7 +292,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             OrderItemValidator validator)
         {
             var expected = new ErrorDetails("DeliveryDateOutsideDeliveryWindow", "DeliveryDate");
-            model.DeliveryDate = order.CommencementDate.Value.AddDays(-1);
+            model.DeliveryDate = order.CommencementDate?.AddDays(-1);
 
             var request = new CreateOrderItemSolutionRequest(order, model);
 

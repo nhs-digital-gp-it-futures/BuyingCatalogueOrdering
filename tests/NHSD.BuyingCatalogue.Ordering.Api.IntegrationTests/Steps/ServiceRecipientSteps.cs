@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using JetBrains.Annotations;
 using Newtonsoft.Json.Linq;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
@@ -89,13 +90,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             return new()
             {
-                Name = token.SelectToken("name").ToString(),
-                OdsCode = token.SelectToken("odsCode").ToString(),
+                Name = token.SelectToken("name")?.ToString(),
+                OdsCode = token.SelectToken("odsCode")?.ToString(),
             };
         }
 
         private sealed class ServiceRecipientsTable
         {
+            [UsedImplicitly]
             public IEnumerable<ServiceRecipientTable> ServiceRecipients { get; init; }
         }
 
@@ -105,6 +107,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             public string Name { get; init; }
 
+            [UsedImplicitly]
             public string OrderId { get; init; }
         }
     }

@@ -16,11 +16,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services
 
         public Guid GetUserIdentity()
         {
+            if (context.HttpContext is null)
+                throw new InvalidOperationException();
+
             return context.HttpContext.User.GetUserId();
         }
 
         public string GetUserName()
         {
+            if (context.HttpContext is null)
+                throw new InvalidOperationException();
+
             return context.HttpContext.User.GetUserName();
         }
 

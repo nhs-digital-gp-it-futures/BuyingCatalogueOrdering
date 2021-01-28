@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using JetBrains.Annotations;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests;
@@ -217,6 +218,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             }
         }
 
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class RequestInfo
         {
             public int? OrderItemId { get; set; }

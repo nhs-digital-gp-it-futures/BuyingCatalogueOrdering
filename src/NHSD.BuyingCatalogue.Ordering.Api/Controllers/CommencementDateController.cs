@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
     [Route("api/v1/orders/{orderId}/sections/commencement-date")]
     [ApiController]
-    [Produces("application/json")]
+    [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     public sealed class CommencementDateController : Controller
     {
@@ -70,7 +71,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             order.CommencementDate = model.CommencementDate.Value;
 
-            var name = User.Identity.Name;
+            var name = User.GetUserName();
             order.SetLastUpdatedBy(User.GetUserId(), name);
 
             await orderRepository.UpdateOrderAsync(order);

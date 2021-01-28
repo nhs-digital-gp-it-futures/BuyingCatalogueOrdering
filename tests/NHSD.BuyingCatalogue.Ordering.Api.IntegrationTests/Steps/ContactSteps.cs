@@ -1,10 +1,12 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using JetBrains.Annotations;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder;
+using NUnit.Framework;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 
@@ -51,6 +53,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             var contact = (await response.ReadBodyAsJsonAsync()).SelectToken(section);
 
+            Assert.NotNull(contact);
+
             var actual = new
             {
                 FirstName = contact.Value<string>("firstName"),
@@ -62,6 +66,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected);
         }
 
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class ContactTable
         {
             public string FirstName { get; init; }

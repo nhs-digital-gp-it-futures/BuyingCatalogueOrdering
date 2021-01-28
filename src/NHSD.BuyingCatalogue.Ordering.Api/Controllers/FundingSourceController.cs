@@ -67,7 +67,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             order.FundingSourceOnlyGms = model.OnlyGms;
 
-            var name = User.Identity.Name;
+            var name = User.GetUserName();
             order.SetLastUpdatedBy(User.GetUserId(), name);
 
             await orderRepository.UpdateOrderAsync(order);
