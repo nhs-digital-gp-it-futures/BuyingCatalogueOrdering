@@ -78,10 +78,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
 
         public DateTime? M1Planned { get; }
 
+        // The remaining properties are required fields in the finance CSV file but they are not populated
+        // ReSharper disable once UnassignedGetOnlyAutoProperty (used by CsvHelper to generate empty column)
         public DateTime? ActualM1Date { get; }
 
+        // ReSharper disable once UnassignedGetOnlyAutoProperty (used by CsvHelper to generate empty column)
         public DateTime? BuyerVerificationDate { get; }
 
+        // ReSharper disable once UnassignedGetOnlyAutoProperty (used by CsvHelper to generate empty column)
         public DateTime? CeaseDate { get; }
     }
 }

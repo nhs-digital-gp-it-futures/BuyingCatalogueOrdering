@@ -4,7 +4,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
 {
     internal sealed class ContactBuilder
     {
-        private int contactId;
+        private readonly int contactId;
+
         private string firstName;
         private string lastName;
         private string email;
@@ -20,12 +21,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         }
 
         public static ContactBuilder Create() => new();
-
-        public ContactBuilder WithContactId(int id)
-        {
-            contactId = id;
-            return this;
-        }
 
         public ContactBuilder WithFirstName(string name)
         {

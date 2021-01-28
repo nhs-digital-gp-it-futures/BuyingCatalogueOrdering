@@ -8,24 +8,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders
         private readonly DateTime? deliveryDate;
         private readonly string estimationPeriod;
         private readonly decimal? price;
-
-        private int? quantity;
+        private readonly int? quantity = 123;
 
         private UpdateOrderItemModelBuilder()
         {
             deliveryDate = DateTime.UtcNow;
-            quantity = 123;
             estimationPeriod = "month";
             price = 25.1m;
         }
 
         public static UpdateOrderItemModelBuilder Create() => new();
-
-        public UpdateOrderItemModelBuilder WithQuantity(int? number)
-        {
-            quantity = number;
-            return this;
-        }
 
         public UpdateOrderItemModel BuildSolution() => new()
         {
