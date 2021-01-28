@@ -160,7 +160,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Then(@"the order with orderId (.*) is updated and has a Organisation Address with data")]
-        public async Task ThenTheOrderWithOrderIdHasOrganisationAddresData(string orderId, Table table)
+        public async Task ThenTheOrderWithOrderIdHasOrganisationAddressData(string orderId, Table table)
         {
             var order = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);
             var actual = await AddressEntity.FetchAddressById(settings.ConnectionString, order.OrganisationAddressId);

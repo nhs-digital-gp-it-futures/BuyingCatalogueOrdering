@@ -23,7 +23,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
             var id = userId == default ? fixture.Create<Guid>() : userId;
             var name = userName ?? fixture.Create<string>();
 
-            fixture.Customize<IHttpContextAccessor>(c => new HttpContextAccessorSpecimenBuilder(id, name));
+            fixture.Customize<IHttpContextAccessor>(_ => new HttpContextAccessorSpecimenBuilder(id, name));
         }
 
         private sealed class HttpContextAccessorSpecimenBuilder : ISpecimenBuilder

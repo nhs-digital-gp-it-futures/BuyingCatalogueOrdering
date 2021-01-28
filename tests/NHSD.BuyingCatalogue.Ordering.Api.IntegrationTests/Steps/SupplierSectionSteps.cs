@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Threading.Tasks;
 using FluentAssertions;
+using JetBrains.Annotations;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
@@ -135,7 +136,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var address = table.CreateInstance<SupplierAddressTable>();
 
-            var addressId = (int)(await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId))
+            var addressId = (await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId))
                 .SupplierAddressId;
 
             var actual = await AddressEntity.FetchAddressById(settings.ConnectionString, addressId);
@@ -148,7 +149,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var contact = table.CreateInstance<SupplierContactTable>();
 
-            var contactId = (int)(await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId))
+            var contactId = (await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId))
                 .SupplierContactId;
 
             var actual = await ContactEntity.FetchContactById(settings.ConnectionString, contactId);
@@ -187,6 +188,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string SupplierName { get; init; }
         }
 
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class SupplierContactTable
         {
             public string FirstName { get; init; }
@@ -198,6 +200,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string Phone { get; init; }
         }
 
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class ContactTable
         {
             public string FirstName { get; init; }
@@ -209,6 +212,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string TelephoneNumber { get; init; }
         }
 
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class SupplierAddressTable
         {
             public string Line1 { get; init; }

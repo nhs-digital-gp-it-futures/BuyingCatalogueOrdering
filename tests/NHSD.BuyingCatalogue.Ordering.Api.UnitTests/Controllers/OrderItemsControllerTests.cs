@@ -485,7 +485,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             IReadOnlyList<CreateOrderItemRequest> requests = null;
 
             service.Setup(s => s.CreateAsync(order, It.IsNotNull<IReadOnlyList<CreateOrderItemRequest>>()))
-                .Callback<Order, IEnumerable<CreateOrderItemRequest>>((o, r) => requests = r.ToList())
+                .Callback<Order, IEnumerable<CreateOrderItemRequest>>((_, r) => requests = r.ToList())
                 .ReturnsAsync(new AggregateValidationResult());
 
             await controller.CreateOrderItemsAsync(orderId, models);
