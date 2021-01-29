@@ -10,16 +10,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class AddressExtensionsTests
+    internal static class AddressExtensionsTests
     {
         [Test]
-        public void ToModel_NullAddress_ReturnsNull()
+        public static void ToModel_NullAddress_ReturnsNull()
         {
             AddressExtensions.ToModel(null).Should().BeNull();
         }
 
         [Test]
-        public void ToModel_Address_ReturnsAddressModel()
+        public static void ToModel_Address_ReturnsAddressModel()
         {
             Address address = AddressBuilder
                 .Create()
@@ -53,7 +53,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public void FromModel_NullAddressModel_ThrowsException()
+        public static void FromModel_NullAddressModel_ThrowsException()
         {
             Address address = AddressBuilder
                 .Create()
@@ -66,7 +66,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public void FromModel_AddressModel_UpdatesAddress()
+        public static void FromModel_AddressModel_UpdatesAddress()
         {
             Address address = AddressBuilder
                 .Create()
@@ -91,7 +91,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public void FromModel_NullAddress_ReturnsNewAddress()
+        public static void FromModel_NullAddress_ReturnsNewAddress()
         {
             var addressModel = new AddressModel();
 

@@ -6,9 +6,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NHSD.BuyingCatalogue.Ordering.Api", "src\NHSD.BuyingCatalogue.Ordering.Api\NHSD.BuyingCatalogue.Ordering.Api.csproj", "{B4DBCB83-BDBA-4C65-9F0B-C6FCB06A846B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2BC13686-75FE-43D6-A30D-3E39F5D688A9}"
-	ProjectSection(SolutionItems) = preProject
-		tests\.editorconfig = tests\.editorconfig
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker", "docker", "{2ADEB1FE-86F6-4F4A-9452-F8C3E82E1400}"
 	ProjectSection(SolutionItems) = preProject

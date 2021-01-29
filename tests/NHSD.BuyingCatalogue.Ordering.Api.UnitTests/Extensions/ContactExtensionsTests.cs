@@ -10,16 +10,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class ContactExtensionsTests
+    internal static class ContactExtensionsTests
     {
         [Test]
-        public void ToModel_NullContact_ReturnsNull()
+        public static void ToModel_NullContact_ReturnsNull()
         {
             ContactExtensions.ToModel(null).Should().BeNull();
         }
 
         [Test]
-        public void ToModel_Contact_ReturnsPrimaryContactModel()
+        public static void ToModel_Contact_ReturnsPrimaryContactModel()
         {
             Contact contact = ContactBuilder
                 .Create()
@@ -43,7 +43,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public void FromModel_NullPrimaryContactModelModel_ThrowsException()
+        public static void FromModel_NullPrimaryContactModelModel_ThrowsException()
         {
             Contact contact = ContactBuilder
                 .Create()
@@ -56,7 +56,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public void FromModel_PrimaryContactModel_UpdatesContact()
+        public static void FromModel_PrimaryContactModel_UpdatesContact()
         {
             Contact contact = ContactBuilder
                 .Create()
@@ -84,7 +84,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public void FromModel_NullContact_ReturnsNewContact()
+        public static void FromModel_NullContact_ReturnsNewContact()
         {
             var primaryContactModel = new PrimaryContactModel();
 

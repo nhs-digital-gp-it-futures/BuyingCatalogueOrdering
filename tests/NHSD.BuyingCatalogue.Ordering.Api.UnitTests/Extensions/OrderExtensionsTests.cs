@@ -10,10 +10,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class OrderExtensionsTests
+    internal static class OrderExtensionsTests
     {
         [Test]
-        public void IsSupplierSectionComplete_HasPrimaryContact_ReturnsTrue()
+        public static void IsSupplierSectionComplete_HasPrimaryContact_ReturnsTrue()
         {
             var order = OrderBuilder
                 .Create()
@@ -24,7 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public void IsSupplierSectionComplete_NullPrimaryContact_ReturnsFalse()
+        public static void IsSupplierSectionComplete_NullPrimaryContact_ReturnsFalse()
         {
             var order = OrderBuilder
                 .Create()
@@ -35,14 +35,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public void IsSupplierSectionComplete_NullOrder_ReturnsFalse()
+        public static void IsSupplierSectionComplete_NullOrder_ReturnsFalse()
         {
             var actual = OrderExtensions.IsSupplierSectionComplete(null);
             actual.Should().BeFalse();
         }
 
         [Test]
-        public void IsCommencementDateSectionComplete_HasCommencementDate_ReturnsTrue()
+        public static void IsCommencementDateSectionComplete_HasCommencementDate_ReturnsTrue()
         {
             var order = OrderBuilder
                 .Create()
@@ -53,7 +53,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public void IsCommencementDateSectionComplete_NullPrimaryContact_ReturnsFalse()
+        public static void IsCommencementDateSectionComplete_NullPrimaryContact_ReturnsFalse()
         {
             var order = OrderBuilder
                 .Create()
@@ -64,21 +64,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public void IsCommencementDateSectionComplete_NullOrder_ReturnsFalse()
+        public static void IsCommencementDateSectionComplete_NullOrder_ReturnsFalse()
         {
             var actual = OrderExtensions.IsCommencementDateSectionComplete(null);
             actual.Should().BeFalse();
         }
 
         [Test]
-        public void IsServiceRecipientsSectionComplete_NullOrder_ReturnsFalse()
+        public static void IsServiceRecipientsSectionComplete_NullOrder_ReturnsFalse()
         {
             var actual = OrderExtensions.IsServiceRecipientsSectionComplete(null);
             actual.Should().BeFalse();
         }
 
         [Test]
-        public void IsServiceRecipientsSectionComplete_ServiceRecipientsViewed_ReturnsTrue()
+        public static void IsServiceRecipientsSectionComplete_ServiceRecipientsViewed_ReturnsTrue()
         {
             var order = OrderBuilder.Create().WithServiceRecipientsViewed(true).Build();
             var actual = order.IsServiceRecipientsSectionComplete();
@@ -86,7 +86,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public void IsServiceRecipientsSectionComplete_ServiceRecipientsViewedFalse_ReturnsFalse()
+        public static void IsServiceRecipientsSectionComplete_ServiceRecipientsViewedFalse_ReturnsFalse()
         {
             var order = OrderBuilder.Create().WithServiceRecipientsViewed(false).Build();
             var actual = order.IsServiceRecipientsSectionComplete();
@@ -94,14 +94,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public void IsCatalogueSolutionsSectionComplete_NullOrder_ReturnsFalse()
+        public static void IsCatalogueSolutionsSectionComplete_NullOrder_ReturnsFalse()
         {
             var actual = OrderExtensions.IsCatalogueSolutionsSectionComplete(null);
             actual.Should().BeFalse();
         }
 
         [Test]
-        public void IsCatalogueSolutionsSectionComplete_CatalogueSolutionsViewed_ReturnsTrue()
+        public static void IsCatalogueSolutionsSectionComplete_CatalogueSolutionsViewed_ReturnsTrue()
         {
             var order = OrderBuilder.Create().WithCatalogueSolutionsViewed(true).Build();
             var actual = order.IsCatalogueSolutionsSectionComplete();
@@ -109,7 +109,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public void IsCatalogueSolutionsSectionComplete_CatalogueSolutionsNotViewed_ReturnsFalse()
+        public static void IsCatalogueSolutionsSectionComplete_CatalogueSolutionsNotViewed_ReturnsFalse()
         {
             var order = OrderBuilder.Create().WithCatalogueSolutionsViewed(false).Build();
             var actual = order.IsCatalogueSolutionsSectionComplete();
@@ -117,7 +117,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public void IsAssociatedServicesSectionComplete_NullOrder_ReturnsFalse()
+        public static void IsAssociatedServicesSectionComplete_NullOrder_ReturnsFalse()
         {
             var actual = OrderExtensions.IsAssociatedServicesSectionComplete(null);
             actual.Should().BeFalse();
@@ -125,7 +125,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
 
         [TestCase(false)]
         [TestCase(true)]
-        public void IsAssociatedServicesSectionComplete_ToggleViewed_ReturnsExpectedValue(bool viewed)
+        public static void IsAssociatedServicesSectionComplete_ToggleViewed_ReturnsExpectedValue(bool viewed)
         {
             var order = OrderBuilder.Create().WithAdditionalServicesViewed(viewed).Build();
             var actual = order.IsAssociatedServicesSectionComplete();
@@ -133,7 +133,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public void IsFundingSourceComplete_OrderFundingViewed_ReturnsTrue()
+        public static void IsFundingSourceComplete_OrderFundingViewed_ReturnsTrue()
         {
             var order = OrderBuilder.Create().WithFundingSourceOnlyGms(true).Build();
             var actual = order.IsFundingSourceComplete();
@@ -141,14 +141,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public void IsFundingSourceComplete_NullOrder_ReturnsFalse()
+        public static void IsFundingSourceComplete_NullOrder_ReturnsFalse()
         {
             var actual = OrderExtensions.IsFundingSourceComplete(null);
             actual.Should().BeFalse();
         }
 
         [Test]
-        public void IsSectionStatusCompleteComplete_NullOrder_ReturnsFalse()
+        public static void IsSectionStatusCompleteComplete_NullOrder_ReturnsFalse()
         {
             var actual = OrderExtensions.IsSectionStatusComplete(null);
             actual.Should().BeFalse();
@@ -162,7 +162,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         [TestCase(true, true, false, false, false, false, false)]
         [TestCase(true, true, false, true, true, false, false)]
         [TestCase(true, false, true, false, false, true, false)]
-        public void IsSectionStatusCompleteComplete_whenCalled_ReturnsCorrectResult(
+        public static void IsSectionStatusCompleteComplete_whenCalled_ReturnsCorrectResult(
             bool? fundingComplete,
             bool recipientViewed,
             bool associatedViewed,
