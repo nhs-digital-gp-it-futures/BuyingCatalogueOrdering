@@ -5,13 +5,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class DefaultDeliveryDate : IEquatable<DefaultDeliveryDate>
     {
-        public string OrderId { get; set; }
+        public string OrderId { get; init; }
 
-        public string CatalogueItemId { get; set; }
+        public string CatalogueItemId { get; init; }
 
-        public int PriceId { get; set; }
+        public int PriceId { get; init; }
 
-        public DateTime DeliveryDate { get; set; }
+        public DateTime DeliveryDate { get; init; }
 
         public bool Equals(DefaultDeliveryDate other)
         {
@@ -22,8 +22,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 return true;
 
             return OrderId.EqualsOrdinalIgnoreCase(other.OrderId)
-                   && CatalogueItemId.EqualsOrdinalIgnoreCase(other.CatalogueItemId)
-                   && PriceId == other.PriceId;
+               && CatalogueItemId.EqualsOrdinalIgnoreCase(other.CatalogueItemId)
+               && PriceId == other.PriceId;
         }
 
         public override bool Equals(object obj)

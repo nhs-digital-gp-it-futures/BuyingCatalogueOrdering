@@ -1,4 +1,5 @@
-﻿using EnumsNET;
+﻿using System;
+using EnumsNET;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
@@ -8,7 +9,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public static string Name(this TimeUnit timeUnit) => timeUnit.AsString(EnumFormat.DisplayName);
 
-        internal static int AmountInYear(this TimeUnit timeUnit) =>
-            timeUnit.GetAttributes().Get<AmountInYearAttribute>().AmountInYear;
+        internal static int AmountInYear(this TimeUnit timeUnit)
+        {
+            var amountInYearAttribute = timeUnit.GetAttributes()?.Get<AmountInYearAttribute>();
+            if (amountInYearAttribute is null)
+                throw new InvalidOperationException();
+
+            return amountInYearAttribute.AmountInYear;
+        }
     }
 }

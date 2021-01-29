@@ -80,7 +80,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             order.SetDescription(isValid.Value);
 
-            var name = User.Identity.Name;
+            var name = User.GetUserName();
             order.SetLastUpdatedBy(User.GetUserId(), name);
 
             await orderRepository.UpdateOrderAsync(order);

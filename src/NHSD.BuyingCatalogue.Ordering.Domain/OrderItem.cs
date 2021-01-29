@@ -143,6 +143,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public override int GetHashCode()
         {
+            // ReSharper disable once BaseObjectGetHashCodeCallInGetHashCode
             return !IsTransient() ? OrderItemId : base.GetHashCode();
         }
 

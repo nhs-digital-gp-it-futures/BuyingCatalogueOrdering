@@ -17,14 +17,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             Name = name;
         }
 
-        public string OdsCode { get; set; }
+        public string OdsCode { get; init; }
 
-        public string OrderId { get; set; }
+        public string OrderId { get; init; }
 
         [ForeignKey("OrderId")]
-        public Order Order { get; set; }
+        public Order Order { get; init; }
 
-        public string Name { get; set; }
+        public string Name { get; init; }
 
         public bool Equals(ServiceRecipient other)
         {

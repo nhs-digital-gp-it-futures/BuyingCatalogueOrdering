@@ -106,7 +106,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 OrderId = orderId,
                 CatalogueItemId = catalogueItemId,
                 PriceId = priceId,
-                DeliveryDate = defaultDeliveryDate.DeliveryDate.Value,
+                DeliveryDate = defaultDeliveryDate.DeliveryDate.GetValueOrDefault(),
             };
 
             repository.Verify(r => r.AddOrUpdateAsync(It.Is<DefaultDeliveryDate>(d => VerifyDeliveryDate(expectedDeliveryDate, d))));

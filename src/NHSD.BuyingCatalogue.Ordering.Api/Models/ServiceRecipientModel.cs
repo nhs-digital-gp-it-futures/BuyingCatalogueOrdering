@@ -4,9 +4,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
     public sealed class ServiceRecipientModel : IEquatable<ServiceRecipientModel>
     {
-        public string Name { get; set; }
+        public string Name { get; init; }
 
-        public string OdsCode { get; set; }
+        public string OdsCode { get; init; }
 
         public bool Equals(ServiceRecipientModel other)
         {

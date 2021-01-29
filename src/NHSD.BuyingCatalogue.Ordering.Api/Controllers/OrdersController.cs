@@ -262,7 +262,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             order.IsDeleted = true;
 
-            var name = User.Identity.Name;
+            var name = User.GetUserName();
             order.SetLastUpdatedBy(User.GetUserId(), name);
             await orderRepository.UpdateOrderAsync(order);
             return NoContent();

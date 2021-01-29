@@ -54,7 +54,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var actual = new OrderSummaryTable
             {
                 OrderId = jsonResponse.Value<string>("orderId"),
-                OrganisationId = jsonResponse.SelectToken("organisationId").ToObject<Guid>(),
+                OrganisationId = jsonResponse.SelectToken("organisationId")?.ToObject<Guid>(),
                 Description = jsonResponse.Value<string>("description"),
             };
 
@@ -84,17 +84,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var jsonResponse = await response.ReadBodyAsJsonAsync();
 
-            var actualSectionStatus = jsonResponse.SelectToken("sectionStatus").ToString();
-            Assert.IsNotNull(actualSectionStatus);
+            var actualSectionStatus = jsonResponse.SelectToken("sectionStatus")?.ToString();
 
+            Assert.IsNotNull(actualSectionStatus);
             actualSectionStatus.Should().BeEquivalentTo(expectedStatus);
         }
 
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class OrderSummaryTable
         {
             public string OrderId { get; init; }
 
-            public Guid OrganisationId { get; init; }
+            public Guid? OrganisationId { get; init; }
 
             public string Description { get; init; }
         }
