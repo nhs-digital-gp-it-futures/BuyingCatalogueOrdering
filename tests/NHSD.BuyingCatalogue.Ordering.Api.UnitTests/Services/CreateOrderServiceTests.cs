@@ -15,16 +15,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class CreateOrderServiceTests
+    internal static class CreateOrderServiceTests
     {
         [Test]
-        public void Constructor_NullOrderRepository_ThrowsException()
+        public static void Constructor_NullOrderRepository_ThrowsException()
         {
             Assert.Throws<ArgumentNullException>(() => _ = new CreateOrderService(null));
         }
 
         [Test]
-        public void CreateAsync_NullCreateOrderRequest_ThrowsException()
+        public static void CreateAsync_NullCreateOrderRequest_ThrowsException()
         {
             static async Task TestAsync()
             {
@@ -38,7 +38,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public async Task CreateAsync_SuccessfulOrderValidation_ReturnsSuccess()
+        public static async Task CreateAsync_SuccessfulOrderValidation_ReturnsSuccess()
         {
             var context = CreateOrderServiceTestContext.Setup();
             var sut = context.CreateOrderService;
@@ -52,7 +52,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public async Task CreateAsync_SuccessfulOrderValidation_OrderRepository_CalledOnce()
+        public static async Task CreateAsync_SuccessfulOrderValidation_OrderRepository_CalledOnce()
         {
             var context = CreateOrderServiceTestContext.Setup();
             var sut = context.CreateOrderService;
@@ -72,7 +72,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public async Task CreateAsync_OrderValidationFailsWithEmptyOrganisationId_ReturnFailureResult()
+        public static async Task CreateAsync_OrderValidationFailsWithEmptyOrganisationId_ReturnFailureResult()
         {
             var context = CreateOrderServiceTestContext.Setup();
 
@@ -91,7 +91,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public async Task CreateAsync_OrderValidationFailsWithEmptyDescription_ReturnFailureResult()
+        public static async Task CreateAsync_OrderValidationFailsWithEmptyDescription_ReturnFailureResult()
         {
             var context = CreateOrderServiceTestContext.Setup();
 
@@ -110,7 +110,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        public async Task CreateAsync_OrderValidationFailsWithLongDescription_ReturnFailureResult()
+        public static async Task CreateAsync_OrderValidationFailsWithLongDescription_ReturnFailureResult()
         {
             var context = CreateOrderServiceTestContext.Setup();
 

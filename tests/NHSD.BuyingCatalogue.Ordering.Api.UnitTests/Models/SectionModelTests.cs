@@ -7,10 +7,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class SectionModelTests
+    internal static class SectionModelTests
     {
         [Test]
-        public void Description_ReturnsExpected()
+        public static void Description_ReturnsExpected()
         {
             var actual = SectionModel.Description;
 
@@ -19,7 +19,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        public void OrderingParty_ReturnsExpected()
+        public static void OrderingParty_ReturnsExpected()
         {
             var actual = SectionModel.OrderingParty;
 
@@ -28,7 +28,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        public void WithStatus_Null_ThrowsException()
+        public static void WithStatus_Null_ThrowsException()
         {
             static void Test()
             {
@@ -40,7 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        public void WithStatus_UnknownStatus_StatusIsEqual()
+        public static void WithStatus_UnknownStatus_StatusIsEqual()
         {
             const string expected = "unknown";
             var actual = SectionModel.OrderingParty;
@@ -51,7 +51,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        public void WithStatus_Status_ReturnsSameInstance()
+        public static void WithStatus_Status_ReturnsSameInstance()
         {
             const string status = "some status";
             var sectionModel = SectionModel.OrderingParty;
@@ -62,7 +62,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        public void WithCount_Int_CountIsEqual()
+        public static void WithCount_Int_CountIsEqual()
         {
             const int expected = 123;
             var actual = SectionModel.OrderingParty;
@@ -73,7 +73,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        public void WithCount_Int_ReturnsSameInstance()
+        public static void WithCount_Int_ReturnsSameInstance()
         {
             const int count = 2;
             var sectionModel = SectionModel.OrderingParty;

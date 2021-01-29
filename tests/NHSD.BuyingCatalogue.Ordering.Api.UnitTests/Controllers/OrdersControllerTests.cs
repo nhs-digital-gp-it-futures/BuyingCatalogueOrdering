@@ -925,6 +925,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             }
         }
 
+        [SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated by test framework")]
         private sealed class SummaryModelSectionTestCaseData
         {
             internal static IEnumerable<TestCaseData> OrderDescriptionSectionStatusCases

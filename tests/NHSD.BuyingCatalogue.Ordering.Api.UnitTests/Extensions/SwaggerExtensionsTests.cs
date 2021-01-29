@@ -9,12 +9,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    internal sealed class SwaggerExtensionsTests
+    internal static class SwaggerExtensionsTests
     {
         [TestCase(false, true)]
         [TestCase(true, false)]
         [TestCase(false, false)]
-        public void AddSwaggerDocumentation_ParameterIsNull_ThrowsArgumentNullException(bool hasServiceCollection, bool hasConf)
+        public static void AddSwaggerDocumentation_ParameterIsNull_ThrowsArgumentNullException(bool hasServiceCollection, bool hasConf)
         {
             var serviceCollection = new Mock<IServiceCollection>();
             var configuration = new Mock<IConfiguration>();
@@ -24,7 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public void UseSwaggerDocumentation_ParameterIsNull_ThrowsArgumentNullException()
+        public static void UseSwaggerDocumentation_ParameterIsNull_ThrowsArgumentNullException()
         {
             Assert.Throws<ArgumentNullException>(() => SwaggerExtensions.UseSwaggerDocumentation(null));
         }
