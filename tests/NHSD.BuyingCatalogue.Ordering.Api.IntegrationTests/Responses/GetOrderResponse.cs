@@ -35,7 +35,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 
         public void AssertOrderItemCost(decimal orderItemCost)
         {
-            var item = ReadOrderItems(ContentAsJson).First(x => x.CatalogueItemName is not null);
+            var item = ReadOrderItems(ContentAsJson).First(i => i.CatalogueItemName is not null);
             decimal actual = item.CostPerYear;
 
             actual.Should().Be(orderItemCost);

@@ -75,12 +75,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             var serviceInstanceItems = order.ServiceInstanceItems.ToDictionary(i => i.OrderItemId, i => i.ServiceInstanceId);
             var serviceRecipientDictionary = order.ServiceRecipients
                 .Select(recipient => new ServiceRecipientModel { Name = recipient.Name, OdsCode = recipient.OdsCode })
-                .ToDictionary(x => x.OdsCode, StringComparer.OrdinalIgnoreCase);
+                .ToDictionary(r => r.OdsCode, StringComparer.OrdinalIgnoreCase);
 
             var orderItems = order.OrderItems;
             var orderOrganisationOdsCode = order.OrganisationOdsCode;
 
-            if (orderItems.Select(x => x.OdsCode).Contains(orderOrganisationOdsCode))
+            if (orderItems.Select(i => i.OdsCode).Contains(orderOrganisationOdsCode))
             {
                 if (!serviceRecipientDictionary.ContainsKey(orderOrganisationOdsCode))
                 {
@@ -170,9 +170,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             }
 
             int serviceRecipientsCount = await serviceRecipientRepository.GetCountByOrderIdAsync(orderId);
-            int catalogueSolutionsCount = order.OrderItems.Count(y => y.CatalogueItemType.Equals(CatalogueItemType.Solution));
-            int associatedServicesCount = order.OrderItems.Count(y => y.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
-            int additionalServicesCount = order.OrderItems.Count(y => y.CatalogueItemType.Equals(CatalogueItemType.AdditionalService));
+            int catalogueSolutionsCount = order.OrderItems.Count(i => i.CatalogueItemType.Equals(CatalogueItemType.Solution));
+            int associatedServicesCount = order.OrderItems.Count(i => i.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
+            int additionalServicesCount = order.OrderItems.Count(i => i.CatalogueItemType.Equals(CatalogueItemType.AdditionalService));
 
             OrderSummaryModel orderSummaryModel = new OrderSummaryModel
             {
@@ -238,7 +238,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return CreatedAtAction(nameof(CreateOrderAsync).TrimAsync(), null, new { orderId = result.Value }, createOrderResponse);
             }
 
-            createOrderResponse.Errors = result.Errors.Select(x => new ErrorModel(x.Id, x.Field));
+            createOrderResponse.Errors = result.Errors.Select(d => new ErrorModel(d.Id, d.Field));
             return BadRequest(createOrderResponse);
         }
 

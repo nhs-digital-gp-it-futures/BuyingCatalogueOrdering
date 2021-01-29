@@ -85,7 +85,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             await context.Controller.GetAsync(orderId);
 
-            context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(orderId), Times.Once);
+            context.OrderRepositoryMock.Verify(r => r.GetOrderByIdAsync(orderId));
         }
 
         [Test]
@@ -132,9 +132,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var response = await context.Controller.PutFundingSourceAsync(orderId, model);
             response.Should().BeEquivalentTo(new NoContentResult());
 
-            context.OrderRepositoryMock.Verify(x =>
-                x.UpdateOrderAsync(It.Is<Order>(
-                    y => y.FundingSourceOnlyGms == fundingSource)));
+            context.OrderRepositoryMock.Verify(
+                r => r.UpdateOrderAsync(It.Is<Order>(o => o.FundingSourceOnlyGms == fundingSource)));
         }
 
         [Test]
@@ -148,10 +147,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var response = await context.Controller.PutFundingSourceAsync(orderId, model);
             response.Should().BeEquivalentTo(new NoContentResult());
 
-            context.OrderRepositoryMock.Verify(x =>
-                x.UpdateOrderAsync(It.Is<Order>(
-                    y => y.LastUpdatedBy == context.NameIdentity &&
-                         y.LastUpdatedByName == context.Name)));
+            context.OrderRepositoryMock.Verify(r => r.UpdateOrderAsync(
+                It.Is<Order>(o => o.LastUpdatedBy == context.NameIdentity && o.LastUpdatedByName == context.Name)));
         }
 
         private sealed class FundingSourceControllerTestContext
@@ -169,7 +166,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     .Build();
 
                 OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
+                OrderRepositoryMock.Setup(r => r.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
 
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
                     new[]

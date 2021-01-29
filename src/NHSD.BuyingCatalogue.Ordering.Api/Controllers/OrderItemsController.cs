@@ -110,11 +110,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return Forbid();
             }
 
-            OrderItem orderItem = order.OrderItems.FirstOrDefault(x => x.OrderItemId == orderItemId);
+            OrderItem orderItem = order.OrderItems.FirstOrDefault(i => i.OrderItemId == orderItemId);
             if (orderItem is null)
                 return NotFound();
 
-            var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(x => x.OdsCode.ToUpperInvariant());
+            var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(r => r.OdsCode.ToUpperInvariant());
 
             serviceRecipientDictionary.TryAdd(
                 order.OrganisationOdsCode.ToUpperInvariant(),
@@ -156,7 +156,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return CreatedAtAction(nameof(GetAsync).TrimAsync(), "OrderItems", new { orderId, orderItemId = createOrderItemResponse.OrderItemId }, createOrderItemResponse);
             }
 
-            createOrderItemResponse.Errors = result.Errors.Select(x => new ErrorModel(x.Id, x.Field));
+            createOrderItemResponse.Errors = result.Errors.Select(d => new ErrorModel(d.Id, d.Field));
             return BadRequest(createOrderItemResponse);
         }
 
@@ -225,7 +225,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             var updateOrderItemResponse = new UpdateOrderItemResponseModel
             {
-                Errors = result.Errors.Select(x => new ErrorModel(x.Id, x.Field)),
+                Errors = result.Errors.Select(d => new ErrorModel(d.Id, d.Field)),
             };
 
             return BadRequest(updateOrderItemResponse);

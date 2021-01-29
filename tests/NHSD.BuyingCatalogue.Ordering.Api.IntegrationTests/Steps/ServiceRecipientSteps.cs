@@ -74,8 +74,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var jsonBody = await response.ReadBodyAsJsonAsync();
             var serviceRecipients = jsonBody?.SelectToken("serviceRecipients")?.Select(CreateServiceRecipients);
 
-            expected.Should().BeEquivalentTo(serviceRecipients, conf =>
-                conf.Excluding(x => x.OrderId).WithStrictOrdering());
+            expected.Should().BeEquivalentTo(
+                serviceRecipients,
+                conf => conf.Excluding(r => r.OrderId).WithStrictOrdering());
         }
 
         [Then(@"the persisted service recipients are")]

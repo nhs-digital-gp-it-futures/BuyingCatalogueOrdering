@@ -60,8 +60,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             await context.CreatePurchasingDocumentService.CreatePatientNumbersCsvAsync(stream, order);
 
             context.PatientCsvWriterMock.Verify(
-                x => x.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<OdooPatientNumbersOrderItem>>()),
-                Times.Once);
+                w => w.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<OdooPatientNumbersOrderItem>>()));
         }
 
         [TestCase(true, false)]
@@ -87,8 +86,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             await context.CreatePurchasingDocumentService.CreateCsvAsync(stream, order);
 
             context.PriceCsvWriterMock.Verify(
-                x => x.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<OdooOrderItem>>()),
-                Times.Once);
+                w => w.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<OdooOrderItem>>()));
         }
 
         [Test]
@@ -138,11 +136,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             private CreatePurchasingDocumentServiceTestContext()
             {
                 PatientCsvWriterMock = new Mock<ICsvStreamWriter<OdooPatientNumbersOrderItem>>();
-                PatientCsvWriterMock.Setup(x =>
-                    x.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<OdooPatientNumbersOrderItem>>()));
+                PatientCsvWriterMock.Setup(w =>
+                    w.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<OdooPatientNumbersOrderItem>>()));
 
                 PriceCsvWriterMock = new Mock<ICsvStreamWriter<OdooOrderItem>>();
-                PriceCsvWriterMock.Setup(x => x.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<OdooOrderItem>>()));
+                PriceCsvWriterMock.Setup(w => w.WriteRecordsAsync(It.IsAny<Stream>(), It.IsAny<IEnumerable<OdooOrderItem>>()));
 
                 CreatePurchasingDocumentService = CreatePurchasingDocumentServiceBuilder
                     .Create()

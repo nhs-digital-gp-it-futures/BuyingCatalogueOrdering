@@ -27,7 +27,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
             if (order is null)
                 throw new ArgumentNullException(nameof(order));
 
-            var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(x => x.OdsCode, x => x.Name);
+            var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(r => r.OdsCode, r => r.Name);
             serviceRecipientDictionary.TryAdd(order.OrganisationOdsCode, order.OrganisationName);
 
             var patientNumbersPriceTypes = order.OrderItems.Select(orderItem => new OdooPatientNumbersOrderItem
@@ -61,7 +61,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
             if (order is null)
                 throw new ArgumentNullException(nameof(order));
 
-            var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(x => x.OdsCode, x => x.Name);
+            var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(r => r.OdsCode, r => r.Name);
             serviceRecipientDictionary.TryAdd(order.OrganisationOdsCode, order.OrganisationName);
 
             var orderItems = order.OrderItems

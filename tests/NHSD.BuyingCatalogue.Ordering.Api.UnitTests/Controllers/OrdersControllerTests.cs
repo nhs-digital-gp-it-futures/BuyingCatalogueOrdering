@@ -103,14 +103,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 CreateOrderTestData(orderId, context.PrimaryOrganisationId, orderDescription),
             };
 
-            context.Orders = orders.Select(x => x.Order);
+            context.Orders = orders.Select(t => t.Order);
 
             var controller = context.OrdersController;
 
             var result = await controller.GetAllAsync(context.PrimaryOrganisationId);
             var ordersResult = result.Value;
             ordersResult.Should().ContainSingle();
-            ordersResult.Should().BeEquivalentTo(orders.Select(x => x.Expected));
+            ordersResult.Should().BeEquivalentTo(orders.Select(t => t.Expected));
         }
 
         [Test]
@@ -123,7 +123,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 CreateOrderTestData("C0000014-01", otherOrganisationId, "A description"),
             };
 
-            context.Orders = orders.Select(x => x.Order);
+            context.Orders = orders.Select(t => t.Order);
 
             var controller = context.OrdersController;
 
@@ -143,14 +143,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 CreateOrderTestData("C000012-01", context.PrimaryOrganisationId, "Another Description"),
             };
 
-            context.Orders = orders.Select(x => x.Order);
+            context.Orders = orders.Select(t => t.Order);
 
             var controller = context.OrdersController;
 
             var result = await controller.GetAllAsync(context.PrimaryOrganisationId);
             var ordersResult = result.Value;
             ordersResult.Count.Should().Be(2);
-            ordersResult.Should().BeEquivalentTo(orders.Select(x => x.Expected));
+            ordersResult.Should().BeEquivalentTo(orders.Select(t => t.Expected));
         }
 
         [Test]
@@ -376,7 +376,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             await controller.GetOrderSummaryAsync(expectedOrderId);
 
-            context.ServiceRecipientRepositoryMock.Verify(x => x.GetCountByOrderIdAsync(expectedOrderId), Times.Once);
+            context.ServiceRecipientRepositoryMock.Verify(r => r.GetCountByOrderIdAsync(expectedOrderId));
         }
 
         [Test]
@@ -423,7 +423,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             await controller.CreateOrderAsync(createOrderModel);
 
-            context.CreateOrderServiceMock.Verify(x => x.CreateAsync(It.IsAny<CreateOrderRequest>()), Times.Once);
+            context.CreateOrderServiceMock.Verify(s => s.CreateAsync(It.IsAny<CreateOrderRequest>()));
         }
 
         [Test]
@@ -525,7 +525,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             await context.OrdersController.DeleteOrderAsync("Order");
             context.Order.IsDeleted.Should().BeTrue();
-            context.OrderRepositoryMock.Verify(x => x.UpdateOrderAsync(It.Is<Order>(y => y.IsDeleted)));
+            context.OrderRepositoryMock.Verify(r => r.UpdateOrderAsync(It.Is<Order>(o => o.IsDeleted)));
         }
 
         [Test]
@@ -843,21 +843,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     .ReturnsAsync(() => Order);
 
                 CreateOrderServiceMock = new Mock<ICreateOrderService>();
-                CreateOrderServiceMock.Setup(x => x.CreateAsync(It.IsAny<CreateOrderRequest>()))
+                CreateOrderServiceMock.Setup(s => s.CreateAsync(It.IsAny<CreateOrderRequest>()))
                     .ReturnsAsync(() => CreateOrderResult);
 
                 Orders = new List<Order>();
-                OrderRepositoryMock.Setup(x => x.ListOrdersByOrganisationIdAsync(It.IsAny<Guid>()))
+                OrderRepositoryMock.Setup(r => r.ListOrdersByOrganisationIdAsync(It.IsAny<Guid>()))
                     .ReturnsAsync(() => Orders);
 
                 ServiceRecipientRepositoryMock = new Mock<IServiceRecipientRepository>();
                 ServiceRecipientRepositoryMock
-                    .Setup(x => x.GetCountByOrderIdAsync(It.IsNotNull<string>()))
+                    .Setup(r => r.GetCountByOrderIdAsync(It.IsNotNull<string>()))
                     .ReturnsAsync(() => ServiceRecipientListCount);
 
                 CompleteOrderServiceMock = new Mock<ICompleteOrderService>();
                 CompleteOrderServiceMock
-                    .Setup(x => x.CompleteAsync(It.IsNotNull<CompleteOrderRequest>()))
+                    .Setup(s => s.CompleteAsync(It.IsNotNull<CompleteOrderRequest>()))
                     .ReturnsAsync(() => CompleteOrderResult);
 
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(

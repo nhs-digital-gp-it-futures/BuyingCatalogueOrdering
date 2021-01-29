@@ -24,7 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var context = CommencementDateControllerTestContext.Setup();
             var model = new CommencementDateModel { CommencementDate = DateTime.Now };
             var result = await context.Controller.Update("myOrder", model);
-            context.OrderRepositoryMock.Verify(x => x.UpdateOrderAsync(It.Is<Order>(order => order.CommencementDate == model.CommencementDate)));
+            context.OrderRepositoryMock.Verify(r => r.UpdateOrderAsync(It.Is<Order>(order => order.CommencementDate == model.CommencementDate)));
             result.Should().BeOfType<NoContentResult>();
         }
 
@@ -122,7 +122,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                     .Build();
 
                 OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
+                OrderRepositoryMock.Setup(r => r.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
                     new[]
                     {

@@ -108,7 +108,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             const string orderId = "C123";
             await controller.GetAsync(orderId);
 
-            context.OrderRepositoryMock.Verify(x => x.GetOrderByIdAsync(orderId), Times.Once);
+            context.OrderRepositoryMock.Verify(r => r.GetOrderByIdAsync(orderId));
         }
 
         [TestCase(null)]
@@ -225,7 +225,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 PrimaryOrganisationId = Guid.NewGuid();
 
                 OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(x => x.GetOrderByIdAsync(It.IsAny<string>()))
+                OrderRepositoryMock
+                    .Setup(r => r.GetOrderByIdAsync(It.IsAny<string>()))
                     .ReturnsAsync(() => Order);
 
                 ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(

@@ -59,7 +59,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var expected = table.CreateSet<Attachments>();
 
             var actual = (await emailServerDriver.FindAllEmailsAsync())[0].Attachments;
-            actual.Select(x => x.FileName).Should().BeEquivalentTo(expected.Select(x => x.Filename));
+            actual.Select(a => a.FileName).Should().BeEquivalentTo(expected.Select(a => a.Filename));
         }
 
         [UsedImplicitly(ImplicitUseTargetFlags.Members)]

@@ -31,10 +31,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common
 
             var jsonResponse = await response.ReadBodyAsJsonAsync();
 
-            var actual = jsonResponse?.SelectToken("errors")?.Select(x => new ResponseErrorsTable
+            var actual = jsonResponse?.SelectToken("errors")?.Select(t => new ResponseErrorsTable
             {
-                Id = x.Value<string>("id"),
-                Field = x.Value<string>("field"),
+                Id = t.Value<string>("id"),
+                Field = t.Value<string>("field"),
             });
 
             actual.Should().BeEquivalentTo(expected);

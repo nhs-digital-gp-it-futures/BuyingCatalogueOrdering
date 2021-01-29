@@ -59,7 +59,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             };
 
             validator
-                .Setup(x => x.Validate(createOrderItemRequest))
+                .Setup(v => v.Validate(createOrderItemRequest))
                 .Returns(new ValidationResult(expectedErrors));
 
             var actual = await service.CreateAsync(createOrderItemRequest);
