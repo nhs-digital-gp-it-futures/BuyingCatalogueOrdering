@@ -27,9 +27,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
             await using var csvWriter = new CsvWriter(streamWriter, CultureInfo.CurrentCulture);
 
             var options = new TypeConverterOptions { Formats = new[] { "dd/MM/yyyy" } };
-            csvWriter.Configuration.TypeConverterOptionsCache.AddOptions<DateTime?>(options);
+            csvWriter.Context.TypeConverterOptionsCache.AddOptions<DateTime?>(options);
 
-            csvWriter.Configuration.RegisterClassMap<TClassMap>();
+            csvWriter.Context.RegisterClassMap<TClassMap>();
             await csvWriter.WriteRecordsAsync(records);
         }
     }
