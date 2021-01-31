@@ -33,36 +33,27 @@ Scenario: Edit all order items
         | OrderId    | OdsCode | Name        |
         | C000014-01 | ODS1    | Recipient 1 |
         | C000014-01 | ODS2    | Recipient 2 |
+        | C000014-01 | ODS3    | Recipient 3 |
 
 @10516
 Scenario: Add an order item
     Given the user creates a request to update the order with ID 'C000014-01' with the following items
         | OrderItemId | ItemType           | PayloadType | CatalogueItemName | OdsCode | ServiceRecipientName |
-        | 1           | catalogue solution | complete    | Item A            | ODS1    | Recipient 1          |
-        | 2           | additional service | complete    | Item B            | ODS2    | Recipient 2          |
-        | 3           | associated service | complete    | Item C            | ODS3    | Recipient 3          |
-        |             | catalogue solution | complete    | Item D            | ODS1    | Recipient 1          |
+        |             | catalogue solution | complete    | Item D            | ODS4    | Recipient 4          |
     When the user sends the edit order items request
     Then a response with status code 204 is returned
-    And the expected order items exist
+    And the following order items exist
+        | OrderItemId | OrderId    | OdsCode | CatalogueItemName | CatalogueItemType |
+        | 1           | C000014-01 | ODS1    | Item A            | Solution          |
+        | 2           | C000014-01 | ODS2    | Item B            | AdditionalService |
+        | 3           | C000014-01 | ODS3    | Item C            | AssociatedService |
+        | 4           | C000014-01 | ODS4    | Item D            | Solution          |
     And the persisted service recipients are
         | OrderId    | OdsCode | Name        |
         | C000014-01 | ODS1    | Recipient 1 |
         | C000014-01 | ODS2    | Recipient 2 |
-
-@10516
-Scenario: Remove an order item
-    Given the user creates a request to update the order with ID 'C000014-01' with the following items
-        | OrderItemId | ItemType           | PayloadType | CatalogueItemName | OdsCode | ServiceRecipientName |
-        | 1           | catalogue solution | complete    | Item A            | ODS1    | Recipient 1          |
-        | 2           | additional service | complete    | Item B            | ODS2    | Recipient 2          |
-    When the user sends the edit order items request
-    Then a response with status code 204 is returned
-    And the expected order items exist
-    And the persisted service recipients are
-        | OrderId    | OdsCode | Name        |
-        | C000014-01 | ODS1    | Recipient 1 |
-        | C000014-01 | ODS2    | Recipient 2 |
+        | C000014-01 | ODS3    | Recipient 3 |
+        | C000014-01 | ODS4    | Recipient 4 |
 
 @10516
 Scenario: Edit order items and the order audit information is updated

@@ -8,6 +8,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
     public sealed class OrderItemMerge
     {
         private readonly HashSet<CatalogueItemType> catalogueItemTypes = new();
+        private readonly HashSet<ServiceRecipient> recipients;
         private readonly List<OrderItem> newItems = new();
         private readonly Dictionary<int, OrderItem> updatedItems = new();
 
@@ -15,8 +16,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             "Maintainability",
             "CA1508:Avoid dead conditional code",
             Justification = "string.IsNullOrWhiteSpace(userName) is true for white space")]
-        public OrderItemMerge(Guid userId, string userName)
+        public OrderItemMerge(IEnumerable<ServiceRecipient> recipients, Guid userId, string userName)
         {
+            if (recipients is null)
+                throw new ArgumentNullException(nameof(recipients));
+
+            this.recipients = recipients.ToHashSet();
+
             if (userName is null)
                 throw new ArgumentNullException(nameof(userName));
 
@@ -27,6 +33,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         }
 
         public IReadOnlyList<OrderItem> NewItems => newItems;
+
+        public IReadOnlySet<ServiceRecipient> Recipients => recipients;
 
         public IDictionary<int, OrderItem> UpdatedItems => updatedItems;
 
