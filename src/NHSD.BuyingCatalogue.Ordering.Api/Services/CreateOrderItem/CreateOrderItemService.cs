@@ -16,20 +16,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
         private readonly IIdentityService identityService;
         private readonly IOrderItemFactory orderItemFactory;
         private readonly ICreateOrderItemValidator orderItemValidator;
-        private readonly IServiceRecipientRepository serviceRecipientRepository;
 
         public CreateOrderItemService(
             IOrderRepository orderRepository,
             IIdentityService identityService,
             IOrderItemFactory orderItemFactory,
-            ICreateOrderItemValidator orderItemValidator,
-            IServiceRecipientRepository serviceRecipientRepository)
+            ICreateOrderItemValidator orderItemValidator)
         {
             this.orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
             this.identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
             this.orderItemFactory = orderItemFactory ?? throw new ArgumentNullException(nameof(orderItemFactory));
             this.orderItemValidator = orderItemValidator ?? throw new ArgumentNullException(nameof(orderItemValidator));
-            this.serviceRecipientRepository = serviceRecipientRepository ?? throw new ArgumentNullException(nameof(serviceRecipientRepository));
         }
 
         public async Task<Result<int>> CreateAsync(CreateOrderItemRequest request)
@@ -90,16 +87,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
                 return aggregateValidationResult;
 
             order.MergeOrderItems(CreateOrderItemMerge(model));
-            await UpdateServiceRecipients(order.OrderId, model);
             await orderRepository.UpdateOrderAsync(order);
 
             return aggregateValidationResult;
         }
 
-        private OrderItemMerge CreateOrderItemMerge(IEnumerable<CreateOrderItemRequest> requests)
+        private OrderItemMerge CreateOrderItemMerge(IReadOnlyList<CreateOrderItemRequest> requests)
         {
+            var serviceRecipients = requests.Select(r => r.ServiceRecipient).Where(r => r is not null);
             (Guid id, string name) = identityService.GetUserInfo();
-            var orderItemsToMerge = new OrderItemMerge(id, name);
+
+            var orderItemsToMerge = new OrderItemMerge(serviceRecipients, id, name);
 
             if (!orderItemsToMerge.AddOrderItems(requests.Select(r => orderItemFactory.Create(r))))
             {
@@ -109,12 +107,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             }
 
             return orderItemsToMerge;
-        }
-
-        private async Task UpdateServiceRecipients(string orderId, IEnumerable<CreateOrderItemRequest> requests)
-        {
-            var serviceRecipients = requests.Select(r => r.ServiceRecipient).Where(r => r is not null).Distinct();
-            await serviceRecipientRepository.UpdateWithoutSavingAsync(orderId, serviceRecipients);
         }
     }
 }

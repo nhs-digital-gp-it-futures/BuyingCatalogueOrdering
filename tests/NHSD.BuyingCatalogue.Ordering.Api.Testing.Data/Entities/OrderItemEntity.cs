@@ -124,7 +124,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
         }
 
         public static async Task<OrderItemEntity> FetchByOrderItemId(string connectionString, int orderItemId) =>
-            (await FetchAllAsync(connectionString)).Single(item => orderItemId == item.OrderItemId);
+            (await FetchAllAsync(connectionString)).SingleOrDefault(item => orderItemId == item.OrderItemId);
 
         public static async Task<OrderItemEntity> FetchByCatalogueItemName(string connectionString, string catalogueItemName) =>
             (await FetchAllAsync(connectionString)).Single(item =>

@@ -16,7 +16,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         [AutoData]
         public static void Constructor_InitializesUserId(Guid userId, string userName)
         {
-            var merge = new OrderItemMerge(userId, userName);
+            var merge = new OrderItemMerge(Array.Empty<ServiceRecipient>(), userId, userName);
             merge.UserId.Should().Be(userId);
         }
 
@@ -24,36 +24,43 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         [AutoData]
         public static void Constructor_InitializesUserName(string userName)
         {
-            var merge = new OrderItemMerge(Guid.Empty, userName);
+            var merge = new OrderItemMerge(Array.Empty<ServiceRecipient>(), Guid.Empty, userName);
             merge.UserName.Should().Be(userName);
         }
 
         [Test]
         public static void Constructor_NullUserName_ThrowsException()
         {
-            Assert.Throws<ArgumentNullException>(() => _ = new OrderItemMerge(Guid.Empty, null));
+            Assert.Throws<ArgumentNullException>(() => _ = new OrderItemMerge(
+                Array.Empty<ServiceRecipient>(),
+                Guid.Empty,
+                null));
         }
 
         [TestCase("")]
         [TestCase("\t")]
         public static void Constructor_EmptyUserName_ThrowsException(string userName)
         {
-            Assert.Throws<ArgumentException>(() => _ = new OrderItemMerge(Guid.Empty, userName));
+            Assert.Throws<ArgumentException>(() => _ = new OrderItemMerge(
+                Array.Empty<ServiceRecipient>(),
+                Guid.Empty,
+                userName));
         }
 
         [Test]
         [AutoData]
-        public static void AddOrderItem_NullOrderItem_ThrowsException(OrderItemMerge merge)
+        public static void AddOrderItem_NullOrderItem_ThrowsException(Guid userId, string userName)
         {
+            var merge = new OrderItemMerge(Array.Empty<ServiceRecipient>(), userId, userName);
             Assert.Throws<ArgumentNullException>(() => merge.AddOrderItem(null));
         }
 
         [Test]
         [AutoData]
-        public static void AddOrderItem_WithoutId_AddsToNewItems(OrderItemMerge merge)
+        public static void AddOrderItem_WithoutId_AddsToNewItems(Guid userId, string userName)
         {
+            var merge = new OrderItemMerge(Array.Empty<ServiceRecipient>(), userId, userName);
             var orderItem = OrderItemBuilder.Create().Build();
-
             var result = merge.AddOrderItem(orderItem);
 
             result.Should().BeTrue();
@@ -64,8 +71,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
         [Test]
         [AutoData]
-        public static void AddOrderItem_WithId_AddsToUpdatedItems(int orderItemId, OrderItemMerge merge)
+        public static void AddOrderItem_WithId_AddsToUpdatedItems(int orderItemId, Guid userId, string userName)
         {
+            var merge = new OrderItemMerge(Array.Empty<ServiceRecipient>(), userId, userName);
             var orderItem = OrderItemBuilder.Create().WithOrderItemId(orderItemId).Build();
 
             var result = merge.AddOrderItem(orderItem);
@@ -78,8 +86,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
         [Test]
         [AutoData]
-        public static void AddOrderItem_WithExistingId_IsNotAdded(int orderItemId, OrderItemMerge merge)
+        public static void AddOrderItem_WithExistingId_IsNotAdded(int orderItemId, Guid userId, string userName)
         {
+            var merge = new OrderItemMerge(Array.Empty<ServiceRecipient>(), userId, userName);
             var orderItem1 = OrderItemBuilder.Create().WithOrderItemId(orderItemId).Build();
             var orderItem2 = OrderItemBuilder.Create().WithOrderItemId(orderItemId).Build();
 
@@ -91,8 +100,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
         [Test]
         [AutoData]
-        public static void MarkOrderSectionsAsViewed_MarksExpectedSections(OrderItemMerge merge)
+        public static void MarkOrderSectionsAsViewed_MarksExpectedSections(Guid userId, string userName)
         {
+            var merge = new OrderItemMerge(Array.Empty<ServiceRecipient>(), userId, userName);
             var order = OrderBuilder.Create().Build();
             var orderItem1 = OrderItemBuilder.Create().WithCatalogueItemType(CatalogueItemType.AdditionalService).Build();
             var orderItem2 = OrderItemBuilder.Create().WithCatalogueItemType(CatalogueItemType.Solution).Build();
@@ -108,6 +118,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             order.AdditionalServicesViewed.Should().BeTrue();
             order.AssociatedServicesViewed.Should().BeFalse();
             order.CatalogueSolutionsViewed.Should().BeTrue();
+        }
+
+        [Test]
+        public static void ServiceRecipients_InitializedWithExpectedValues()
+        {
+            var recipient1 = new ServiceRecipient { OdsCode = "ODS1", Name = "Recipient 1" };
+            var recipient2 = new ServiceRecipient { OdsCode = "ODS2", Name = "Recipient 2" };
+
+            var merge = new OrderItemMerge(new[] { recipient1, recipient1, recipient2 }, Guid.Empty, "Foo");
+
+            merge.Recipients.Should().BeEquivalentTo(recipient1, recipient2);
         }
     }
 }

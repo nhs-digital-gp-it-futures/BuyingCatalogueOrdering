@@ -66,6 +66,34 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await bulkRequest.OrderItemsCreatedAsExpected();
         }
 
+        [Then(@"the following order items exist")]
+        public async Task ThenTheFollowingOrderItemsExist(Table table)
+        {
+            var expectedItems = table.CreateDynamicSet().ToList();
+            var actualItems = new List<dynamic>();
+
+            foreach (var item in expectedItems)
+            {
+                var orderItem = await OrderItemEntity.FetchByOrderItemId(
+                    settings.ConnectionString,
+                    item.OrderItemId);
+
+                if (orderItem is null)
+                    continue;
+
+                actualItems.Add(new
+                {
+                    orderItem.OrderItemId,
+                    bulkRequest.OrderId,
+                    CatalogueItemType = orderItem.CatalogueItemType.ToString(),
+                    orderItem.CatalogueItemName,
+                    orderItem.OdsCode,
+                });
+            }
+
+            table.CompareToDynamicSet(actualItems);
+        }
+
         [Then(@"the response contains the following error details")]
         public async Task ThenTheResponseContainsTheFollowingErrorDetails(Table table)
         {
@@ -121,7 +149,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             internal async Task<CreateOrderItemBaseRequest> CreateOrderItemRequest(RequestInfo requestInfo)
             {
-                OrderItemRequest = CreateOrderItemBaseRequest.Create(requestInfo.ItemType, request, settings.OrderingApiBaseUrl, orderId);
+                OrderItemRequest = CreateOrderItemBaseRequest.Create(
+                    requestInfo.ItemType,
+                    request,
+                    settings.OrderingApiBaseUrl,
+                    orderId);
+
                 OrderItemRequest.SetPayload(requestInfo.PayloadType);
 
                 return await InitializeOrderItemRequest(requestInfo);
@@ -198,10 +231,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             internal BulkRequest(string orderId, string orderingApiBaseUrl, string dbConnectionString)
             {
                 this.dbConnectionString = dbConnectionString;
+                OrderId = orderId;
                 url = new Uri($"{orderingApiBaseUrl}/api/v1/orders/{orderId}/order-items/batch");
             }
 
             internal IList<CreateOrderItemBaseRequest> Items { get; } = new List<CreateOrderItemBaseRequest>();
+
+            internal string OrderId { get; }
 
             internal async Task SendRequest(Request request)
             {
@@ -212,7 +248,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             {
                 foreach (var request in Items)
                 {
-                    var orderItem = await OrderItemEntity.FetchByCatalogueItemName(dbConnectionString, request.Payload.CatalogueItemName);
+                    var orderItem = await OrderItemEntity.FetchByCatalogueItemName(
+                        dbConnectionString,
+                        request.Payload.CatalogueItemName);
+
                     request.AssertPayload(orderItem);
                 }
             }

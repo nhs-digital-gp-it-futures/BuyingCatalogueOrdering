@@ -209,18 +209,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public static void MergeOrderItems_RemovesOrderItemsNotInMerge()
+        [AutoData]
+        public static void MergeOrderItems_DoesNotRemoveOrderItemsNotInMerge(Guid userId, string userName)
         {
+            var merge = new OrderItemMerge(Array.Empty<ServiceRecipient>(), userId, userName);
             var orderItem = OrderItemBuilder.Create().Build();
             var order = OrderBuilder.Create().WithOrderItem(orderItem).Build();
 
             order.OrderItems.Should().HaveCount(1);
             order.OrderItems.Should().Contain(orderItem);
 
-            order.MergeOrderItems(new OrderItemMerge(Guid.Empty, "Name"));
+            order.MergeOrderItems(merge);
 
-            order.OrderItems.Should().HaveCount(0);
-            order.OrderItems.Should().NotContain(orderItem);
+            order.OrderItems.Should().HaveCount(1);
+            order.OrderItems.Should().Contain(orderItem);
         }
 
         [Test]
@@ -228,8 +230,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         public static void MergeOrderItems_UpdatesExistingItems(
             int orderId,
             DateTime originalDeliveryDate,
-            OrderItemMerge merge)
+            Guid userId,
+            string userName)
         {
+            var merge = new OrderItemMerge(Array.Empty<ServiceRecipient>(), userId, userName);
             var orderItem = OrderItemBuilder
                 .Create()
                 .WithOrderItemId(orderId)
@@ -257,8 +261,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
         [Test]
         [AutoData]
-        public static void MergeOrderItems_AddsNewOrderItemsInMerge(OrderItemMerge merge)
+        public static void MergeOrderItems_AddsNewOrderItemsInMerge(Guid userId, string userName)
         {
+            var merge = new OrderItemMerge(Array.Empty<ServiceRecipient>(), userId, userName);
             var orderItem = OrderItemBuilder.Create().Build();
             var order = OrderBuilder.Create().Build();
             merge.AddOrderItem(orderItem);
@@ -274,8 +279,37 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
         [Test]
         [AutoData]
-        public static void MergeOrderItems_MarksSectionsAsViewed(OrderItemMerge merge)
+        public static void MergeOrderItems_AddsNewServiceRecipient(Guid userId, string userName)
         {
+            var recipient1 = new ServiceRecipient { OdsCode = "ODS1", Name = "Recipient 1" };
+            var recipient2 = new ServiceRecipient { OdsCode = "ODS2", Name = "Recipient 2" };
+
+            var order = OrderBuilder
+                .Create()
+                .WithServiceRecipient(new OdsOrganisation(recipient1.OdsCode, recipient1.Name))
+                .Build();
+
+            var orderItem = OrderItemBuilder.Create().WithOdsCode(recipient2.OdsCode).Build();
+
+            var merge = new OrderItemMerge(
+                new[] { recipient2 },
+                userId,
+                userName);
+
+            merge.AddOrderItem(orderItem);
+
+            order.ServiceRecipients.Should().BeEquivalentTo(recipient1);
+
+            order.MergeOrderItems(merge);
+
+            order.ServiceRecipients.Should().BeEquivalentTo(recipient1, recipient2);
+        }
+
+        [Test]
+        [AutoData]
+        public static void MergeOrderItems_MarksSectionsAsViewed(Guid userId, string userName)
+        {
+            var merge = new OrderItemMerge(Array.Empty<ServiceRecipient>(), userId, userName);
             var order = OrderBuilder.Create().Build();
             var orderItem = OrderItemBuilder.Create().WithCatalogueItemType(CatalogueItemType.AssociatedService).Build();
             merge.AddOrderItem(orderItem);
@@ -293,8 +327,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             int orderItemId,
             Guid originalUserId,
             string originalUserName,
-            OrderItemMerge merge)
+            Guid userId,
+            string userName)
         {
+            var merge = new OrderItemMerge(Array.Empty<ServiceRecipient>(), userId, userName);
             var orderItem = OrderItemBuilder.Create().WithOrderItemId(orderItemId).Build();
             var updatedOrderItem = OrderItemBuilder
                 .Create()
@@ -313,8 +349,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
             order.MergeOrderItems(merge);
 
-            order.LastUpdatedBy.Should().Be(merge.UserId);
-            order.LastUpdatedByName.Should().Be(merge.UserName);
+            order.LastUpdatedBy.Should().Be(userId);
+            order.LastUpdatedByName.Should().Be(userName);
         }
 
         [Test]
@@ -322,8 +358,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         public static void MergeOrderItems_ItemsUnchanged_DoesNotSetLastUpdatedBy(
             Guid originalUserId,
             string originalUserName,
-            OrderItemMerge merge)
+            Guid userId,
+            string userName)
         {
+            var merge = new OrderItemMerge(Array.Empty<ServiceRecipient>(), userId, userName);
             var orderItem = OrderItemBuilder.Create().WithOrderItemId(1).Build();
             var order = OrderBuilder
                 .Create()

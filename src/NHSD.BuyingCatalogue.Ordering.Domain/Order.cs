@@ -168,15 +168,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 throw new ArgumentNullException(nameof(merge));
 
             var startingOrderItemsHash = GetOrderItemsHash();
-            orderItems.RemoveAll(i => !merge.UpdatedItems.ContainsKey(i.OrderItemId));
+            var itemsToUpdate = orderItems.Intersect(merge.UpdatedItems.Values);
 
-            foreach (var orderItem in orderItems)
+            foreach (var orderItem in itemsToUpdate)
             {
                 var updatedItem = merge.UpdatedItems[orderItem.OrderItemId];
                 orderItem.UpdateFrom(updatedItem);
             }
 
             orderItems.AddRange(merge.NewItems);
+            serviceRecipients.AddRange(merge.Recipients.Except(ServiceRecipients));
             merge.MarkOrderSectionsAsViewed(this);
 
             if (startingOrderItemsHash != GetOrderItemsHash())
@@ -213,22 +214,25 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             int associatedServicesCount = OrderItems.Count(o => o.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
 
             var solutionAndAssociatedServices = catalogueSolutionsCount > 0
-                                                && associatedServicesCount > 0;
+                && associatedServicesCount > 0;
 
             var solutionAndNoAssociatedServices = catalogueSolutionsCount > 0
-                                                  && associatedServicesCount == 0
-                                                  && AssociatedServicesViewed;
+                && associatedServicesCount == 0
+                && AssociatedServicesViewed;
 
             var noSolutionsAndAssociatedServices = serviceRecipientsCount > 0
-                                                   && catalogueSolutionsCount == 0
-                                                   && CatalogueSolutionsViewed
-                                                   && associatedServicesCount > 0;
+                && catalogueSolutionsCount == 0
+                && CatalogueSolutionsViewed
+                && associatedServicesCount > 0;
 
             var recipientsAndAssociatedServices = serviceRecipientsCount == 0
-                                                   && ServiceRecipientsViewed
-                                                   && associatedServicesCount > 0;
+                && ServiceRecipientsViewed
+                && associatedServicesCount > 0;
 
-            return solutionAndNoAssociatedServices || solutionAndAssociatedServices || recipientsAndAssociatedServices || noSolutionsAndAssociatedServices;
+            return solutionAndNoAssociatedServices
+                || solutionAndAssociatedServices
+                || recipientsAndAssociatedServices
+                || noSolutionsAndAssociatedServices;
         }
 
         public Result Complete(Guid lastUpdatedBy, string lastUpdatedByName)
