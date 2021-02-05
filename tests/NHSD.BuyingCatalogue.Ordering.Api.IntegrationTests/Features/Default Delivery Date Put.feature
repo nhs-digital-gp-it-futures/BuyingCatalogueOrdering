@@ -125,6 +125,15 @@ Scenario: Set a default delivery date five years after the commencement date of 
         | DeliveryDateOutsideDeliveryWindow | DeliveryDate  |
 
 @8952
+Scenario: A buyer user cannot set the default delivery of an order for an organisation they don't belong to
+    Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
+    And the user sets the default delivery date using the following details
+        | OrderId    | CatalogueItemId | PriceId | DeliveryDate |
+        | C000014-02 | 10001-001       | 1       | 31/10/2020   |
+    When the user confirms the default delivery date
+    Then a response with status code 403 is returned
+
+@8952
 Scenario: A service failure causes the expected response to be returned when setting a default delivery date
     Given the call to the database will fail
     And the user sets the default delivery date using the following details

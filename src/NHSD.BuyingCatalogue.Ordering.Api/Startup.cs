@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +18,7 @@ using Microsoft.IdentityModel.Tokens;
 using NHSD.BuyingCatalogue.EmailClient;
 using NHSD.BuyingCatalogue.EmailClient.Configuration;
 using NHSD.BuyingCatalogue.Ordering.Api.ActionFilters;
+using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Logging;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
@@ -66,7 +69,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
 
             Log.Logger.Information("Authority on ORDAPI is: {@authority}", authority);
             Log.Logger.Information("ORDAPI Require Https: {@requiredHttps}", requireHttps);
-            Log.Logger.Information($"ORDAPI Allow Invalid Certificates: {allowInvalidCertificate}", allowInvalidCertificate);
+            Log.Logger.Information("ORDAPI Allow Invalid Certificates: {@allowInvalidCertificate}", allowInvalidCertificate);
             Log.Logger.Information("ORDAPI BypassIdentity: {@bypassIdentity}", bypassIdentity);
             Log.Logger.Information("SMTP settings: {@smtpSettings}", smtpSettings);
             Log.Logger.Information("Purchasing settings: {@purchasingSettings}", purchasingSettings);
@@ -98,7 +101,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 .AddScoped<ICsvStreamWriter<OdooOrderItem>, CsvStreamStreamWriter<OdooOrderItem, OdooOrderItemMap>>()
                 .AddScoped<IDefaultDeliveryDateValidator, DefaultDeliveryDateValidator>()
                 .AddScoped<ICreateOrderItemValidator, OrderItemValidator>()
-                .AddScoped<IUpdateOrderItemValidator, OrderItemValidator>();
+                .AddScoped<IUpdateOrderItemValidator, OrderItemValidator>()
+                .AddScoped<IAsyncAuthorizationFilter, OrderLookupOrganisationAuthorizationFilter>();
 
             services
                 .AddSingleton(smtpSettings)
@@ -135,7 +139,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                     }
                 });
 
-            services.AddControllers(options => options.Filters.Add<InputValidationActionFilter>())
+            static void ControllerOptions(MvcOptions options)
+            {
+                options.Filters.Add<OrderLookupOrganisationAuthorizationFilter>();
+                options.Filters.Add<InputValidationActionFilter>();
+            }
+
+            services.AddControllers(ControllerOptions)
                 .AddFluentValidation(c => c.ImplicitlyValidateChildProperties = true)
                 .ConfigureApiBehaviorOptions(options => options.SuppressModelStateInvalidFilter = true)
                 .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);

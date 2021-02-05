@@ -5,6 +5,7 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Errors;
@@ -23,6 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
+    [AuthorizeOrganisation]
     public sealed class OrdersController : ControllerBase
     {
         private readonly IOrderRepository orderRepository;
@@ -64,12 +66,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (order is null)
             {
                 return NotFound();
-            }
-
-            var primaryOrganisationId = User.GetPrimaryOrganisationId();
-            if (primaryOrganisationId != order.OrganisationId)
-            {
-                return Forbid();
             }
 
             var serviceInstanceItems = order.ServiceInstanceItems.ToDictionary(i => i.OrderItemId, i => i.ServiceInstanceId);
@@ -129,14 +125,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
         [HttpGet]
         [Route("/api/v1/organisations/{organisationId}/[controller]")]
+        [TypeFilter(typeof(OrganisationIdOrganisationAuthorizationFilter))]
         public async Task<ActionResult<IList<OrderListItemModel>>> GetAllAsync(Guid organisationId)
         {
-            var primaryOrganisationId = User.GetPrimaryOrganisationId();
-            if (primaryOrganisationId != organisationId)
-            {
-                return Forbid();
-            }
-
             var orders = await orderRepository.ListOrdersByOrganisationIdAsync(organisationId);
             var orderModelResult = orders.Select(order => new OrderListItemModel
             {
@@ -161,12 +152,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (order is null)
             {
                 return NotFound();
-            }
-
-            var primaryOrganisationId = User.GetPrimaryOrganisationId();
-            if (primaryOrganisationId != order.OrganisationId)
-            {
-                return Forbid();
             }
 
             int serviceRecipientsCount = await serviceRecipientRepository.GetCountByOrderIdAsync(orderId);
@@ -254,12 +239,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return NotFound();
             }
 
-            var primaryOrganisationId = User.GetPrimaryOrganisationId();
-            if (primaryOrganisationId != order.OrganisationId)
-            {
-                return Forbid();
-            }
-
             order.IsDeleted = true;
 
             var name = User.GetUserName();
@@ -292,12 +271,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (order is null)
             {
                 return NotFound();
-            }
-
-            var primaryOrganisationId = User.GetPrimaryOrganisationId();
-            if (primaryOrganisationId != order.OrganisationId)
-            {
-                return Forbid();
             }
 
             var completeOrderResult = await updateOrderStatusAsync(order);
