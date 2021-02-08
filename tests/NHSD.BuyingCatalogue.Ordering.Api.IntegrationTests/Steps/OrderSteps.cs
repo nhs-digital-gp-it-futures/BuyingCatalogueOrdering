@@ -84,7 +84,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithOrganisationName(ordersTableItem.OrganisationName)
                     .WithOrganisationOdsCode(ordersTableItem.OrganisationOdsCode)
                     .WithOrganisationAddressId(organisationAddressId)
-                    .WithOrganisationBillingAddressId(ordersTableItem.OrganisationBillingAddressId)
                     .WithOrganisationContactId(organisationContactId)
                     .WithOrderStatus(ordersTableItem.OrderStatus)
                     .WithDateCreated(ordersTableItem.Created != DateTime.MinValue ? ordersTableItem.Created : DateTime.UtcNow)
@@ -230,8 +229,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string OrganisationAddressPostcode { get; init; }
 
             public string OrganisationContactEmail { get; init; }
-
-            public int? OrganisationBillingAddressId { get; init; }
 
             public OrderStatus OrderStatus { get; init; } = OrderStatus.Complete;
 

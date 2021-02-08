@@ -12,7 +12,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
         private string organisationName;
         private string organisationOdsCode;
         private int? organisationAddressId;
-        private int? organisationBillingAddressId;
         private int? organisationContactId;
         private OrderStatus orderStatus;
         private DateTime lastUpdated;
@@ -40,7 +39,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
             organisationName = null;
             organisationOdsCode = "test";
             organisationAddressId = null;
-            organisationBillingAddressId = null;
             organisationContactId = null;
             orderStatus = 0;
             lastUpdated = DateTime.UtcNow;
@@ -97,12 +95,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
         public OrderEntityBuilder WithOrganisationAddressId(int? addressId)
         {
             organisationAddressId = addressId;
-            return this;
-        }
-
-        public OrderEntityBuilder WithOrganisationBillingAddressId(int? billingAddressId)
-        {
-            organisationBillingAddressId = billingAddressId;
             return this;
         }
 
@@ -224,7 +216,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
                 OrganisationName = organisationName,
                 OrganisationOdsCode = organisationOdsCode,
                 OrganisationAddressId = organisationAddressId,
-                OrganisationBillingAddressId = organisationBillingAddressId,
                 OrganisationContactId = organisationContactId,
                 OrderStatus = orderStatus,
                 LastUpdated = lastUpdated,

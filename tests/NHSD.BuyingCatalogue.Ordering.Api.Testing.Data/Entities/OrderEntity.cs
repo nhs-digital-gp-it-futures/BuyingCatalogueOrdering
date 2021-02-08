@@ -18,8 +18,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 
         public int? OrganisationAddressId { get; set; }
 
-        public int? OrganisationBillingAddressId { get; set; }
-
         public int? OrganisationContactId { get; set; }
 
         public OrderStatus OrderStatus { get; set; }
@@ -65,7 +63,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
                 OrganisationName,
                 OrganisationOdsCode,
                 OrganisationAddressId,
-                OrganisationBillingAddressId,
                 OrganisationContactId,
                 OrderStatusId,
                 Created,
@@ -93,7 +90,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
                 @OrganisationName,
                 @OrganisationOdsCode,
                 @OrganisationAddressId,
-                @OrganisationBillingAddressId,
                 @OrganisationContactId,
                 @OrderStatus,
                 @Created,
