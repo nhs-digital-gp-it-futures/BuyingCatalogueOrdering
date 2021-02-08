@@ -6,7 +6,6 @@
     OrganisationName NVARCHAR(256) NULL,
     OrganisationOdsCode NVARCHAR(8) NULL,
     OrganisationAddressId INT NULL,
-    OrganisationBillingAddressId INT NULL,
     OrganisationContactId INT NULL,
     OrderStatusId INT NOT NULL,
     ServiceRecipientsViewed BIT CONSTRAINT DF_Order_ServiceRecipientsViewed DEFAULT 0,
@@ -25,11 +24,9 @@
     LastUpdatedByName NVARCHAR(256) NULL,
     IsDeleted BIT CONSTRAINT DF_Order_IsDeleted DEFAULT 0 NOT NULL,
     Completed DATETIME2 NULL,
-    
     CONSTRAINT PK_OrderId PRIMARY KEY (OrderId),
     CONSTRAINT FK_Order_OrderStatus FOREIGN KEY (OrderStatusId) REFERENCES OrderStatus (OrderStatusId),
     CONSTRAINT FK_Order_OrganisationAddress FOREIGN KEY (OrganisationAddressId) REFERENCES [Address] (AddressId),
-    CONSTRAINT FK_Order_OrganisationBillingAddress FOREIGN KEY (OrganisationBillingAddressId) REFERENCES [Address] (AddressId),
     CONSTRAINT FK_Order_OrganisationContact FOREIGN KEY (OrganisationContactId) REFERENCES Contact (ContactId),
     CONSTRAINT FK_Order_SupplierAddress FOREIGN KEY (SupplierAddressId) REFERENCES [Address] (AddressId),
     CONSTRAINT FK_Order_SupplierContact FOREIGN KEY (SupplierContactId) REFERENCES Contact (ContactId)
