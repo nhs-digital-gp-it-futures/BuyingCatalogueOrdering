@@ -51,6 +51,14 @@ Scenario: A non buyer user cannot get a default delivery date
     Then a response with status code 403 is returned
 
 @8952
+Scenario: A buyer user cannot get the default delivery of an order for an organisation they don't belong to
+    Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
+    When the user gets the default delivery date for the catalogue item with the following details
+        | OrderId    | CatalogueItemId | PriceId |
+        | C000014-01 | 10001-001       | 1       |
+    Then a response with status code 403 is returned
+
+@8952
 Scenario: A service failure causes the expected response to be returned when getting a default delivery date
     Given the call to the database will fail
     When the user gets the default delivery date for the catalogue item with the following details

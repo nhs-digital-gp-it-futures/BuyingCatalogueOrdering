@@ -54,18 +54,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public static async Task GetAsync_WrongOrganisationId_ReturnsForbidden()
-        {
-            var context = OrdersControllerTestContext.Setup();
-
-            const string orderId = "C0000014-01";
-            context.Order = CreateGetTestData(orderId, Guid.NewGuid(), "ods").Order;
-
-            var response = await context.OrdersController.GetAsync(orderId);
-            response.Result.Should().BeOfType<ForbidResult>();
-        }
-
-        [Test]
         public static async Task GetAsync_OrderExists_ReturnsResult()
         {
             var context = OrdersControllerTestContext.Setup();
@@ -111,25 +99,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var ordersResult = result.Value;
             ordersResult.Should().ContainSingle();
             ordersResult.Should().BeEquivalentTo(orders.Select(t => t.Expected));
-        }
-
-        [Test]
-        public static async Task GetAllAsync_SingleOrderWithOtherOrganisationIdExists_ReturnsForbidden()
-        {
-            var otherOrganisationId = Guid.NewGuid();
-            var context = OrdersControllerTestContext.Setup();
-            var orders = new List<(Order Order, OrderListItemModel Expected)>
-            {
-                CreateOrderTestData("C0000014-01", otherOrganisationId, "A description"),
-            };
-
-            context.Orders = orders.Select(t => t.Order);
-
-            var controller = context.OrdersController;
-
-            var result = await controller.GetAllAsync(otherOrganisationId);
-            result.Should().NotBeNull();
-            result.Result.Should().BeOfType<ForbidResult>();
         }
 
         [Test]
@@ -559,18 +528,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public static async Task DeleteOrderAsync_OrderForDifferentOrganisation_ReturnsForbidden()
-        {
-            var context = OrdersControllerTestContext.Setup();
-            context.Order = OrderBuilder.Create()
-                .WithOrganisationId(Guid.NewGuid())
-                .Build();
-
-            var response = await context.OrdersController.DeleteOrderAsync("Order");
-            response.Should().BeOfType<ForbidResult>();
-        }
-
-        [Test]
         public static void UpdateStatusAsync_NullModel_ThrowsException()
         {
             var context = OrdersControllerTestContext.Setup();
@@ -585,18 +542,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var response = await context.OrdersController.UpdateStatusAsync("Order", context.CompleteOrderStatusModel);
             response.Result.Should().BeOfType<NotFoundResult>();
-        }
-
-        [Test]
-        public static async Task UpdateStatusAsync_OrderForDifferentOrganisation_ReturnsBadRequest()
-        {
-            var context = OrdersControllerTestContext.Setup();
-            context.Order = OrderBuilder.Create()
-                .WithOrganisationId(Guid.NewGuid())
-                .Build();
-
-            var response = await context.OrdersController.UpdateStatusAsync("Order", context.CompleteOrderStatusModel);
-            response.Result.Should().BeOfType<ForbidResult>();
         }
 
         [TestCase(null)]
