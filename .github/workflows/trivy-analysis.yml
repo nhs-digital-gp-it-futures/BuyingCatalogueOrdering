@@ -1,0 +1,37 @@
+name: Trivy
+
+on:
+  push:
+    branches: [ master ]
+
+  pull_request:
+    branches: [ master ]
+
+  schedule:
+    - cron: '20 20 * * 0'
+
+jobs:
+  analyse:
+    name: Analyse Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build image from Dockerfile
+        run: |
+          docker build -f src/NHSD.BuyingCatalogue.Ordering.Api/Dockerfile -t docker.io/nhsd/buying-catalogue/ordering-api:${{ github.sha }} .
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'docker.io/nhsd/buying-catalogue/ordering-api:${{ github.sha }}'
+          format: 'template'
+          template: '@/contrib/sarif.tpl'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: 'trivy-results.sarif'
