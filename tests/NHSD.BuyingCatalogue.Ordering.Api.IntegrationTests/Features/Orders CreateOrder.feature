@@ -100,7 +100,7 @@ Scenario: A non buyer user cannot create an order
     Then a response with status code 403 is returned
 
 @6739
-Scenario: 10. Service Failure
+Scenario: Service Failure
     Given the call to the database will fail
     When a POST request is made to create an order
         | OrganisationId                       | Description                         |
@@ -108,7 +108,7 @@ Scenario: 10. Service Failure
     Then a response with status code 500 is returned
 
 @5287
-Scenario: 11. Create an order after deleting one
+Scenario: Create an order after deleting one
     Given Orders exist
         | OrderId    | Description        | LastUpdatedBy                        | OrganisationId                       | IsDeleted |
         | C010098-01 | Some Description 1 | 335392e4-4bb1-413b-9de5-36a85c9c0422 | 4af62b99-638c-4247-875e-965239cd0c48 | False     |

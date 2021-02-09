@@ -3,6 +3,7 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
@@ -14,6 +15,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
+    [AuthorizeOrganisation]
     public sealed class FundingSourceController : Controller
     {
         private readonly IOrderRepository orderRepository;
@@ -30,12 +32,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (order is null)
             {
                 return NotFound();
-            }
-
-            var primaryOrganisationId = User.GetPrimaryOrganisationId();
-            if (primaryOrganisationId != order.OrganisationId)
-            {
-                return Forbid();
             }
 
             return new GetFundingSourceModel
@@ -57,12 +53,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (order is null)
             {
                 return NotFound();
-            }
-
-            var primaryOrganisationId = User.GetPrimaryOrganisationId();
-            if (primaryOrganisationId != order.OrganisationId)
-            {
-                return Forbid();
             }
 
             order.FundingSourceOnlyGms = model.OnlyGms;

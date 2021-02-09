@@ -61,6 +61,15 @@ Scenario: A non buyer user cannot create order items
     Then a response with status code 403 is returned
 
 @6036
+Scenario: A buyer user cannot create order items for an organisation they don't belong to
+    Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
+    And the user creates a request to add the following items to the order with ID 'C000014-01'
+        | ItemType           | PayloadType | CatalogueItemName | OdsCode | ServiceRecipientName |
+        | catalogue solution | complete    | Item A            | ODS2    | Recipient 1          |
+    When the user sends the create order items request
+    Then a response with status code 403 is returned
+
+@6036
 Scenario: Service failure
     Given the call to the database will fail
     And the user creates a request to add the following items to the order with ID 'C000014-01'
