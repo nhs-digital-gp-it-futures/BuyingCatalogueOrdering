@@ -128,7 +128,7 @@ Scenario: If a user is not authorised then they cannot access the service recipi
     Then a response with status code 401 is returned
 
 @7412
-Scenario: 10. A non buyer user cannot access the service recipients section
+Scenario: A non buyer user cannot access the service recipients section
     Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
     When the user makes a request to set the service-recipients section with order ID C000014-02
         | OdsCode | Name         |
@@ -136,7 +136,7 @@ Scenario: 10. A non buyer user cannot access the service recipients section
     Then a response with status code 403 is returned
 
 @7412
-Scenario: 11. A buyer user cannot access the service recipients section for an organisation they don't belong to
+Scenario: A buyer user cannot access the service recipients section for an organisation they don't belong to
     Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
     When the user makes a request to set the service-recipients section with order ID C000014-02
         | OdsCode | Name         |
@@ -144,7 +144,7 @@ Scenario: 11. A buyer user cannot access the service recipients section for an o
     Then a response with status code 403 is returned
 
 @7412
-Scenario: 12. Service Failure
+Scenario: Service Failure
     Given the call to the database will fail
     When the user makes a request to set the service-recipients section with order ID C000014-02
         | OdsCode | Name         |
@@ -152,7 +152,7 @@ Scenario: 12. Service Failure
     Then a response with status code 500 is returned
 
 @7412
-Scenario: 11. the user selects service recipients and the order marks the service recipient section as viewed
+Scenario: the user selects service recipients and the order marks the service recipient section as viewed
     When the user makes a request to set the service-recipients section with order ID C000014-02
         | OdsCode | Name                |
         | Ods7    | Service Recipients2 |

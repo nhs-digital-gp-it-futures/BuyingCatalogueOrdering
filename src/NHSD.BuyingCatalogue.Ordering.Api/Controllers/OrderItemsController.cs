@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Attributes;
-using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
+using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Errors;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
@@ -22,6 +22,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
+    [AuthorizeOrganisation]
     public sealed class OrderItemsController : ControllerBase
     {
         private readonly IOrderRepository orderRepository;
@@ -56,12 +57,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (order is null)
             {
                 return NotFound();
-            }
-
-            var primaryOrganisationId = User.GetPrimaryOrganisationId();
-            if (primaryOrganisationId != order.OrganisationId)
-            {
-                return Forbid();
             }
 
             IEnumerable<OrderItem> orderItems = order.OrderItems;
@@ -104,12 +99,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return NotFound();
             }
 
-            var primaryOrganisationId = User.GetPrimaryOrganisationId();
-            if (primaryOrganisationId != order.OrganisationId)
-            {
-                return Forbid();
-            }
-
             OrderItem orderItem = order.OrderItems.FirstOrDefault(i => i.OrderItemId == orderItemId);
             if (orderItem is null)
                 return NotFound();
@@ -138,12 +127,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (order is null)
             {
                 return NotFound();
-            }
-
-            var primaryOrganisationId = User.GetPrimaryOrganisationId();
-            if (primaryOrganisationId != order.OrganisationId)
-            {
-                return Forbid();
             }
 
             var createOrderItemResponse = new CreateOrderItemResponseModel();
@@ -201,10 +184,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             var order = await orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
                 return NotFound();
-
-            var primaryOrganisationId = User.GetPrimaryOrganisationId();
-            if (primaryOrganisationId != order.OrganisationId)
-                return Forbid();
 
             var orderItem = order.OrderItems.FirstOrDefault(
                 item => orderItemId.Equals(item.OrderItemId));

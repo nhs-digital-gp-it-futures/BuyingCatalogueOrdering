@@ -64,19 +64,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public static async Task GetAllAsync_OrganisationIdDoesNotMatch_ReturnsForbidden()
-        {
-            var context = ServiceRecipientsTestContext.Setup();
-            context.Order = OrderBuilder
-                .Create()
-                .WithOrganisationId(Guid.NewGuid())
-                .Build();
-
-            var response = await context.Controller.GetAllAsync("myOrder");
-            response.Should().BeEquivalentTo(new ActionResult<ServiceRecipientsModel>(new ForbidResult()));
-        }
-
-        [Test]
         public static async Task GetAllAsync_NoServiceRecipient_ReturnsEmptyList()
         {
             var context = ServiceRecipientsTestContext.Setup();
@@ -161,19 +148,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var response = await context.Controller.UpdateAsync(orderId, DefaultServiceRecipientsModel);
             response.Should().BeEquivalentTo(new NotFoundResult());
-        }
-
-        [Test]
-        public static async Task UpdateAsync_OrganisationIdDoesNotMatch_ReturnsForbidden()
-        {
-            var context = ServiceRecipientsTestContext.Setup();
-            context.Order = OrderBuilder
-                .Create()
-                .WithOrganisationId(Guid.NewGuid())
-                .Build();
-
-            var response = await context.Controller.UpdateAsync("myOrder", DefaultServiceRecipientsModel);
-            response.Should().BeEquivalentTo(new ForbidResult());
         }
 
         [Test]

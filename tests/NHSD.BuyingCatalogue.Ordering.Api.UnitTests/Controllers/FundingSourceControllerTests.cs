@@ -41,22 +41,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public static async Task GetAsync_DifferentOrganisationId_ForbiddenReturned()
-        {
-            const string orderId = "C0000014-01";
-            var context = FundingSourceControllerTestContext.Setup();
-            context.PrimaryOrganisationId = Guid.NewGuid();
-            context.Order = OrderBuilder
-                .Create()
-                .WithOrganisationId(Guid.NewGuid())
-                .Build();
-
-            var actual = await context.Controller.GetAsync(orderId);
-
-            actual.Result.Should().BeOfType<ForbidResult>();
-        }
-
-        [Test]
         public static async Task GetAsync_OrderExists_FundingSourceDetailsReturned()
         {
             const string orderId = "C0000014-01";
@@ -93,19 +77,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var context = FundingSourceControllerTestContext.Setup();
             Assert.ThrowsAsync<ArgumentNullException>(() => context.Controller.PutFundingSourceAsync("123", null));
-        }
-
-        [Test]
-        public static async Task Put_OtherOrganisationId_ReturnsForbidResult()
-        {
-            var organisationId = Guid.NewGuid();
-            const string orderId = "C0000014-01";
-            var context = FundingSourceControllerTestContext.Setup(organisationId);
-            var order = OrderBuilder.Create().WithOrganisationId(Guid.NewGuid()).Build();
-            context.Order = order;
-
-            var response = await context.Controller.PutFundingSourceAsync(orderId, new UpdateFundingSourceModel());
-            response.Should().BeEquivalentTo(new ForbidResult());
         }
 
         [Test]
@@ -193,7 +164,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             internal Guid NameIdentity { get; }
 
-            internal Guid PrimaryOrganisationId { get; set; }
+            internal Guid PrimaryOrganisationId { get; }
 
             internal Mock<IOrderRepository> OrderRepositoryMock { get; }
 

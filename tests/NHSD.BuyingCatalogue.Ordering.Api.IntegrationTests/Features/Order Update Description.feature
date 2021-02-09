@@ -90,7 +90,7 @@ Scenario: A user with read only permissions, cannot update an orders description
     Then a response with status code 403 is returned
 
 @5322
-Scenario: 10. Service Failure
+Scenario: Service Failure
     Given the call to the database will fail
     When the user makes a request to update the description with the ID C000014-01
         | Description         |
@@ -98,7 +98,7 @@ Scenario: 10. Service Failure
     Then a response with status code 500 is returned
 
 @5322
-Scenario: 11. Update order description to 100 characters should be successful
+Scenario: Update order description to 100 characters should be successful
     When the user makes a request to update the description with the ID C000014-02
         | Description              |
         | #A string of length 100# |

@@ -63,25 +63,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public static async Task Get_OtherOrganisationId_ReturnsForbidden()
-        {
-            const string orderId = "C0000014-01";
-            var context = OrderDescriptionTestContext.Setup();
-
-            (Order order, _) = CreateOrderDescriptionTestData(
-                orderId,
-                OrderDescription.Create("Test Description").Value,
-                Guid.NewGuid());
-
-            context.Order = order;
-
-            using var controller = context.OrderDescriptionController;
-
-            var result = await controller.GetAsync(orderId);
-            result.Should().BeOfType<ForbidResult>();
-        }
-
-        [Test]
         public static async Task Get_OrderById_CalledOnce()
         {
             var context = OrderDescriptionTestContext.Setup();
@@ -167,28 +148,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 new OrderDescriptionModel { Description = "New Description" });
 
             response.Should().BeOfType<NoContentResult>();
-        }
-
-        [Test]
-        public static async Task UpdateAsync_OtherOrganisationId_ReturnsForbidden()
-        {
-            const string orderId = "C0000014-01";
-            var context = OrderDescriptionTestContext.Setup();
-
-            (Order order, _) = CreateOrderDescriptionTestData(
-                orderId,
-                OrderDescription.Create("Test Description").Value,
-                Guid.NewGuid());
-
-            context.Order = order;
-
-            using var controller = context.OrderDescriptionController;
-
-            var response = await controller.UpdateAsync(
-                orderId,
-                new OrderDescriptionModel { Description = "New Description" });
-
-            response.Should().BeOfType<ForbidResult>();
         }
 
         [Test]

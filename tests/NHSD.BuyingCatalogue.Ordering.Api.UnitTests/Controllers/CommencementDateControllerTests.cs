@@ -44,20 +44,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public static async Task Update_UserHasDifferentPrimaryOrganisationId_ReturnsForbidden()
-        {
-            var context = CommencementDateControllerTestContext.Setup();
-            context.Order = OrderBuilder
-                .Create()
-                .WithOrganisationId(Guid.NewGuid())
-                .Build();
-
-            var model = new CommencementDateModel { CommencementDate = DateTime.Now };
-            var result = await context.Controller.Update("myOrder", model);
-            result.Should().BeOfType<ForbidResult>();
-        }
-
-        [Test]
         public static async Task Update_NoOrderFound_ReturnsNotFound()
         {
             var context = CommencementDateControllerTestContext.Setup();
@@ -89,20 +75,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             context.Order = null;
             var result = await context.Controller.GetAsync("myOrder");
             result.Should().BeOfType<NotFoundResult>();
-        }
-
-        [Test]
-        public static async Task GetAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
-        {
-            var context = CommencementDateControllerTestContext.Setup();
-            context.Order = OrderBuilder
-                .Create()
-                .WithOrganisationId(Guid.NewGuid())
-                .Build();
-
-            context.Order.CommencementDate = DateTime.Now;
-            var result = await context.Controller.GetAsync("myOrder");
-            result.Should().BeOfType<ForbidResult>();
         }
 
         [Test]

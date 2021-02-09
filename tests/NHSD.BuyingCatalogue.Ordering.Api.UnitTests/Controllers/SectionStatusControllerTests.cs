@@ -42,18 +42,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public static async Task UpdateStatusAsync_WrongOrganisationId_ReturnsForbidden()
-        {
-            var context = SectionStatusControllerTestContext.Setup();
-
-            const string orderId = "C0000014-01";
-            context.Order = CreateGetTestData(orderId, Guid.NewGuid(), "ods");
-
-            var response = await context.SectionStatusController.UpdateStatusAsync(orderId, SectionModel.AdditionalServices.Id, new UpdateOrderSectionModel { Status = "complete" });
-            response.Should().BeOfType<ForbidResult>();
-        }
-
-        [Test]
         public static async Task UpdateStatusAsync_WrongSectionId_ReturnsForbidden()
         {
             var context = SectionStatusControllerTestContext.Setup();

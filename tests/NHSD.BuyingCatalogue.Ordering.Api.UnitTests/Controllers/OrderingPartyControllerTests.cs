@@ -38,23 +38,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public static async Task GetAsync_WrongOrganisationId_ReturnsForbidden()
-        {
-            var context = OrderingPartyTestContext.Setup();
-
-            const string orderId = "C0000014-01";
-            (Order order, _) = CreateOrderingPartyTestData(orderId, Guid.NewGuid());
-
-            context.Order = order;
-
-            var controller = context.OrderingPartyController;
-
-            var result = await controller.GetAsync(orderId);
-
-            result.Result.Should().BeOfType<ForbidResult>();
-        }
-
-        [Test]
         public static async Task GetAsync_EmptyOrderingParty_ReturnsEmptyResult()
         {
             const string orderId = "C0000014-01";

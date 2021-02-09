@@ -73,23 +73,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [OrderingAutoData]
-        public static async Task ListAsync_InvalidPrimaryOrganisationId_ReturnsForbid(
-            Order order,
-            [Frozen] Mock<IOrderRepository> repository,
-            OrderItemsController controller)
-        {
-            const string orderId = "myOrder";
-
-            repository.Setup(r => r.GetOrderByIdAsync(orderId, It.IsAny<Action<IOrderQuery>>()))
-                .ReturnsAsync(order);
-
-            var result = await controller.ListAsync(orderId, null);
-
-            result.Result.Should().BeOfType<ForbidResult>();
-        }
-
-        [Test]
         [OrderingInlineAutoData(null)]
         [OrderingInlineAutoData("Solution")]
         [OrderingInlineAutoData("AdditionalService")]
@@ -153,19 +136,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var result = await context.OrderItemsController.GetAsync(string.Empty, 1);
 
             result.Result.Should().BeOfType<NotFoundResult>();
-        }
-
-        [Test]
-        public static async Task GetAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
-        {
-            var context = OrderItemsControllerTestContext.Setup();
-            context.Order = OrderBuilder
-                .Create()
-                .Build();
-
-            var result = await context.OrderItemsController.GetAsync(context.Order.OrderId, 1);
-
-            result.Result.Should().BeOfType<ForbidResult>();
         }
 
         [Test]
@@ -297,21 +267,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var result = await context.OrderItemsController.CreateOrderItemAsync("unknown", createModel);
 
             result.Result.Should().BeOfType<NotFoundResult>();
-        }
-
-        [Test]
-        [OrderingAutoData]
-        public static async Task CreateOrderItemAsync_InvalidPrimaryOrganisationId_ReturnsForbid(CreateOrderItemModel createModel)
-        {
-            var context = OrderItemsControllerTestContext.Setup();
-            context.Order = OrderBuilder
-                .Create()
-                .WithOrganisationId(Guid.NewGuid())
-                .Build();
-
-            var result = await context.OrderItemsController.CreateOrderItemAsync("myOrder", createModel);
-
-            result.Result.Should().BeOfType<ForbidResult>();
         }
 
         [Test]
@@ -638,24 +593,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             await context.OrderItemsController.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
 
             context.OrderRepositoryMock.Verify(r => r.GetOrderByIdAsync(orderId));
-        }
-
-        [Test]
-        public static async Task UpdateOrderItemAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
-        {
-            const string orderId = "C10000-01";
-            const int orderItemId = 1;
-            var updateModel = UpdateOrderItemModelBuilder.Create().BuildSolution();
-
-            var context = OrderItemsControllerTestContext.Setup();
-            context.Order = OrderBuilder
-                .Create()
-                .WithOrganisationId(Guid.NewGuid())
-                .Build();
-
-            var result = await context.OrderItemsController.UpdateOrderItemAsync(orderId, orderItemId, updateModel);
-
-            result.Result.Should().BeOfType<ForbidResult>();
         }
 
         [Test]
