@@ -84,7 +84,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 
             builder.Property(orderItem => orderItem.Price)
                 .HasColumnName(nameof(OrderItem.Price))
-                .HasColumnType("decimal(18, 3)");
+                .HasColumnType("decimal(18, 4)");
 
             builder.Property(orderItem => orderItem.Created)
                 .HasColumnName(nameof(OrderItem.Created))

@@ -27,7 +27,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
                     "high-boundary", () =>
                     UpdateOrderItemRequestPayloadBuilder
                         .Create()
-                        .WithPrice(999999999999999.999m)
+                        .WithPrice(99999999999999.9999m)
                         .WithQuantity(int.MaxValue - 1)
                         .Build()
                 },
