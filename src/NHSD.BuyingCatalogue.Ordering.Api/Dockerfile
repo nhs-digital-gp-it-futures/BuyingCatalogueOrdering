@@ -1,4 +1,6 @@
-FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-alpine AS base
+RUN apk update && apk add icu-libs
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
@@ -24,4 +26,4 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 COPY --from=build /app/build/start.sh .
 RUN ["chmod", "+x", "./start.sh"]
-ENTRYPOINT ["/bin/bash", "-c", "./start.sh"]
+ENTRYPOINT ["sh", "./start.sh"]
