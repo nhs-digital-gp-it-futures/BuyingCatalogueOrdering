@@ -1,32 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.Kernel;
+using NHSD.BuyingCatalogue.Ordering.Common.UnitTests;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
 {
-    internal class OrderCustomization : OrderingCustomization
+    internal sealed class OrderCustomization : ICustomization
     {
-        public override void Customize(IFixture fixture)
+        public void Customize(IFixture fixture)
         {
-            base.Customize(fixture);
-
-            fixture.Customize<Order>(c => c
-                .FromFactory(new MethodInvoker(new FactoryMethodQuery()))
-                .Do(o => o.AddOrderItem(
-                    fixture.Create<OrderItem>(),
-                    fixture.Create<Guid>(),
-                    fixture.Create<string>()))
-                .Do(o => o.SetServiceRecipients(
-                    CreateServiceRecipients(fixture),
-                    fixture.Create<Guid>(),
-                    fixture.Create<string>())));
+            fixture.Customize<Order>(c => c.FromFactory(() => CreateOrder(fixture))
+                .Without(o => o.CallOffId)
+                .Without(o => o.Revision)
+                .Without(o => o.OrderStatus));
         }
 
-        protected virtual IEnumerable<OdsOrganisation> CreateServiceRecipients(IFixture fixture)
+        private static Order CreateOrder(ISpecimenBuilder fixture)
         {
-            return fixture.CreateMany<OdsOrganisation>();
+            var callOffId = fixture.Create<CallOffId>();
+            var order = new Order
+            {
+                CallOffId = callOffId,
+                Revision = callOffId.Revision,
+            };
+
+            BackingField.SetValue(order, nameof(Order.Id), callOffId.Id);
+
+            return order;
         }
     }
 }
