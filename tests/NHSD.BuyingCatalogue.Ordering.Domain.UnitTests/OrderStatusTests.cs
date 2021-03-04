@@ -79,5 +79,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
             instance.Equals(comparisonObject).Should().BeFalse();
         }
+
+        [Test]
+        public static void GetHashCode_ReturnsExpectedResult()
+        {
+            var status = OrderStatus.Complete;
+
+            var hash = status.GetHashCode();
+
+            hash.Should().Be(status.Id.GetHashCode());
+        }
     }
 }

@@ -13,44 +13,30 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
     {
         [Test]
         [AutoData]
-        public static void Constructor_String_String_String_InitializesOrderId(string orderId)
+        public static void Constructor_String_String_InitializesOdsCode(string odsCode)
         {
-            var recipient = new ServiceRecipient(orderId, null, null);
-
-            recipient.OrderId.Should().Be(orderId);
-            recipient.Name.Should().BeNull();
-            recipient.OdsCode.Should().BeNull();
-        }
-
-        [Test]
-        [AutoData]
-        public static void Constructor_String_String_String_InitializesOdsCode(string odsCode)
-        {
-            var recipient = new ServiceRecipient(null, odsCode, null);
+            var recipient = new ServiceRecipient(odsCode, null);
 
             recipient.OdsCode.Should().Be(odsCode);
             recipient.Name.Should().BeNull();
-            recipient.OrderId.Should().BeNull();
         }
 
         [Test]
         [AutoData]
-        public static void Constructor_String_String_String_InitializesName(string name)
+        public static void Constructor_String_String_InitializesName(string name)
         {
-            var recipient = new ServiceRecipient(null, null, name);
+            var recipient = new ServiceRecipient(null, name);
 
             recipient.Name.Should().Be(name);
-            recipient.OrderId.Should().BeNull();
             recipient.OdsCode.Should().BeNull();
         }
 
         [Test]
         public static void Equals_DifferentType_ReturnsFalse()
         {
-            var recipient = new ServiceRecipient("Id-1", "ODS", null);
+            var recipient = new ServiceRecipient("ODS", null);
             var anonRecipient = new
             {
-                recipient.OrderId,
                 recipient.OdsCode,
             };
 
@@ -77,15 +63,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
         private static IEnumerable<ITestCaseData> EqualityTestCases()
         {
-            const string orderId = "Id-1";
             const string odsCode = "ODS";
 
-            var a = new ServiceRecipient(orderId, odsCode, null);
+            var a = new ServiceRecipient(odsCode, null);
 
             yield return new TestCaseData(a, a, true);
-            yield return new TestCaseData(a, new ServiceRecipient(orderId.ToUpperInvariant(), odsCode, null), true);
-            yield return new TestCaseData(a, new ServiceRecipient("Id-2", odsCode, null), false);
-            yield return new TestCaseData(a, new ServiceRecipient(orderId, "PDS", null), false);
+            yield return new TestCaseData(a, new ServiceRecipient(odsCode, null), true);
+            yield return new TestCaseData(a, new ServiceRecipient("PDS", null), false);
         }
     }
 }
