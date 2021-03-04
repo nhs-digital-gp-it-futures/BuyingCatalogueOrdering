@@ -1,18 +1,21 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
+using Microsoft.EntityFrameworkCore;
+using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Authorization
 {
     internal sealed class OrderLookupOrganisationAuthorizationFilter : OrganisationAuthorizationFilter
     {
-        internal const string DefaultParameterName = "orderId";
+        internal const string DefaultParameterName = "callOffId";
 
-        private readonly IOrderRepository orderRepository;
+        private readonly ApplicationDbContext dbContext;
 
-        public OrderLookupOrganisationAuthorizationFilter(IOrderRepository orderRepository) =>
-            this.orderRepository = orderRepository;
+        public OrderLookupOrganisationAuthorizationFilter(ApplicationDbContext dbContext) =>
+            this.dbContext = dbContext;
 
         protected override string ParameterName { get; } = DefaultParameterName;
 
@@ -34,11 +37,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Authorization
 
         protected override async Task<(string Id, IActionResult Result)> GetOrganisationId(string routeValue)
         {
-            var order = await orderRepository.GetOrderByIdAsync(routeValue, q => q.WithoutTracking());
+            (bool success, CallOffId callOffId) = CallOffId.Parse(routeValue);
+            if (!success)
+                return (null, new NotFoundResult());
+
+            var order = await dbContext.Order
+                .Where(o => o.Id == callOffId.Id)
+                .Select(o => new { OrderingPartyId = o.OrderingParty == null ? null : o.OrderingParty.Id.ToString() })
+                .AsNoTracking()
+                .SingleOrDefaultAsync();
+
             if (order is null)
                 return (null, new NotFoundResult());
 
-            return (order.OrganisationId.ToString(), null);
+            return (order.OrderingPartyId, null);
         }
     }
 }
