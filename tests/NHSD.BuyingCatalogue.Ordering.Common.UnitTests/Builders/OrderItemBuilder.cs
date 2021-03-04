@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
@@ -6,69 +7,39 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
     public sealed class OrderItemBuilder
     {
         private readonly CataloguePriceType cataloguePriceType;
+        private readonly List<OrderItemRecipient> recipients = new();
 
-        private int? orderItemId;
-        private string odsCode;
-        private string catalogueItemId;
-        private CatalogueItemType catalogueItemType;
-        private string catalogueItemName;
+        private CatalogueItem catalogueItem;
         private ProvisioningType provisioningType;
-        private CataloguePriceUnit cataloguePriceUnit;
+
+        private PricingUnit pricingUnit;
         private TimeUnit? priceTimeUnit;
+
         private string currencyCode;
-        private int quantity;
         private TimeUnit? estimationPeriod;
-        private DateTime? deliveryDate;
+        private DateTime? defaultDeliveryDate;
+        private int orderId;
         private decimal? price;
-        private DateTime created;
 
         private OrderItemBuilder()
         {
-            odsCode = "ODS1";
-            catalogueItemId = "100001-001";
-            catalogueItemType = CatalogueItemType.Solution;
-            catalogueItemName = Guid.NewGuid().ToString();
+            catalogueItem = new CatalogueItem { Name = "Doctor Doctor", CatalogueItemType = CatalogueItemType.Solution };
             provisioningType = ProvisioningType.Patient;
             cataloguePriceType = CataloguePriceType.Flat;
-            cataloguePriceUnit = CataloguePriceUnit.Create("patients", "per patient");
+            pricingUnit = new PricingUnit { Name = "patient", Description = "per patient" };
             priceTimeUnit = TimeUnit.PerMonth;
             currencyCode = "GBP";
-            quantity = 10;
             estimationPeriod = TimeUnit.PerYear;
-            deliveryDate = DateTime.UtcNow;
+            defaultDeliveryDate = DateTime.UtcNow;
+            orderId = 1;
             price = 2.000m;
-            created = DateTime.UtcNow;
         }
 
         public static OrderItemBuilder Create() => new();
 
-        public OrderItemBuilder WithOrderItemId(int id)
+        public OrderItemBuilder WithCatalogueItem(CatalogueItem item)
         {
-            orderItemId = id;
-            return this;
-        }
-
-        public OrderItemBuilder WithOdsCode(string code)
-        {
-            odsCode = code;
-            return this;
-        }
-
-        public OrderItemBuilder WithCatalogueItemId(string id)
-        {
-            catalogueItemId = id;
-            return this;
-        }
-
-        public OrderItemBuilder WithCatalogueItemType(CatalogueItemType itemType)
-        {
-            catalogueItemType = itemType;
-            return this;
-        }
-
-        public OrderItemBuilder WithCatalogueItemName(string name)
-        {
-            catalogueItemName = name;
+            catalogueItem = item;
             return this;
         }
 
@@ -78,9 +49,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             return this;
         }
 
-        public OrderItemBuilder WithCataloguePriceUnit(CataloguePriceUnit priceUnit)
+        public OrderItemBuilder WithPricingUnit(PricingUnit unit)
         {
-            cataloguePriceUnit = priceUnit;
+            pricingUnit = unit;
             return this;
         }
 
@@ -96,21 +67,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             return this;
         }
 
-        public OrderItemBuilder WithQuantity(int number)
-        {
-            quantity = number;
-            return this;
-        }
-
         public OrderItemBuilder WithEstimationPeriod(TimeUnit? period)
         {
             estimationPeriod = period;
             return this;
         }
 
-        public OrderItemBuilder WithDeliveryDate(DateTime? date)
+        public OrderItemBuilder WithOrderId(int id)
         {
-            deliveryDate = date;
+            orderId = id;
+            return this;
+        }
+
+        public OrderItemBuilder WithRecipient(OrderItemRecipient recipient)
+        {
+            recipients.Add(recipient);
             return this;
         }
 
@@ -120,36 +91,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             return this;
         }
 
-        public OrderItemBuilder WithCreated(DateTime dateCreated)
-        {
-            created = dateCreated;
-            return this;
-        }
-
         public OrderItem Build()
         {
-            var orderItem = new OrderItem(
-                odsCode,
-                catalogueItemId,
-                catalogueItemType,
-                catalogueItemName,
-                null,
-                provisioningType,
-                cataloguePriceType,
-                cataloguePriceUnit,
-                priceTimeUnit,
-                currencyCode,
-                quantity,
-                estimationPeriod,
-                deliveryDate,
-                price);
-
-            if (orderItemId.HasValue)
+            var orderItem = new OrderItem
             {
-                Field.Set(orderItem, nameof(OrderItem.OrderItemId), orderItemId);
-            }
+                CatalogueItem = catalogueItem,
+                CataloguePriceType = cataloguePriceType,
+                CurrencyCode = currencyCode,
+                DefaultDeliveryDate = defaultDeliveryDate,
+                EstimationPeriod = estimationPeriod,
+                OrderId = orderId,
+                Price = price,
+                PricingUnit = pricingUnit,
+                PriceTimeUnit = priceTimeUnit,
+                ProvisioningType = provisioningType,
+            };
 
-            Field.Set(orderItem, nameof(OrderItem.Created), created);
+            orderItem.SetRecipients(recipients);
 
             return orderItem;
         }

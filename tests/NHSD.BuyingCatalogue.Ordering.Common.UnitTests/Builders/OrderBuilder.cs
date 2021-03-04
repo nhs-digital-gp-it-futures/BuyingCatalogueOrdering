@@ -9,11 +9,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
         private readonly string organisationName;
         private readonly string organisationOdsCode;
         private readonly Address organisationAddress;
-        private readonly DateTime created;
         private readonly IList<OrderItem> orderItems = new List<OrderItem>();
         private readonly IList<ServiceInstanceItem> serviceInstanceItems = new List<ServiceInstanceItem>();
-        private readonly IList<OdsOrganisation> serviceRecipients = new List<OdsOrganisation>();
-        private string orderId;
+        private readonly List<SelectedServiceRecipient> serviceRecipients = new();
+        private int orderId;
         private string orderDescription;
         private Guid organisationId;
         private Contact organisationContact;
@@ -34,14 +33,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
 
         private OrderBuilder()
         {
-            orderId = "C000014-01";
+            orderId = 1;
             orderDescription = "Some Description";
             organisationId = Guid.NewGuid();
+
             organisationName = "Organisation Name";
             organisationOdsCode = "Ods Code";
             organisationAddress = AddressBuilder.Create().WithLine1("1 Some Ordering Party").Build();
             organisationContact = null;
-            created = DateTime.UtcNow;
             lastUpdated = DateTime.UtcNow;
             lastUpdatedBy = Guid.NewGuid();
             lastUpdatedByName = "Bob Smith";
@@ -60,7 +59,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
 
         public static OrderBuilder Create() => new();
 
-        public OrderBuilder WithOrderId(string id)
+        public OrderBuilder WithOrderId(int id)
         {
             orderId = id;
             return this;
@@ -176,10 +175,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
 
         public OrderBuilder WithServiceRecipient(string code, string name)
         {
-            return WithServiceRecipient(new OdsOrganisation(code, name));
+            return WithServiceRecipient(new SelectedServiceRecipient { Recipient = new ServiceRecipient(code, name) });
         }
 
-        public OrderBuilder WithServiceRecipient(OdsOrganisation serviceRecipient)
+        public OrderBuilder WithServiceRecipient(SelectedServiceRecipient serviceRecipient)
         {
             serviceRecipients.Add(serviceRecipient);
             return this;
@@ -192,8 +191,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
 
             serviceInstanceItems.Add(new ServiceInstanceItem
             {
-                OrderItemId = forOrderItem.OrderItemId,
-                ServiceInstanceId = $"SI{increment}-{forOrderItem.OdsCode}",
+                OrderItemId = 1, // forOrderItem.OrderItemId,
+                ServiceInstanceId = $"SI{increment}-{forOrderItem.OrderItemRecipients[0].Recipient.OdsCode}",
             });
 
             return this;
@@ -201,42 +200,49 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
 
         public Order Build()
         {
-            var order = Order.Create(OrderDescription.Create(orderDescription).Value, organisationId, lastUpdatedBy, lastUpdatedByName);
-
-            order.OrderId = orderId;
-            order.OrganisationName = organisationName;
-            order.OrganisationOdsCode = organisationOdsCode;
-            order.OrganisationAddress = organisationAddress;
-            order.OrganisationContact = organisationContact;
-            order.SupplierId = supplierId;
-            order.SupplierName = supplierName;
-            order.SupplierAddress = supplierAddress;
-            order.SupplierContact = supplierContact;
-            order.CommencementDate = commencementDate;
+            var order = new Order
+            {
+                CommencementDate = commencementDate,
+                Description = orderDescription,
+                FundingSourceOnlyGms = fundingSourceOnlyGms,
+                OrderingParty = new OrderingParty
+                {
+                    Id = organisationId,
+                    Name = organisationName,
+                    OdsCode = organisationOdsCode,
+                    Address = organisationAddress,
+                },
+                OrderingPartyContact = organisationContact,
+                Progress = new OrderProgress
+                {
+                    AdditionalServicesViewed = additionalServicesViewed,
+                    AssociatedServicesViewed = associatedServicesViewed,
+                    CatalogueSolutionsViewed = catalogueSolutionsViewed,
+                    ServiceRecipientsViewed = serviceRecipientsViewed,
+                },
+                Supplier = new Supplier
+                {
+                    Id = supplierId,
+                    Name = supplierName,
+                    Address = supplierAddress,
+                },
+                SupplierContact = supplierContact,
+            };
 
             foreach (var orderItem in orderItems)
             {
-                order.AddOrderItem(orderItem, lastUpdatedBy, lastUpdatedByName);
+                order.AddOrUpdateOrderItem(orderItem);
             }
 
-            order.SetServiceRecipients(
-                serviceRecipients,
-                lastUpdatedBy,
-                lastUpdatedByName);
+            order.SetSelectedServiceRecipients(serviceRecipients);
 
-            order.AdditionalServicesViewed = additionalServicesViewed;
-            order.ServiceRecipientsViewed = serviceRecipientsViewed;
-            order.CatalogueSolutionsViewed = catalogueSolutionsViewed;
-            order.AssociatedServicesViewed = associatedServicesViewed;
-            order.FundingSourceOnlyGms = fundingSourceOnlyGms;
-            order.Created = created;
-            order.LastUpdated = lastUpdated;
-
-            Field.Set(order, nameof(Order.ServiceInstanceItems), serviceInstanceItems);
+            BackingField.SetValue(order, nameof(Order.LastUpdated), lastUpdated);
+            BackingField.SetValue(order, nameof(Order.Id), orderId);
+            BackingField.SetValue(order, nameof(Order.ServiceInstanceItems), serviceInstanceItems);
 
             if (completed is not null)
             {
-                Field.Set(order, nameof(Order.Completed), completed);
+                BackingField.SetValue(order, nameof(Order.Completed), completed);
             }
 
             return order;
