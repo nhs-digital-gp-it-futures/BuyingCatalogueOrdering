@@ -1,20 +1,23 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 {
-    public sealed class DefaultDeliveryDateEntityTypeConfiguration : IEntityTypeConfiguration<DefaultDeliveryDate>
+    internal sealed class DefaultDeliveryDateEntityTypeConfiguration : IEntityTypeConfiguration<DefaultDeliveryDate>
     {
         public void Configure(EntityTypeBuilder<DefaultDeliveryDate> builder)
         {
-            if (builder is null)
-                throw new ArgumentNullException(nameof(builder));
+            builder.ToTable("DefaultDeliveryDate");
+            builder.HasKey(d => new { d.OrderId, d.CatalogueItemId });
+            builder.Property(d => d.OrderId).IsRequired();
+            builder
+                .Property(d => d.CatalogueItemId)
+                .HasMaxLength(14)
+                .HasConversion(id => id.ToString(), id => CatalogueItemId.ParseExact(id));
 
-            builder.HasKey(d => new { d.OrderId, d.CatalogueItemId, d.PriceId });
-            builder.Property(d => d.OrderId).HasMaxLength(10);
-            builder.Property(d => d.CatalogueItemId).HasMaxLength(14);
+            builder.Property(d => d.DeliveryDate).HasColumnType("date");
+
             builder.HasOne<Order>()
                 .WithMany()
                 .HasForeignKey(d => d.OrderId)
