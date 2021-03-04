@@ -1,108 +1,45 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class OrderItem : IEquatable<OrderItem>
     {
+        private readonly List<OrderItemRecipient> recipients = new();
+
 #pragma warning disable IDE0044 // Add read-only modifier
 
         // Cannot be read-only so that EF Core can set value
         [UsedImplicitly]
-        private DateTime created;
+        private DateTime created = DateTime.UtcNow;
 
-        private DateTime lastUpdated;
-
-        // Cannot be read-only so that EF Core can set value
-        [UsedImplicitly]
-        private int orderItemId;
+        private DateTime lastUpdated = DateTime.UtcNow;
 
 #pragma warning restore IDE0044 // Add read-only modifier
 
-        public OrderItem(
-            string odsCode,
-            string catalogueItemId,
-            CatalogueItemType catalogueItemType,
-            string catalogueItemName,
-            string parentCatalogueItemId,
-            ProvisioningType provisioningType,
-            CataloguePriceType cataloguePriceType,
-            CataloguePriceUnit cataloguePriceUnit,
-            TimeUnit? priceTimeUnit,
-            string currencyCode,
-            int quantity,
-            TimeUnit? estimationPeriod,
-            DateTime? deliveryDate,
-            decimal? price,
-            int orderItemId = default)
-            : this()
-        {
-            if (string.IsNullOrWhiteSpace(catalogueItemId))
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(catalogueItemId));
+        public int OrderId { get; init; }
 
-            if (string.IsNullOrWhiteSpace(currencyCode))
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(currencyCode));
+        public CatalogueItem CatalogueItem { get; init; }
 
-            if (string.IsNullOrWhiteSpace(catalogueItemName))
-                throw new ArgumentException("Value cannot be null or whitespace.", nameof(catalogueItemName));
+        public CataloguePriceType CataloguePriceType { get; init; }
 
-            OdsCode = odsCode;
-            CatalogueItemId = catalogueItemId;
-            CatalogueItemType = catalogueItemType;
-            CatalogueItemName = catalogueItemName;
-            ParentCatalogueItemId = parentCatalogueItemId;
-            ProvisioningType = provisioningType;
-            CataloguePriceType = cataloguePriceType;
-            CataloguePriceUnit = cataloguePriceUnit ?? throw new ArgumentNullException(nameof(cataloguePriceUnit));
-            PriceTimeUnit = priceTimeUnit;
-            CurrencyCode = currencyCode;
-            Quantity = quantity;
-            EstimationPeriod = estimationPeriod;
-            DeliveryDate = deliveryDate;
-            Price = price;
-            this.orderItemId = orderItemId;
+        public string CurrencyCode { get; init; }
 
-            var now = DateTime.UtcNow;
-            created = now;
-            lastUpdated = now;
-        }
+        public DateTime? DefaultDeliveryDate { get; init; }
 
-        private OrderItem()
-        {
-        }
+        public TimeUnit? EstimationPeriod { get; set; }
 
-        // A private field is used here as EF core will set this value when an order item is persisted to the database.
-        // To mimic this functionality in the unit tests use the name of this field to set it via reflection.
-        // ReSharper disable once ConvertToAutoProperty
-        public int OrderItemId => orderItemId;
+        public IReadOnlyList<OrderItemRecipient> OrderItemRecipients => recipients;
 
-        public string OdsCode { get; }
+        public decimal? Price { get; set; }
 
-        public string CatalogueItemId { get; }
+        public PricingUnit PricingUnit { get; init; }
 
-        public CatalogueItemType CatalogueItemType { get; }
+        public TimeUnit? PriceTimeUnit { get; init; }
 
-        public string CatalogueItemName { get; }
-
-        public string ParentCatalogueItemId { get; }
-
-        public ProvisioningType ProvisioningType { get; }
-
-        public CataloguePriceType CataloguePriceType { get; }
-
-        public CataloguePriceUnit CataloguePriceUnit { get; }
-
-        public TimeUnit? PriceTimeUnit { get; }
-
-        public string CurrencyCode { get; }
-
-        public int Quantity { get; private set; }
-
-        public TimeUnit? EstimationPeriod { get; private set; }
-
-        public DateTime? DeliveryDate { get; private set; }
-
-        public decimal? Price { get; private set; }
+        public ProvisioningType ProvisioningType { get; init; }
 
         // Backing field is set by EF Core (allowing property to be read-only)
         // ReSharper disable once ConvertToAutoPropertyWithPrivateSetter
@@ -113,16 +50,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         public DateTime Created => created;
 
         public CostType CostType =>
-            CatalogueItemType.Equals(CatalogueItemType.AssociatedService) &&
+            CatalogueItem.CatalogueItemType.Equals(CatalogueItemType.AssociatedService) &&
             ProvisioningType.Equals(ProvisioningType.Declarative)
                 ? CostType.OneOff
                 : CostType.Recurring;
 
-        internal bool Updated { get; private set; }
+        public void SetRecipients(IEnumerable<OrderItemRecipient> itemRecipients)
+        {
+            recipients.Clear();
+            recipients.AddRange(itemRecipients);
+            Updated();
+        }
 
         public decimal CalculateTotalCostPerYear()
         {
-            return Price.GetValueOrDefault() * Quantity * (PriceTimeUnit?.AmountInYear() ?? EstimationPeriod?.AmountInYear() ?? 1);
+            return OrderItemRecipients.Sum(r => r.CalculateTotalCostPerYear(
+                Price.GetValueOrDefault(),
+                PriceTimeUnit ?? EstimationPeriod));
         }
 
         public bool Equals(OrderItem other)
@@ -133,58 +77,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             if (ReferenceEquals(this, other))
                 return true;
 
-            if (IsTransient() || other.IsTransient())
-                return false;
-
-            return OrderItemId == other.OrderItemId;
+            return CatalogueItem.Equals(other.CatalogueItem) && OrderId == other.OrderId;
         }
 
         public override bool Equals(object obj) => Equals(obj as OrderItem);
 
         public override int GetHashCode()
         {
-            // ReSharper disable once BaseObjectGetHashCodeCallInGetHashCode
-            return !IsTransient() ? OrderItemId : base.GetHashCode();
-        }
-
-        internal void UpdateFrom(OrderItem updatedItem)
-        {
-            ChangePrice(
-                updatedItem.DeliveryDate,
-                updatedItem.Quantity,
-                updatedItem.EstimationPeriod,
-                updatedItem.Price,
-                null);
-        }
-
-        internal void ChangePrice(
-            DateTime? deliveryDate,
-            int quantity,
-            TimeUnit? estimationPeriod,
-            decimal? price,
-            Action onPropertyChangedCallback)
-        {
-            bool changed = !Equals(DeliveryDate, deliveryDate);
-            changed = changed || !Equals(Quantity, quantity);
-            changed = changed || (estimationPeriod is not null && !Equals(EstimationPeriod, estimationPeriod));
-            changed = changed || !Equals(Price, price);
-
-            DeliveryDate = deliveryDate;
-            Quantity = quantity;
-
-            if (estimationPeriod is not null)
-            {
-                EstimationPeriod = estimationPeriod;
-            }
-
-            Price = price;
-
-            if (!changed)
-                return;
-
-            onPropertyChangedCallback?.Invoke();
-            lastUpdated = DateTime.UtcNow;
-            Updated = true;
+            return HashCode.Combine(OrderId, CatalogueItem);
         }
 
         internal void MarkOrderSectionAsViewed(Order order)
@@ -192,9 +92,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             if (order is null)
                 throw new ArgumentNullException(nameof(order));
 
-            CatalogueItemType.MarkOrderSectionAsViewed(order);
+            CatalogueItem.CatalogueItemType.MarkOrderSectionAsViewed(order);
         }
 
-        private bool IsTransient() => OrderItemId == default;
+        private void Updated() => lastUpdated = DateTime.UtcNow;
     }
 }
