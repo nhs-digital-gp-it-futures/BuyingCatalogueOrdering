@@ -69,17 +69,24 @@
     <Build Include="Security\Users\NHSD.sql" />
     <Build Include="Security\Logins\NHSD.sql" />
     <None Include="Deployment\InsertOrderStatuses.sql" />
-    <Build Include="Views\ServiceInstanceItem.sql" />
-    <Build Include="Functions\GetServiceInstanceIncrement.sql" />
-    <Build Include="Functions\HasParentSolution.sql" />
-    <Build Include="Indexes\IX_ServiceInstance.sql" />
+    <None Include="Views\ServiceInstanceItem.sql" />
+    <None Include="Functions\GetServiceInstanceIncrement.sql" />
+    <None Include="Functions\HasParentSolution.sql" />
+    <None Include="Indexes\IX_ServiceInstance.sql" />
+    <Build Include="Tables\OrderingParty.sql" />
+    <Build Include="Tables\Supplier.sql" />
+    <Build Include="Tables\CatalogueItem.sql" />
+    <Build Include="Tables\PricingUnit.sql" />
+    <Build Include="Tables\SelectedServiceRecipients.sql" />
+    <Build Include="Tables\ServiceRecipient.sql" />
+    <Build Include="Tables\OrderProgress.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\OrderStatus.sql" />
     <Build Include="Tables\Order.sql" />
     <Build Include="Tables\Contact.sql" />
     <Build Include="Tables\Address.sql" />
-    <Build Include="Tables\ServiceRecipient.sql" />
+    <Build Include="Tables\OrderItemRecipients.sql" />
     <Build Include="Tables\OrderItem.sql" />
     <Build Include="Tables\ProvisioningType.sql" />
     <Build Include="Tables\CatalogueItemType.sql" />
