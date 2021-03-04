@@ -62,9 +62,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
         private static IEnumerable<ITestCaseData> MarkOrderSectionAsViewedTestCases()
         {
-            yield return new TestCaseData(CatalogueItemType.AdditionalService, new Func<Order, bool>(o => o.AdditionalServicesViewed));
-            yield return new TestCaseData(CatalogueItemType.AssociatedService, new Func<Order, bool>(o => o.AssociatedServicesViewed));
-            yield return new TestCaseData(CatalogueItemType.Solution, new Func<Order, bool>(o => o.CatalogueSolutionsViewed));
+            yield return new TestCaseData(CatalogueItemType.AdditionalService, new Func<Order, bool>(o => o.Progress.AdditionalServicesViewed));
+            yield return new TestCaseData(CatalogueItemType.AssociatedService, new Func<Order, bool>(o => o.Progress.AssociatedServicesViewed));
+            yield return new TestCaseData(CatalogueItemType.Solution, new Func<Order, bool>(o => o.Progress.CatalogueSolutionsViewed));
         }
 
         private static IEnumerable<ITestCaseData> InferEstimationPeriodTestCases()
