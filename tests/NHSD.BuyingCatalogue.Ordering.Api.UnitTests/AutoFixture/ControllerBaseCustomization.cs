@@ -63,7 +63,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
             {
                 // Order must be frozen for this to work correctly
                 var order = context.Create<Order>();
-                return order.OrganisationId;
+                return order.OrderingParty.Id;
             }
         }
 

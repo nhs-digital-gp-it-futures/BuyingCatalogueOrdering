@@ -5,7 +5,6 @@ using AutoFixture.Kernel;
 using EnumsNET;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
@@ -28,7 +27,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
             var estimationPeriodNameBuilder = new EnumValueByParameterNameSpecimenBuilder<TimeUnit>("estimationPeriodName", e => e.AsString(EnumFormat.DisplayName));
 
             fixture.Customize<CreateOrderItemRequest>(_ => estimationPeriodNameBuilder);
-            fixture.Customize<UpdateOrderItemRequest>(_ => estimationPeriodNameBuilder);
         }
 
         private abstract class EnumValueByNameSpecimenBuilder<TEnum, TInfo> : ISpecimenBuilder
