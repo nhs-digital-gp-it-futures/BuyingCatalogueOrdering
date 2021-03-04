@@ -1,17 +1,14 @@
 ﻿using System;
-using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
     public sealed class DefaultDeliveryDate : IEquatable<DefaultDeliveryDate>
     {
-        public string OrderId { get; init; }
+        public int OrderId { get; init; }
 
-        public string CatalogueItemId { get; init; }
+        public CatalogueItemId CatalogueItemId { get; init; }
 
-        public int PriceId { get; init; }
-
-        public DateTime DeliveryDate { get; init; }
+        public DateTime? DeliveryDate { get; set; }
 
         public bool Equals(DefaultDeliveryDate other)
         {
@@ -21,9 +18,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             if (ReferenceEquals(this, other))
                 return true;
 
-            return OrderId.EqualsOrdinalIgnoreCase(other.OrderId)
-               && CatalogueItemId.EqualsOrdinalIgnoreCase(other.CatalogueItemId)
-               && PriceId == other.PriceId;
+            return OrderId == other.OrderId && CatalogueItemId == other.CatalogueItemId;
         }
 
         public override bool Equals(object obj)
@@ -33,7 +28,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(OrderId, CatalogueItemId, PriceId);
+            return HashCode.Combine(OrderId, CatalogueItemId);
         }
     }
 }

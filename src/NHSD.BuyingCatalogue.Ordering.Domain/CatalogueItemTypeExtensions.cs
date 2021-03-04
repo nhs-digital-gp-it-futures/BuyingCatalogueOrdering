@@ -26,15 +26,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             switch (itemType)
             {
                 case CatalogueItemType.Solution:
-                    order.CatalogueSolutionsViewed = true;
+                    order.Progress.CatalogueSolutionsViewed = true;
                     break;
 
                 case CatalogueItemType.AdditionalService:
-                    order.AdditionalServicesViewed = true;
+                    order.Progress.AdditionalServicesViewed = true;
                     break;
 
                 case CatalogueItemType.AssociatedService:
-                    order.AssociatedServicesViewed = true;
+                    order.Progress.AssociatedServicesViewed = true;
                     break;
 
                 default:

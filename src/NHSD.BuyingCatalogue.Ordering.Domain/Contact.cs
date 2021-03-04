@@ -2,7 +2,7 @@
 {
     public sealed class Contact
     {
-        public int ContactId { get; set; }
+        public int Id { get; set; }
 
         public string FirstName { get; set; }
 
