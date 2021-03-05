@@ -1,263 +1,214 @@
 ﻿using System;
-using System.Security.Claims;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
+using AutoFixture;
+using AutoFixture.AutoMoq;
+using AutoFixture.Idioms;
+using AutoFixture.NUnit3;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
-using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
-using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
+using NHSD.BuyingCatalogue.Ordering.Api.Services;
+using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
-    [Parallelizable(ParallelScope.All)]
+    [Parallelizable(ParallelScope.Children)]
+    [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class SupplierSectionControllerTests
     {
         [Test]
-        public static void Constructor_NullRepository_Throws()
+        public static void Constructor_VerifyGuardClauses()
         {
-            Assert.Throws<ArgumentNullException>(() => _ = new SupplierSectionController(null));
+            var fixture = new Fixture().Customize(new AutoMoqCustomization());
+            var assertion = new GuardClauseAssertion(fixture);
+            var constructors = typeof(SupplierSectionController).GetConstructors();
+
+            assertion.Verify(constructors);
         }
 
         [Test]
-        public static async Task GetAsync_OrderIdDoesNotExists_NotFoundReturned()
+        [InMemoryDbAutoData(nameof(GetAsync_OrderDoesNotExist_ReturnsNotFound))]
+        public static async Task GetAsync_OrderDoesNotExist_ReturnsNotFound(
+            CallOffId callOffId,
+            SupplierSectionController controller)
         {
-            const string orderId = "C0000014-01";
+            var response = await controller.GetAsync(callOffId);
 
-            var context = SupplierSectionControllerTestContext.Setup();
-
-            var controller = context.SupplierSectionController;
-            var response = await controller.GetAsync(orderId);
-
+            response.Should().NotBeNull();
             response.Result.Should().BeOfType<NotFoundResult>();
         }
 
         [Test]
-        public static async Task GetAsync_OrderIdExists_SupplierSectionDetailsReturned()
+        [InMemoryDbAutoData(nameof(GetAsync_OrderIdExists_SupplierSectionDetailsReturned))]
+        public static async Task GetAsync_OrderIdExists_SupplierSectionDetailsReturned(
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            SupplierSectionController controller)
         {
-            const string orderId = "C0000014-01";
-            const string supplierId = "1234";
-            const string supplierName = "NHS Supplier";
+            order.Supplier.Should().NotBeNull();
+            order.SupplierContact.Should().NotBeNull();
 
-            var supplierAddress = AddressBuilder
-                .Create()
-                .Build();
+            context.Add(order);
+            await context.SaveChangesAsync();
 
-            var supplierContact = ContactBuilder
-                .Create()
-                .Build();
+            var expectedValue = new SupplierModel(order.Supplier, order.SupplierContact);
 
-            var context = SupplierSectionControllerTestContext.Setup();
-            context.Order = OrderBuilder
-                .Create()
-                .WithOrderId(orderId)
-                .WithOrganisationId(context.PrimaryOrganisationId)
-                .WithSupplierId(supplierId)
-                .WithSupplierName(supplierName)
-                .WithSupplierAddress(supplierAddress)
-                .WithSupplierContact(supplierContact)
-                .Build();
+            var response = await controller.GetAsync(callOffId);
 
-            var controller = context.SupplierSectionController;
-            var response = await controller.GetAsync(orderId);
-
-            var expected = new SupplierModel
-            {
-                SupplierId = supplierId,
-                Name = supplierName,
-                Address = supplierAddress.ToModel(),
-                PrimaryContact = supplierContact.ToModel(),
-            };
-
-            response.Should().BeEquivalentTo(new ActionResult<SupplierModel>(new OkObjectResult(expected)));
+            response.Value.Should().BeEquivalentTo(expectedValue);
         }
 
         [Test]
-        public static async Task GetAsync_DifferentOrganisationId_ForbiddenReturned()
+        [InMemoryDbAutoData(nameof(UpdateAsync_ModelIsNull_ThrowsArgumentNullException))]
+        public static void UpdateAsync_ModelIsNull_ThrowsArgumentNullException(
+            CallOffId callOffId,
+            SupplierSectionController controller)
         {
-            const string orderId = "C0000014-01";
-            var context = SupplierSectionControllerTestContext.Setup();
-
-            context.PrimaryOrganisationId = Guid.NewGuid();
-            context.Order = OrderBuilder
-                .Create()
-                .WithOrganisationId(Guid.NewGuid())
-                .Build();
-
-            var controller = context.SupplierSectionController;
-            var actual = await controller.GetAsync(orderId);
-
-            var expected = new ActionResult<SupplierModel>(new ForbidResult());
-            actual.Should().BeEquivalentTo(expected);
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await controller.UpdateAsync(callOffId, null));
         }
 
         [Test]
-        public static async Task GetAsync_GetOrderByIdAsync_CalledOnce()
+        [InMemoryDbAutoData(nameof(UpdateAsync_OrderDoesNotExist_ReturnsNotFound))]
+        public static async Task UpdateAsync_OrderDoesNotExist_ReturnsNotFound(
+            CallOffId callOffId,
+            SupplierModel model,
+            SupplierSectionController controller)
         {
-            var context = SupplierSectionControllerTestContext.Setup();
+            var response = await controller.UpdateAsync(callOffId, model);
 
-            var controller = context.SupplierSectionController;
-
-            const string orderId = "C123";
-            await controller.GetAsync(orderId);
-
-            context.OrderRepositoryMock.Verify(r => r.GetOrderByIdAsync(orderId));
-        }
-
-        [TestCase(null)]
-        [TestCase("INVALID")]
-        public static async Task UpdateAsync_OrderIdDoesNotExist_ReturnNotFound(string orderId)
-        {
-            var context = SupplierSectionControllerTestContext.Setup();
-
-            var controller = context.SupplierSectionController;
-
-            var response =
-                await controller.UpdateAsync(orderId, new SupplierModel { PrimaryContact = new PrimaryContactModel() });
-
-            response.Should().BeEquivalentTo(new NotFoundResult());
+            response.Should().BeOfType<NotFoundResult>();
         }
 
         [Test]
-        public static void UpdateAsync_ModelIsNull_ThrowsNullArgumentException()
+        [InMemoryDbAutoData(nameof(UpdateAsync_UpdatesOrderingParty))]
+        public static async Task UpdateAsync_UpdatesOrderingParty(
+            [Frozen] Mock<IContactDetailsService> contactDetailsService,
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            SupplierModel model,
+            SupplierSectionController controller)
         {
-            static async Task GetSupplierSectionWithNullModel()
-            {
-                var context = SupplierSectionControllerTestContext.Setup();
+            order.Supplier.Should().NotBeEquivalentTo(model);
 
-                var controller = context.SupplierSectionController;
-                await controller.UpdateAsync("OrderId", null);
-            }
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
 
-            Assert.ThrowsAsync<ArgumentNullException>(GetSupplierSectionWithNullModel);
-        }
+            contactDetailsService
+                .Setup(s => s.AddOrUpdateAddress(It.IsNotNull<Address>(), It.IsNotNull<AddressModel>()))
+                .Returns(order.Supplier.Address);
 
-        [TestCase(false, true)]
-        [TestCase(true, false)]
-        [TestCase(false, false)]
-        public static void UpdateAsync_NullAddressOrContact_ThrowsNullArgumentException(bool hasPrimaryContact, bool hasAddress)
-        {
-            const string orderId = "C0000014-01";
-            const string supplierId = "1234";
-            const string supplierName = "NHS Supplier";
+            await controller.UpdateAsync(callOffId, model);
 
-            var supplierAddress = AddressBuilder
-                .Create()
-                .Build();
-
-            var supplierContact = ContactBuilder
-                .Create()
-                .Build();
-            var context = SupplierSectionControllerTestContext.Setup();
-
-            context.Order = OrderBuilder
-                .Create()
-                .WithOrderId(orderId)
-                .WithOrganisationId(context.PrimaryOrganisationId)
-                .WithSupplierId(supplierId)
-                .WithSupplierName(supplierName)
-                .WithSupplierAddress(supplierAddress)
-                .WithSupplierContact(supplierContact)
-                .Build();
-
-            var controller = context.SupplierSectionController;
-
-            Assert.ThrowsAsync<ArgumentNullException>(async () =>
-            {
-                _ = await controller.UpdateAsync(
-                    orderId,
-                    new SupplierModel
-                    {
-                        Name = "New Description",
-                        SupplierId = "New",
-                        PrimaryContact = hasPrimaryContact ? new PrimaryContactModel() : null,
-                        Address = hasAddress ? new AddressModel() : null,
-                    });
-            });
+            order.Supplier.Should().BeEquivalentTo(model, o => o.Including(p => p.Name));
         }
 
         [Test]
-        public static async Task UpdateAsync_UpdateIsValid_ReturnsNoContent()
+        [InMemoryDbAutoData(nameof(UpdateAsync_InvokesAddOrUpdateAddress))]
+        public static async Task UpdateAsync_InvokesAddOrUpdateAddress(
+            [Frozen] Mock<IContactDetailsService> contactDetailsService,
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            SupplierModel model,
+            SupplierSectionController controller)
         {
-            const string orderId = "C0000014-01";
-            const string supplierId = "1234";
-            const string supplierName = "NHS Supplier";
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
 
-            var supplierAddress = AddressBuilder
-                .Create()
-                .Build();
+            var originalAddress = order.Supplier.Address;
 
-            var supplierContact = ContactBuilder
-                .Create()
-                .Build();
-            var context = SupplierSectionControllerTestContext.Setup();
+            Expression<Func<IContactDetailsService, Address>> addOrUpdateAddress = s => s.AddOrUpdateAddress(
+                It.Is<Address>(a => a == originalAddress),
+                It.Is<AddressModel>(a => a == model.Address));
 
-            context.Order = OrderBuilder
-                .Create()
-                .WithOrderId(orderId)
-                .WithOrganisationId(context.PrimaryOrganisationId)
-                .WithSupplierId(supplierId)
-                .WithSupplierName(supplierName)
-                .WithSupplierAddress(supplierAddress)
-                .WithSupplierContact(supplierContact)
-                .Build();
+            contactDetailsService.Setup(addOrUpdateAddress).Returns(originalAddress);
 
-            var controller = context.SupplierSectionController;
+            await controller.UpdateAsync(callOffId, model);
 
-            var response = await controller.UpdateAsync(
-                orderId,
-                new SupplierModel { Name = "New Description", SupplierId = "New", PrimaryContact = new PrimaryContactModel(), Address = new AddressModel() });
-
-            response.Should().BeOfType<NoContentResult>();
+            contactDetailsService.Verify(addOrUpdateAddress);
         }
 
-        private sealed class SupplierSectionControllerTestContext
+        [Test]
+        [InMemoryDbAutoData(nameof(UpdateAsync_InvokesAddOrUpdatePrimaryContact))]
+        public static async Task UpdateAsync_InvokesAddOrUpdatePrimaryContact(
+            [Frozen] Mock<IContactDetailsService> contactDetailsService,
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            SupplierModel model,
+            SupplierSectionController controller)
         {
-            private SupplierSectionControllerTestContext()
-            {
-                PrimaryOrganisationId = Guid.NewGuid();
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
 
-                OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock
-                    .Setup(r => r.GetOrderByIdAsync(It.IsAny<string>()))
-                    .ReturnsAsync(() => Order);
+            contactDetailsService
+                .Setup(s => s.AddOrUpdateAddress(It.IsNotNull<Address>(), It.IsNotNull<AddressModel>()))
+                .Returns(order.Supplier.Address);
 
-                ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
-                    new[]
-                    {
-                        new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
-                        new Claim(ClaimTypes.Name, "Test User"),
-                        new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
-                    },
-                    "mock"));
+            var originalContact = order.SupplierContact;
 
-                SupplierSectionController = new SupplierSectionController(OrderRepositoryMock.Object)
-                {
-                    ControllerContext = new ControllerContext
-                    {
-                        HttpContext = new DefaultHttpContext { User = ClaimsPrincipal },
-                    },
-                };
-            }
+            await controller.UpdateAsync(callOffId, model);
 
-            internal Guid PrimaryOrganisationId { get; set; }
+            contactDetailsService.Verify(s => s.AddOrUpdatePrimaryContact(
+                It.Is<Contact>(c => c == originalContact),
+                It.Is<PrimaryContactModel>(c => c == model.PrimaryContact)));
+        }
 
-            internal Mock<IOrderRepository> OrderRepositoryMock { get; }
+        [Test]
+        [InMemoryDbAutoData(nameof(UpdateAsync_SavesToDb))]
+        public static async Task UpdateAsync_SavesToDb(
+            [Frozen] Mock<IContactDetailsService> contactDetailsService,
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            SupplierModel model,
+            SupplierSectionController controller)
+        {
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
 
-            internal Order Order { get; set; }
+            contactDetailsService
+                .Setup(s => s.AddOrUpdateAddress(It.IsNotNull<Address>(), It.IsNotNull<AddressModel>()))
+                .Returns(order.Supplier.Address);
 
-            internal SupplierSectionController SupplierSectionController { get; }
+            await controller.UpdateAsync(callOffId, model);
 
-            private ClaimsPrincipal ClaimsPrincipal { get; }
+            context.Set<Order>().First(o => o.Equals(order)).Supplier.Should().BeEquivalentTo(
+                model,
+                o => o.Including(p => p.Name));
+        }
 
-            internal static SupplierSectionControllerTestContext Setup() => new();
+        [Test]
+        [InMemoryDbAutoData(nameof(UpdateAsync_SuccessfulUpdate_ReturnsNoContentResult))]
+        public static async Task UpdateAsync_SuccessfulUpdate_ReturnsNoContentResult(
+            [Frozen] Mock<IContactDetailsService> contactDetailsService,
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            SupplierModel model,
+            SupplierSectionController controller)
+        {
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
+
+            contactDetailsService
+                .Setup(s => s.AddOrUpdateAddress(It.IsNotNull<Address>(), It.IsNotNull<AddressModel>()))
+                .Returns(order.Supplier.Address);
+
+            var result = await controller.UpdateAsync(callOffId, model);
+
+            result.Should().BeOfType<NoContentResult>();
         }
     }
 }

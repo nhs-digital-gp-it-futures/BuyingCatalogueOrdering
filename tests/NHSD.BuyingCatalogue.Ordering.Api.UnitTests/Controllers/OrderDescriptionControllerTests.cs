@@ -1,236 +1,129 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
+using AutoFixture;
+using AutoFixture.AutoMoq;
+using AutoFixture.Idioms;
+using AutoFixture.NUnit3;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Api.Models.Errors;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
-using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
+using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
-    [Parallelizable(ParallelScope.All)]
+    [Parallelizable(ParallelScope.Children)]
+    [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class OrderDescriptionControllerTests
     {
         [Test]
-        public static void Constructor_NullRepository_Throws()
+        public static void Constructor_VerifyGuardClauses()
         {
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                _ = new OrderDescriptionController(null);
-            });
+            var fixture = new Fixture().Customize(new AutoMoqCustomization());
+            var assertion = new GuardClauseAssertion(fixture);
+            var constructors = typeof(OrderDescriptionController).GetConstructors();
+
+            assertion.Verify(constructors);
         }
 
         [Test]
-        public static async Task Get_OrderIdDoesNotExist_ReturnsNotFound()
+        [InMemoryDbAutoData(nameof(Get_OrderIdDoesNotExist_ReturnsNotFound))]
+        public static async Task Get_OrderIdDoesNotExist_ReturnsNotFound(
+            CallOffId callOffId,
+            OrderDescriptionController controller)
         {
-            var context = OrderDescriptionTestContext.Setup();
+            var result = await controller.GetAsync(callOffId);
 
-            using var controller = context.OrderDescriptionController;
-
-            var response = await controller.GetAsync("INVALID");
-
-            response.Should().BeEquivalentTo(new NotFoundResult());
+            result.Result.Should().BeOfType<NotFoundResult>();
         }
 
         [Test]
-        public static async Task Get_OrderIdExists_ReturnsTheOrdersDescription()
+        [InMemoryDbAutoData(nameof(Get_OrderIdExists_ReturnsTheOrdersDescription))]
+        public static async Task Get_OrderIdExists_ReturnsTheOrdersDescription(
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            OrderDescriptionController controller)
         {
-            const string orderId = "C0000014-01";
-            var context = OrderDescriptionTestContext.Setup();
+            order.FundingSourceOnlyGms = true;
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
 
-            (Order order, OrderDescriptionModel expectedDescription) = CreateOrderDescriptionTestData(
-                orderId,
-                OrderDescription.Create("Test Description").Value,
-                context.PrimaryOrganisationId);
+            var expected = new OrderDescriptionModel { Description = order.Description };
 
-            context.Order = order;
+            var actual = await controller.GetAsync(callOffId);
 
-            using var controller = context.OrderDescriptionController;
-
-            var result = await controller.GetAsync(orderId) as OkObjectResult;
-
-            var orderDescription = result?.Value as OrderDescriptionModel;
-            orderDescription.Should().BeEquivalentTo(expectedDescription);
+            actual.Value.Should().BeEquivalentTo(expected);
         }
 
         [Test]
-        public static async Task Get_OrderById_CalledOnce()
+        [InMemoryDbAutoData(nameof(UpdateAsync_OrderIsNull_ReturnsNotFound))]
+        public static async Task UpdateAsync_OrderIsNull_ReturnsNotFound(
+            OrderDescriptionModel model,
+            OrderDescriptionController controller)
         {
-            var context = OrderDescriptionTestContext.Setup();
+            var response = await controller.UpdateAsync(null, model);
 
-            using var controller = context.OrderDescriptionController;
-
-            await controller.GetAsync(string.Empty);
-
-            context.OrderRepositoryMock.Verify(r => r.GetOrderByIdAsync(string.Empty));
-        }
-
-        [TestCase(null)]
-        [TestCase("INVALID")]
-        public static async Task UpdateAsync_OrderIdDoesNotExist_ReturnNotFound(string orderId)
-        {
-            var context = OrderDescriptionTestContext.Setup();
-
-            using var controller = context.OrderDescriptionController;
-
-            var response =
-                await controller.UpdateAsync(orderId, new OrderDescriptionModel { Description = "Desc" });
-
-            response.Should().BeEquivalentTo(new NotFoundResult());
+            response.Should().BeOfType<NotFoundResult>();
         }
 
         [Test]
-        public static void UpdateAsync_ModelIsNull_ThrowsNullArgumentException()
+        [InMemoryDbAutoData(nameof(UpdateAsync_ModelIsNull_ThrowsArgumentExceptionNull))]
+        public static void UpdateAsync_ModelIsNull_ThrowsArgumentExceptionNull(
+            Order order,
+            OrderDescriptionController controller)
         {
-            static async Task GetOrderDescriptionWithNullModel()
-            {
-                var context = OrderDescriptionTestContext.Setup();
-
-                using var controller = context.OrderDescriptionController;
-                await controller.UpdateAsync("OrderId", null);
-            }
-
-            Assert.ThrowsAsync<ArgumentNullException>(GetOrderDescriptionWithNullModel);
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await controller.UpdateAsync(order, null));
         }
 
         [Test]
-        public static async Task UpdateAsync_ValidationError_ReturnsBadRequest()
+        [InMemoryDbAutoData(nameof(UpdateAsync_UpdatesDescription))]
+        public static async Task UpdateAsync_UpdatesDescription(
+            Order order,
+            OrderDescriptionModel model,
+            OrderDescriptionController controller)
         {
-            const string orderId = "C0000014-01";
-            const string description = null;
+            order.Description.Should().NotBe(model.Description);
 
-            var context = OrderDescriptionTestContext.Setup();
+            await controller.UpdateAsync(order, model);
 
-            (Order order, _) = CreateOrderDescriptionTestData(
-                orderId,
-                OrderDescription.Create("Test Description").Value,
-                context.PrimaryOrganisationId);
-
-            context.Order = order;
-
-            using var controller = context.OrderDescriptionController;
-
-            var response = await controller.UpdateAsync(orderId, new OrderDescriptionModel { Description = description });
-
-            var isValid = OrderDescription.Create(description);
-            var expected =
-                new BadRequestObjectResult(new ErrorsModel(isValid.Errors.Select(d => new ErrorModel(d.Id, d.Field))));
-
-            response.Should().BeEquivalentTo(expected);
+            order.Description.Should().Be(model.Description);
         }
 
         [Test]
-        public static async Task UpdateAsync_UpdatedDescriptionIsValid_ReturnsNoContent()
+        [InMemoryDbAutoData(nameof(UpdateAsync_SuccessfulUpdate_ReturnsNoContentResult))]
+        public static async Task UpdateAsync_SuccessfulUpdate_ReturnsNoContentResult(
+            Order order,
+            OrderDescriptionModel model,
+            OrderDescriptionController controller)
         {
-            const string orderId = "C0000014-01";
-            var context = OrderDescriptionTestContext.Setup();
+            var result = await controller.UpdateAsync(order, model);
 
-            (Order order, _) = CreateOrderDescriptionTestData(
-                orderId,
-                OrderDescription.Create("Test Description").Value,
-                context.PrimaryOrganisationId);
-
-            context.Order = order;
-
-            using var controller = context.OrderDescriptionController;
-
-            var response = await controller.UpdateAsync(
-                orderId,
-                new OrderDescriptionModel { Description = "New Description" });
-
-            response.Should().BeOfType<NoContentResult>();
+            result.Should().BeOfType<NoContentResult>();
         }
 
         [Test]
-        public static async Task UpdateAsync_UpdateAndGet_CalledOnce()
+        [InMemoryDbAutoData(nameof(UpdateAsync_SavesChangesToDb))]
+        public static async Task UpdateAsync_SavesChangesToDb(
+            [Frozen] ApplicationDbContext context,
+            Order order,
+            OrderDescriptionModel model,
+            OrderDescriptionController controller)
         {
-            const string orderId = "C0000014-01";
-            var newDescription = OrderDescription.Create("New Description").Value;
+            order.Description.Should().NotBe(model.Description);
 
-            var context = OrderDescriptionTestContext.Setup();
+            context.Add(order);
+            await context.SaveChangesAsync();
 
-            (Order order, _) = CreateOrderDescriptionTestData(
-                orderId,
-                OrderDescription.Create("Test Description").Value,
-                context.PrimaryOrganisationId);
+            await controller.UpdateAsync(order, model);
 
-            context.Order = order;
-
-            using var controller = context.OrderDescriptionController;
-
-            await controller.UpdateAsync(
-                orderId,
-                new OrderDescriptionModel { Description = newDescription.Value });
-
-            order.SetDescription(newDescription);
-
-            context.OrderRepositoryMock.Verify(r => r.GetOrderByIdAsync(orderId));
-            context.OrderRepositoryMock.Verify(r => r.UpdateOrderAsync(order));
-        }
-
-        private static (Order Order, OrderDescriptionModel ExpectedDescription) CreateOrderDescriptionTestData(
-            string orderId, OrderDescription description, Guid organisationId)
-        {
-            var repositoryOrder = OrderBuilder
-                .Create()
-                .WithOrderId(orderId)
-                .WithDescription(description.Value)
-                .WithOrganisationId(organisationId)
-                .Build();
-
-            return (repositoryOrder, new OrderDescriptionModel { Description = repositoryOrder.Description.Value });
-        }
-
-        private sealed class OrderDescriptionTestContext
-        {
-            private OrderDescriptionTestContext()
-            {
-                PrimaryOrganisationId = Guid.NewGuid();
-
-                OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(r => r.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
-                ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
-                    new[]
-                    {
-                        new Claim("Ordering", "Manage"),
-                        new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
-                        new Claim(ClaimTypes.Name, "Test User"),
-                        new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
-                    },
-                    "mock"));
-
-                OrderDescriptionController = new OrderDescriptionController(OrderRepositoryMock.Object)
-                {
-                    ControllerContext = new ControllerContext
-                    {
-                        HttpContext = new DefaultHttpContext { User = ClaimsPrincipal },
-                    },
-                };
-            }
-
-            internal Guid PrimaryOrganisationId { get; }
-
-            internal Mock<IOrderRepository> OrderRepositoryMock { get; }
-
-            internal Order Order { get; set; }
-
-            internal OrderDescriptionController OrderDescriptionController { get; }
-
-            private ClaimsPrincipal ClaimsPrincipal { get; }
-
-            internal static OrderDescriptionTestContext Setup()
-            {
-                return new();
-            }
+            context.Set<Order>().First(o => o.Equals(order)).Description.Should().Be(model.Description);
         }
     }
 }

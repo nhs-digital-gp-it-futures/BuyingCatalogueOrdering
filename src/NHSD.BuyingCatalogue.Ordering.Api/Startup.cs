@@ -21,20 +21,17 @@ using NHSD.BuyingCatalogue.Ordering.Api.ActionFilters;
 using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Logging;
+using NHSD.BuyingCatalogue.Ordering.Api.ModelBinding;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Services;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Settings;
 using NHSD.BuyingCatalogue.Ordering.Api.Validation;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Application.Services;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
-using NHSD.BuyingCatalogue.Ordering.Persistence.Repositories;
 using Serilog;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api
@@ -80,28 +77,25 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             services.AddHttpContextAccessor();
 
             services
+                .AddSingleton<IValidator<CreateOrderModel>, CreateOrderModelValidator>()
+                .AddSingleton<IValidator<OrderDescriptionModel>, OrderDescriptionModelValidator>()
                 .AddSingleton<IValidator<ServiceRecipientModel>, ServiceRecipientModelValidator>()
                 .AddSingleton<IValidator<CreateOrderItemModel>, CreateOrderItemModelValidator>()
-                .AddSingleton<IValidator<UpdateOrderItemModel>, UpdateOrderItemModelValidator<UpdateOrderItemModel>>();
+                .AddSingleton<IValidator<OrderItemRecipientModel>, OrderItemRecipientModelValidator>();
 
             services
-                .AddScoped<IOrderRepository, OrderRepository>()
-                .AddScoped<IServiceRecipientRepository, ServiceRecipientRepository>()
-                .AddScoped<IDefaultDeliveryDateRepository, DefaultDeliveryDateRepository>()
-                .AddScoped<IOrderItemFactory, OrderItemFactory>()
                 .AddScoped<IMailTransport, SmtpClient>()
                 .AddScoped<IEmailService, MailKitEmailService>()
                 .AddScoped<IIdentityService, IdentityService>()
-                .AddScoped<ICreateOrderService, CreateOrderService>()
+                .AddScoped<IContactDetailsService, ContactDetailsService>()
                 .AddScoped<ICreateOrderItemService, CreateOrderItemService>()
-                .AddScoped<IUpdateOrderItemService, UpdateOrderItemService>()
                 .AddScoped<ICompleteOrderService, CompleteOrderService>()
+                .AddScoped<IServiceRecipientService, ServiceRecipientService>()
                 .AddScoped<ICreatePurchasingDocumentService, CreatePurchasingDocumentService>()
                 .AddScoped<ICsvStreamWriter<OdooPatientNumbersOrderItem>, CsvStreamStreamWriter<OdooPatientNumbersOrderItem, OdooPatientNumbersOrderItemMap>>()
                 .AddScoped<ICsvStreamWriter<OdooOrderItem>, CsvStreamStreamWriter<OdooOrderItem, OdooOrderItemMap>>()
                 .AddScoped<IDefaultDeliveryDateValidator, DefaultDeliveryDateValidator>()
                 .AddScoped<ICreateOrderItemValidator, OrderItemValidator>()
-                .AddScoped<IUpdateOrderItemValidator, OrderItemValidator>()
                 .AddScoped<IAsyncAuthorizationFilter, OrderLookupOrganisationAuthorizationFilter>();
 
             services
@@ -143,10 +137,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
             {
                 options.Filters.Add<OrderLookupOrganisationAuthorizationFilter>();
                 options.Filters.Add<InputValidationActionFilter>();
+                options.ModelBinderProviders.Insert(0, new OrderModelBinderProvider());
             }
 
             services.AddControllers(ControllerOptions)
-                .AddFluentValidation(c => c.ImplicitlyValidateChildProperties = true)
+                .AddFluentValidation()
                 .ConfigureApiBehaviorOptions(options => options.SuppressModelStateInvalidFilter = true)
                 .AddJsonOptions(options => options.JsonSerializerOptions.IgnoreNullValues = true);
 

@@ -1,248 +1,192 @@
 ﻿using System;
-using System.Security.Claims;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
+using AutoFixture;
+using AutoFixture.AutoMoq;
+using AutoFixture.Idioms;
+using AutoFixture.NUnit3;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
-using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
+using NHSD.BuyingCatalogue.Ordering.Api.Services;
+using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
-    [Parallelizable(ParallelScope.All)]
+    [Parallelizable(ParallelScope.Children)]
+    [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class OrderingPartyControllerTests
     {
         [Test]
-        public static void Constructor_Null_NullException()
+        public static void Constructor_VerifyGuardClauses()
         {
-            Assert.Throws<ArgumentNullException>(() => _ = new OrderingPartyController(null));
+            var fixture = new Fixture().Customize(new AutoMoqCustomization());
+            var assertion = new GuardClauseAssertion(fixture);
+            var constructors = typeof(OrderingPartyController).GetConstructors();
+
+            assertion.Verify(constructors);
         }
 
         [Test]
-        public static async Task GetAsync_OrderIdDoesNotExist_ReturnsNotFound()
+        [InMemoryDbAutoData(nameof(GetAsync_OrderDoesNotExist_ReturnsNotFound))]
+        public static async Task GetAsync_OrderDoesNotExist_ReturnsNotFound(
+            CallOffId callOffId,
+            OrderingPartyController controller)
         {
-            var context = OrderingPartyTestContext.Setup();
+            var response = await controller.GetAsync(callOffId);
 
-            var controller = context.OrderingPartyController;
-
-            var response = await controller.GetAsync("INVALID");
-
+            response.Should().NotBeNull();
             response.Result.Should().BeOfType<NotFoundResult>();
         }
 
         [Test]
-        public static async Task GetAsync_EmptyOrderingParty_ReturnsEmptyResult()
+        [InMemoryDbAutoData(nameof(GetAsync_OrderExists_ReturnsTheOrderingParty))]
+        public static async Task GetAsync_OrderExists_ReturnsTheOrderingParty(
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            OrderingPartyController controller)
         {
-            const string orderId = "C0000014-01";
-            var context = OrderingPartyTestContext.Setup();
+            order.OrderingParty.Should().NotBeNull();
+            order.OrderingPartyContact.Should().NotBeNull();
 
-            (Order order, OrderingPartyModel _) = CreateOrderingPartyTestData(orderId, context.PrimaryOrganisationId, false);
+            context.Add(order);
+            await context.SaveChangesAsync();
 
-            context.Order = order;
+            var expectedValue = new OrderingPartyModel(order.OrderingParty, order.OrderingPartyContact);
 
-            var controller = context.OrderingPartyController;
+            var response = await controller.GetAsync(callOffId);
 
-            var result = await controller.GetAsync(orderId);
-
-            result.Result.Should().BeOfType<OkResult>();
+            response.Value.Should().BeEquivalentTo(expectedValue);
         }
 
         [Test]
-        public static async Task GetAsync_OrderIdExists_ReturnsTheOrderingParty()
+        [InMemoryDbAutoData(nameof(UpdateAsync_ModelIsNull_ThrowsArgumentNullException))]
+        public static void UpdateAsync_ModelIsNull_ThrowsArgumentNullException(
+            CallOffId callOffId,
+            OrderingPartyController controller)
         {
-            const string orderId = "C0000014-01";
-            var context = OrderingPartyTestContext.Setup();
-
-            (Order order, OrderingPartyModel expectedOrderingParty) = CreateOrderingPartyTestData(orderId, context.PrimaryOrganisationId);
-
-            context.Order = order;
-
-            var controller = context.OrderingPartyController;
-
-            var result = await controller.GetAsync(orderId);
-
-            result.Should()
-                .BeEquivalentTo(new ActionResult<OrderingPartyModel>(new OkObjectResult(expectedOrderingParty)));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await controller.UpdateAsync(callOffId, null));
         }
 
         [Test]
-        public static async Task GetAsync_GetOrderById_CalledOnce()
+        [InMemoryDbAutoData(nameof(UpdateAsync_OrderDoesNotExist_ReturnsNotFound))]
+        public static async Task UpdateAsync_OrderDoesNotExist_ReturnsNotFound(
+            CallOffId callOffId,
+            OrderingPartyModel model,
+            OrderingPartyController controller)
         {
-            var context = OrderingPartyTestContext.Setup();
+            var response = await controller.UpdateAsync(callOffId, model);
 
-            var controller = context.OrderingPartyController;
-
-            await controller.GetAsync(string.Empty);
-
-            context.OrderRepositoryMock.Verify(r => r.GetOrderByIdAsync(string.Empty));
-        }
-
-        [TestCase(null)]
-        [TestCase("INVALID")]
-        public static async Task UpdateAsync_OrderIdDoesNotExist_ReturnNotFound(string orderId)
-        {
-            var context = OrderingPartyTestContext.Setup();
-
-            var controller = context.OrderingPartyController;
-
-            var response =
-                await controller.UpdateAsync(orderId, new OrderingPartyModel { PrimaryContact = new PrimaryContactModel() });
-
-            response.Should().BeEquivalentTo(new NotFoundResult());
+            response.Should().BeOfType<NotFoundResult>();
         }
 
         [Test]
-        public static void UpdateAsync_ModelIsNull_ThrowsNullArgumentException()
+        [InMemoryDbAutoData(nameof(UpdateAsync_UpdatesOrderingParty))]
+        public static async Task UpdateAsync_UpdatesOrderingParty(
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            OrderingPartyModel model,
+            OrderingPartyController controller)
         {
-            static async Task GetOrderingPartyWithModelModel()
-            {
-                var context = OrderingPartyTestContext.Setup();
+            order.OrderingParty.Should().NotBeEquivalentTo(model);
 
-                var controller = context.OrderingPartyController;
-                await controller.UpdateAsync("OrderId", null);
-            }
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
 
-            Assert.ThrowsAsync<ArgumentNullException>(GetOrderingPartyWithModelModel);
-        }
+            await controller.UpdateAsync(callOffId, model);
 
-        [TestCase(false, true)]
-        [TestCase(true, false)]
-        [TestCase(false, false)]
-        public static void UpdateAsync_NullAddressOrContact_ThrowsNullArgumentException(bool hasPrimaryContact, bool hasAddress)
-        {
-            const string orderId = "C0000014-01";
-            var context = OrderingPartyTestContext.Setup();
-
-            (Order order, OrderingPartyModel _) = CreateOrderingPartyTestData(orderId, context.PrimaryOrganisationId);
-
-            context.Order = order;
-
-            var controller = context.OrderingPartyController;
-
-            Assert.ThrowsAsync<ArgumentNullException>(async () =>
-            {
-                _ = await controller.UpdateAsync(
-                    orderId,
-                    new OrderingPartyModel
-                    {
-                        Name = "New Description",
-                        OdsCode = "NewODS",
-                        PrimaryContact = hasPrimaryContact ? new PrimaryContactModel() : null,
-                        Address = hasAddress ? new AddressModel() : null,
-                    });
-            });
+            order.OrderingParty.Should().BeEquivalentTo(
+                model,
+                o => o.Including(p => p.Name).Including(p => p.OdsCode));
         }
 
         [Test]
-        public static async Task UpdateAsync_UpdateIsValid_ReturnsNoContent()
+        [InMemoryDbAutoData(nameof(UpdateAsync_InvokesAddOrUpdateAddress))]
+        public static async Task UpdateAsync_InvokesAddOrUpdateAddress(
+            [Frozen] Mock<IContactDetailsService> contactDetailsService,
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            OrderingPartyModel model,
+            OrderingPartyController controller)
         {
-            const string orderId = "C0000014-01";
-            var context = OrderingPartyTestContext.Setup();
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
 
-            (Order order, OrderingPartyModel _) = CreateOrderingPartyTestData(orderId, context.PrimaryOrganisationId);
+            var originalAddress = order.OrderingParty.Address;
 
-            context.Order = order;
+            await controller.UpdateAsync(callOffId, model);
 
-            var controller = context.OrderingPartyController;
-
-            var response = await controller.UpdateAsync(
-                orderId,
-                new OrderingPartyModel
-                {
-                    Name = "New Description",
-                    OdsCode = "New",
-                    PrimaryContact = new PrimaryContactModel(),
-                    Address = new AddressModel(),
-                });
-
-            response.Should().BeOfType<NoContentResult>();
+            contactDetailsService.Verify(s => s.AddOrUpdateAddress(
+                It.Is<Address>(a => a == originalAddress),
+                It.Is<AddressModel>(a => a == model.Address)));
         }
 
-        private static (Order Order, OrderingPartyModel ExpectedOrderingParty) CreateOrderingPartyTestData(
-            string orderId,
-            Guid organisationId,
-            bool hasOrganisationContact = true)
+        [Test]
+        [InMemoryDbAutoData(nameof(UpdateAsync_InvokesAddOrUpdatePrimaryContact))]
+        public static async Task UpdateAsync_InvokesAddOrUpdatePrimaryContact(
+            [Frozen] Mock<IContactDetailsService> contactDetailsService,
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            OrderingPartyModel model,
+            OrderingPartyController controller)
         {
-            var repositoryOrder = OrderBuilder
-                .Create()
-                .WithOrderId(orderId)
-                .WithOrganisationId(organisationId)
-                .WithOrganisationContact(hasOrganisationContact ? ContactBuilder.Create().Build() : null)
-                .Build();
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
 
-            var orderingPartyAddress = repositoryOrder.OrganisationAddress;
+            var originalContact = order.OrderingPartyContact;
 
-            return (repositoryOrder, new OrderingPartyModel
-            {
-                Name = repositoryOrder.OrganisationName,
-                OdsCode = repositoryOrder.OrganisationOdsCode,
-                Address = new AddressModel
-                {
-                    Line1 = orderingPartyAddress.Line1,
-                    Line2 = orderingPartyAddress.Line2,
-                    Line3 = orderingPartyAddress.Line3,
-                    Line4 = orderingPartyAddress.Line4,
-                    Line5 = orderingPartyAddress.Line5,
-                    Town = orderingPartyAddress.Town,
-                    County = orderingPartyAddress.County,
-                    Postcode = orderingPartyAddress.Postcode,
-                    Country = orderingPartyAddress.Country,
-                },
-                PrimaryContact = !hasOrganisationContact ? null : new PrimaryContactModel
-                {
-                    FirstName = repositoryOrder.OrganisationContact.FirstName,
-                    LastName = repositoryOrder.OrganisationContact.LastName,
-                    EmailAddress = repositoryOrder.OrganisationContact.Email,
-                    TelephoneNumber = repositoryOrder.OrganisationContact.Phone,
-                },
-            });
+            await controller.UpdateAsync(callOffId, model);
+
+            contactDetailsService.Verify(s => s.AddOrUpdatePrimaryContact(
+                It.Is<Contact>(c => c == originalContact),
+                It.Is<PrimaryContactModel>(c => c == model.PrimaryContact)));
         }
 
-        private sealed class OrderingPartyTestContext
+        [Test]
+        [InMemoryDbAutoData(nameof(UpdateAsync_SavesToDb))]
+        public static async Task UpdateAsync_SavesToDb(
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            OrderingPartyModel model,
+            OrderingPartyController controller)
         {
-            private OrderingPartyTestContext()
-            {
-                PrimaryOrganisationId = Guid.NewGuid();
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
 
-                OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(r => r.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
-                ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
-                    new[]
-                    {
-                        new Claim("Ordering", "Manage"),
-                        new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
-                        new Claim(ClaimTypes.Name, "Test User"),
-                        new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
-                    },
-                    "mock"));
+            await controller.UpdateAsync(callOffId, model);
 
-                OrderingPartyController = new OrderingPartyController(OrderRepositoryMock.Object)
-                {
-                    ControllerContext = new ControllerContext
-                    {
-                        HttpContext = new DefaultHttpContext { User = ClaimsPrincipal },
-                    },
-                };
-            }
+            context.Set<Order>().First(o => o.Equals(order)).OrderingParty.Should().BeEquivalentTo(
+                model,
+                o => o.Including(p => p.Name).Including(p => p.OdsCode));
+        }
 
-            internal Guid PrimaryOrganisationId { get; }
+        [Test]
+        [InMemoryDbAutoData(nameof(UpdateAsync_SuccessfulUpdate_ReturnsNoContentResult))]
+        public static async Task UpdateAsync_SuccessfulUpdate_ReturnsNoContentResult(
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            OrderingPartyModel model,
+            OrderingPartyController controller)
+        {
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
 
-            internal Mock<IOrderRepository> OrderRepositoryMock { get; }
+            var result = await controller.UpdateAsync(callOffId, model);
 
-            internal Order Order { get; set; }
-
-            internal OrderingPartyController OrderingPartyController { get; }
-
-            private ClaimsPrincipal ClaimsPrincipal { get; }
-
-            internal static OrderingPartyTestContext Setup() => new();
+            result.Should().BeOfType<NoContentResult>();
         }
     }
 }
