@@ -1,5 +1,4 @@
-﻿using System;
-using NHSD.BuyingCatalogue.Ordering.Api.Models;
+﻿using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
@@ -20,19 +19,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
             };
         }
 
-        internal static Contact FromModel(this Contact contact, PrimaryContactModel model)
+        internal static Contact ToDomain(this PrimaryContactModel model)
         {
-            contact ??= new Contact();
-
-            if (model is null)
-                throw new ArgumentNullException(nameof(model));
-
-            contact.FirstName = model.FirstName;
-            contact.LastName = model.LastName;
-            contact.Email = model.EmailAddress;
-            contact.Phone = model.TelephoneNumber;
-
-            return contact;
+            return model is null
+                ? new Contact()
+                : new Contact
+                {
+                    FirstName = model.FirstName,
+                    LastName = model.LastName,
+                    Email = model.EmailAddress,
+                    Phone = model.TelephoneNumber,
+                };
         }
     }
 }

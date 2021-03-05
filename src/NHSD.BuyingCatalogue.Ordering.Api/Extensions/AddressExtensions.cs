@@ -1,5 +1,4 @@
-﻿using System;
-using NHSD.BuyingCatalogue.Ordering.Api.Models;
+﻿using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
@@ -25,24 +24,22 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
             };
         }
 
-        internal static Address FromModel(this Address address, AddressModel model)
+        internal static Address ToDomain(this AddressModel model)
         {
-            address ??= new Address();
-
-            if (model is null)
-                throw new ArgumentNullException(nameof(model));
-
-            address.Line1 = model.Line1;
-            address.Line2 = model.Line2;
-            address.Line3 = model.Line3;
-            address.Line4 = model.Line4;
-            address.Line5 = model.Line5;
-            address.Town = model.Town;
-            address.County = model.County;
-            address.Postcode = model.Postcode;
-            address.Country = model.Country;
-
-            return address;
+            return model is null
+                ? null
+                : new Address
+                {
+                    Line1 = model.Line1,
+                    Line2 = model.Line2,
+                    Line3 = model.Line3,
+                    Line4 = model.Line4,
+                    Line5 = model.Line5,
+                    Town = model.Town,
+                    County = model.County,
+                    Postcode = model.Postcode,
+                    Country = model.Country,
+                };
         }
     }
 }
