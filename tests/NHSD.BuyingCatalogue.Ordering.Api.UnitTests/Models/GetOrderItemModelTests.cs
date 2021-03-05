@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using AutoFixture.NUnit3;
 using FluentAssertions;
+using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
+using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
 
@@ -15,62 +18,50 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
     internal static class GetOrderItemModelTests
     {
         [Test]
-        [OrderingAutoData]
-        public static void Constructor_NullOrderItem_ThrowsArgumentNullException(
-            ServiceRecipient serviceRecipient)
+        [CommonAutoData]
+        public static void Constructor_NullOrderItem_ThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => _ = new GetOrderItemModel(null, serviceRecipient));
+            Assert.Throws<ArgumentNullException>(() => _ = new GetOrderItemModel(null));
         }
 
         [Test]
-        [OrderingAutoData]
-        public static void Constructor_InitializesOrderItemId(
-            [Frozen] OrderItem orderItem,
+        [CommonAutoData]
+        public static void Constructor_InitializesServiceRecipients(
+            [Frozen] IEnumerable<OrderItemRecipient> recipients,
             GetOrderItemModel model)
         {
-            model.OrderItemId.Should().Be(orderItem.OrderItemId);
+            model.ServiceRecipients.Should().BeEquivalentTo(recipients.ToList().ToModelList());
         }
 
         [Test]
-        [OrderingAutoData]
-        public static void Constructor_InitializesServiceRecipient(
-            [Frozen] ServiceRecipient serviceRecipient,
-            GetOrderItemModel model)
-        {
-            model.ServiceRecipient.Should().NotBeNull();
-            model.ServiceRecipient.Name.Should().Be(serviceRecipient.Name);
-            model.ServiceRecipient.OdsCode.Should().Be(serviceRecipient.OdsCode);
-        }
-
-        [Test]
-        [OrderingAutoData]
+        [CommonAutoData]
         public static void Constructor_InitializesCatalogueItemType(
             [Frozen] OrderItem orderItem,
             GetOrderItemModel model)
         {
-            model.CatalogueItemType.Should().Be(orderItem.CatalogueItemType.ToString());
+            model.CatalogueItemType.Should().Be(orderItem.CatalogueItem.CatalogueItemType.ToString());
         }
 
         [Test]
-        [OrderingAutoData]
+        [CommonAutoData]
         public static void Constructor_InitializesCatalogueItemName(
             [Frozen] OrderItem orderItem,
             GetOrderItemModel model)
         {
-            model.CatalogueItemName.Should().Be(orderItem.CatalogueItemName);
+            model.CatalogueItemName.Should().Be(orderItem.CatalogueItem.Name);
         }
 
         [Test]
-        [OrderingAutoData]
+        [CommonAutoData]
         public static void Constructor_InitializesCatalogueItemId(
             [Frozen] OrderItem orderItem,
             GetOrderItemModel model)
         {
-            model.CatalogueItemId.Should().Be(orderItem.CatalogueItemId);
+            model.CatalogueItemId.Should().Be(orderItem.CatalogueItem.Id.ToString());
         }
 
         [Test]
-        [OrderingAutoData]
+        [CommonAutoData]
         public static void Constructor_InitializesCurrencyCode(
             [Frozen] OrderItem orderItem,
             GetOrderItemModel model)
@@ -79,18 +70,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [OrderingAutoData]
-        public static void Constructor_InitializesDeliveryDate(
-            [Frozen] OrderItem orderItem,
-            GetOrderItemModel model)
-        {
-            model.DeliveryDate.Should().Be(orderItem.DeliveryDate);
-        }
-
-        [Test]
-        [OrderingAutoData]
+        [CommonAutoData]
         public static void Constructor_InitializesItemUnit(
-            [Frozen] CataloguePriceUnit priceUnit,
+            [Frozen] PricingUnit priceUnit,
             GetOrderItemModel model)
         {
             model.ItemUnit.Should().NotBeNull();
@@ -99,7 +81,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [OrderingAutoData]
+        [CommonAutoData]
         public static void Constructor_InitializesPrice(
             [Frozen] OrderItem orderItem,
             GetOrderItemModel model)
@@ -108,7 +90,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [OrderingAutoData]
+        [CommonAutoData]
         public static void Constructor_InitializesProvisioningType(
             [Frozen] ProvisioningType provisioningType,
             GetOrderItemModel model)
@@ -117,16 +99,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [OrderingAutoData]
-        public static void Constructor_InitializesQuantity(
-            [Frozen] OrderItem orderItem,
-            GetOrderItemModel model)
-        {
-            model.Quantity.Should().Be(orderItem.Quantity);
-        }
-
-        [Test]
-        [OrderingAutoData]
+        [CommonAutoData]
         public static void Constructor_InitializesTimeUnit(
             [Frozen] TimeUnit timeUnit,
             GetOrderItemModel model)
@@ -137,7 +110,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [OrderingAutoData]
+        [CommonAutoData]
         public static void Constructor_InitializesType(
             [Frozen] CataloguePriceType priceType,
             GetOrderItemModel model)
@@ -146,22 +119,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [OrderingAutoData]
+        [CommonAutoData]
         public static void Constructor_InitializesEstimationPeriod(
             [Frozen] TimeUnit estimationPeriod,
             GetOrderItemModel model)
         {
             model.EstimationPeriod.Should().Be(estimationPeriod.Name());
-        }
-
-        [Test]
-        [OrderingAutoData]
-        public static void Constructor_NullServiceRecipient_ServiceRecipientIsNull(
-            OrderItem orderItem)
-        {
-            var model = new GetOrderItemModel(orderItem, null);
-
-            model.ServiceRecipient.Should().BeNull();
         }
     }
 }

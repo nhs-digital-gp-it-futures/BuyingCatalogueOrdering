@@ -1,45 +1,32 @@
-﻿using System;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
-using NHSD.BuyingCatalogue.Ordering.Domain;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
-    public sealed class CreateOrderItemModel : UpdateOrderItemModel
+    public sealed class CreateOrderItemModel
     {
-        public string CatalogueItemId { get; set; }
-
-        public string CatalogueItemName { get; set; }
+        public string CatalogueItemName { get; init; }
 
         public string CatalogueItemType { get; set; }
 
         public string CatalogueSolutionId { get; set; }
 
-        public string CurrencyCode { get; set; }
+        public string CurrencyCode { get; init; }
 
-        public ItemUnitModel ItemUnit { get; set; }
+        public string EstimationPeriod { get; set; }
+
+        public ItemUnitModel ItemUnit { get; init; }
+
+        public decimal? Price { get; init; }
 
         public string ProvisioningType { get; set; }
 
-        public ServiceRecipientModel ServiceRecipient { get; set; }
+        [SuppressMessage("Design", "CA1002:Do not expose generic lists", Justification = "Model binding will bind as list")]
+        [SuppressMessage("Usage", "CA2227:Collection properties should be read only", Justification = "Set/init required for binding")]
+        public List<OrderItemRecipientModel> ServiceRecipients { get; set; }
 
         public TimeUnitModel TimeUnit { get; set; }
 
-        public string Type { get; set; }
-
-        internal CreateOrderItemRequest ToRequest(Order order)
-        {
-            if (order is null)
-                throw new ArgumentNullException(nameof(order));
-
-            var itemType = OrderingEnums.Parse<CatalogueItemType>(CatalogueItemType);
-
-            return itemType switch
-            {
-                Domain.CatalogueItemType.Solution => new CreateOrderItemSolutionRequest(order, this),
-                Domain.CatalogueItemType.AdditionalService => new CreateOrderItemAdditionalServiceRequest(order, this),
-                Domain.CatalogueItemType.AssociatedService => new CreateOrderItemAssociatedServiceRequest(order, this),
-                _ => throw new InvalidOperationException("Invalid catalogue item type."),
-            };
-        }
+        public string Type { get; init; }
     }
 }
