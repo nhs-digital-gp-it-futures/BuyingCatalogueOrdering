@@ -20,9 +20,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         private Guid lastUpdatedBy;
         private string lastUpdatedByName;
 
-        [SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Set by EF Core")]
+#pragma warning disable 0649 // Set by EF Core
+
+        [SuppressMessage("Style", "IDE0044:Add read-only modifier", Justification = "Set by EF Core")]
         [UsedImplicitly]
         private int id;
+
+#pragma warning restore 0649
 
         // The private set is required here as EF core will use this to identity the property as read/write,
         // so that it can set this value when an order item is persisted to the database.

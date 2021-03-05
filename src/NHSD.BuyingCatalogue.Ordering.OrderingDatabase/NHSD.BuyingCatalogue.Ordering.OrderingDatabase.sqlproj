@@ -69,10 +69,6 @@
     <Build Include="Security\Users\NHSD.sql" />
     <Build Include="Security\Logins\NHSD.sql" />
     <None Include="Deployment\InsertOrderStatuses.sql" />
-    <None Include="Views\ServiceInstanceItem.sql" />
-    <None Include="Functions\GetServiceInstanceIncrement.sql" />
-    <None Include="Functions\HasParentSolution.sql" />
-    <None Include="Indexes\IX_ServiceInstance.sql" />
     <Build Include="Tables\OrderingParty.sql" />
     <Build Include="Tables\Supplier.sql" />
     <Build Include="Tables\CatalogueItem.sql" />
