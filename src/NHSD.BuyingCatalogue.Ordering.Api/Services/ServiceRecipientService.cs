@@ -29,7 +29,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services
             foreach (var recipient in existingServiceRecipients)
                 recipient.Name = requestRecipients[recipient.OdsCode].Name;
 
-            var newServiceRecipients = existingServiceRecipients.Except(requestRecipients.Values).ToList();
+            var newServiceRecipients = requestRecipients.Values.Except(existingServiceRecipients).ToList();
 
             // ReSharper disable once MethodHasAsyncOverload
             // Non-async method recommended over async version for most cases (see EF Core docs)

@@ -23,6 +23,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Validation
                         RuleFor(m => m.CatalogueSolutionId)
                             .Required()
                             .MaxLength(14)
+                            .Must(BeValidCatalogueItemId).WithValidValueMessage()
                             .When(IsAdditionalService);
 
                         Unless(IsAssociatedService, () =>
@@ -58,7 +59,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Validation
 
             RuleFor(m => m.CurrencyCode)
                 .Required()
-                .Matches("GBP").WithMessage("{PropertyName}ValidValue");
+                .Matches("GBP").WithValidValueMessage();
 
             RuleFor(m => m.ItemUnit).Required();
 
@@ -79,6 +80,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Validation
         {
             var recipientCodes = new HashSet<string>();
             return recipients?.All(recipient => recipientCodes.Add(recipient.OdsCode)) ?? true;
+        }
+
+        private static bool BeValidCatalogueItemId(string catalogueItemId)
+        {
+            return CatalogueItemId.Parse(catalogueItemId).Success;
         }
 
         private static bool BeValidEstimationPeriod(string estimationPeriod)

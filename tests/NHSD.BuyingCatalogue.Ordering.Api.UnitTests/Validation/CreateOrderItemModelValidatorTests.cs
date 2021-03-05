@@ -257,12 +257,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
 
         [Test]
         [AutoData]
-        public static void Validate_CatalogueSolutionIdIsValid_IsAdditionalService_DoesNotHaveError(
+        public static void Validate_CatalogueSolutionIdIsNotCatalogueItemId_IsAdditionalService_HasError(
             CreateOrderItemModel model,
             CreateOrderItemModelValidator validator)
         {
             model.CatalogueItemType = nameof(CatalogueItemType.AdditionalService);
             model.CatalogueSolutionId = new string('1', 14);
+
+            validator
+                .ShouldHaveValidationErrorFor(m => m.CatalogueSolutionId, model)
+                .WithErrorMessage($"{nameof(CreateOrderItemModel.CatalogueSolutionId)}ValidValue");
+        }
+
+        [Test]
+        [AutoData]
+        public static void Validate_CatalogueSolutionIdIsValid_IsAdditionalService_DoesNotHaveError(
+            CreateOrderItemModel model,
+            CreateOrderItemModelValidator validator)
+        {
+            model.CatalogueItemType = nameof(CatalogueItemType.AdditionalService);
+            model.CatalogueSolutionId = new CatalogueItemId(1, "001").ToString();
 
             validator.ShouldNotHaveValidationErrorFor(m => m.CatalogueSolutionId, model);
         }

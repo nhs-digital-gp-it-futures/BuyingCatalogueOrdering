@@ -10,7 +10,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
         {
             builder.ToTable("DefaultDeliveryDate");
             builder.HasKey(d => new { d.OrderId, d.CatalogueItemId });
-            builder.Property(d => d.OrderId).IsRequired();
             builder
                 .Property(d => d.CatalogueItemId)
                 .HasMaxLength(14)
@@ -19,7 +18,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
             builder.Property(d => d.DeliveryDate).HasColumnType("date");
 
             builder.HasOne<Order>()
-                .WithMany()
+                .WithMany(o => o.DefaultDeliveryDates)
                 .HasForeignKey(d => d.OrderId)
                 .HasConstraintName("FK_DefaultDeliveryDate_OrderId");
         }
