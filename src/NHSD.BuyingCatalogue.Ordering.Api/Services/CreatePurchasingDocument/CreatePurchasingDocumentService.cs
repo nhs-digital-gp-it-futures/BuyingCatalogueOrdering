@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using NHSD.BuyingCatalogue.Ordering.Application;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
@@ -27,28 +28,27 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
             if (order is null)
                 throw new ArgumentNullException(nameof(order));
 
-            var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(r => r.OdsCode, r => r.Name);
-            serviceRecipientDictionary.TryAdd(order.OrganisationOdsCode, order.OrganisationName);
-
-            var patientNumbersPriceTypes = order.OrderItems.Select(orderItem => new OdooPatientNumbersOrderItem
-            {
-                CallOffAgreementId = order.OrderId,
-                CallOffOrderingPartyId = order.OrganisationOdsCode,
-                CallOffOrderingPartyName = order.OrganisationName,
-                CallOffCommencementDate = order.CommencementDate,
-                ServiceRecipientId = orderItem.OdsCode,
-                ServiceRecipientName = serviceRecipientDictionary[orderItem.OdsCode],
-                ServiceRecipientItemId = $"{order.OrderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
-                SupplierId = order.SupplierId,
-                SupplierName = order.SupplierName,
-                ProductId = orderItem.CatalogueItemId,
-                ProductName = orderItem.CatalogueItemName,
-                ProductType = orderItem.CatalogueItemType.DisplayName(),
-                QuantityOrdered = orderItem.Quantity,
-                UnitOfOrder = orderItem.CataloguePriceUnit.Description,
-                Price = orderItem.Price.GetValueOrDefault(),
-                M1Planned = orderItem.DeliveryDate,
-            });
+            var patientNumbersPriceTypes = order
+                .FlattenOrderItems()
+                .Select(orderItem => new OdooPatientNumbersOrderItem
+                {
+                    CallOffAgreementId = order.CallOffId.ToString(),
+                    CallOffOrderingPartyId = order.OrderingParty.OdsCode,
+                    CallOffOrderingPartyName = order.OrderingParty.Name,
+                    CallOffCommencementDate = order.CommencementDate,
+                    ServiceRecipientId = orderItem.Recipient.OdsCode,
+                    ServiceRecipientName = orderItem.Recipient.Name,
+                    ServiceRecipientItemId = $"{order.CallOffId}-{orderItem.Recipient.OdsCode}-{orderItem.ItemId}",
+                    SupplierId = order.Supplier.Id,
+                    SupplierName = order.Supplier.Name,
+                    ProductId = orderItem.CatalogueItem.Id.ToString(),
+                    ProductName = orderItem.CatalogueItem.Name,
+                    ProductType = orderItem.CatalogueItem.CatalogueItemType.DisplayName(),
+                    QuantityOrdered = orderItem.Quantity,
+                    UnitOfOrder = orderItem.PricingUnit.Description,
+                    Price = orderItem.Price.GetValueOrDefault(),
+                    M1Planned = orderItem.DeliveryDate,
+                });
 
             await patientNumbersCsvWriter.WriteRecordsAsync(stream, patientNumbersPriceTypes);
         }
@@ -61,11 +61,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
             if (order is null)
                 throw new ArgumentNullException(nameof(order));
 
-            var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(r => r.OdsCode, r => r.Name);
-            serviceRecipientDictionary.TryAdd(order.OrganisationOdsCode, order.OrganisationName);
-
-            var orderItems = order.OrderItems
-                .Select(o => new OdooOrderItem(order, o, serviceRecipientDictionary[o.OdsCode]));
+            var orderItems = order.FlattenOrderItems().Select(o => new OdooOrderItem(o));
 
             await csvWriter.WriteRecordsAsync(stream, orderItems);
         }
