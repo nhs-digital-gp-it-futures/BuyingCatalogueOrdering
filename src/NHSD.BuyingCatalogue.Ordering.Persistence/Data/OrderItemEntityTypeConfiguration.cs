@@ -9,15 +9,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
         public void Configure(EntityTypeBuilder<OrderItem> builder)
         {
             const string catalogueItemId = "CatalogueItemId";
-            const string orderId = "OrderId";
 
             builder.ToTable("OrderItem");
             builder.Property<CatalogueItemId>(catalogueItemId)
                 .HasMaxLength(14)
                 .HasConversion(id => id.ToString(), id => CatalogueItemId.ParseExact(id));
 
-            builder.Property<int>(orderId).IsRequired();
-            builder.HasKey(orderId, catalogueItemId);
+            builder.Property(o => o.OrderId).IsRequired();
+            builder.HasKey(nameof(OrderItem.OrderId), catalogueItemId);
 
             builder.Property(i => i.Created).HasDefaultValueSql("(GetUtcDate())");
             builder.Property(i => i.CurrencyCode)
@@ -46,7 +45,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 
             builder.HasOne<Order>()
                 .WithMany(o => o.OrderItems)
-                .HasForeignKey(orderId)
+                .HasForeignKey(o => o.OrderId)
                 .HasConstraintName("FK_OrderItem_Order");
 
             builder.HasOne(i => i.PricingUnit)

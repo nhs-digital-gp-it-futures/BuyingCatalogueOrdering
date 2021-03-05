@@ -39,7 +39,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 
             var defaultDeliveryDate = order.DefaultDeliveryDates.SingleOrDefault(d => d.CatalogueItemId == catalogueItemId);
             var provisioningType = Enum.Parse<ProvisioningType>(model.ProvisioningType, true);
-            var estimationPeriod = catalogueItem.CatalogueItemType.InferEstimationPeriod(
+            var estimationPeriod = catalogueItemType.InferEstimationPeriod(
                 provisioningType,
                 OrderingEnums.ParseTimeUnit(model.EstimationPeriod));
 
@@ -50,6 +50,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
                 CurrencyCode = model.CurrencyCode,
                 DefaultDeliveryDate = defaultDeliveryDate?.DeliveryDate,
                 EstimationPeriod = estimationPeriod,
+                OrderId = order.Id,
                 Price = model.Price,
                 PricingUnit = pricingUnit,
                 PriceTimeUnit = model.TimeUnit.ToTimeUnit(),
@@ -76,7 +77,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             CreateOrderItemModel model,
             CatalogueItemType catalogueItemType)
         {
-            var parentCatalogueItem = await context.FindAsync<CatalogueItem>(model.CatalogueSolutionId);
+            CatalogueItem parentCatalogueItem = null;
+            var catalogueSolutionId = model.CatalogueSolutionId;
+
+            if (catalogueSolutionId is not null)
+                parentCatalogueItem = await context.FindAsync<CatalogueItem>(CatalogueItemId.Parse(catalogueSolutionId).Id);
+
             var catalogueItem = await context.FindAsync<CatalogueItem>(catalogueItemId) ?? new CatalogueItem
             {
                 Id = catalogueItemId,
@@ -84,7 +90,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
             };
 
             catalogueItem.Name = model.CatalogueItemName;
-            catalogueItem.ParentCatalogueItemId = parentCatalogueItem.Id;
+            catalogueItem.ParentCatalogueItemId = parentCatalogueItem?.Id;
 
             return catalogueItem;
         }

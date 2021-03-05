@@ -19,7 +19,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
         public AggregateValidationResult Validate(Order order, CreateOrderItemModel model, CatalogueItemType itemType)
         {
             if (order.CommencementDate is null)
-                throw OrderCommencementDateArgumentException(nameof(order));
+                throw new ArgumentNullException(nameof(order), $"{nameof(order)}.{nameof(Order.CommencementDate)} should not be null.");
 
             var aggregateValidationResult = new AggregateValidationResult();
             var itemIndex = -1;
@@ -46,13 +46,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
         }
 
         private static IReadOnlyList<ErrorDetails> NoErrors() => Array.Empty<ErrorDetails>();
-
-        private static Exception OrderCommencementDateArgumentException(string paramName)
-        {
-            return new ArgumentException($"{OrderProperty(paramName)}.{nameof(Order.CommencementDate)} should not be null.", paramName);
-        }
-
-        private static string OrderProperty(string paramName) => $"{paramName}.{nameof(CreateOrderItemRequest.Order)}";
 
         private static IReadOnlyList<ErrorDetails> Errors(params ErrorDetails[] details) => details;
 

@@ -8,7 +8,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public CatalogueItemType CatalogueItemType { get; init; }
 
-        public CatalogueItemId ParentCatalogueItemId { get; set; }
+        public CatalogueItemId? ParentCatalogueItemId { get; set; }
 
         public string Name { get; set; }
 

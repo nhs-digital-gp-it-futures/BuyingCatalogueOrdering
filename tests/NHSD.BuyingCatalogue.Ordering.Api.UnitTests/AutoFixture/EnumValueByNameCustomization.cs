@@ -4,7 +4,6 @@ using AutoFixture;
 using AutoFixture.Kernel;
 using EnumsNET;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
@@ -19,14 +18,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
             fixture.Customize<CreateOrderItemModel>(_ => new EnumValueByPropertyNameSpecimenBuilder<TimeUnit>(
                 nameof(CreateOrderItemModel.EstimationPeriod),
                 e => e.AsString(EnumFormat.DisplayName)));
-
-            fixture.Customize<CreateOrderItemRequest>(_ => new EnumValueByParameterNameSpecimenBuilder<CatalogueItemType>());
-            fixture.Customize<CreateOrderItemRequest>(_ => new EnumValueByParameterNameSpecimenBuilder<CataloguePriceType>());
-            fixture.Customize<CreateOrderItemRequest>(_ => new EnumValueByParameterNameSpecimenBuilder<ProvisioningType>());
-
-            var estimationPeriodNameBuilder = new EnumValueByParameterNameSpecimenBuilder<TimeUnit>("estimationPeriodName", e => e.AsString(EnumFormat.DisplayName));
-
-            fixture.Customize<CreateOrderItemRequest>(_ => estimationPeriodNameBuilder);
         }
 
         private abstract class EnumValueByNameSpecimenBuilder<TEnum, TInfo> : ISpecimenBuilder
@@ -81,27 +72,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
             internal EnumValueByPropertyNameSpecimenBuilder(string propertyName, Func<TEnum, string> getEnumName)
                 : base(getEnumName, p => (p.Name, p.PropertyType), propertyName)
             {
-            }
-        }
-
-        private sealed class EnumValueByParameterNameSpecimenBuilder<TEnum> : EnumValueByNameSpecimenBuilder<TEnum, ParameterInfo>
-            where TEnum : struct, Enum
-        {
-            internal EnumValueByParameterNameSpecimenBuilder()
-                : this(GetDefaultParameterName(), e => e.ToString())
-            {
-            }
-
-            internal EnumValueByParameterNameSpecimenBuilder(string paramName, Func<TEnum, string> getEnumName)
-                : base(getEnumName, p => (p.Name, p.ParameterType), paramName)
-            {
-            }
-
-            private static string GetDefaultParameterName()
-            {
-                var name = typeof(TEnum).Name;
-
-                return char.ToLowerInvariant(name[0]) + name[1..] + "Name";
             }
         }
     }
