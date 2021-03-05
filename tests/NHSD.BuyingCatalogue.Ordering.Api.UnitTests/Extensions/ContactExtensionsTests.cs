@@ -1,8 +1,7 @@
-﻿using System;
+﻿using AutoFixture.NUnit3;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
 
@@ -19,19 +18,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public static void ToModel_Contact_ReturnsPrimaryContactModel()
+        [AutoData]
+        public static void ToModel_ReturnsExpectedPrimaryContactModel(Contact contact)
         {
-            Contact contact = ContactBuilder
-                .Create()
-                .WithFirstName(Guid.NewGuid().ToString())
-                .WithLastName(Guid.NewGuid().ToString())
-                .WithEmail(Guid.NewGuid().ToString())
-                .WithPhone(Guid.NewGuid().ToString())
-                .Build();
-
             var actual = contact.ToModel();
 
-            PrimaryContactModel expected = new PrimaryContactModel
+            var expected = new PrimaryContactModel
             {
                 FirstName = contact.FirstName,
                 LastName = contact.LastName,
@@ -43,54 +35,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public static void FromModel_NullPrimaryContactModelModel_ThrowsException()
+        public static void ToDomain_NullModel_ReturnsExpectedContact()
         {
-            Contact contact = ContactBuilder
-                .Create()
-                .Build();
-
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                contact.FromModel(null);
-            });
+            ContactExtensions.ToDomain(null).Should().BeEquivalentTo(new Contact());
         }
 
         [Test]
-        public static void FromModel_PrimaryContactModel_UpdatesContact()
+        [AutoData]
+        public static void ToDomain_ReturnsExpectedContact(PrimaryContactModel model)
         {
-            Contact contact = ContactBuilder
-                .Create()
-                .Build();
+            var actual = model.ToDomain();
 
-            PrimaryContactModel inputPrimaryContactModel = new PrimaryContactModel
+            var expected = new Contact
             {
-                FirstName = Guid.NewGuid().ToString(),
-                LastName = Guid.NewGuid().ToString(),
-                EmailAddress = Guid.NewGuid().ToString(),
-                TelephoneNumber = Guid.NewGuid().ToString(),
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Email = model.EmailAddress,
+                Phone = model.TelephoneNumber,
             };
 
-            var actualContact = contact.FromModel(inputPrimaryContactModel);
-
-            Contact expectedContact = ContactBuilder
-                .Create()
-                .WithFirstName(inputPrimaryContactModel.FirstName)
-                .WithLastName(inputPrimaryContactModel.LastName)
-                .WithEmail(inputPrimaryContactModel.EmailAddress)
-                .WithPhone(inputPrimaryContactModel.TelephoneNumber)
-                .Build();
-
-            actualContact.Should().BeEquivalentTo(expectedContact);
-        }
-
-        [Test]
-        public static void FromModel_NullContact_ReturnsNewContact()
-        {
-            var primaryContactModel = new PrimaryContactModel();
-
-            var actualContact = ContactExtensions.FromModel(null, primaryContactModel);
-
-            actualContact.Should().NotBeNull();
+            actual.Should().BeEquivalentTo(expected);
         }
     }
 }
