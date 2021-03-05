@@ -285,7 +285,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var modelState = controller.ModelState;
             modelState.ErrorCount.Should().Be(errorDetails.Count);
-            modelState.Keys.Should().BeEquivalentTo(errorDetails.Select(e => "[0]." + e.Field));
+            modelState.Keys.Should().BeEquivalentTo(errorDetails.Select(e => e.ParentName + "[0]." + e.Field));
 
             var modelStateErrors = modelState.Values.Select(v => v.Errors[0].ErrorMessage);
             modelStateErrors.Should().BeEquivalentTo(errorDetails.Select(e => e.Id));

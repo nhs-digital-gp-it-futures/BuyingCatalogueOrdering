@@ -37,13 +37,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Validation
 
         private static IEnumerable<(string Key, string ErrorMessage)> ToModelErrors(int key, IEnumerable<ErrorDetails> errors)
         {
-            return errors.Select(e => (CreateModelKey(key, e.Field), e.Id));
+            return errors.Select(e => (CreateModelKey(e.ParentName, key, e.Field), e.Id));
         }
 
-        private static string CreateModelKey(int key, string field)
+        private static string CreateModelKey(string parentName, int key, string field)
         {
             return ModelNames.CreatePropertyModelName(
-                ModelNames.CreateIndexModelName(string.Empty, key),
+                ModelNames.CreateIndexModelName(parentName, key),
                 field);
         }
     }
