@@ -28,44 +28,41 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         [CommonAutoData]
         public static void Constructor_InitializesServiceRecipients(
             [Frozen] IEnumerable<OrderItemRecipient> recipients,
-            GetOrderItemModel model)
+            OrderItem orderItem)
         {
+            var model = new GetOrderItemModel(orderItem);
             model.ServiceRecipients.Should().BeEquivalentTo(recipients.ToList().ToModelList());
         }
 
         [Test]
         [CommonAutoData]
-        public static void Constructor_InitializesCatalogueItemType(
-            [Frozen] OrderItem orderItem,
-            GetOrderItemModel model)
+        public static void Constructor_InitializesCatalogueItemType(OrderItem orderItem)
         {
+            var model = new GetOrderItemModel(orderItem);
             model.CatalogueItemType.Should().Be(orderItem.CatalogueItem.CatalogueItemType.ToString());
         }
 
         [Test]
         [CommonAutoData]
-        public static void Constructor_InitializesCatalogueItemName(
-            [Frozen] OrderItem orderItem,
-            GetOrderItemModel model)
+        public static void Constructor_InitializesCatalogueItemName(OrderItem orderItem)
         {
+            var model = new GetOrderItemModel(orderItem);
             model.CatalogueItemName.Should().Be(orderItem.CatalogueItem.Name);
         }
 
         [Test]
         [CommonAutoData]
-        public static void Constructor_InitializesCatalogueItemId(
-            [Frozen] OrderItem orderItem,
-            GetOrderItemModel model)
+        public static void Constructor_InitializesCatalogueItemId(OrderItem orderItem)
         {
+            var model = new GetOrderItemModel(orderItem);
             model.CatalogueItemId.Should().Be(orderItem.CatalogueItem.Id.ToString());
         }
 
         [Test]
         [CommonAutoData]
-        public static void Constructor_InitializesCurrencyCode(
-            [Frozen] OrderItem orderItem,
-            GetOrderItemModel model)
+        public static void Constructor_InitializesCurrencyCode(OrderItem orderItem)
         {
+            var model = new GetOrderItemModel(orderItem);
             model.CurrencyCode.Should().Be(orderItem.CurrencyCode);
         }
 
@@ -73,8 +70,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         [CommonAutoData]
         public static void Constructor_InitializesItemUnit(
             [Frozen] PricingUnit priceUnit,
-            GetOrderItemModel model)
+            OrderItem orderItem)
         {
+            var model = new GetOrderItemModel(orderItem);
             model.ItemUnit.Should().NotBeNull();
             model.ItemUnit.Description.Should().Be(priceUnit.Description);
             model.ItemUnit.Name.Should().Be(priceUnit.Name);
@@ -82,10 +80,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
 
         [Test]
         [CommonAutoData]
-        public static void Constructor_InitializesPrice(
-            [Frozen] OrderItem orderItem,
-            GetOrderItemModel model)
+        public static void Constructor_InitializesPrice(OrderItem orderItem)
         {
+            var model = new GetOrderItemModel(orderItem);
             model.Price.Should().Be(orderItem.Price);
         }
 
@@ -93,8 +90,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         [CommonAutoData]
         public static void Constructor_InitializesProvisioningType(
             [Frozen] ProvisioningType provisioningType,
-            GetOrderItemModel model)
+            OrderItem orderItem)
         {
+            var model = new GetOrderItemModel(orderItem);
             model.ProvisioningType.Should().Be(provisioningType.ToString());
         }
 
@@ -102,8 +100,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         [CommonAutoData]
         public static void Constructor_InitializesTimeUnit(
             [Frozen] TimeUnit timeUnit,
-            GetOrderItemModel model)
+            OrderItem orderItem)
         {
+            var model = new GetOrderItemModel(orderItem);
             model.TimeUnit.Should().NotBeNull();
             model.TimeUnit.Description.Should().Be(timeUnit.Description());
             model.TimeUnit.Name.Should().Be(timeUnit.Name());
@@ -113,8 +112,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         [CommonAutoData]
         public static void Constructor_InitializesType(
             [Frozen] CataloguePriceType priceType,
-            GetOrderItemModel model)
+            OrderItem orderItem)
         {
+            var model = new GetOrderItemModel(orderItem);
             model.Type.Should().Be(priceType.ToString());
         }
 
@@ -122,8 +122,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         [CommonAutoData]
         public static void Constructor_InitializesEstimationPeriod(
             [Frozen] TimeUnit estimationPeriod,
-            GetOrderItemModel model)
+            OrderItem orderItem)
         {
+            var model = new GetOrderItemModel(orderItem);
             model.EstimationPeriod.Should().Be(estimationPeriod.Name());
         }
     }

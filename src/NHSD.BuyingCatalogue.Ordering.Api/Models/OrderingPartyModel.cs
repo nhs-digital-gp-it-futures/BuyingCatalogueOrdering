@@ -5,7 +5,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
     public sealed class OrderingPartyModel
     {
-        public OrderingPartyModel(OrderingParty orderingParty, Contact primaryContact)
+        public OrderingPartyModel()
+        {
+        }
+
+        internal OrderingPartyModel(OrderingParty orderingParty, Contact primaryContact)
         {
             if (orderingParty is null)
                 throw new ArgumentNullException(nameof(orderingParty));
