@@ -48,7 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
 
             public object Create(object request, ISpecimenContext context)
             {
-                if (!(request is TInfo info))
+                if (request is not TInfo info)
                     return new NoSpecimen();
 
                 if (IsItem(info))
@@ -101,7 +101,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
             {
                 var name = typeof(TEnum).Name;
 
-                return char.ToLowerInvariant(name[0]) + name.Substring(1) + "Name";
+                return char.ToLowerInvariant(name[0]) + name[1..] + "Name";
             }
         }
     }
