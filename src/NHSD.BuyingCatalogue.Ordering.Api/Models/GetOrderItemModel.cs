@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
@@ -6,47 +7,28 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
     public sealed class GetOrderItemModel
     {
-        public GetOrderItemModel(OrderItem orderItem, ServiceRecipient serviceRecipient)
+        public GetOrderItemModel(OrderItem orderItem)
         {
             if (orderItem is null)
                 throw new ArgumentNullException(nameof(orderItem));
 
-            OrderItemId = orderItem.OrderItemId;
-            ServiceRecipient = serviceRecipient is not null
-                ? new ServiceRecipientModel
-                {
-                    OdsCode = serviceRecipient.OdsCode,
-                    Name = serviceRecipient.Name,
-                }
-                : null;
-            CatalogueItemType = orderItem.CatalogueItemType.ToString();
-            CatalogueItemName = orderItem.CatalogueItemName;
-            CatalogueItemId = orderItem.CatalogueItemId;
+            CatalogueItemId = orderItem.CatalogueItem.Id.ToString();
+            CatalogueItemName = orderItem.CatalogueItem.Name;
+            CatalogueItemType = orderItem.CatalogueItem.CatalogueItemType.ToString();
             CurrencyCode = orderItem.CurrencyCode;
-            DeliveryDate = orderItem.DeliveryDate;
+            DefaultDeliveryDate = orderItem.DefaultDeliveryDate;
+            EstimationPeriod = orderItem.EstimationPeriod?.Name();
             ItemUnit = new ItemUnitModel
             {
-                Name = orderItem.CataloguePriceUnit.Name,
-                Description = orderItem.CataloguePriceUnit.Description,
+                Name = orderItem.PricingUnit.Name,
+                Description = orderItem.PricingUnit.Description,
             };
             Price = orderItem.Price;
             ProvisioningType = orderItem.ProvisioningType.ToString();
-            Quantity = orderItem.Quantity;
+            ServiceRecipients = orderItem.OrderItemRecipients.ToModelList();
             TimeUnit = orderItem.PriceTimeUnit?.ToModel();
             Type = orderItem.CataloguePriceType.ToString();
-            EstimationPeriod = orderItem.EstimationPeriod?.Name();
         }
-
-        public GetOrderItemModel(
-            OrderItem orderItem,
-            ServiceRecipient serviceRecipient,
-            string serviceInstanceId)
-            : this(orderItem, serviceRecipient)
-        {
-            ServiceInstanceId = serviceInstanceId;
-        }
-
-        public int OrderItemId { get; }
 
         public string CatalogueItemId { get; }
 
@@ -56,7 +38,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 
         public string CurrencyCode { get; }
 
-        public DateTime? DeliveryDate { get; }
+        public DateTime? DefaultDeliveryDate { get; }
+
+        public string EstimationPeriod { get; }
 
         public ItemUnitModel ItemUnit { get; }
 
@@ -64,16 +48,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 
         public string ProvisioningType { get; }
 
-        public int Quantity { get; }
-
-        public ServiceRecipientModel ServiceRecipient { get; }
-
-        public string ServiceInstanceId { get; }
+        public IReadOnlyCollection<OrderItemRecipientModel> ServiceRecipients { get; }
 
         public TimeUnitModel TimeUnit { get; }
 
         public string Type { get; }
-
-        public string EstimationPeriod { get; }
     }
 }

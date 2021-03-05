@@ -1,32 +1,86 @@
 ﻿using System;
 using System.Collections.Generic;
+using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
     public sealed class OrderModel
     {
-        public string Description { get; set; }
+        private OrderModel(Order order) => OrderItems = GetOrderItems(order);
 
-        public OrderingPartyModel OrderParty { get; set; }
+        public string Description { get; init; }
 
-        public SupplierModel Supplier { get; set; }
+        public OrderingPartyModel OrderParty { get; init; }
 
-        public DateTime? CommencementDate { get; set; }
+        public SupplierModel Supplier { get; init; }
 
-        public IEnumerable<OrderItemModel> OrderItems { get; set; }
+        public DateTime? CommencementDate { get; init; }
 
-        public IEnumerable<ServiceRecipientModel> ServiceRecipients { get; set; }
+        public IReadOnlyList<OrderItemModel> OrderItems { get; }
 
-        public decimal TotalOneOffCost { get; set; }
+        public decimal TotalOneOffCost { get; init; }
 
-        public decimal TotalRecurringCostPerMonth { get; set; }
+        public decimal TotalRecurringCostPerMonth { get; init; }
 
-        public decimal TotalRecurringCostPerYear { get; set; }
+        public decimal TotalRecurringCostPerYear { get; init; }
 
-        public decimal TotalOwnershipCost { get; set; }
+        public decimal TotalOwnershipCost { get; init; }
 
-        public string Status { get; set; }
+        public string Status { get; init; }
 
-        public DateTime? DateCompleted { get; set; }
+        public DateTime? DateCompleted { get; init; }
+
+        internal static OrderModel Create(Order order)
+        {
+            var calculatedCostPerYear = order.CalculateCostPerYear(CostType.Recurring);
+
+            return new OrderModel(order)
+            {
+                Description = order.Description,
+                OrderParty = new OrderingPartyModel(order.OrderingParty, order.OrderingPartyContact),
+                CommencementDate = order.CommencementDate,
+                Supplier = new SupplierModel(order.Supplier, order.SupplierContact),
+                TotalOneOffCost = order.CalculateCostPerYear(CostType.OneOff),
+                TotalRecurringCostPerMonth = calculatedCostPerYear / 12,
+                TotalRecurringCostPerYear = calculatedCostPerYear,
+                TotalOwnershipCost = order.CalculateTotalOwnershipCost(),
+                Status = order.OrderStatus.Name,
+                DateCompleted = order.Completed,
+            };
+        }
+
+        private static IReadOnlyList<OrderItemModel> GetOrderItems(Order order)
+        {
+            var items = new List<OrderItemModel>();
+            var i = 1;
+
+            foreach (var orderItem in order.OrderItems)
+            {
+                var recipientModels = new List<ExtendedOrderItemRecipientModel>();
+
+                foreach (var recipient in orderItem.OrderItemRecipients)
+                {
+                    var odsCode = recipient.Recipient.OdsCode;
+                    var recipientModel = new ExtendedOrderItemRecipientModel
+                    {
+                        DeliveryDate = recipient.DeliveryDate,
+                        ItemId = $"{order.CallOffId}-{odsCode}-{i}",
+                        Name = recipient.Recipient.Name,
+                        OdsCode = odsCode,
+                        Quantity = recipient.Quantity,
+
+                        // TODO: correct as part of service instance ID fix-up
+                        ServiceInstanceId = "ServiceInstanceId",
+                    };
+
+                    recipientModels.Add(recipientModel);
+                    i++;
+                }
+
+                items.Add(new OrderItemModel(orderItem, recipientModels));
+            }
+
+            return items;
+        }
     }
 }
