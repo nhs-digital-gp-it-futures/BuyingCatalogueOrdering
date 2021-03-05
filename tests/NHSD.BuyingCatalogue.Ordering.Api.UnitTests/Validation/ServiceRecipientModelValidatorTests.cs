@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using AutoFixture.NUnit3;
+using FluentValidation;
 using FluentValidation.TestHelper;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
@@ -8,9 +9,16 @@ using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
 {
+    [TestFixture]
+    [Parallelizable(ParallelScope.All)]
     [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class ServiceRecipientModelValidatorTests
     {
+        static ServiceRecipientModelValidatorTests()
+        {
+            ValidatorOptions.Global.DisplayNameResolver = FluentValidationOptions.DisplayNameResolver;
+        }
+
         [Test]
         [OrderingInlineAutoData(null)]
         [OrderingInlineAutoData("")]
