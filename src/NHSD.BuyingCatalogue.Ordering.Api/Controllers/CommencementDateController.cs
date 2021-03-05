@@ -1,70 +1,60 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
-using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
+using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
-    [Route("api/v1/orders/{orderId}/sections/commencement-date")]
+    [Route("api/v1/orders/{callOffId}/sections/commencement-date")]
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     [AuthorizeOrganisation]
-    public sealed class CommencementDateController : Controller
+    public sealed class CommencementDateController : ControllerBase
     {
-        private readonly IOrderRepository orderRepository;
+        private readonly ApplicationDbContext context;
 
-        public CommencementDateController(IOrderRepository orderRepository)
+        public CommencementDateController(ApplicationDbContext context)
         {
-            this.orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetAsync(string orderId)
+        public async Task<ActionResult<CommencementDateModel>> GetAsync(CallOffId callOffId)
         {
-            var order = await orderRepository.GetOrderByIdAsync(orderId);
-            if (order is null)
-            {
+            var model = await context.Order
+                .Where(o => o.Id == callOffId.Id)
+                .Select(o => new CommencementDateModel { CommencementDate = o.CommencementDate })
+                .AsNoTracking()
+                .SingleOrDefaultAsync();
+
+            if (model is null)
                 return NotFound();
-            }
 
-            var result = new CommencementDateModel { CommencementDate = order.CommencementDate };
-
-            return Ok(result);
+            return model;
         }
 
         [HttpPut]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult> Update(string orderId, CommencementDateModel model)
+        public async Task<IActionResult> UpdateAsync([FromRoute] Order order, CommencementDateModel model)
         {
-            var order = await orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
-            {
                 return NotFound();
-            }
 
             if (model is null)
-            {
                 throw new ArgumentNullException(nameof(model));
-            }
 
-            if (!model.CommencementDate.HasValue)
-            {
-                throw new ArgumentException(nameof(model.CommencementDate));
-            }
+            order.CommencementDate = model.CommencementDate!.Value;
 
-            order.CommencementDate = model.CommencementDate.Value;
-
-            var name = User.GetUserName();
-            order.SetLastUpdatedBy(User.GetUserId(), name);
-
-            await orderRepository.UpdateOrderAsync(order);
+            await context.SaveChangesAsync();
 
             return NoContent();
         }

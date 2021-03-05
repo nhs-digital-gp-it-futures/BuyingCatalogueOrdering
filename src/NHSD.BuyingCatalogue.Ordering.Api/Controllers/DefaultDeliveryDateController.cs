@@ -1,84 +1,93 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Errors;
 using NHSD.BuyingCatalogue.Ordering.Api.Validation;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
+using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
-    [Route("api/v1/orders")]
+    [Route("api/v1/orders/{callOffId}/default-delivery-date/{catalogueItemId}")]
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     [AuthorizeOrganisation]
     public sealed class DefaultDeliveryDateController : ControllerBase
     {
-        private readonly IOrderRepository orderRepository;
-        private readonly IDefaultDeliveryDateRepository repository;
+        private readonly ApplicationDbContext context;
         private readonly IDefaultDeliveryDateValidator validator;
 
         public DefaultDeliveryDateController(
-            IDefaultDeliveryDateRepository repository,
-            IDefaultDeliveryDateValidator validator,
-            IOrderRepository orderRepository)
+            ApplicationDbContext context,
+            IDefaultDeliveryDateValidator validator)
         {
-            this.repository = repository ?? throw new ArgumentNullException(nameof(repository));
-            this.orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            this.context = context ?? throw new ArgumentNullException(nameof(context));
             this.validator = validator ?? throw new ArgumentNullException(nameof(validator));
         }
 
-        [HttpPut("{orderId}/default-delivery-date/{catalogueItemId}/{priceId}")]
+        [HttpPut]
         [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<IActionResult> AddOrUpdateAsync(
-            string orderId,
-            string catalogueItemId,
-            int priceId,
-            DefaultDeliveryDateModel defaultDeliveryDate)
+            CallOffId callOffId,
+            CatalogueItemId catalogueItemId,
+            DefaultDeliveryDateModel model)
         {
-            if (defaultDeliveryDate is null)
-                throw new ArgumentNullException(nameof(defaultDeliveryDate));
+            if (model is null)
+                throw new ArgumentNullException(nameof(model));
 
-            var order = await orderRepository.GetOrderByIdAsync(orderId);
+            var order = await context.Order
+                .Where(o => o.Id == callOffId.Id)
+                .Include(o => o.DefaultDeliveryDates.Where(d => d.CatalogueItemId == catalogueItemId))
+                .SingleOrDefaultAsync();
+
             if (order is null)
                 return NotFound();
 
-            (bool isValid, ErrorsModel errors) = validator.Validate(
-                defaultDeliveryDate,
-                order.CommencementDate);
+            (bool isValid, ErrorsModel errors) = validator.Validate(model, order.CommencementDate);
 
             if (!isValid)
                 return BadRequest(errors);
 
-            var isNew = await repository.AddOrUpdateAsync(new DefaultDeliveryDate
-            {
-                OrderId = orderId,
-                CatalogueItemId = catalogueItemId,
-                PriceId = priceId,
+            // ReSharper disable once PossibleInvalidOperationException (covered by model validation)
+            DeliveryDateResult addedOrUpdated = order.SetDefaultDeliveryDate(catalogueItemId, model.DeliveryDate.Value);
 
-                // ReSharper disable once PossibleInvalidOperationException (covered by model validation)
-                DeliveryDate = defaultDeliveryDate.DeliveryDate.Value,
-            });
+            await context.SaveChangesAsync();
 
-            return isNew ? StatusCode(StatusCodes.Status201Created) : Ok();
+            return addedOrUpdated == DeliveryDateResult.Added
+                ? CreatedAtAction(nameof(GetAsync).TrimAsync(), new { callOffId = callOffId.ToString(), catalogueItemId = catalogueItemId.ToString() }, null)
+                : Ok();
         }
 
-        [HttpGet("{orderId}/default-delivery-date/{catalogueItemId}/{priceId}")]
+        [HttpGet]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult<DefaultDeliveryDateModel>> GetAsync(string orderId, string catalogueItemId, int priceId)
+        public async Task<ActionResult<DefaultDeliveryDateModel>> GetAsync(CallOffId callOffId, CatalogueItemId catalogueItemId)
         {
-            var date = await repository.GetAsync(orderId, catalogueItemId, priceId);
-            if (date is null)
+            Expression<Func<Order, IEnumerable<DefaultDeliveryDate>>> defaultDeliveryDate = o
+                => o.DefaultDeliveryDates.Where(d => d.CatalogueItemId == catalogueItemId);
+
+            var model = await context.Order
+                .Where(o => o.Id == callOffId.Id)
+                .Include(defaultDeliveryDate)
+                .SelectMany(defaultDeliveryDate)
+                .Select(d => new DefaultDeliveryDateModel { DeliveryDate = d.DeliveryDate })
+                .AsNoTracking()
+                .SingleOrDefaultAsync();
+
+            if (model is null)
                 return NotFound();
 
-            return new DefaultDeliveryDateModel { DeliveryDate = date.DeliveryDate };
+            return model;
         }
     }
 }

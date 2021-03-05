@@ -4,75 +4,57 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
-using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Api.Models.Errors;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
-    [Route("api/v1/orders/{orderId}/sections/description")]
+    [Route("api/v1/orders/{callOffId}/sections/description")]
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     [AuthorizeOrganisation]
     public sealed class OrderDescriptionController : Controller
     {
-        private readonly IOrderRepository orderRepository;
+        private readonly ApplicationDbContext context;
 
-        public OrderDescriptionController(IOrderRepository orderRepository)
+        public OrderDescriptionController(ApplicationDbContext context)
         {
-            this.orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetAsync(string orderId)
+        public async Task<ActionResult<OrderDescriptionModel>> GetAsync(CallOffId callOffId)
         {
-            var order = await orderRepository.GetOrderByIdAsync(orderId);
-            if (order is null)
-            {
+            var model = await context.Order
+                .Where(o => o.Id == callOffId.Id)
+                .Select(o => new OrderDescriptionModel { Description = o.Description })
+                .AsNoTracking()
+                .SingleOrDefaultAsync();
+
+            if (model is null)
                 return NotFound();
-            }
 
-            var descriptionModel = new OrderDescriptionModel
-            {
-                Description = order.Description.Value,
-            };
-
-            return Ok(descriptionModel);
+            return model;
         }
 
         [HttpPut]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult> UpdateAsync(string orderId, OrderDescriptionModel model)
+        public async Task<ActionResult> UpdateAsync([FromRoute] Order order, OrderDescriptionModel model)
         {
             if (model is null)
-            {
                 throw new ArgumentNullException(nameof(model));
-            }
 
-            var order = await orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
-            {
                 return NotFound();
-            }
 
-            var isValid = OrderDescription.Create(model.Description);
+            order.Description = model.Description;
 
-            if (!isValid.IsSuccess)
-            {
-                return BadRequest(new ErrorsModel(isValid.Errors.Select(d => new ErrorModel(d.Id, d.Field))));
-            }
-
-            order.SetDescription(isValid.Value);
-
-            var name = User.GetUserName();
-            order.SetLastUpdatedBy(User.GetUserId(), name);
-
-            await orderRepository.UpdateOrderAsync(order);
+            await context.SaveChangesAsync();
 
             return NoContent();
         }

@@ -2,35 +2,33 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.Idioms;
+using AutoFixture.NUnit3;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
-using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Errors;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
-using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
-using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
-using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Domain.Results;
+using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
-    [Parallelizable(ParallelScope.All)]
+    [Parallelizable(ParallelScope.Children)]
     [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class OrdersControllerTests
     {
@@ -45,1301 +43,394 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        public static async Task GetAsync_OrderDoesNotExist_ReturnsNotFound()
-        {
-            var context = OrdersControllerTestContext.Setup();
-            context.Order = null;
-            var response = await context.OrdersController.GetAsync("INVALID");
-            response.Result.Should().BeOfType<NotFoundResult>();
-        }
-
-        [Test]
-        public static async Task GetAsync_OrderExists_ReturnsResult()
-        {
-            var context = OrdersControllerTestContext.Setup();
-            const string orderId = "C0000014-01";
-
-            (Order order, OrderModel expectedOrder) = CreateGetTestData(orderId, context.PrimaryOrganisationId, "ods");
-
-            context.Order = order;
-
-            var response = await context.OrdersController.GetAsync(orderId);
-            response.Value.Should().BeEquivalentTo(expectedOrder);
-        }
-
-        [Test]
-        public static async Task GetAllAsync_NoOrdersExist_ReturnsEmptyResult()
-        {
-            var context = OrdersControllerTestContext.Setup();
-
-            var controller = context.OrdersController;
-
-            var result = await controller.GetAllAsync(context.PrimaryOrganisationId);
-            var orders = result.Value;
-            orders.Should().BeEmpty();
-        }
-
-        [TestCase(null, "Some Description")]
-        [TestCase("C0000014-01", "Some Description")]
-        public static async Task GetAllAsync_SingleOrderWithOrganisationIdExists_ReturnsTheOrder(
-            string orderId,
-            string orderDescription)
-        {
-            var context = OrdersControllerTestContext.Setup();
-            var orders = new List<(Order Order, OrderListItemModel Expected)>
-            {
-                CreateOrderTestData(orderId, context.PrimaryOrganisationId, orderDescription),
-            };
-
-            context.Orders = orders.Select(t => t.Order);
-
-            var controller = context.OrdersController;
-
-            var result = await controller.GetAllAsync(context.PrimaryOrganisationId);
-            var ordersResult = result.Value;
-            ordersResult.Should().ContainSingle();
-            ordersResult.Should().BeEquivalentTo(orders.Select(t => t.Expected));
-        }
-
-        [Test]
-        public static async Task GetAllAsync_MultipleOrdersWithOrganisationIdExist_ReturnsAllOrders()
-        {
-            var context = OrdersControllerTestContext.Setup();
-
-            var orders = new List<(Order Order, OrderListItemModel Expected)>
-            {
-                CreateOrderTestData("C0000014-01", context.PrimaryOrganisationId, "Some Description"),
-                CreateOrderTestData("C000012-01", context.PrimaryOrganisationId, "Another Description"),
-            };
-
-            context.Orders = orders.Select(t => t.Order);
-
-            var controller = context.OrdersController;
-
-            var result = await controller.GetAllAsync(context.PrimaryOrganisationId);
-            var ordersResult = result.Value;
-            ordersResult.Count.Should().Be(2);
-            ordersResult.Should().BeEquivalentTo(orders.Select(t => t.Expected));
-        }
-
-        [Test]
-        public static async Task GetAll_OrdersByOrganisationId_CalledOnce()
-        {
-            var context = OrdersControllerTestContext.Setup();
-
-            var controller = context.OrdersController;
-
-            await controller.GetAllAsync(context.PrimaryOrganisationId);
-
-            context.OrderRepositoryMock.Verify(r => r.ListOrdersByOrganisationIdAsync(context.PrimaryOrganisationId));
-        }
-
-        [Test]
-        [OrderingAutoData]
-        public static async Task GetOrderSummaryAsync_OrderNotFound_ReturnsNotFound(
-            string orderId,
+        [InMemoryDbAutoData(nameof(GetAsync_OrderDoesNotExist_ReturnsNotFound))]
+        public static async Task GetAsync_OrderDoesNotExist_ReturnsNotFound(
+            CallOffId callOffId,
             OrdersController controller)
         {
-            var response = await controller.GetOrderSummaryAsync(orderId);
+            var response = await controller.GetAsync(callOffId);
 
-            response.Should().BeOfType<ActionResult<OrderSummaryModel>>();
-            response.As<ActionResult<OrderSummaryModel>>().Result.Should().BeOfType<NotFoundResult>();
-        }
-
-        [Test]
-        public static async Task GetOrderSummaryAsync_IsSummaryComplete_ReturnResult()
-        {
-            const string orderId = "C0000014-01";
-            var context = OrdersControllerTestContext.Setup();
-
-            (Order order, OrderSummaryModel expected) =
-                CreateOrderSummaryTestData(orderId, "Some Description", context.PrimaryOrganisationId);
-
-            context.Order = order;
-
-            var controller = context.OrdersController;
-
-            var response = await controller.GetOrderSummaryAsync(orderId);
-            response.Should().BeEquivalentTo(new ActionResult<OrderSummaryModel>(new OkObjectResult(expected)));
-        }
-
-        [Test]
-        public static async Task GetOrderSummaryAsync_OtherOrganisationId_ReturnResult()
-        {
-            var organisationId = Guid.NewGuid();
-            const string orderId = "C0000014-01";
-            var context = OrdersControllerTestContext.Setup();
-
-            (Order order, _) = CreateOrderSummaryTestData(orderId, "Some Description", organisationId);
-
-            context.Order = order;
-
-            var controller = context.OrdersController;
-
-            var response = await controller.GetOrderSummaryAsync(orderId);
-            response.Should().BeEquivalentTo(new ActionResult<OrderSummaryModel>(new ForbidResult()));
-        }
-
-        [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.OrderDescriptionSectionStatusCases))]
-        [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.OrderingPartySectionStatusCases))]
-        [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.SupplierSectionStatusCases))]
-        [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.CommencementDateSectionStatusCases))]
-        [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.ServiceRecipientsSectionStatusCases))]
-        [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.CatalogueSolutionsSectionStatusCases))]
-        [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.AdditionalServicesSectionStatusCases))]
-        [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.AssociatedServicesSectionStatusCases))]
-        [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.FundingStatusCases))]
-        [TestCaseSource(typeof(SummaryModelSectionTestCaseData), nameof(SummaryModelSectionTestCaseData.SectionStatusCases))]
-        public static async Task GetOrderSummaryAsync_ChangeOrderData_ReturnsExpectedSummary(
-            Order order,
-            OrderSummaryModel expected)
-        {
-            var context = OrdersControllerTestContext.Setup(order.OrganisationId);
-            context.Order = order;
-            context.ServiceRecipientListCount = order.ServiceRecipients.Count;
-            var controller = context.OrdersController;
-
-            var response = (await controller.GetOrderSummaryAsync(context.Order.OrderId)).Result as OkObjectResult;
-            Assert.IsNotNull(response);
-
-            var actual = response.Value.As<OrderSummaryModel>();
-            actual.Should().BeEquivalentTo(expected);
-        }
-
-        [TestCase]
-        public static async Task GetOrderSummaryAsync_ServiceRecipientCount_ReturnsCountOfTwo()
-        {
-            var order = OrderBuilder.Create().Build();
-
-            var context = OrdersControllerTestContext.Setup(order.OrganisationId);
-            context.Order = order;
-            context.ServiceRecipientListCount = 2;
-
-            var controller = context.OrdersController;
-
-            string expectedOrderId = context.Order.OrderId;
-
-            var response = (await controller.GetOrderSummaryAsync(expectedOrderId)).Result as OkObjectResult;
-            Assert.IsNotNull(response);
-
-            var actual = response.Value.As<OrderSummaryModel>();
-
-            var expected = OrderSummaryModelBuilder
-                .Create()
-                .WithOrderId(expectedOrderId)
-                .WithOrganisationId(order.OrganisationId)
-                .WithSections(SectionModelListBuilder
-                    .Create()
-                    .WithServiceRecipients(
-                        SectionModel
-                            .ServiceRecipients
-                            .WithStatus("incomplete")
-                            .WithCount(context.ServiceRecipientListCount))
-                    .Build())
-                .WithSectionStatus("incomplete")
-                .Build();
-
-            actual.Should().BeEquivalentTo(expected);
-        }
-
-        [TestCase]
-        public static async Task GetOrderSummaryAsync_CatalogueSolutionCount_ReturnsCountOfTwo()
-        {
-            var order = OrderBuilder.Create()
-                .WithOrderItem(OrderItemBuilder.Create()
-                    .WithCatalogueItemType(CatalogueItemType.Solution)
-                    .Build())
-                .WithOrderItem(OrderItemBuilder.Create()
-                    .WithCatalogueItemType(CatalogueItemType.Solution)
-                    .Build())
-                .Build();
-
-            var context = OrdersControllerTestContext.Setup(order.OrganisationId);
-            context.Order = order;
-
-            var response = (await context.OrdersController.GetOrderSummaryAsync(order.OrderId)).Result as OkObjectResult;
-            Assert.IsNotNull(response);
-
-            var actual = response.Value.As<OrderSummaryModel>();
-
-            var expected = OrderSummaryModelBuilder
-                .Create()
-                .WithOrderId(order.OrderId)
-                .WithOrganisationId(order.OrganisationId)
-                .WithSections(SectionModelListBuilder
-                    .Create()
-                    .WithServiceRecipients(
-                        SectionModel
-                            .ServiceRecipients
-                            .WithStatus("incomplete")
-                            .WithCount(context.ServiceRecipientListCount))
-                    .WithCatalogueSolutions(SectionModel.CatalogueSolutions
-                        .WithStatus("incomplete")
-                        .WithCount(2))
-                    .Build())
-                .WithSectionStatus("incomplete")
-                .Build();
-
-            actual.Should().BeEquivalentTo(expected);
-        }
-
-        [Test]
-        public static async Task GetOrderSummaryAsync_AssociatedServiceCount_ReturnsCountOfTwo()
-        {
-            var order = OrderBuilder.Create()
-                .WithOrderItem(OrderItemBuilder.Create()
-                    .WithCatalogueItemType(CatalogueItemType.AssociatedService)
-                    .Build())
-                .WithOrderItem(OrderItemBuilder.Create()
-                    .WithCatalogueItemType(CatalogueItemType.AssociatedService)
-                    .Build())
-                .WithOrderItem(OrderItemBuilder.Create()
-                    .WithCatalogueItemType(CatalogueItemType.Solution)
-                    .Build())
-                .Build();
-
-            var context = OrdersControllerTestContext.Setup(order.OrganisationId);
-            context.Order = order;
-
-            var response = (await context.OrdersController.GetOrderSummaryAsync(order.OrderId)).Result as OkObjectResult;
-            Assert.IsNotNull(response);
-
-            var actual = response.Value.As<OrderSummaryModel>();
-
-            var expected = OrderSummaryModelBuilder
-                .Create()
-                .WithOrderId(order.OrderId)
-                .WithOrganisationId(order.OrganisationId)
-                .WithSections(SectionModelListBuilder
-                    .Create()
-                    .WithServiceRecipients(
-                        SectionModel
-                            .ServiceRecipients
-                            .WithStatus("incomplete")
-                            .WithCount(context.ServiceRecipientListCount))
-                    .WithCatalogueSolutions(SectionModel.CatalogueSolutions
-                        .WithStatus("incomplete")
-                        .WithCount(1))
-                    .WithAssociatedServices(SectionModel.AssociatedServices
-                        .WithStatus("incomplete")
-                        .WithCount(2))
-                    .Build())
-                .WithSectionStatus("incomplete")
-                .Build();
-
-            actual.Should().BeEquivalentTo(expected);
-        }
-
-        [TestCase]
-        public static async Task GetOrderSummaryAsync_ServiceRecipientRepository_CalledOnce()
-        {
-            var order = OrderBuilder.Create().Build();
-
-            var context = OrdersControllerTestContext.Setup(order.OrganisationId);
-            context.Order = order;
-            context.ServiceRecipientListCount = 2;
-
-            var controller = context.OrdersController;
-
-            string expectedOrderId = context.Order.OrderId;
-
-            await controller.GetOrderSummaryAsync(expectedOrderId);
-
-            context.ServiceRecipientRepositoryMock.Verify(r => r.GetCountByOrderIdAsync(expectedOrderId));
-        }
-
-        [Test]
-        public static async Task CreateOrderAsync_CreateOrderSuccessfulResult_ReturnsOrderId()
-        {
-            const string newOrderId = "New Test Order Id";
-
-            var context = OrdersControllerTestContext.Setup();
-            context.CreateOrderResult = Result.Success(newOrderId);
-
-            var createOrderRequest = new CreateOrderModel
-            {
-                Description = "Test Order 1",
-                OrganisationId = context.PrimaryOrganisationId,
-            };
-
-            var controller = context.OrdersController;
-
-            var response = await controller.CreateOrderAsync(createOrderRequest);
-
-            var actual = response.Result;
-
-            var expectation = new CreatedAtActionResult(
-                nameof(controller.CreateOrderAsync).TrimAsync(),
-                null,
-                new { orderId = newOrderId },
-                new ErrorResponseModel { OrderId = newOrderId });
-
-            actual.Should().BeEquivalentTo(expectation);
-        }
-
-        [Test]
-        public static async Task CreateOrderAsync_CreateOrderService_CreateAsync_CalledOnce()
-        {
-            var context = OrdersControllerTestContext.Setup();
-
-            var controller = context.OrdersController;
-
-            var createOrderModel = new CreateOrderModel
-            {
-                Description = "Description1",
-                OrganisationId = context.PrimaryOrganisationId,
-            };
-
-            await controller.CreateOrderAsync(createOrderModel);
-
-            context.CreateOrderServiceMock.Verify(s => s.CreateAsync(It.IsAny<CreateOrderRequest>()));
-        }
-
-        [Test]
-        public static async Task CreateOrderAsync_CreateOrderFailureResult_ReturnsBadRequest()
-        {
-            var context = OrdersControllerTestContext.Setup();
-            var controller = context.OrdersController;
-
-            var errors = new List<ErrorDetails> { new("TestErrorId", "TestField") };
-
-            var createOrderRequest = new CreateOrderModel
-            {
-                Description = "Test Order 1",
-                OrganisationId = context.PrimaryOrganisationId,
-            };
-
-            context.CreateOrderResult = Result.Failure<string>(errors);
-
-            var response = await controller.CreateOrderAsync(createOrderRequest);
-
-            response.Should().BeOfType<ActionResult<ErrorResponseModel>>();
-            var actual = response.Result;
-
-            var expectedErrors =
-                new List<ErrorModel> { new("TestErrorId", "TestField") };
-            var expected = new BadRequestObjectResult(new ErrorResponseModel { Errors = expectedErrors });
-            actual.Should().BeEquivalentTo(expected);
-        }
-
-        [Test]
-        public static async Task CreateOrderAsync_IncludesOrganisationAsServiceRecipient()
-        {
-            const string odsCode = "Ods Code";
-            var orgId = Guid.NewGuid();
-
-            var orderItem = OrderItemBuilder.Create()
-                .WithOdsCode(odsCode)
-                .Build();
-
-            var order = OrderBuilder.Create()
-                .WithOrderItem(orderItem)
-                .WithOrganisationId(orgId)
-                .Build();
-
-            var context = OrdersControllerTestContext.Setup(orgId);
-            context.Order = order;
-
-            var controller = context.OrdersController;
-
-            var response = await controller.GetAsync("order-id");
-            var serviceRecipients = response.Value.ServiceRecipients.ToList();
-
-            serviceRecipients.Should().HaveCount(1);
-            serviceRecipients[0].Name.Should().Be(context.Order.OrganisationName);
-            serviceRecipients[0].OdsCode.Should().Be(odsCode);
-        }
-
-        [Test]
-        public static void CreateOrderAsync_NullApplicationUser_ThrowsException()
-        {
-            var context = OrdersControllerTestContext.Setup();
-
-            async Task<ActionResult<ErrorResponseModel>> CreateOrder()
-            {
-                var controller = context.OrdersController;
-                return await controller.CreateOrderAsync(null);
-            }
-
-            Assert.ThrowsAsync<ArgumentNullException>(CreateOrder);
-        }
-
-        [Test]
-        public static async Task CreateOrderAsync_InvalidPrimaryOrganisationId_ReturnsForbid()
-        {
-            var context = OrdersControllerTestContext.Setup();
-            context.Order = OrderBuilder
-                .Create()
-                .WithOrganisationId(Guid.NewGuid())
-                .Build();
-
-            var result = await context.OrdersController.CreateOrderAsync(new CreateOrderModel());
-
-            result.Result.Should().BeOfType<ForbidResult>();
-        }
-
-        [Test]
-        public static async Task DeleteOrderAsync_DeleteOrderSuccessful_ReturnsNoContent()
-        {
-            var context = OrdersControllerTestContext.Setup();
-
-            var response = await context.OrdersController.DeleteOrderAsync("Order");
-            response.Should().BeOfType<NoContentResult>();
-        }
-
-        [Test]
-        public static async Task DeleteOrderAsync_DeleteOrderSuccessful_DeletesAndUpdatesOrder()
-        {
-            var context = OrdersControllerTestContext.Setup();
-
-            await context.OrdersController.DeleteOrderAsync("Order");
-            context.Order.IsDeleted.Should().BeTrue();
-            context.OrderRepositoryMock.Verify(r => r.UpdateOrderAsync(It.Is<Order>(o => o.IsDeleted)));
-        }
-
-        [Test]
-        public static async Task DeleteOrderAsync_DeleteOrderSuccessful_LastUpdatedIsUpdated()
-        {
-            var context = OrdersControllerTestContext.Setup();
-            await context.OrdersController.DeleteOrderAsync("Order");
-            context.Order.LastUpdatedBy.Should().Be(context.NameIdentity);
-            context.Order.LastUpdatedByName.Should().Be(context.Name);
-            context.Order.LastUpdated.Should().NotBe(DateTime.MinValue);
-        }
-
-        [Test]
-        public static async Task DeleteOrderAsync_OrderNotFound_ReturnsNotFound()
-        {
-            var context = OrdersControllerTestContext.Setup();
-            context.Order = null;
-
-            var response = await context.OrdersController.DeleteOrderAsync("Order");
-            response.Should().BeOfType<NotFoundResult>();
-        }
-
-        [Test]
-        public static async Task DeleteOrderAsync_OrderDeleted_ReturnsNotFound()
-        {
-            var context = OrdersControllerTestContext.Setup();
-            context.Order.IsDeleted = true;
-
-            var response = await context.OrdersController.DeleteOrderAsync("Order");
-            response.Should().BeOfType<NotFoundResult>();
-        }
-
-        [Test]
-        public static void UpdateStatusAsync_NullModel_ThrowsException()
-        {
-            var context = OrdersControllerTestContext.Setup();
-            Assert.ThrowsAsync<ArgumentNullException>(() => context.OrdersController.UpdateStatusAsync("Order", null));
-        }
-
-        [Test]
-        public static async Task UpdateStatusAsync_NullOrder_ReturnsNotFound()
-        {
-            var context = OrdersControllerTestContext.Setup();
-            context.Order = null;
-
-            var response = await context.OrdersController.UpdateStatusAsync("Order", context.CompleteOrderStatusModel);
             response.Result.Should().BeOfType<NotFoundResult>();
         }
 
-        [TestCase(null)]
-        [TestCase("")]
-        [TestCase("Incomplete")]
-        public static async Task UpdateStatusAsync_InvalidOrderStatus_ReturnsInvalidOrderStatusError(string orderStatusInput)
+        [Test]
+        [InMemoryDbAutoData(nameof(GetAsync_OrderExists_ReturnsExpectedResult))]
+        public static async Task GetAsync_OrderExists_ReturnsExpectedResult(
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            OrderItem orderItem,
+            Order order,
+            OrdersController controller)
         {
-            var context = OrdersControllerTestContext.Setup();
+            order.AddOrUpdateOrderItem(orderItem);
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
 
-            var response = await context.OrdersController.UpdateStatusAsync("Order", new StatusModel { Status = orderStatusInput });
-            var actual = response.Result.As<BadRequestObjectResult>().Value;
+            var expectedResult = OrderModel.Create(order);
 
+            var response = await controller.GetAsync(callOffId);
+
+            response.Value.Should().BeEquivalentTo(expectedResult);
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(GetAllAsync_NoOrdersExist_ReturnsEmptyResult))]
+        public static async Task GetAllAsync_NoOrdersExist_ReturnsEmptyResult(
+            Guid organisationId,
+            OrdersController controller)
+        {
+            var result = await controller.GetAllAsync(organisationId);
+
+            result.Value.Should().BeEmpty();
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(GetAllAsync_OrdersExist_ReturnsExpectedResult))]
+        public static async Task GetAllAsync_OrdersExist_ReturnsExpectedResult(
+            [Frozen] ApplicationDbContext context,
+            [Frozen] OrderingParty orderingParty,
+            IReadOnlyList<Order> orders,
+            OrdersController controller)
+        {
+            context.Order.AddRange(orders);
+            await context.SaveChangesAsync();
+
+            var expectedResult = orders.Select(o => new OrderListItemModel(o));
+
+            var result = await controller.GetAllAsync(orderingParty.Id);
+
+            result.Value.Should().BeEquivalentTo(expectedResult);
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(GetOrderSummaryAsync_OrderNotFound_ReturnsNotFound))]
+        public static async Task GetOrderSummaryAsync_OrderNotFound_ReturnsNotFound(
+            CallOffId callOffId,
+            OrdersController controller)
+        {
+            var response = await controller.GetOrderSummaryAsync(callOffId);
+
+            response.Result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(GetOrderSummaryAsync_ReturnsExpectedResult))]
+        public static async Task GetOrderSummaryAsync_ReturnsExpectedResult(
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            IReadOnlyList<SelectedServiceRecipient> serviceRecipients,
+            IReadOnlyList<OrderItem> orderItems,
+            Order order,
+            OrdersController controller)
+        {
+            order.SetSelectedServiceRecipients(serviceRecipients);
+            foreach (var orderItem in orderItems)
+                order.AddOrUpdateOrderItem(orderItem);
+
+            context.Order.AddRange(order);
+            await context.SaveChangesAsync();
+
+            var expectedResult = OrderSummaryModel.Create(order);
+
+            var result = await controller.GetOrderSummaryAsync(callOffId);
+
+            result.Value.Should().BeEquivalentTo(expectedResult);
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(CreateOrderAsync_NullModel_ThrowsArgumentNullException))]
+        public static void CreateOrderAsync_NullModel_ThrowsArgumentNullException(
+            OrdersController controller)
+        {
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await controller.CreateOrderAsync(null));
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(CreateOrderAsync_UnauthorizedUser_ReturnsExpectedResult))]
+        public static async Task CreateOrderAsync_UnauthorizedUser_ReturnsExpectedResult(
+            Guid orderingPartyId,
+            [Frozen] Mock<HttpContext> httpContextMock,
+            CreateOrderModel model,
+            OrdersController controller)
+        {
+            var claims = new[] { new Claim("primaryOrganisationId", orderingPartyId.ToString()) };
+            var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "mock"));
+            httpContextMock.Setup(c => c.User).Returns(user);
+
+            var result = await controller.CreateOrderAsync(model);
+
+            result.Should().BeOfType<ForbidResult>();
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(CreateOrderAsync_CreatesOrderingParty))]
+        public static async Task CreateOrderAsync_CreatesOrderingParty(
+            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<HttpContext> httpContextMock,
+            CreateOrderModel model,
+            OrdersController controller)
+        {
+            var claims = new[] { new Claim("primaryOrganisationId", model.OrganisationId.ToString()) };
+            var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "mock"));
+            httpContextMock.Setup(c => c.User).Returns(user);
+
+            await controller.CreateOrderAsync(model);
+
+            var orderingParties = context.Set<OrderingParty>();
+            orderingParties.Should().HaveCount(1);
+            orderingParties.First().Id.Should().Be(model.OrganisationId);
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(CreateOrderAsync_CreatesOrder))]
+        public static async Task CreateOrderAsync_CreatesOrder(
+            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<HttpContext> httpContextMock,
+            OrderingParty orderingParty,
+            string description,
+            OrdersController controller)
+        {
+            context.Add(orderingParty);
+            await context.SaveChangesAsync();
+
+            var model = new CreateOrderModel { OrganisationId = orderingParty.Id, Description = description };
+            var claims = new[] { new Claim("primaryOrganisationId", model.OrganisationId.ToString()) };
+            var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "mock"));
+            httpContextMock.Setup(c => c.User).Returns(user);
+
+            await controller.CreateOrderAsync(model);
+
+            var orders = context.Set<Order>();
+            orders.Should().HaveCount(1);
+            orders.First().OrderingParty.Should().Be(orderingParty);
+            orders.First().Description.Should().Be(description);
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(CreateOrderAsync_ReturnsExpectedResult))]
+        public static async Task CreateOrderAsync_ReturnsExpectedResult(
+            [Frozen] Mock<HttpContext> httpContextMock,
+            OrderingParty orderingParty,
+            OrdersController controller)
+        {
+            var model = new CreateOrderModel { OrganisationId = orderingParty.Id, Description = "Description" };
+            var claims = new[] { new Claim("primaryOrganisationId", model.OrganisationId.ToString()) };
+            var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "mock"));
+            httpContextMock.Setup(c => c.User).Returns(user);
+
+            var result = await controller.CreateOrderAsync(model);
+
+            result.Should().BeOfType<CreatedAtActionResult>();
+            result.As<CreatedAtActionResult>().ActionName.Should().Be("Get");
+            result.As<CreatedAtActionResult>().RouteValues.Should().ContainKey("callOffId");
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(DeleteOrderAsync_NullOrder_ReturnsNotFound))]
+        public static async Task DeleteOrderAsync_NullOrder_ReturnsNotFound(
+            OrdersController controller)
+        {
+            var result = await controller.DeleteOrderAsync(null);
+
+            result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(DeleteOrderAsync_OrderIsDeleted_ReturnsNotFound))]
+        public static async Task DeleteOrderAsync_OrderIsDeleted_ReturnsNotFound(
+            Order order,
+            OrdersController controller)
+        {
+            order.IsDeleted = true;
+
+            var result = await controller.DeleteOrderAsync(order);
+
+            result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(DeleteOrderAsync_UpdatesOrder))]
+        public static async Task DeleteOrderAsync_UpdatesOrder(
+            Order order,
+            OrdersController controller)
+        {
+            order.IsDeleted = false;
+
+            await controller.DeleteOrderAsync(order);
+
+            order.IsDeleted.Should().BeTrue();
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(DeleteOrderAsync_UpdatesDb))]
+        public static async Task DeleteOrderAsync_UpdatesDb(
+            [Frozen] ApplicationDbContext context,
+            Order order,
+            OrdersController controller)
+        {
+            order.IsDeleted = false;
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
+
+            await controller.DeleteOrderAsync(order);
+
+            context.Set<Order>().IgnoreQueryFilters().Single(o => o.Equals(order)).IsDeleted.Should().BeTrue();
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(DeleteOrderAsync_ReturnsExpectedResult))]
+        public static async Task DeleteOrderAsync_ReturnsExpectedResult(
+            Order order,
+            OrdersController controller)
+        {
+            order.IsDeleted = false;
+
+            var result = await controller.DeleteOrderAsync(order);
+
+            result.Should().BeOfType<NoContentResult>();
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(UpdateStatusAsync_NullModel_ThrowsException))]
+        public static void UpdateStatusAsync_NullModel_ThrowsException(
+            OrdersController controller)
+        {
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await controller.UpdateStatusAsync(default, null));
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(UpdateStatusAsync_InvalidOrderStatus_ReturnsInvalidOrderStatusError))]
+        public static async Task UpdateStatusAsync_InvalidOrderStatus_ReturnsInvalidOrderStatusError(
+            StatusModel model,
+            OrdersController controller)
+        {
+            var response = await controller.UpdateStatusAsync(default, model);
+
+            response.Result.Should().BeOfType<BadRequestObjectResult>();
             var expected = new ErrorResponseModel
             {
                 Errors = new List<ErrorModel> { ErrorMessages.InvalidOrderStatus() },
             };
 
-            actual.Should().BeEquivalentTo(expected);
+            response.Result.As<BadRequestObjectResult>().Value.Should().BeEquivalentTo(expected);
         }
 
         [Test]
-        public static async Task UpdateStatusAsync_OrderIsComplete_ReturnsNoContent()
+        [InMemoryDbAutoData(nameof(UpdateStatusAsync_IncompleteOrderStatus_ReturnsInvalidOrderStatusError))]
+        public static async Task UpdateStatusAsync_IncompleteOrderStatus_ReturnsInvalidOrderStatusError(
+            StatusModel model,
+            OrdersController controller)
         {
-            var context = OrdersControllerTestContext.Setup();
-            var orderItem = OrderItemBuilder.Create()
-                .WithCatalogueItemType(CatalogueItemType.Solution)
-                .Build();
+            model.Status = OrderStatus.Incomplete.Name;
 
-            context.Order = OrderBuilder.Create()
-                .WithOrganisationId(context.PrimaryOrganisationId)
-                .WithOrderItem(orderItem)
-                .WithFundingSourceOnlyGms(true)
-                .WithAssociatedServicesViewed(true)
-                .WithCatalogueSolutionsViewed(true)
-                .Build();
+            var response = await controller.UpdateStatusAsync(default, model);
 
-            var response = await context.OrdersController.UpdateStatusAsync("Order", context.CompleteOrderStatusModel);
-            response.Result.Should().BeOfType<NoContentResult>();
+            response.Result.Should().BeOfType<BadRequestObjectResult>();
+            var expected = new ErrorResponseModel
+            {
+                Errors = new List<ErrorModel> { ErrorMessages.InvalidOrderStatus() },
+            };
+
+            response.Result.As<BadRequestObjectResult>().Value.Should().BeEquivalentTo(expected);
         }
 
         [Test]
-        public static async Task UpdateStatusAsync_OrderStatus_Complete_CompleteOrderServiceCalledOnce()
+        [InMemoryDbAutoData(nameof(UpdateStatusAsync_OrderDoesNotExist_ReturnsNotFound))]
+        public static async Task UpdateStatusAsync_OrderDoesNotExist_ReturnsNotFound(
+            StatusModel model,
+            OrdersController controller)
         {
-            var context = OrdersControllerTestContext.Setup();
-            var orderItem = OrderItemBuilder.Create()
-                .WithCatalogueItemType(CatalogueItemType.Solution)
-                .Build();
+            model.Status = OrderStatus.Complete.Name;
 
-            context.Order = OrderBuilder.Create()
-                .WithOrganisationId(context.PrimaryOrganisationId)
-                .WithOrderItem(orderItem)
-                .WithFundingSourceOnlyGms(true)
-                .WithAssociatedServicesViewed(true)
-                .WithCatalogueSolutionsViewed(true)
-                .Build();
+            var response = await controller.UpdateStatusAsync(default, model);
 
-            await context.OrdersController.UpdateStatusAsync("Order", context.CompleteOrderStatusModel);
-
-            context.CompleteOrderServiceMock.Verify(
-                s => s.CompleteAsync(It.Is<CompleteOrderRequest>(request => request.Order.Equals(context.Order))));
+            response.Result.Should().BeOfType<NotFoundResult>();
         }
 
         [Test]
-        public static async Task UpdateStatusAsync_CompleteOrderFailed_ReturnsError()
+        [InMemoryDbAutoData(nameof(UpdateStatusAsync_OrderStatus_Complete_CompleteOrderServiceCalledOnce))]
+        public static async Task UpdateStatusAsync_OrderStatus_Complete_CompleteOrderServiceCalledOnce(
+            [Frozen] Mock<ICompleteOrderService> completeOrderServiceMock,
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            OrderItem orderItem,
+            Order order,
+            StatusModel model,
+            OrdersController controller)
         {
-            var context = OrdersControllerTestContext.Setup();
-            var orderItem = OrderItemBuilder.Create()
-                .WithCatalogueItemType(CatalogueItemType.Solution)
-                .Build();
+            order.AddOrUpdateOrderItem(orderItem);
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
 
-            context.Order = OrderBuilder.Create()
-                .WithOrganisationId(context.PrimaryOrganisationId)
-                .WithOrderItem(orderItem)
-                .WithFundingSourceOnlyGms(true)
-                .WithAssociatedServicesViewed(true)
-                .WithCatalogueSolutionsViewed(true)
-                .Build();
+            Expression<Func<ICompleteOrderService, Task<Result>>> completeAsync = s => s.CompleteAsync(
+                It.Is<Order>(o => o.Equals(order)));
+
+            completeOrderServiceMock.Setup(completeAsync).ReturnsAsync(Result.Success);
+            model.Status = OrderStatus.Complete.Name;
+
+            await controller.UpdateStatusAsync(callOffId, model);
+
+            completeOrderServiceMock.Verify(completeAsync);
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(UpdateStatusAsync_CompleteOrderFailed_ReturnsError))]
+        public static async Task UpdateStatusAsync_CompleteOrderFailed_ReturnsError(
+            [Frozen] Mock<ICompleteOrderService> completeOrderServiceMock,
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            OrderItem orderItem,
+            Order order,
+            StatusModel model,
+            OrdersController controller)
+        {
+            order.AddOrUpdateOrderItem(orderItem);
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
+
+            Expression<Func<ICompleteOrderService, Task<Result>>> completeAsync = s => s.CompleteAsync(
+                It.Is<Order>(o => o.Equals(order)));
 
             var expectedErrorDetails = new ErrorDetails("Some error", "Some field name");
-            context.CompleteOrderResult = Result.Failure(expectedErrorDetails);
+            completeOrderServiceMock.Setup(completeAsync).ReturnsAsync(Result.Failure(expectedErrorDetails));
+            model.Status = OrderStatus.Complete.Name;
 
-            var response = await context.OrdersController.UpdateStatusAsync("Order", context.CompleteOrderStatusModel);
-            var actual = response.Result.As<BadRequestObjectResult>().Value;
+            var response = await controller.UpdateStatusAsync(callOffId, model);
+
+            response.Result.Should().BeOfType<BadRequestObjectResult>();
 
             var expected = new ErrorResponseModel
             {
                 Errors = new List<ErrorModel> { new(expectedErrorDetails.Id, expectedErrorDetails.Field) },
             };
 
-            actual.Should().BeEquivalentTo(expected);
+            response.Result.As<BadRequestObjectResult>().Value.Should().BeEquivalentTo(expected);
         }
 
-        private static (Order Order, OrderListItemModel ExpectedOrder) CreateOrderTestData(
-            string orderId,
-            Guid organisationId,
-            string description)
+        [Test]
+        [InMemoryDbAutoData(nameof(UpdateStatusAsync_OrderIsComplete_ReturnsNoContent))]
+        public static async Task UpdateStatusAsync_OrderIsComplete_ReturnsNoContent(
+            [Frozen] Mock<ICompleteOrderService> completeOrderServiceMock,
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            OrderItem orderItem,
+            Order order,
+            StatusModel model,
+            OrdersController controller)
         {
-            var repositoryOrder = OrderBuilder
-                .Create()
-                .WithOrderId(orderId)
-                .WithOrganisationId(organisationId)
-                .WithDescription(description)
-                .Build();
+            order.AddOrUpdateOrderItem(orderItem);
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
 
-            return (repositoryOrder, new OrderListItemModel
-            {
-                OrderId = repositoryOrder.OrderId,
-                Description = repositoryOrder.Description.Value,
-                Status = repositoryOrder.OrderStatus.Name,
-                DateCreated = repositoryOrder.Created,
-                LastUpdated = repositoryOrder.LastUpdated,
-                LastUpdatedBy = repositoryOrder.LastUpdatedByName,
-                OnlyGms = repositoryOrder.FundingSourceOnlyGms,
-            });
-        }
+            Expression<Func<ICompleteOrderService, Task<Result>>> completeAsync = s => s.CompleteAsync(
+                It.Is<Order>(o => o.Equals(order)));
 
-        private static (Order Order, OrderSummaryModel ExpectedSummary) CreateOrderSummaryTestData(
-            string orderId,
-            string description,
-            Guid organisationId)
-        {
-            var repositoryOrder = OrderBuilder
-                .Create()
-                .WithOrderId(orderId)
-                .WithDescription(description)
-                .WithOrganisationId(organisationId)
-                .Build();
+            completeOrderServiceMock.Setup(completeAsync).ReturnsAsync(Result.Success);
+            model.Status = OrderStatus.Complete.Name;
 
-            return (repositoryOrder, new OrderSummaryModel
-            {
-                OrderId = repositoryOrder.OrderId,
-                OrganisationId = repositoryOrder.OrganisationId,
-                Description = repositoryOrder.Description.Value,
-                Sections = new List<SectionModel>
-                    {
-                        SectionModel.Description.WithStatus(
-                            string.IsNullOrWhiteSpace(repositoryOrder.Description.Value)
-                                ? "incomplete"
-                                : "complete"),
-                        SectionModel.OrderingParty,
-                        SectionModel.Supplier,
-                        SectionModel.CatalogueSolutions,
-                        SectionModel.AssociatedServices,
-                        SectionModel.ServiceRecipients,
-                        SectionModel.CatalogueSolutions,
-                        SectionModel.AdditionalServices,
-                        SectionModel.FundingSource,
-                    },
-            });
-        }
+            var response = await controller.UpdateStatusAsync(callOffId, model);
 
-        private static (Order Order, OrderModel ExpectedOrder) CreateGetTestData(
-            string orderId,
-            Guid organisationId,
-            string odsCode)
-        {
-            var repositoryOrderItem = OrderItemBuilder.Create()
-                .WithOrderItemId(1)
-                .WithOdsCode(odsCode)
-                .Build();
-
-            var oneOffOrderItem = OrderItemBuilder.Create()
-                .WithOrderItemId(2)
-                .WithOdsCode(odsCode)
-                .WithCatalogueItemType(CatalogueItemType.AssociatedService)
-                .WithProvisioningType(ProvisioningType.Declarative)
-                .WithEstimationPeriod(null)
-                .WithPriceTimeUnit(null)
-                .Build();
-
-            var repositoryOrder = OrderBuilder.Create()
-                .WithOrderId(orderId)
-                .WithOrganisationId(organisationId)
-                .WithCompleted(DateTime.UtcNow)
-                .WithOrderItem(repositoryOrderItem)
-                .WithServiceInstanceId(repositoryOrderItem, 1)
-                .WithOrderItem(oneOffOrderItem)
-                .Build();
-
-            var serviceRecipients = new List<OdsOrganisation> { new(odsCode, "EU test") };
-            repositoryOrder.SetServiceRecipients(serviceRecipients, Guid.Empty, string.Empty);
-
-            const int monthsPerYear = 12;
-            var calculatedCostPerYear = repositoryOrder.CalculateCostPerYear(CostType.Recurring);
-            var totalOneOffCost = repositoryOrder.CalculateCostPerYear(CostType.OneOff);
-
-            static string GetServiceInstanceId(IEnumerable<ServiceInstanceItem> items, OrderItem orderItem) =>
-                items.FirstOrDefault(s => s.OrderItemId == orderItem.OrderItemId)?.ServiceInstanceId;
-
-            OrderItemModel OrderItemSelector(OrderItem orderItem) => new(
-                orderId,
-                orderItem,
-                GetServiceInstanceId(repositoryOrder.ServiceInstanceItems, orderItem));
-
-            return (repositoryOrder, new OrderModel
-            {
-                Description = repositoryOrder.Description.Value,
-                OrderParty = new OrderingPartyModel
-                {
-                    Name = repositoryOrder.OrganisationName,
-                    OdsCode = repositoryOrder.OrganisationOdsCode,
-                    Address = repositoryOrder.OrganisationAddress.ToModel(),
-                    PrimaryContact = repositoryOrder.OrganisationContact.ToModel(),
-                },
-                CommencementDate = repositoryOrder.CommencementDate,
-                Supplier = new SupplierModel
-                {
-                    Name = repositoryOrder.SupplierName,
-                    Address = repositoryOrder.SupplierAddress.ToModel(),
-                    PrimaryContact = repositoryOrder.SupplierContact.ToModel(),
-                },
-                TotalOneOffCost = totalOneOffCost,
-                TotalRecurringCostPerMonth = calculatedCostPerYear / monthsPerYear,
-                TotalRecurringCostPerYear = calculatedCostPerYear,
-                TotalOwnershipCost = repositoryOrder.CalculateTotalOwnershipCost(),
-                Status = repositoryOrder.OrderStatus.Name,
-                DateCompleted = repositoryOrder.Completed,
-                ServiceRecipients = repositoryOrder.ServiceRecipients.Select(serviceRecipient =>
-                    new ServiceRecipientModel
-                    {
-                        Name = serviceRecipient.Name,
-                        OdsCode = serviceRecipient.OdsCode,
-                    }),
-                OrderItems = repositoryOrder.OrderItems.Select(OrderItemSelector),
-            });
-        }
-
-        internal sealed class OrdersControllerTestContext
-        {
-            private OrdersControllerTestContext(Guid primaryOrganisationId)
-            {
-                Name = "Test User";
-                NameIdentity = Guid.NewGuid();
-                PrimaryOrganisationId = primaryOrganisationId;
-
-                Order = OrderBuilder.Create()
-                    .WithOrganisationId(PrimaryOrganisationId)
-                    .WithLastUpdated(DateTime.MinValue)
-                    .Build();
-
-                OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(r => r.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
-                OrderRepositoryMock.Setup(r => r.GetOrderByIdAsync(It.IsAny<string>(), It.IsAny<Action<IOrderQuery>>()))
-                    .ReturnsAsync(() => Order);
-
-                CreateOrderServiceMock = new Mock<ICreateOrderService>();
-                CreateOrderServiceMock.Setup(s => s.CreateAsync(It.IsAny<CreateOrderRequest>()))
-                    .ReturnsAsync(() => CreateOrderResult);
-
-                Orders = new List<Order>();
-                OrderRepositoryMock.Setup(r => r.ListOrdersByOrganisationIdAsync(It.IsAny<Guid>()))
-                    .ReturnsAsync(() => Orders);
-
-                ServiceRecipientRepositoryMock = new Mock<IServiceRecipientRepository>();
-                ServiceRecipientRepositoryMock
-                    .Setup(r => r.GetCountByOrderIdAsync(It.IsNotNull<string>()))
-                    .ReturnsAsync(() => ServiceRecipientListCount);
-
-                CompleteOrderServiceMock = new Mock<ICompleteOrderService>();
-                CompleteOrderServiceMock
-                    .Setup(s => s.CompleteAsync(It.IsNotNull<CompleteOrderRequest>()))
-                    .ReturnsAsync(() => CompleteOrderResult);
-
-                ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
-                    new[]
-                    {
-                        new Claim("Ordering", "Manage"),
-                        new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
-                        new Claim(ClaimTypes.Name, Name),
-                        new Claim(ClaimTypes.NameIdentifier, NameIdentity.ToString()),
-                    },
-                    "mock"));
-
-                OrdersController = OrdersControllerBuilder
-                    .Create()
-                    .WithOrderRepository(OrderRepositoryMock.Object)
-                    .WithServiceRecipientRepository(ServiceRecipientRepositoryMock.Object)
-                    .WithCreateOrderService(CreateOrderServiceMock.Object)
-                    .WithCompleteOrderService(CompleteOrderServiceMock.Object)
-                    .Build();
-
-                OrdersController.ControllerContext = new ControllerContext
-                {
-                    HttpContext = new DefaultHttpContext { User = ClaimsPrincipal },
-                };
-            }
-
-            internal StatusModel CompleteOrderStatusModel { get; } = new() { Status = "complete" };
-
-            internal string Name { get; }
-
-            internal Guid NameIdentity { get; }
-
-            internal Guid PrimaryOrganisationId { get; }
-
-            internal int ServiceRecipientListCount { get; set; }
-
-            internal Mock<IOrderRepository> OrderRepositoryMock { get; }
-
-            internal Mock<ICreateOrderService> CreateOrderServiceMock { get; }
-
-            internal Mock<IServiceRecipientRepository> ServiceRecipientRepositoryMock { get; }
-
-            internal Mock<ICompleteOrderService> CompleteOrderServiceMock { get; }
-
-            internal Result<string> CreateOrderResult { get; set; } = Result.Success("NewOrderId");
-
-            internal Result CompleteOrderResult { get; set; } = Result.Success();
-
-            internal IEnumerable<Order> Orders { get; set; }
-
-            internal Order Order { get; set; }
-
-            internal OrdersController OrdersController { get; }
-
-            private ClaimsPrincipal ClaimsPrincipal { get; }
-
-            internal static OrdersControllerTestContext Setup()
-            {
-                return new(Guid.NewGuid());
-            }
-
-            internal static OrdersControllerTestContext Setup(Guid primaryOrganisationId)
-            {
-                return new(primaryOrganisationId);
-            }
-        }
-
-        [SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Instantiated by test framework")]
-        private sealed class SummaryModelSectionTestCaseData
-        {
-            internal static IEnumerable<TestCaseData> OrderDescriptionSectionStatusCases
-            {
-                get
-                {
-                    var organisationId = Guid.NewGuid();
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSupplierContact(null)
-                            .WithOrganisationContact(null)
-                            .WithCommencementDate(null)
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(
-                                SectionModelListBuilder
-                                    .Create()
-                                    .WithDescription(SectionModel.Description.WithStatus("complete"))
-                                    .Build())
-                            .Build());
-                }
-            }
-
-            internal static IEnumerable<TestCaseData> OrderingPartySectionStatusCases
-            {
-                get
-                {
-                    var organisationId = Guid.NewGuid();
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithOrganisationContact(ContactBuilder.Create().Build())
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create()
-                                .WithOrderingParty(SectionModel.OrderingParty.WithStatus("complete"))
-                                .Build())
-                            .Build());
-                }
-            }
-
-            internal static IEnumerable<TestCaseData> SupplierSectionStatusCases
-            {
-                get
-                {
-                    var organisationId = Guid.NewGuid();
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSupplierContact(ContactBuilder.Create().Build())
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create()
-                                .WithSupplier(SectionModel.Supplier.WithStatus("complete"))
-                                .Build())
-                            .Build());
-                }
-            }
-
-            internal static IEnumerable<TestCaseData> CommencementDateSectionStatusCases
-            {
-                get
-                {
-                    var organisationId = Guid.NewGuid();
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithCommencementDate(DateTime.UtcNow)
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create()
-                                .WithCommencementDate(SectionModel.CommencementDate.WithStatus("complete"))
-                                .Build())
-                            .Build());
-                }
-            }
-
-            internal static IEnumerable<TestCaseData> ServiceRecipientsSectionStatusCases
-            {
-                get
-                {
-                    var organisationId = Guid.NewGuid();
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithServiceRecipientsViewed(true)
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create()
-                                .WithServiceRecipients(
-                                    SectionModel
-                                        .ServiceRecipients
-                                        .WithStatus("complete")
-                                        .WithCount(0))
-                                .Build())
-                            .Build());
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithServiceRecipientsViewed(false)
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder
-                                .Create()
-                                .WithServiceRecipients(
-                                    SectionModel
-                                        .ServiceRecipients
-                                        .WithStatus("incomplete")
-                                        .WithCount(0))
-                                .Build())
-                            .Build());
-                }
-            }
-
-            internal static IEnumerable<TestCaseData> AdditionalServicesSectionStatusCases
-            {
-                get
-                {
-                    var organisationId = Guid.NewGuid();
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithAdditionalServicesViewed(true)
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create()
-                                .WithAdditionalServices(SectionModel.AdditionalServices
-                                    .WithStatus("complete")
-                                    .WithCount(0))
-                                .Build())
-                            .Build());
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithAdditionalServicesViewed(false)
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create()
-                                .WithAdditionalServices(SectionModel.AdditionalServices
-                                    .WithStatus("incomplete")
-                                    .WithCount(0))
-                                .Build())
-                            .Build());
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithAdditionalServicesViewed(true)
-                            .WithOrderItem(OrderItemBuilder.Create()
-                                .WithCatalogueItemType(CatalogueItemType.AdditionalService)
-                                .Build())
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create()
-                                .WithAdditionalServices(SectionModel.AdditionalServices
-                                    .WithStatus("complete")
-                                    .WithCount(1))
-                                .Build())
-                            .Build());
-                }
-            }
-
-            internal static IEnumerable<TestCaseData> CatalogueSolutionsSectionStatusCases
-            {
-                get
-                {
-                    var organisationId = Guid.NewGuid();
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithCatalogueSolutionsViewed(true)
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create()
-                                .WithCatalogueSolutions(SectionModel.CatalogueSolutions
-                                    .WithStatus("complete")
-                                    .WithCount(0))
-                                .Build())
-                            .Build());
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithCatalogueSolutionsViewed(false)
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create()
-                                .WithCatalogueSolutions(SectionModel.CatalogueSolutions
-                                    .WithStatus("incomplete")
-                                    .WithCount(0))
-                                .Build())
-                            .Build());
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithCatalogueSolutionsViewed(true)
-                            .WithOrderItem(OrderItemBuilder.Create()
-                                .WithCatalogueItemType(CatalogueItemType.Solution)
-                                .Build())
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create()
-                                .WithCatalogueSolutions(SectionModel.CatalogueSolutions
-                                    .WithStatus("complete")
-                                    .WithCount(1))
-                                .Build())
-                            .Build());
-                }
-            }
-
-            internal static IEnumerable<TestCaseData> AssociatedServicesSectionStatusCases
-            {
-                get
-                {
-                    var organisationId = Guid.NewGuid();
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithAssociatedServicesViewed(true)
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create()
-                                .WithAssociatedServices(SectionModel.AssociatedServices
-                                    .WithStatus("complete")
-                                    .WithCount(0))
-                                .Build())
-                            .Build());
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithAssociatedServicesViewed(false)
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create()
-                                .WithAssociatedServices(SectionModel.AssociatedServices
-                                    .WithStatus("incomplete")
-                                    .WithCount(0))
-                                .Build())
-                            .Build());
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithAssociatedServicesViewed(true)
-                            .WithOrderItem(OrderItemBuilder.Create()
-                                .WithCatalogueItemType(CatalogueItemType.AssociatedService)
-                                .Build())
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create()
-                                .WithAssociatedServices(SectionModel.AssociatedServices
-                                    .WithStatus("complete")
-                                    .WithCount(1))
-                                .Build())
-                            .Build());
-                }
-            }
-
-            internal static IEnumerable<TestCaseData> FundingStatusCases
-            {
-                get
-                {
-                    var organisationId = Guid.NewGuid();
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithFundingSourceOnlyGms(true)
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create()
-                                .WithFundingSource(SectionModel.FundingSource
-                                    .WithStatus("complete"))
-                                .Build())
-                            .Build());
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithFundingSourceOnlyGms(false)
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create()
-                                .WithFundingSource(SectionModel.FundingSource
-                                    .WithStatus("complete"))
-                                .Build())
-                            .Build());
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithFundingSourceOnlyGms(null)
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create()
-                                .WithFundingSource(SectionModel.FundingSource
-                                    .WithStatus("incomplete"))
-                                .Build())
-                            .Build());
-                }
-            }
-
-            internal static IEnumerable<TestCaseData> SectionStatusCases
-            {
-                get
-                {
-                    var organisationId = Guid.NewGuid();
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithCatalogueSolutionsViewed(false)
-                            .WithServiceRecipientsViewed(false)
-                            .WithAssociatedServicesViewed(false)
-                            .WithFundingSourceOnlyGms(null)
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create()
-                                .WithCatalogueSolutions(SectionModel.CatalogueSolutions
-                                    .WithStatus("incomplete")
-                                    .WithCount(0))
-                                .WithFundingSource(SectionModel.FundingSource.WithStatus("incomplete"))
-                                .Build())
-                            .WithSectionStatus("incomplete")
-                            .Build());
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithCatalogueSolutionsViewed(true)
-                            .WithOrderItem(OrderItemBuilder.Create().WithCatalogueItemType(CatalogueItemType.Solution).Build())
-                            .WithServiceRecipientsViewed(true)
-                            .WithAssociatedServicesViewed(true)
-                            .WithFundingSourceOnlyGms(true)
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create()
-                                .WithCatalogueSolutions(SectionModel.CatalogueSolutions.WithStatus("complete").WithCount(1))
-                                .WithServiceRecipients(SectionModel.ServiceRecipients.WithStatus("complete").WithCount(0))
-                                .WithAssociatedServices(SectionModel.AssociatedServices.WithStatus("complete").WithCount(0))
-                                .WithFundingSource(SectionModel.FundingSource.WithStatus("complete"))
-                                .Build())
-                            .WithSectionStatus("complete")
-                            .Build());
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithCatalogueSolutionsViewed(true)
-                            .WithOrderItem(OrderItemBuilder.Create().WithCatalogueItemType(CatalogueItemType.Solution).Build())
-                            .WithServiceRecipientsViewed(true)
-                            .WithAssociatedServicesViewed(true)
-                            .WithOrderItem(OrderItemBuilder.Create().WithCatalogueItemType(CatalogueItemType.AssociatedService).Build())
-                            .WithFundingSourceOnlyGms(true)
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create()
-                                .WithCatalogueSolutions(SectionModel.CatalogueSolutions
-                                    .WithStatus("complete")
-                                    .WithCount(1))
-                                .WithServiceRecipients(SectionModel.ServiceRecipients.WithStatus("complete").WithCount(0))
-                                .WithAssociatedServices(SectionModel.AssociatedServices.WithStatus("complete").WithCount(1))
-                                .WithFundingSource(SectionModel.FundingSource.WithStatus("complete"))
-                                .Build())
-                            .WithSectionStatus("complete")
-                            .Build());
-
-                    yield return new TestCaseData(
-                        OrderBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithCatalogueSolutionsViewed(true)
-                            .WithServiceRecipientsViewed(true)
-                            .WithServiceRecipient("ODS1", "Recipient1")
-                            .WithAssociatedServicesViewed(true)
-                            .WithOrderItem(OrderItemBuilder.Create().WithCatalogueItemType(CatalogueItemType.AssociatedService).Build())
-                            .WithFundingSourceOnlyGms(true)
-                            .Build(),
-                        OrderSummaryModelBuilder
-                            .Create()
-                            .WithOrganisationId(organisationId)
-                            .WithSections(SectionModelListBuilder.Create()
-                                .WithCatalogueSolutions(SectionModel.CatalogueSolutions
-                                    .WithStatus("complete")
-                                    .WithCount(0))
-                                .WithServiceRecipients(SectionModel.ServiceRecipients.WithStatus("complete").WithCount(1))
-                                .WithAssociatedServices(SectionModel.AssociatedServices.WithStatus("complete").WithCount(1))
-                                .WithFundingSource(SectionModel.FundingSource.WithStatus("complete"))
-                                .Build())
-                            .WithSectionStatus("complete")
-                            .Build());
-                }
-            }
+            response.Result.Should().BeOfType<NoContentResult>();
         }
     }
 }

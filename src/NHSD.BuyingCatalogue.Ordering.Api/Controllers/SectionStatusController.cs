@@ -5,12 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
-using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -23,50 +22,46 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     {
         private static readonly Dictionary<string, Action<Order>> CompleteSectionActionsDictionary = new()
         {
-            { SectionModel.CatalogueSolutions.Id, o => o.CatalogueSolutionsViewed = true },
-            { SectionModel.AdditionalServices.Id, o => o.AdditionalServicesViewed = true },
-            { SectionModel.AssociatedServices.Id, o => o.AssociatedServicesViewed = true },
+            { SectionModel.CatalogueSolutions.Id, o => o.Progress.CatalogueSolutionsViewed = true },
+            { SectionModel.AdditionalServices.Id, o => o.Progress.AdditionalServicesViewed = true },
+            { SectionModel.AssociatedServices.Id, o => o.Progress.AssociatedServicesViewed = true },
         };
 
-        private readonly IOrderRepository orderRepository;
+        private readonly ApplicationDbContext context;
 
-        public SectionStatusController(IOrderRepository orderRepository)
+        public SectionStatusController(ApplicationDbContext context)
         {
-            this.orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         [HttpPut]
-        [Route("{orderId}/sections/{sectionId}")]
+        [Route("{callOffId}/sections/{sectionId}")]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult> UpdateStatusAsync(string orderId, string sectionId, UpdateOrderSectionModel sectionStatus)
+        public async Task<IActionResult> UpdateStatusAsync(
+            [FromRoute] Order order,
+            string sectionId,
+            UpdateOrderSectionModel sectionStatus)
         {
             if (sectionStatus is null)
-            {
                 throw new ArgumentNullException(nameof(sectionStatus));
-            }
 
-            var order = await orderRepository.GetOrderByIdAsync(orderId);
+            if (sectionId is null)
+                throw new ArgumentNullException(nameof(sectionId));
 
             if (order is null)
-            {
                 return NotFound();
-            }
 
             if (CompleteSectionActionsDictionary.ContainsKey(sectionId))
             {
                 if (sectionStatus.Status == "complete")
-                {
                     CompleteSectionActionsDictionary[sectionId](order);
-                }
             }
             else
             {
                 return Forbid();
             }
 
-            order.SetLastUpdatedBy(User.GetUserId(), User.GetUserName());
-
-            await orderRepository.UpdateOrderAsync(order);
+            await context.SaveChangesAsync();
 
             return NoContent();
         }

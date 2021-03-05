@@ -1,168 +1,140 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Security.Claims;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
+using AutoFixture;
+using AutoFixture.AutoMoq;
+using AutoFixture.Idioms;
+using AutoFixture.NUnit3;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
-using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
-using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
+using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
-    [Parallelizable(ParallelScope.All)]
+    [Parallelizable(ParallelScope.Children)]
+    [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class SectionStatusControllerTests
     {
         [Test]
-        public static void Constructor_NullParameter_ThrowsArgumentNullException()
+        public static void Constructors_VerifyGuardClauses()
         {
-            var sectionControllerBuilder = SectionStatusControllerBuilder
-                .Create()
-                .WithOrderRepository(null);
+            var fixture = new Fixture().Customize(new AutoMoqCustomization());
+            var assertion = new GuardClauseAssertion(fixture);
+            var constructors = typeof(SectionStatusController).GetConstructors();
 
-            Assert.Throws<ArgumentNullException>(() => sectionControllerBuilder.Build());
+            assertion.Verify(constructors);
         }
 
         [Test]
-        public static async Task UpdateStatusAsync_OrderDoesNotExist_ReturnsNotFound()
+        [InMemoryDbAutoData(nameof(UpdateStatusAsync_SectionStatusIsNull_ThrowsArgumentNullException))]
+        public static void UpdateStatusAsync_SectionStatusIsNull_ThrowsArgumentNullException(
+            Order order,
+            string sectionId,
+            SectionStatusController controller)
         {
-            var context = SectionStatusControllerTestContext.Setup();
-
-            var response =
-                await context.SectionStatusController.UpdateStatusAsync("INVALID", SectionModel.AdditionalServices.Id, new UpdateOrderSectionModel { Status = "complete" });
-            response.Should().BeOfType<NotFoundResult>();
+            Assert.ThrowsAsync<ArgumentNullException>(
+                async () => await controller.UpdateStatusAsync(order, sectionId, null));
         }
 
         [Test]
-        public static async Task UpdateStatusAsync_WrongSectionId_ReturnsForbidden()
+        [InMemoryDbAutoData(nameof(UpdateStatusAsync_SectionIdIsNull_ThrowsArgumentNullException))]
+        public static void UpdateStatusAsync_SectionIdIsNull_ThrowsArgumentNullException(
+            Order order,
+            UpdateOrderSectionModel model,
+            SectionStatusController controller)
         {
-            var context = SectionStatusControllerTestContext.Setup();
-
-            const string orderId = "C0000014-01";
-            context.Order = CreateGetTestData(orderId, context.PrimaryOrganisationId, "ods");
-
-            var response = await context.SectionStatusController.UpdateStatusAsync(orderId, "unknown-section", new UpdateOrderSectionModel { Status = "complete" });
-            response.Should().BeOfType<ForbidResult>();
+            Assert.ThrowsAsync<ArgumentNullException>(
+                async () => await controller.UpdateStatusAsync(order, null, model));
         }
 
-        [TestCase("additional-services")]
-        [TestCase("catalogue-solutions")]
-        [TestCase("associated-services")]
-        public static async Task UpdateStatusAsync_CorrectSectionId_ReturnsNoContentResult(string sectionName)
+        [Test]
+        [InMemoryDbAutoData(nameof(UpdateStatusAsync_OrderIsNull_ReturnsNotFound))]
+        public static async Task UpdateStatusAsync_OrderIsNull_ReturnsNotFound(
+            string sectionId,
+            UpdateOrderSectionModel model,
+            SectionStatusController controller)
         {
-            var context = SectionStatusControllerTestContext.Setup();
+            var result = await controller.UpdateStatusAsync(null, sectionId, model);
 
-            const string orderId = "C0000014-01";
-            context.Order = CreateGetTestData(orderId, context.PrimaryOrganisationId, "ods");
-
-            var response = await context.SectionStatusController.UpdateStatusAsync(orderId, sectionName, new UpdateOrderSectionModel { Status = "complete" });
-            response.Should().BeOfType<NoContentResult>();
+            result.Should().BeOfType<NotFoundResult>();
         }
 
-        [TestCase("additional-services", true, false, false)]
-        [TestCase("catalogue-solutions", false, true, false)]
-        [TestCase("associated-services", false, false, true)]
+        [Test]
+        [InMemoryDbAutoData(nameof(UpdateStatusAsync_WrongSectionId_ReturnsForbidden))]
+        public static async Task UpdateStatusAsync_WrongSectionId_ReturnsForbidden(
+            Order order,
+            string sectionId,
+            UpdateOrderSectionModel model,
+            SectionStatusController controller)
+        {
+            var result = await controller.UpdateStatusAsync(order, sectionId, model);
+
+            result.Should().BeOfType<ForbidResult>();
+        }
+
+        [Test]
+        [InMemoryDbInlineAutoData(nameof(UpdateStatusAsync_WithSectionId_UpdatesTheSelectedStatus), "additional-services", true, false, false)]
+        [InMemoryDbInlineAutoData(nameof(UpdateStatusAsync_WithSectionId_UpdatesTheSelectedStatus), "catalogue-solutions", false, true, false)]
+        [InMemoryDbInlineAutoData(nameof(UpdateStatusAsync_WithSectionId_UpdatesTheSelectedStatus), "associated-services", false, false, true)]
         public static async Task UpdateStatusAsync_WithSectionId_UpdatesTheSelectedStatus(
             string sectionId,
             bool additionalServicesViewed,
             bool catalogueSolutionsViewed,
-            bool associatedServicesViewed)
+            bool associatedServicesViewed,
+            Order order,
+            SectionStatusController controller)
         {
-            var context = SectionStatusControllerTestContext.Setup();
+            order.Progress.AdditionalServicesViewed = false;
+            order.Progress.AssociatedServicesViewed = false;
+            order.Progress.CatalogueSolutionsViewed = false;
+            order.Progress.ServiceRecipientsViewed = false;
 
-            const string orderId = "C0000014-01";
-            context.Order = CreateGetTestData(orderId, context.PrimaryOrganisationId, "ods");
+            await controller.UpdateStatusAsync(order, sectionId, new UpdateOrderSectionModel { Status = "complete" });
 
-            await context.SectionStatusController.UpdateStatusAsync(orderId, sectionId, new UpdateOrderSectionModel { Status = "complete" });
-
-            context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o => o.AdditionalServicesViewed == additionalServicesViewed)));
-            context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o => o.CatalogueSolutionsViewed == catalogueSolutionsViewed)));
-            context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o => o.AssociatedServicesViewed == associatedServicesViewed)));
-            context.OrderRepositoryMock.Verify(u => u.UpdateOrderAsync(It.Is<Order>(o => o.ServiceRecipientsViewed == false)));
+            order.Progress.AdditionalServicesViewed.Should().Be(additionalServicesViewed);
+            order.Progress.AssociatedServicesViewed.Should().Be(associatedServicesViewed);
+            order.Progress.CatalogueSolutionsViewed.Should().Be(catalogueSolutionsViewed);
+            order.Progress.ServiceRecipientsViewed.Should().BeFalse();
         }
 
-        private static Order CreateGetTestData(string orderId, Guid organisationId, string odsCode)
+        [Test]
+        [InMemoryDbAutoData(nameof(UpdateStatusAsync_WithSectionId_UpdatesDb))]
+        public static async Task UpdateStatusAsync_WithSectionId_UpdatesDb(
+            [Frozen] ApplicationDbContext context,
+            Order order,
+            SectionStatusController controller)
         {
-            var repositoryOrderItem = OrderItemBuilder.Create()
-                .WithOdsCode(odsCode)
-                .Build();
+            order.Progress.CatalogueSolutionsViewed = false;
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
 
-            var repositoryOrder = OrderBuilder.Create()
-                .WithOrderId(orderId)
-                .WithOrganisationId(organisationId)
-                .WithOrderItem(repositoryOrderItem)
-                .WithServiceRecipient(odsCode, "EU test")
-                .Build();
+            await controller.UpdateStatusAsync(
+                order,
+                "catalogue-solutions",
+                new UpdateOrderSectionModel { Status = "complete" });
 
-            return repositoryOrder;
+            context.Set<Order>().First().Progress.CatalogueSolutionsViewed.Should().BeTrue();
         }
 
-        internal sealed class SectionStatusControllerTestContext
+        [Test]
+        [InMemoryDbAutoData(nameof(UpdateStatusAsync_CorrectSectionId_ReturnsNoContentResult))]
+        public static async Task UpdateStatusAsync_CorrectSectionId_ReturnsNoContentResult(
+            Order order,
+            SectionStatusController controller)
         {
-            private SectionStatusControllerTestContext(Guid primaryOrganisationId)
-            {
-                Name = "Test User";
-                NameIdentity = Guid.NewGuid();
-                PrimaryOrganisationId = primaryOrganisationId;
-                OrderRepositoryMock = new Mock<IOrderRepository>();
+            var response = await controller.UpdateStatusAsync(
+                order,
+                "catalogue-solutions",
+                new UpdateOrderSectionModel { Status = "complete" });
 
-                Orders = new List<Order>();
-                OrderRepositoryMock
-                    .Setup(r => r.ListOrdersByOrganisationIdAsync(It.IsAny<Guid>()))
-                    .ReturnsAsync(() => Orders);
-
-                OrderRepositoryMock.Setup(r => r.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
-
-                OrderRepositoryMock.Setup(r => r.UpdateOrderAsync(It.IsAny<Order>()));
-
-                ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
-                    new[]
-                    {
-                        new Claim("Ordering", "Manage"),
-                        new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
-                        new Claim(ClaimTypes.Name, Name),
-                        new Claim(ClaimTypes.NameIdentifier, NameIdentity.ToString()),
-                    },
-                    "mock"));
-
-                SectionStatusController = SectionStatusControllerBuilder
-                    .Create()
-                    .WithOrderRepository(OrderRepositoryMock.Object)
-                    .Build();
-
-                SectionStatusController.ControllerContext = new ControllerContext
-                {
-                    HttpContext = new DefaultHttpContext { User = ClaimsPrincipal },
-                };
-            }
-
-            internal string Name { get; }
-
-            internal Guid NameIdentity { get; }
-
-            internal Guid PrimaryOrganisationId { get; }
-
-            internal Mock<IOrderRepository> OrderRepositoryMock { get; }
-
-            internal IEnumerable<Order> Orders { get; set; }
-
-            internal Order Order { get; set; }
-
-            internal SectionStatusController SectionStatusController { get; }
-
-            private ClaimsPrincipal ClaimsPrincipal { get; }
-
-            internal static SectionStatusControllerTestContext Setup() => new(Guid.NewGuid());
-
-            internal static SectionStatusControllerTestContext Setup(Guid primaryOrganisationId) => new(primaryOrganisationId);
+            response.Should().BeOfType<NoContentResult>();
         }
     }
 }
