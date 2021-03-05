@@ -5,6 +5,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
     public sealed class OrderItemModel
     {
+        public OrderItemModel()
+        {
+        }
+
         internal OrderItemModel(OrderItem orderItem, IReadOnlyList<ExtendedOrderItemRecipientModel> recipients)
         {
             CataloguePriceType = orderItem.CataloguePriceType.ToString();

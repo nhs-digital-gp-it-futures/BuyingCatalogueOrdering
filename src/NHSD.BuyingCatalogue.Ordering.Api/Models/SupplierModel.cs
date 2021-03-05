@@ -1,28 +1,28 @@
-﻿using System;
-using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
+﻿using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
     public sealed class SupplierModel
     {
-        public SupplierModel(Supplier supplier, Contact contact)
+        public SupplierModel()
         {
-            if (supplier is null)
-                throw new ArgumentNullException(nameof(supplier));
-
-            SupplierId = supplier.Id;
-            Name = supplier.Name;
-            Address = supplier.Address.ToModel();
-            PrimaryContact = contact.ToModel();
         }
 
-        public string SupplierId { get; }
+        internal SupplierModel(Supplier supplier, Contact contact)
+        {
+            SupplierId = supplier?.Id;
+            Name = supplier?.Name;
+            Address = supplier?.Address.ToModel();
+            PrimaryContact = contact?.ToModel();
+        }
 
-        public string Name { get; }
+        public string SupplierId { get; init; }
 
-        public AddressModel Address { get; }
+        public string Name { get; init; }
 
-        public PrimaryContactModel PrimaryContact { get; }
+        public AddressModel Address { get; init; }
+
+        public PrimaryContactModel PrimaryContact { get; init; }
     }
 }

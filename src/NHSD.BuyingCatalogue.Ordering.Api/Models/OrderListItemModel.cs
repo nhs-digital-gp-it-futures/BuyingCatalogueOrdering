@@ -6,6 +6,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
     public sealed class OrderListItemModel
     {
+        public OrderListItemModel()
+        {
+        }
+
         internal OrderListItemModel(Order order)
         {
             OrderId = order.CallOffId.ToString();

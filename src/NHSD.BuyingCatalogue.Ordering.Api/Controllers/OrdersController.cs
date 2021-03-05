@@ -129,7 +129,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             return CreatedAtAction(
                 nameof(GetAsync).TrimAsync(),
                 new { callOffId = order.CallOffId.ToString() },
-                null);
+                new { orderId = order.CallOffId.ToString() });
         }
 
         [HttpDelete]

@@ -7,7 +7,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
     public sealed class GetOrderItemModel
     {
-        public GetOrderItemModel(OrderItem orderItem)
+        public GetOrderItemModel()
+        {
+        }
+
+        internal GetOrderItemModel(OrderItem orderItem)
         {
             if (orderItem is null)
                 throw new ArgumentNullException(nameof(orderItem));
@@ -30,28 +34,28 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
             Type = orderItem.CataloguePriceType.ToString();
         }
 
-        public string CatalogueItemId { get; }
+        public string CatalogueItemId { get; init; }
 
-        public string CatalogueItemType { get; }
+        public string CatalogueItemType { get; init; }
 
-        public string CatalogueItemName { get; }
+        public string CatalogueItemName { get; init; }
 
-        public string CurrencyCode { get; }
+        public string CurrencyCode { get; init; }
 
-        public DateTime? DefaultDeliveryDate { get; }
+        public DateTime? DefaultDeliveryDate { get; init; }
 
-        public string EstimationPeriod { get; }
+        public string EstimationPeriod { get; init; }
 
-        public ItemUnitModel ItemUnit { get; }
+        public ItemUnitModel ItemUnit { get; init; }
 
-        public decimal? Price { get; }
+        public decimal? Price { get; init; }
 
-        public string ProvisioningType { get; }
+        public string ProvisioningType { get; init; }
 
-        public IReadOnlyCollection<OrderItemRecipientModel> ServiceRecipients { get; }
+        public IReadOnlyCollection<OrderItemRecipientModel> ServiceRecipients { get; init; }
 
-        public TimeUnitModel TimeUnit { get; }
+        public TimeUnitModel TimeUnit { get; init; }
 
-        public string Type { get; }
+        public string Type { get; init; }
     }
 }

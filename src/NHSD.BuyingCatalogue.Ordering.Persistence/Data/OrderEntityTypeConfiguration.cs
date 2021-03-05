@@ -25,6 +25,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
 
             builder.Property(o => o.FundingSourceOnlyGms).HasColumnName("FundingSourceOnlyGMS");
             builder.Property(o => o.LastUpdated).HasDefaultValueSql("(getutcdate())");
+            builder.Property(o => o.LastUpdatedBy);
             builder.Property(o => o.LastUpdatedByName).HasMaxLength(256);
             builder.Property(o => o.Revision).HasDefaultValueSql("((1))");
             builder.Property(o => o.OrderStatus)
