@@ -2,111 +2,108 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Validation;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
-using NHSD.BuyingCatalogue.Ordering.Application.Services;
 using NHSD.BuyingCatalogue.Ordering.Domain;
-using NHSD.BuyingCatalogue.Ordering.Domain.Results;
+using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 {
-    public sealed class CreateOrderItemService : ICreateOrderItemService
+    internal sealed class CreateOrderItemService : ICreateOrderItemService
     {
-        private readonly IOrderRepository orderRepository;
-        private readonly IIdentityService identityService;
-        private readonly IOrderItemFactory orderItemFactory;
+        private readonly ApplicationDbContext context;
         private readonly ICreateOrderItemValidator orderItemValidator;
+        private readonly IServiceRecipientService serviceRecipientService;
 
         public CreateOrderItemService(
-            IOrderRepository orderRepository,
-            IIdentityService identityService,
-            IOrderItemFactory orderItemFactory,
-            ICreateOrderItemValidator orderItemValidator)
+            ApplicationDbContext context,
+            ICreateOrderItemValidator orderItemValidator,
+            IServiceRecipientService serviceRecipientService)
         {
-            this.orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
-            this.identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
-            this.orderItemFactory = orderItemFactory ?? throw new ArgumentNullException(nameof(orderItemFactory));
+            this.context = context ?? throw new ArgumentNullException(nameof(context));
             this.orderItemValidator = orderItemValidator ?? throw new ArgumentNullException(nameof(orderItemValidator));
+            this.serviceRecipientService = serviceRecipientService ?? throw new ArgumentNullException(nameof(serviceRecipientService));
         }
 
-        public async Task<Result<int>> CreateAsync(CreateOrderItemRequest request)
+        public async Task<AggregateValidationResult> CreateAsync(Order order, CatalogueItemId catalogueItemId, CreateOrderItemModel model)
         {
-            if (request is null)
-                throw new ArgumentNullException(nameof(request));
+            var catalogueItemType = Enum.Parse<CatalogueItemType>(model.CatalogueItemType, true);
 
-            var validationResult = orderItemValidator.Validate(request);
-            if (!validationResult.Success)
-            {
-                return Result.Failure<int>(validationResult.Errors);
-            }
-
-            var catalogueItemType = request.CatalogueItemType;
-            var provisioningType = request.ProvisioningType;
-            var cataloguePriceUnit = CataloguePriceUnit.Create(request.CataloguePriceUnitTierName, request.CataloguePriceUnitDescription);
-
-            var priceTimeUnit = request.PriceTimeUnit;
-            var estimationPeriod = catalogueItemType.InferEstimationPeriod(provisioningType, request.EstimationPeriod);
-
-            var orderItem = new OrderItem(
-                request.OdsCode,
-                request.CatalogueItemId,
-                catalogueItemType,
-                request.CatalogueItemName,
-                request.CatalogueSolutionId,
-                provisioningType,
-                request.CataloguePriceType,
-                cataloguePriceUnit,
-                priceTimeUnit,
-                request.CurrencyCode,
-                request.Quantity,
-                estimationPeriod,
-                request.DeliveryDate,
-                request.Price);
-
-            Order order = request.Order;
-            order.AddOrderItem(
-                orderItem,
-                identityService.GetUserIdentity(),
-                identityService.GetUserName());
-
-            await orderRepository.UpdateOrderAsync(order);
-
-            return Result.Success(orderItem.OrderItemId);
-        }
-
-        public async Task<AggregateValidationResult> CreateAsync(Order order, IReadOnlyList<CreateOrderItemRequest> model)
-        {
-            if (order is null)
-                throw new ArgumentNullException(nameof(order));
-
-            if (model is null)
-                throw new ArgumentNullException(nameof(model));
-
-            var aggregateValidationResult = orderItemValidator.Validate(model, order.OrderItems);
+            var aggregateValidationResult = orderItemValidator.Validate(order, model, catalogueItemType);
             if (!aggregateValidationResult.Success)
                 return aggregateValidationResult;
 
-            order.MergeOrderItems(CreateOrderItemMerge(model));
-            await orderRepository.UpdateOrderAsync(order);
+            var catalogueItem = await AddOrUpdateCatalogueItem(catalogueItemId, model, catalogueItemType);
+            var serviceRecipients = await AddOrUpdateServiceRecipients(model);
+            var pricingUnit = await AddOrUpdatePricingUnit(model);
+
+            var defaultDeliveryDate = order.DefaultDeliveryDates.SingleOrDefault(d => d.CatalogueItemId == catalogueItemId);
+            var provisioningType = Enum.Parse<ProvisioningType>(model.ProvisioningType, true);
+            var estimationPeriod = catalogueItem.CatalogueItemType.InferEstimationPeriod(
+                provisioningType,
+                OrderingEnums.ParseTimeUnit(model.EstimationPeriod));
+
+            var item = order.AddOrUpdateOrderItem(new OrderItem
+            {
+                CatalogueItem = catalogueItem,
+                CataloguePriceType = Enum.Parse<CataloguePriceType>(model.Type, true),
+                CurrencyCode = model.CurrencyCode,
+                DefaultDeliveryDate = defaultDeliveryDate?.DeliveryDate,
+                EstimationPeriod = estimationPeriod,
+                Price = model.Price,
+                PricingUnit = pricingUnit,
+                PriceTimeUnit = model.TimeUnit.ToTimeUnit(),
+                ProvisioningType = Enum.Parse<ProvisioningType>(model.ProvisioningType, true),
+            });
+
+            item.SetRecipients(model.ServiceRecipients.Select(r => new OrderItemRecipient
+            {
+                DeliveryDate = r.DeliveryDate,
+                Quantity = r.Quantity.GetValueOrDefault(),
+                Recipient = serviceRecipients[r.OdsCode],
+            }));
+
+            if (defaultDeliveryDate is not null)
+                context.DefaultDeliveryDate.Remove(defaultDeliveryDate);
+
+            await context.SaveChangesAsync();
 
             return aggregateValidationResult;
         }
 
-        private OrderItemMerge CreateOrderItemMerge(IReadOnlyList<CreateOrderItemRequest> requests)
+        private async Task<CatalogueItem> AddOrUpdateCatalogueItem(
+            CatalogueItemId catalogueItemId,
+            CreateOrderItemModel model,
+            CatalogueItemType catalogueItemType)
         {
-            var serviceRecipients = requests.Select(r => r.ServiceRecipient).Where(r => r is not null);
-            (Guid id, string name) = identityService.GetUserInfo();
-
-            var orderItemsToMerge = new OrderItemMerge(serviceRecipients, id, name);
-
-            if (!orderItemsToMerge.AddOrderItems(requests.Select(r => orderItemFactory.Create(r))))
+            var parentCatalogueItem = await context.FindAsync<CatalogueItem>(model.CatalogueSolutionId);
+            var catalogueItem = await context.FindAsync<CatalogueItem>(catalogueItemId) ?? new CatalogueItem
             {
-                // This should never happen under normal circumstances
-                // as validation should prevent it
-                throw new InvalidOperationException("Duplicate order item IDs exist.");
-            }
+                Id = catalogueItemId,
+                CatalogueItemType = catalogueItemType,
+            };
 
-            return orderItemsToMerge;
+            catalogueItem.Name = model.CatalogueItemName;
+            catalogueItem.ParentCatalogueItemId = parentCatalogueItem.Id;
+
+            return catalogueItem;
+        }
+
+        private async Task<PricingUnit> AddOrUpdatePricingUnit(CreateOrderItemModel model)
+        {
+            var pricingUnit = await context.FindAsync<PricingUnit>(model.ItemUnit.Name) ?? new PricingUnit
+            {
+                Name = model.ItemUnit.Name,
+            };
+
+            pricingUnit.Description = model.ItemUnit.Description;
+
+            return pricingUnit;
+        }
+
+        private async Task<IReadOnlyDictionary<string, ServiceRecipient>> AddOrUpdateServiceRecipients(CreateOrderItemModel model)
+        {
+            return await serviceRecipientService.AddOrUpdateServiceRecipients(model.ServiceRecipients);
         }
     }
 }
