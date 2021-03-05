@@ -1,13 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using AutoFixture.NUnit3;
+using FluentAssertions;
 using FluentValidation;
 using FluentValidation.TestHelper;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Api.Validation;
+using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
 {
@@ -22,9 +27,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [OrderingInlineAutoData(null)]
-        [OrderingInlineAutoData("")]
-        [OrderingInlineAutoData("\t")]
+        [CommonInlineAutoData(null)]
+        [CommonInlineAutoData("")]
+        [CommonInlineAutoData("\t")]
         public static void Validate_CatalogueItemTypeIsEmpty_HasError(
             string catalogueItemType,
             CreateOrderItemModelValidator validator)
@@ -45,9 +50,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [OrderingInlineAutoData(nameof(CatalogueItemType.AdditionalService))]
-        [OrderingInlineAutoData(nameof(CatalogueItemType.AssociatedService))]
-        [OrderingInlineAutoData(nameof(CatalogueItemType.Solution))]
+        [CommonInlineAutoData(nameof(CatalogueItemType.AdditionalService))]
+        [CommonInlineAutoData(nameof(CatalogueItemType.AssociatedService))]
+        [CommonInlineAutoData(nameof(CatalogueItemType.Solution))]
         public static void Validate_CatalogueItemTypeIsValid_DoesNotHaveError(
             string catalogueItemType,
             CreateOrderItemModelValidator validator)
@@ -56,58 +61,25 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [OrderingInlineAutoData(null)]
-        [OrderingInlineAutoData("")]
-        [OrderingInlineAutoData("\t")]
-        [OrderingInlineAutoData("InvalidCatalogueItemType")]
+        [CommonInlineAutoData(null)]
+        [CommonInlineAutoData("")]
+        [CommonInlineAutoData("\t")]
+        [CommonInlineAutoData("InvalidCatalogueItemType")]
         public static void Validate_CatalogueItemTypeIsNotValid_DoesNotHaveErrorsForDependentRules(
             string catalogueItemType,
-            CreateOrderItemModel model,
             CreateOrderItemModelValidator validator)
         {
-            model.CatalogueItemType = catalogueItemType;
+            var model = new CreateOrderItemModel { CatalogueItemType = catalogueItemType };
 
             validator.ShouldNotHaveValidationErrorFor(m => m.CatalogueSolutionId, model);
-            validator.ShouldNotHaveValidationErrorFor(m => m.DeliveryDate, model);
-            validator.ShouldNotHaveValidationErrorFor(m => m.ServiceRecipient, model);
+            validator.ShouldNotHaveValidationErrorFor(m => m.ServiceRecipients, model);
             validator.ShouldNotHaveValidationErrorFor(m => m.TimeUnit, model);
         }
 
         [Test]
-        [OrderingInlineAutoData(null)]
-        [OrderingInlineAutoData("")]
-        [OrderingInlineAutoData("\t")]
-        public static void Validate_CatalogueItemIdIsEmpty_HasError(
-            string catalogueItemId,
-            CreateOrderItemModelValidator validator)
-        {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.CatalogueItemId, catalogueItemId)
-                .WithErrorMessage($"{nameof(CreateOrderItemModel.CatalogueItemId)}Required");
-        }
-
-        [Test]
-        [AutoData]
-        public static void Validate_CatalogueItemIdIsTooLong_HasError(
-            CreateOrderItemModelValidator validator)
-        {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.CatalogueItemId, new string('1', 15))
-                .WithErrorMessage($"{nameof(CreateOrderItemModel.CatalogueItemId)}TooLong");
-        }
-
-        [Test]
-        [AutoData]
-        public static void Validate_CatalogueItemIdIsValid_DoesNotHaveError(
-            CreateOrderItemModelValidator validator)
-        {
-            validator.ShouldNotHaveValidationErrorFor(m => m.CatalogueItemId, new string('1', 14));
-        }
-
-        [Test]
-        [OrderingInlineAutoData(null)]
-        [OrderingInlineAutoData("")]
-        [OrderingInlineAutoData("\t")]
+        [CommonInlineAutoData(null)]
+        [CommonInlineAutoData("")]
+        [CommonInlineAutoData("\t")]
         public static void Validate_CatalogueItemNameIsEmpty_HasError(
             string catalogueItemName,
             CreateOrderItemModelValidator validator)
@@ -136,9 +108,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [OrderingInlineAutoData(null)]
-        [OrderingInlineAutoData("")]
-        [OrderingInlineAutoData("\t")]
+        [CommonInlineAutoData(null)]
+        [CommonInlineAutoData("")]
+        [CommonInlineAutoData("\t")]
         public static void Validate_ProvisioningTypeIsEmpty_HasError(
             string provisioningType,
             CreateOrderItemModelValidator validator)
@@ -159,9 +131,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [OrderingInlineAutoData(nameof(ProvisioningType.Declarative))]
-        [OrderingInlineAutoData(nameof(ProvisioningType.OnDemand))]
-        [OrderingInlineAutoData(nameof(ProvisioningType.Patient))]
+        [CommonInlineAutoData(nameof(ProvisioningType.Declarative))]
+        [CommonInlineAutoData(nameof(ProvisioningType.OnDemand))]
+        [CommonInlineAutoData(nameof(ProvisioningType.Patient))]
         public static void Validate_ProvisioningTypeIsValid_DoesNotHaveError(
             string provisioningType,
             CreateOrderItemModelValidator validator)
@@ -170,9 +142,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [OrderingInlineAutoData(null)]
-        [OrderingInlineAutoData("")]
-        [OrderingInlineAutoData("\t")]
+        [CommonInlineAutoData(null)]
+        [CommonInlineAutoData("")]
+        [CommonInlineAutoData("\t")]
         public static void Validate_TypeIsEmpty_HasError(
             string type,
             CreateOrderItemModelValidator validator)
@@ -193,8 +165,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [OrderingInlineAutoData(nameof(CataloguePriceType.Flat))]
-        [OrderingInlineAutoData(nameof(CataloguePriceType.Tiered))]
+        [CommonInlineAutoData(nameof(CataloguePriceType.Flat))]
+        [CommonInlineAutoData(nameof(CataloguePriceType.Tiered))]
         public static void Validate_TypeIsValid_DoesNotHaveError(
             string type,
             CreateOrderItemModelValidator validator)
@@ -203,9 +175,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [OrderingInlineAutoData(null)]
-        [OrderingInlineAutoData("")]
-        [OrderingInlineAutoData("\t")]
+        [CommonInlineAutoData(null)]
+        [CommonInlineAutoData("")]
+        [CommonInlineAutoData("\t")]
         public static void Validate_CurrencyCodeIsEmpty_HasError(
             string currencyCode,
             CreateOrderItemModelValidator validator)
@@ -253,9 +225,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [OrderingInlineAutoData(null)]
-        [OrderingInlineAutoData("")]
-        [OrderingInlineAutoData("\t")]
+        [CommonInlineAutoData(null)]
+        [CommonInlineAutoData("")]
+        [CommonInlineAutoData("\t")]
         public static void Validate_CatalogueSolutionIdIsEmpty_IsAdditionalService_HasError(
             string catalogueSolutionId,
             CreateOrderItemModel model,
@@ -296,8 +268,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [OrderingInlineAutoData(nameof(CatalogueItemType.AssociatedService))]
-        [OrderingInlineAutoData(nameof(CatalogueItemType.Solution))]
+        [CommonInlineAutoData(nameof(CatalogueItemType.AssociatedService))]
+        [CommonInlineAutoData(nameof(CatalogueItemType.Solution))]
         public static void Validate_CatalogueSolutionIdIsNull_IsNotAdditionalService_DoesNotHaveError(
             string catalogueItemType,
             CreateOrderItemModel model,
@@ -310,41 +282,56 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [OrderingInlineAutoData(nameof(CatalogueItemType.AdditionalService))]
-        [OrderingInlineAutoData(nameof(CatalogueItemType.Solution))]
-        public static void Validate_ServiceRecipientIsNull_IsNotAssociatedService_HasError(
+        [CommonInlineAutoData(nameof(CatalogueItemType.AdditionalService))]
+        [CommonInlineAutoData(nameof(CatalogueItemType.Solution))]
+        public static void Validate_ServiceRecipientsIsNull_IsNotAssociatedService_HasError(
             string catalogueItemType,
             CreateOrderItemModel model,
             CreateOrderItemModelValidator validator)
         {
             model.CatalogueItemType = catalogueItemType;
-            model.ServiceRecipient = null;
+            model.ServiceRecipients = null;
 
             validator
-                .ShouldHaveValidationErrorFor(m => m.ServiceRecipient, model)
-                .WithErrorMessage($"{nameof(CreateOrderItemModel.ServiceRecipient)}Required");
+                .ShouldHaveValidationErrorFor(m => m.ServiceRecipients, model)
+                .WithErrorMessage($"{nameof(CreateOrderItemModel.ServiceRecipients)}Required");
         }
 
         [Test]
-        [OrderingInlineAutoData(nameof(CatalogueItemType.AdditionalService))]
-        [OrderingInlineAutoData(nameof(CatalogueItemType.Solution))]
-        public static void Validate_ServiceRecipientIsNotNull_IsNotAssociatedService_DoesNotHaveError(
+        [CommonInlineAutoData(nameof(CatalogueItemType.AdditionalService))]
+        [CommonInlineAutoData(nameof(CatalogueItemType.Solution))]
+        public static void Validate_ServiceRecipientsIsNotNull_IsNotAssociatedService_DoesNotHaveError(
             string catalogueItemType,
-            ServiceRecipientModel recipient,
+            List<OrderItemRecipientModel> recipients,
             CreateOrderItemModel model,
             CreateOrderItemModelValidator validator)
         {
             model.CatalogueItemType = catalogueItemType;
-            model.ServiceRecipient = recipient;
+            model.ServiceRecipients = recipients;
 
-            validator.ShouldNotHaveValidationErrorFor(m => m.ServiceRecipient, model);
+            validator.ShouldNotHaveValidationErrorFor(m => m.ServiceRecipients, model);
         }
 
         [Test]
-        [OrderingInlineAutoData(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.Declarative))]
-        [OrderingInlineAutoData(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.Patient))]
-        [OrderingInlineAutoData(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.Declarative))]
-        [OrderingInlineAutoData(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.Patient))]
+        [CommonAutoData]
+        public static void Validate_ServiceRecipientsContainsDuplicates_HasError(
+            OrderItemRecipientModel recipientModel,
+            CreateOrderItemModel model,
+            CreateOrderItemModelValidator validator)
+        {
+            model.CatalogueItemType = nameof(CatalogueItemType.Solution);
+            model.ServiceRecipients = new List<OrderItemRecipientModel> { recipientModel, recipientModel };
+
+            validator
+                .ShouldHaveValidationErrorFor(m => m.ServiceRecipients, model)
+                .WithErrorMessage($"{nameof(CreateOrderItemModel.ServiceRecipients)}ContainsDuplicates");
+        }
+
+        [Test]
+        [CommonInlineAutoData(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.Declarative))]
+        [CommonInlineAutoData(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.Patient))]
+        [CommonInlineAutoData(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.Declarative))]
+        [CommonInlineAutoData(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.Patient))]
         public static void Validate_TimeUnitIsNull_IsNotAssociatedService_IsNotOnDemand_HasError(
             string catalogueItemType,
             string provisioningType,
@@ -361,10 +348,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [OrderingInlineAutoData(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.Declarative))]
-        [OrderingInlineAutoData(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.Patient))]
-        [OrderingInlineAutoData(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.Declarative))]
-        [OrderingInlineAutoData(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.Patient))]
+        [CommonInlineAutoData(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.Declarative))]
+        [CommonInlineAutoData(nameof(CatalogueItemType.AdditionalService), nameof(ProvisioningType.Patient))]
+        [CommonInlineAutoData(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.Declarative))]
+        [CommonInlineAutoData(nameof(CatalogueItemType.Solution), nameof(ProvisioningType.Patient))]
         public static void Validate_TimeUnitIsNotNull_IsNotAssociatedService_IsNotOnDemand_DoesNotHaveError(
             string catalogueItemType,
             string provisioningType,
@@ -385,12 +372,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             CreateOrderItemModel model,
             CreateOrderItemModelValidator validator)
         {
+            var recipient = new OrderItemRecipientModel();
             model.CatalogueItemType = nameof(CatalogueItemType.Solution);
-            model.DeliveryDate = null;
+            model.ServiceRecipients = new List<OrderItemRecipientModel> { recipient };
 
-            validator
-                .ShouldHaveValidationErrorFor(m => m.DeliveryDate, model)
-                .WithErrorMessage($"{nameof(CreateOrderItemModel.DeliveryDate)}Required");
+            var expectedPropertyName =
+                $"{nameof(CreateOrderItemModel.ServiceRecipients)}[0].{nameof(OrderItemRecipientModel.DeliveryDate)}";
+
+            var result = validator.Validate(model);
+            var failure = result.Errors.FirstOrDefault(e => e.PropertyName == expectedPropertyName);
+
+            Assert.NotNull(failure);
+            failure.ErrorMessage.Should().Be($"{nameof(OrderItemRecipientModel.DeliveryDate)}Required");
         }
 
         [Test]
@@ -400,30 +393,44 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             CreateOrderItemModel model,
             CreateOrderItemModelValidator validator)
         {
+            var recipient = new OrderItemRecipientModel { DeliveryDate = deliveryDate };
             model.CatalogueItemType = nameof(CatalogueItemType.Solution);
-            model.DeliveryDate = deliveryDate;
+            model.ServiceRecipients = new List<OrderItemRecipientModel> { recipient };
 
-            validator.ShouldNotHaveValidationErrorFor(m => m.DeliveryDate, model);
+            var expectedPropertyName =
+                $"{nameof(CreateOrderItemModel.ServiceRecipients)}[0].{nameof(OrderItemRecipientModel.DeliveryDate)}";
+
+            var result = validator.Validate(model);
+            var failure = result.Errors.FirstOrDefault(e => e.PropertyName == expectedPropertyName);
+
+            failure.Should().BeNull();
         }
 
         [Test]
-        [OrderingInlineAutoData(nameof(CatalogueItemType.AdditionalService))]
-        [OrderingInlineAutoData(nameof(CatalogueItemType.AssociatedService))]
+        [CommonInlineAutoData(nameof(CatalogueItemType.AdditionalService))]
+        [CommonInlineAutoData(nameof(CatalogueItemType.AssociatedService))]
         public static void Validate_DeliveryDateIsNull_IsNotSolution_DoesNotHaveError(
             string catalogueItemType,
             CreateOrderItemModel model,
             CreateOrderItemModelValidator validator)
         {
+            var recipient = new OrderItemRecipientModel();
             model.CatalogueItemType = catalogueItemType;
-            model.DeliveryDate = null;
+            model.ServiceRecipients = new List<OrderItemRecipientModel> { recipient };
 
-            validator.ShouldNotHaveValidationErrorFor(m => m.DeliveryDate, model);
+            var expectedPropertyName =
+                $"{nameof(CreateOrderItemModel.ServiceRecipients)}[0].{nameof(OrderItemRecipientModel.DeliveryDate)}";
+
+            var result = validator.Validate(model);
+            var failure = result.Errors.FirstOrDefault(e => e.PropertyName == expectedPropertyName);
+
+            failure.Should().BeNull();
         }
 
         [Test]
-        [OrderingInlineAutoData(null)]
-        [OrderingInlineAutoData("")]
-        [OrderingInlineAutoData("\t")]
+        [CommonInlineAutoData(null)]
+        [CommonInlineAutoData("")]
+        [CommonInlineAutoData("\t")]
         public static void Validate_EstimationPeriodIsEmpty_IsOnDemand_HasError(
             string estimationPeriod,
             CreateOrderItemModel model,
@@ -452,8 +459,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [OrderingInlineAutoData(nameof(TimeUnit.PerMonth))]
-        [OrderingInlineAutoData(nameof(TimeUnit.PerYear))]
+        [CommonInlineAutoData(nameof(TimeUnit.PerMonth))]
+        [CommonInlineAutoData(nameof(TimeUnit.PerYear))]
         public static void Validate_EstimationPeriodIsValid_IsOnDemand_DoesNotHaveError(
             string estimationPeriod,
             CreateOrderItemModel model,
@@ -466,12 +473,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [OrderingInlineAutoData(nameof(ProvisioningType.Declarative), null)]
-        [OrderingInlineAutoData(nameof(ProvisioningType.Declarative), "")]
-        [OrderingInlineAutoData(nameof(ProvisioningType.Declarative), "\t")]
-        [OrderingInlineAutoData(nameof(ProvisioningType.Patient), null)]
-        [OrderingInlineAutoData(nameof(ProvisioningType.Patient), "")]
-        [OrderingInlineAutoData(nameof(ProvisioningType.Patient), "\t")]
+        [CommonInlineAutoData(nameof(ProvisioningType.Declarative), null)]
+        [CommonInlineAutoData(nameof(ProvisioningType.Declarative), "")]
+        [CommonInlineAutoData(nameof(ProvisioningType.Declarative), "\t")]
+        [CommonInlineAutoData(nameof(ProvisioningType.Patient), null)]
+        [CommonInlineAutoData(nameof(ProvisioningType.Patient), "")]
+        [CommonInlineAutoData(nameof(ProvisioningType.Patient), "\t")]
         public static void Validate_EstimationPeriodIsEmpty_IsNotOnDemand_DoesNotHaveError(
             string provisioningType,
             string estimationPeriod,
@@ -485,8 +492,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [OrderingInlineAutoData(nameof(ProvisioningType.Declarative))]
-        [OrderingInlineAutoData(nameof(ProvisioningType.Patient))]
+        [CommonInlineAutoData(nameof(ProvisioningType.Declarative))]
+        [CommonInlineAutoData(nameof(ProvisioningType.Patient))]
         public static void Validate_EstimationPeriodIsNotValid_IsNotOnDemand_DoesNotHaveError(
             string provisioningType,
             CreateOrderItemModel model,
@@ -515,8 +522,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [OrderingInlineAutoData(nameof(ProvisioningType.Declarative))]
-        [OrderingInlineAutoData(nameof(ProvisioningType.Patient))]
+        [CommonInlineAutoData(nameof(ProvisioningType.Declarative))]
+        [CommonInlineAutoData(nameof(ProvisioningType.Patient))]
         public static void Validate_TimeUnitIsNotNull_IsNotOnDemand_DoesNotHaveError(
             string provisioningType,
             TimeUnitModel timeUnit,
@@ -539,6 +546,50 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             model.TimeUnit = null;
 
             validator.ShouldNotHaveValidationErrorFor(m => m.TimeUnit, model);
+        }
+
+        [Test]
+        [AutoData]
+        public static void Validate_PriceIsNull_HasError(
+            CreateOrderItemModelValidator validator)
+        {
+            validator
+                .ShouldHaveValidationErrorFor(m => m.Price, null as decimal?)
+                .WithErrorMessage($"{nameof(CreateOrderItemModel.Price)}Required");
+        }
+
+        [Test]
+        [AutoData]
+        public static void Validate_PriceIsLessThanZero_HasError(
+            CreateOrderItemModelValidator validator)
+        {
+            validator
+                .ShouldHaveValidationErrorFor(m => m.Price, -0.01m)
+                .WithErrorMessage($"{nameof(CreateOrderItemModel.Price)}GreaterThanOrEqualToZero");
+        }
+
+        [Test]
+        [AutoData]
+        public static void Validate_PriceIsMaxPrice_HasError(
+            CreateOrderItemModelValidator validator)
+        {
+            validator
+                .ShouldHaveValidationErrorFor(m => m.Price, CreateOrderItemModelValidator.MaxPrice + 0.001m)
+                .WithErrorMessage($"{nameof(CreateOrderItemModel.Price)}LessThanMax");
+        }
+
+        [TestCaseSource(nameof(PriceIsValidTestCases))]
+        public static void Validate_PriceIsValid_DoesNotHaveError(decimal price)
+        {
+            var validator = new CreateOrderItemModelValidator();
+
+            validator.ShouldNotHaveValidationErrorFor(m => m.Price, price);
+        }
+
+        private static IEnumerable<ITestCaseData> PriceIsValidTestCases()
+        {
+            yield return new TestCaseData(0.00m);
+            yield return new TestCaseData(CreateOrderItemModelValidator.MaxPrice - 0.001m);
         }
     }
 }
