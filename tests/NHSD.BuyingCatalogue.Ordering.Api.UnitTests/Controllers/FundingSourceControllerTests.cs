@@ -1,188 +1,131 @@
 ﻿using System;
-using System.Security.Claims;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
+using AutoFixture;
+using AutoFixture.AutoMoq;
+using AutoFixture.Idioms;
+using AutoFixture.NUnit3;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
-using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
+using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
-    [Parallelizable(ParallelScope.All)]
+    [Parallelizable(ParallelScope.Children)]
+    [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class FundingSourceControllerTests
     {
         [Test]
-        public static void Constructor_NullOrderRepository_ThrowsArgumentNullException()
+        public static void Constructor_VerifyGuardClauses()
         {
-            var builder = FundingSourceControllerBuilder.Create()
-                .WithOrderRepository(null);
+            var fixture = new Fixture().Customize(new AutoMoqCustomization());
+            var assertion = new GuardClauseAssertion(fixture);
+            var constructors = typeof(FundingSourceController).GetConstructors();
 
-            Assert.Throws<ArgumentNullException>(() => builder.Build());
+            assertion.Verify(constructors);
         }
 
         [Test]
-        public static async Task GetAsync_OrderDoesNotExist_ReturnsNotFound()
+        [InMemoryDbAutoData(nameof(GetAsync_OrderDoesNotExist_ReturnsNotFound))]
+        public static async Task GetAsync_OrderDoesNotExist_ReturnsNotFound(
+            CallOffId callOffId,
+            FundingSourceController controller)
         {
-            const string orderId = "DoesNotExist";
-            var context = FundingSourceControllerTestContext.Setup();
-            context.Order = null;
-
-            var result = await context.Controller.GetAsync(orderId);
+            var result = await controller.GetAsync(callOffId);
 
             result.Result.Should().BeOfType<NotFoundResult>();
         }
 
         [Test]
-        public static async Task GetAsync_OrderExists_FundingSourceDetailsReturned()
+        [InMemoryDbAutoData(nameof(GetAsync_OrderExists_FundingSourceDetailsReturned))]
+        public static async Task GetAsync_OrderExists_FundingSourceDetailsReturned(
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            FundingSourceController controller)
         {
-            const string orderId = "C0000014-01";
-            var context = FundingSourceControllerTestContext.Setup();
-            context.Order = OrderBuilder
-                .Create()
-                .WithOrganisationId(context.PrimaryOrganisationId)
-                .WithFundingSourceOnlyGms(true)
-                .Build();
+            order.FundingSourceOnlyGms = true;
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
 
-            var actual = await context.Controller.GetAsync(orderId);
+            var expected = new GetFundingSourceModel { OnlyGms = true };
 
-            var expected = new GetFundingSourceModel
-            {
-                OnlyGms = context.Order.FundingSourceOnlyGms,
-            };
+            var actual = await controller.GetAsync(callOffId);
 
             actual.Value.Should().BeEquivalentTo(expected);
         }
 
         [Test]
-        public static async Task GetAsync_GetOrderByIdAsync_CalledOnce()
+        [InMemoryDbAutoData(nameof(PutFundingSourceAsync_NullModel_ThrowsException))]
+        public static void PutFundingSourceAsync_NullModel_ThrowsException(
+            Order order,
+            FundingSourceController controller)
         {
-            const string orderId = "C0000014-01";
-            var context = FundingSourceControllerTestContext.Setup();
-
-            await context.Controller.GetAsync(orderId);
-
-            context.OrderRepositoryMock.Verify(r => r.GetOrderByIdAsync(orderId));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await controller.PutFundingSourceAsync(order, null));
         }
 
         [Test]
-        public static void Put_NullModel_ThrowsException()
+        [InMemoryDbAutoData(nameof(PutFundingSourceAsync_OrderIsNull_ReturnsNotFound))]
+        public static async Task PutFundingSourceAsync_OrderIsNull_ReturnsNotFound(
+            UpdateFundingSourceModel model,
+            FundingSourceController controller)
         {
-            var context = FundingSourceControllerTestContext.Setup();
-            Assert.ThrowsAsync<ArgumentNullException>(() => context.Controller.PutFundingSourceAsync("123", null));
+            var response = await controller.PutFundingSourceAsync(null, model);
+
+            response.Should().BeOfType<NotFoundResult>();
         }
 
         [Test]
-        public static async Task Put_NullOrderReturned_ReturnsNotFound()
+        [InMemoryDbAutoData(nameof(PutFundingSourceAsync_UpdatesFundingSourceOnlyGms))]
+        public static async Task PutFundingSourceAsync_UpdatesFundingSourceOnlyGms(
+            Order order,
+            UpdateFundingSourceModel model,
+            FundingSourceController controller)
         {
-            var organisationId = Guid.NewGuid();
-            const string orderId = "C0000014-01";
-            var context = FundingSourceControllerTestContext.Setup(organisationId);
-            context.Order = null;
+            order.FundingSourceOnlyGms = false;
+            model.OnlyGms = true;
 
-            var response = await context.Controller.PutFundingSourceAsync(orderId, new UpdateFundingSourceModel());
-            response.Should().BeEquivalentTo(new NotFoundResult());
-        }
+            await controller.PutFundingSourceAsync(order, model);
 
-        [TestCase(false)]
-        [TestCase(true)]
-        public static async Task Put_AllValid_CallsUpdateOnOrderRepository(bool fundingSource)
-        {
-            var organisationId = Guid.NewGuid();
-            const string orderId = "C0000014-01";
-            var context = FundingSourceControllerTestContext.Setup(organisationId);
-            var model = new UpdateFundingSourceModel { OnlyGms = fundingSource };
-
-            var response = await context.Controller.PutFundingSourceAsync(orderId, model);
-            response.Should().BeEquivalentTo(new NoContentResult());
-
-            context.OrderRepositoryMock.Verify(
-                r => r.UpdateOrderAsync(It.Is<Order>(o => o.FundingSourceOnlyGms == fundingSource)));
+            order.FundingSourceOnlyGms.Should().BeTrue();
         }
 
         [Test]
-        public static async Task Put_AllValid_UpdatesLastUpdated()
+        [InMemoryDbAutoData(nameof(PutFundingSourceAsync_SuccessfulUpdate_ReturnsNoContentResult))]
+        public static async Task PutFundingSourceAsync_SuccessfulUpdate_ReturnsNoContentResult(
+            Order order,
+            UpdateFundingSourceModel model,
+            FundingSourceController controller)
         {
-            var organisationId = Guid.NewGuid();
-            const string orderId = "C0000014-01";
-            var context = FundingSourceControllerTestContext.Setup(organisationId);
-            var model = new UpdateFundingSourceModel { OnlyGms = true };
+            var result = await controller.PutFundingSourceAsync(order, model);
 
-            var response = await context.Controller.PutFundingSourceAsync(orderId, model);
-            response.Should().BeEquivalentTo(new NoContentResult());
-
-            context.OrderRepositoryMock.Verify(r => r.UpdateOrderAsync(
-                It.Is<Order>(o => o.LastUpdatedBy == context.NameIdentity && o.LastUpdatedByName == context.Name)));
+            result.Should().BeOfType<NoContentResult>();
         }
 
-        private sealed class FundingSourceControllerTestContext
+        [Test]
+        [InMemoryDbAutoData(nameof(PutFundingSourceAsync_SavesChangesToDb))]
+        public static async Task PutFundingSourceAsync_SavesChangesToDb(
+            [Frozen] ApplicationDbContext context,
+            Order order,
+            UpdateFundingSourceModel model,
+            FundingSourceController controller)
         {
-            private FundingSourceControllerTestContext(Guid primaryOrganisationId)
-            {
-                PrimaryOrganisationId = primaryOrganisationId;
-                Name = "Test User";
-                NameIdentity = Guid.NewGuid();
+            order.FundingSourceOnlyGms = false;
+            model.OnlyGms = true;
 
-                Order = OrderBuilder.Create()
-                    .WithOrganisationId(PrimaryOrganisationId)
-                    .WithLastUpdatedBy(Guid.NewGuid())
-                    .WithLastUpdatedByName("Gandalf the Gray")
-                    .Build();
+            context.Add(order);
+            await context.SaveChangesAsync();
 
-                OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(r => r.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
+            await controller.PutFundingSourceAsync(order, model);
 
-                ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
-                    new[]
-                    {
-                        new Claim("Ordering", "Manage"),
-                        new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
-                        new Claim(ClaimTypes.Name, Name),
-                        new Claim(ClaimTypes.NameIdentifier, NameIdentity.ToString()),
-                    },
-                    "mock"));
-
-                Controller = FundingSourceControllerBuilder
-                    .Create()
-                    .WithOrderRepository(OrderRepositoryMock.Object)
-                    .WithControllerContext(
-                        new ControllerContext
-                        {
-                            HttpContext = new DefaultHttpContext { User = ClaimsPrincipal },
-                        })
-                    .Build();
-            }
-
-            internal string Name { get; }
-
-            internal Guid NameIdentity { get; }
-
-            internal Guid PrimaryOrganisationId { get; }
-
-            internal Mock<IOrderRepository> OrderRepositoryMock { get; }
-
-            internal FundingSourceController Controller { get; }
-
-            internal Order Order { get; set; }
-
-            private ClaimsPrincipal ClaimsPrincipal { get; }
-
-            internal static FundingSourceControllerTestContext Setup()
-            {
-                return new(Guid.NewGuid());
-            }
-
-            internal static FundingSourceControllerTestContext Setup(Guid primaryOrganisationId)
-            {
-                return new(primaryOrganisationId);
-            }
+            context.Set<Order>().First(o => o.Equals(order)).FundingSourceOnlyGms.Should().BeTrue();
         }
     }
 }

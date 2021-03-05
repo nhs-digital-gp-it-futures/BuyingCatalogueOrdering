@@ -89,7 +89,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
         {
             return new()
             {
-                AddressId = addressId,
+                Id = addressId,
                 Line1 = line1,
                 Line2 = line2,
                 Line3 = line3,

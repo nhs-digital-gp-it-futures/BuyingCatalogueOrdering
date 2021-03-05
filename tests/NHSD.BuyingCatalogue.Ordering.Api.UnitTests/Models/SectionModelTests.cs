@@ -30,13 +30,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         [Test]
         public static void WithStatus_Null_ThrowsException()
         {
-            static void Test()
-            {
-                var actual = SectionModel.OrderingParty;
-                actual.WithStatus(null);
-            }
+            var actual = SectionModel.OrderingParty;
 
-            Assert.Throws<ArgumentNullException>(Test);
+            Assert.Throws<ArgumentNullException>(() => actual.WithStatus(null));
         }
 
         [Test]

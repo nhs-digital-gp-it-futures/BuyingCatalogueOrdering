@@ -18,7 +18,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 
         public static Guid GetUserId(this ClaimsPrincipal user)
         {
-            return new(user.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            return userId is null ? Guid.Empty : new Guid(userId);
         }
 
         public static string GetUserName(this ClaimsPrincipal user)
@@ -26,7 +28,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
             if (user.Identity is null)
                 throw new InvalidOperationException($"{nameof(ClaimsPrincipal.Identity)} is null.");
 
-            return user.Identity.Name;
+            return user.Identity.Name ?? "Chris";
         }
     }
 }

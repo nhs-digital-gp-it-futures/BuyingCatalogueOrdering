@@ -6,7 +6,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
     {
         public static bool IsOrderingPartySectionComplete(this Order order)
         {
-            return order?.OrganisationContact is not null;
+            return order?.OrderingPartyContact is not null;
         }
 
         public static bool IsSupplierSectionComplete(this Order order)
@@ -21,17 +21,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 
         public static bool IsServiceRecipientsSectionComplete(this Order order)
         {
-            return order is not null && order.ServiceRecipientsViewed;
+            return order is not null && order.Progress.ServiceRecipientsViewed;
         }
 
         public static bool IsCatalogueSolutionsSectionComplete(this Order order)
         {
-            return order is not null && order.CatalogueSolutionsViewed;
+            return order is not null && order.Progress.CatalogueSolutionsViewed;
         }
 
         public static bool IsAdditionalServicesSectionComplete(this Order order)
         {
-            return order is not null && order.AdditionalServicesViewed;
+            return order is not null && order.Progress.AdditionalServicesViewed;
         }
 
         public static bool IsFundingSourceComplete(this Order order)
@@ -41,7 +41,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 
         public static bool IsAssociatedServicesSectionComplete(this Order order)
         {
-            return !(order is null) && order.AssociatedServicesViewed;
+            return order is not null && order.Progress.AssociatedServicesViewed;
         }
 
         public static bool IsSectionStatusComplete(this Order order) =>

@@ -1,8 +1,7 @@
-﻿using System;
+﻿using AutoFixture.NUnit3;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
 
@@ -19,85 +18,27 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public static void ToModel_Address_ReturnsAddressModel()
+        [AutoData]
+        public static void ToModel_Address_ReturnsExpectedAddressModel(Address address)
         {
-            Address address = AddressBuilder
-                .Create()
-                .WithLine1(Guid.NewGuid().ToString())
-                .WithLine2(Guid.NewGuid().ToString())
-                .WithLine3(Guid.NewGuid().ToString())
-                .WithLine4(Guid.NewGuid().ToString())
-                .WithLine5(Guid.NewGuid().ToString())
-                .WithTown(Guid.NewGuid().ToString())
-                .WithCounty(Guid.NewGuid().ToString())
-                .WithPostcode(Guid.NewGuid().ToString())
-                .WithCountry(Guid.NewGuid().ToString())
-                .Build();
-
             var actual = address.ToModel();
 
-            AddressModel expected = new AddressModel
-            {
-                Line1 = address.Line1,
-                Line2 = address.Line2,
-                Line3 = address.Line3,
-                Line4 = address.Line4,
-                Line5 = address.Line5,
-                Town = address.Town,
-                County = address.County,
-                Postcode = address.Postcode,
-                Country = address.Country,
-            };
-
-            actual.Should().BeEquivalentTo(expected);
+            actual.Should().BeEquivalentTo(address, o => o.Excluding(a => a.Id));
         }
 
         [Test]
-        public static void FromModel_NullAddressModel_ThrowsException()
+        public static void ToDomain_NullModel_ReturnsNull()
         {
-            Address address = AddressBuilder
-                .Create()
-                .Build();
-
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                address.FromModel(null);
-            });
+            AddressExtensions.ToDomain(null).Should().BeNull();
         }
 
         [Test]
-        public static void FromModel_AddressModel_UpdatesAddress()
+        [AutoData]
+        public static void ToDomain_Address_ReturnsExpectedAddress(AddressModel model)
         {
-            Address address = AddressBuilder
-                .Create()
-                .Build();
+            var actual = model.ToDomain();
 
-            AddressModel inputAddressModel = new AddressModel
-            {
-                Line1 = Guid.NewGuid().ToString(),
-                Line2 = Guid.NewGuid().ToString(),
-                Line3 = Guid.NewGuid().ToString(),
-                Line4 = Guid.NewGuid().ToString(),
-                Line5 = Guid.NewGuid().ToString(),
-                Town = Guid.NewGuid().ToString(),
-                County = Guid.NewGuid().ToString(),
-                Postcode = Guid.NewGuid().ToString(),
-                Country = Guid.NewGuid().ToString(),
-            };
-
-            var actualAddress = address.FromModel(inputAddressModel);
-
-            actualAddress.Should().BeEquivalentTo(inputAddressModel);
-        }
-
-        [Test]
-        public static void FromModel_NullAddress_ReturnsNewAddress()
-        {
-            var addressModel = new AddressModel();
-
-            var actualAddress = AddressExtensions.FromModel(null, addressModel);
-
-            actualAddress.Should().NotBeNull();
+            actual.Should().BeEquivalentTo(model);
         }
     }
 }

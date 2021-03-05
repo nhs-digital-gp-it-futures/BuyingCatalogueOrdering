@@ -1,46 +1,46 @@
 ﻿using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 {
-    public abstract class CreateOrderItemRequest : UpdateOrderItemRequest
+    internal sealed class CreateOrderItemRequest
     {
-        protected CreateOrderItemRequest(Order order, CreateOrderItemModel model, CatalogueItemType itemType)
-            : base(order, model)
+        public CreateOrderItemRequest(CatalogueItemId catalogueItemId, CreateOrderItemModel model)
         {
-            CatalogueItemId = model.CatalogueItemId;
-            CatalogueItemType = itemType;
+            CatalogueItemId = catalogueItemId;
+            CatalogueItemType = OrderingEnums.ParseStrictIgnoreCase<CatalogueItemType>(model.CatalogueItemType);
             CatalogueItemName = model.CatalogueItemName;
             ProvisioningType = OrderingEnums.ParseStrictIgnoreCase<ProvisioningType>(model.ProvisioningType);
             CataloguePriceType = OrderingEnums.ParseStrictIgnoreCase<CataloguePriceType>(model.Type);
-            CataloguePriceUnitTierName = model.ItemUnit.Name;
+            CataloguePriceUnitName = model.ItemUnit.Name;
             CataloguePriceUnitDescription = model.ItemUnit.Description;
+            CatalogueSolutionId = model.CatalogueSolutionId;
             CurrencyCode = model.CurrencyCode;
+            PriceTimeUnit = model.TimeUnit?.ToTimeUnit();
         }
 
-        public ServiceRecipient ServiceRecipient { get; protected set; }
+        public Order Order { get; set; }
 
-        public string OdsCode { get; protected set; }
+        public ServiceRecipient ServiceRecipient { get; set; }
 
-        public string CatalogueItemId { get; }
-
-        public CatalogueItemType CatalogueItemType { get; }
+        public CatalogueItemId CatalogueItemId { get; }
 
         public string CatalogueItemName { get; }
 
-        public string CatalogueSolutionId { get; protected set; }
-
-        public ProvisioningType ProvisioningType { get; }
+        public CatalogueItemType CatalogueItemType { get; }
 
         public CataloguePriceType CataloguePriceType { get; }
 
-        public string CataloguePriceUnitTierName { get; }
-
         public string CataloguePriceUnitDescription { get; }
 
-        public TimeUnit? PriceTimeUnit { get; protected set; }
+        public string CataloguePriceUnitName { get; }
+
+        public string CatalogueSolutionId { get; }
 
         public string CurrencyCode { get; }
+
+        public TimeUnit? PriceTimeUnit { get; }
+
+        public ProvisioningType ProvisioningType { get; }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
-using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders;
+using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
@@ -10,16 +12,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
+    [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class OrderExtensionsTests
     {
         [Test]
-        public static void IsSupplierSectionComplete_HasPrimaryContact_ReturnsTrue()
+        [CommonAutoData]
+        public static void IsSupplierSectionComplete_HasPrimaryContact_ReturnsTrue(Order order)
         {
-            var order = OrderBuilder
-                .Create()
-                .WithSupplierContact(ContactBuilder.Create().Build())
-                .Build();
-
             order.IsSupplierSectionComplete().Should().BeTrue();
         }
 
@@ -86,9 +85,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public static void IsServiceRecipientsSectionComplete_ServiceRecipientsViewedFalse_ReturnsFalse()
+        [CommonAutoData]
+        public static void IsServiceRecipientsSectionComplete_ServiceRecipientsViewedFalse_ReturnsFalse(Order order)
         {
-            var order = OrderBuilder.Create().WithServiceRecipientsViewed(false).Build();
+            order.Progress.ServiceRecipientsViewed = false;
             var actual = order.IsServiceRecipientsSectionComplete();
             actual.Should().BeFalse();
         }
@@ -101,9 +101,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public static void IsCatalogueSolutionsSectionComplete_CatalogueSolutionsViewed_ReturnsTrue()
+        [CommonAutoData]
+        public static void IsCatalogueSolutionsSectionComplete_CatalogueSolutionsViewed_ReturnsTrue(Order order)
         {
-            var order = OrderBuilder.Create().WithCatalogueSolutionsViewed(true).Build();
+            order.Progress.CatalogueSolutionsViewed = true;
             var actual = order.IsCatalogueSolutionsSectionComplete();
             actual.Should().BeTrue();
         }
@@ -154,14 +155,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
             actual.Should().BeFalse();
         }
 
-        [TestCase(null, false, false, false, false, false, false)]
-        [TestCase(true, true, true, true, true, false, true)]
-        [TestCase(true, true, true, true, true, true, true)]
-        [TestCase(true, true, true, true, false, true, true)]
-        [TestCase(true, true, true, true, false, true, true)]
-        [TestCase(true, true, false, false, false, false, false)]
-        [TestCase(true, true, false, true, true, false, false)]
-        [TestCase(true, false, true, false, false, true, false)]
+        [Test]
+        [CommonInlineAutoData(null, false, false, false, false, false, false)]
+        [CommonInlineAutoData(true, true, true, true, true, false, true)]
+        [CommonInlineAutoData(true, true, true, true, true, true, true)]
+        [CommonInlineAutoData(true, true, true, true, false, true, true)]
+        [CommonInlineAutoData(true, true, false, false, false, false, false)]
+        [CommonInlineAutoData(true, true, false, true, true, false, false)]
+        [CommonInlineAutoData(true, false, true, false, false, true, false)]
         public static void IsSectionStatusCompleteComplete_whenCalled_ReturnsCorrectResult(
             bool? fundingComplete,
             bool recipientViewed,
@@ -169,31 +170,41 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
             bool solutionViewed,
             bool hasSolution,
             bool hasAssociated,
-            bool expectedResult)
+            bool expectedResult,
+            IReadOnlyList<CatalogueItemId> itemIds,
+            Order order)
         {
-            var orderBuilder = OrderBuilder
-                .Create()
-                .WithFundingSourceOnlyGms(fundingComplete)
-                .WithServiceRecipientsViewed(recipientViewed)
-                .WithAssociatedServicesViewed(associatedViewed)
-                .WithCatalogueSolutionsViewed(solutionViewed);
+            order.FundingSourceOnlyGms = fundingComplete;
+            order.Progress.AssociatedServicesViewed = associatedViewed;
+            order.Progress.CatalogueSolutionsViewed = solutionViewed;
+            order.Progress.ServiceRecipientsViewed = recipientViewed;
 
             if (hasSolution)
             {
-                var orderItem = OrderItemBuilder.Create();
-                orderItem.WithCatalogueItemType(CatalogueItemType.Solution);
-                orderBuilder.WithOrderItem(orderItem.Build());
+                order.AddOrUpdateOrderItem(new OrderItem
+                {
+                    CatalogueItem = new CatalogueItem
+                    {
+                        Id = itemIds[0],
+                        CatalogueItemType = CatalogueItemType.Solution,
+                    },
+                });
             }
 
             if (hasAssociated)
             {
-                var orderItem = OrderItemBuilder.Create();
-                orderItem.WithCatalogueItemType(CatalogueItemType.AssociatedService);
-                orderBuilder.WithOrderItem(orderItem.Build());
+                order.AddOrUpdateOrderItem(new OrderItem
+                {
+                    CatalogueItem = new CatalogueItem
+                    {
+                        Id = itemIds[1],
+                        CatalogueItemType = CatalogueItemType.AssociatedService,
+                    },
+                });
             }
 
-            var order = orderBuilder.Build();
             var actual = order.IsSectionStatusComplete();
+
             actual.Should().Be(expectedResult);
         }
     }

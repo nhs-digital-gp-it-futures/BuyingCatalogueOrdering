@@ -7,7 +7,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Validation
     {
         internal static IRuleBuilderOptions<T, TProperty> Required<T, TProperty>(this IRuleBuilderInitial<T, TProperty> ruleBuilder, string message = null)
         {
-            return ruleBuilder.Cascade(CascadeMode.Stop).NotEmpty().WithMessage(message ?? "{PropertyName}Required");
+            return ruleBuilder.Cascade(CascadeMode.Stop).NotEmpty().WithRequiredMessage(message);
         }
 
         internal static IRuleBuilderOptions<T, TProperty?> LessThanMax<T, TProperty>(this IRuleBuilder<T, TProperty?> ruleBuilder, TProperty valueToCompare)
@@ -36,6 +36,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Validation
         internal static IRuleBuilderOptions<T, TProperty> WithLessThanMaxMessage<T, TProperty>(this IRuleBuilderOptions<T, TProperty> ruleBuilder)
         {
             return ruleBuilder.WithMessage("{PropertyName}LessThanMax");
+        }
+
+        internal static IRuleBuilderOptions<T, TProperty> WithRequiredMessage<T, TProperty>(this IRuleBuilderOptions<T, TProperty> ruleBuilder, string message = null)
+        {
+            return ruleBuilder.WithMessage(message ?? "{PropertyName}Required");
         }
 
         internal static IRuleBuilderOptions<T, TProperty> WithValidValueMessage<T, TProperty>(this IRuleBuilderOptions<T, TProperty> ruleBuilder)

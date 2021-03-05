@@ -4,97 +4,75 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
-using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
+using NHSD.BuyingCatalogue.Ordering.Api.Services;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
-    [Route("api/v1/orders/{orderId}/sections/service-recipients")]
+    [Route("api/v1/orders/{callOffId}/sections/service-recipients")]
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     [AuthorizeOrganisation]
     public sealed class ServiceRecipientsSectionController : ControllerBase
     {
-        private readonly IOrderRepository orderRepository;
-        private readonly IServiceRecipientRepository serviceRecipientRepository;
+        private readonly ApplicationDbContext context;
+        private readonly IServiceRecipientService serviceRecipientService;
 
         public ServiceRecipientsSectionController(
-            IOrderRepository orderRepository,
-            IServiceRecipientRepository serviceRecipientRepository)
+            ApplicationDbContext context,
+            IServiceRecipientService serviceRecipientService)
         {
-            this.orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
-            this.serviceRecipientRepository = serviceRecipientRepository ??
-                throw new ArgumentNullException(nameof(serviceRecipientRepository));
+            this.context = context ?? throw new ArgumentNullException(nameof(context));
+            this.serviceRecipientService = serviceRecipientService ?? throw new ArgumentNullException(nameof(serviceRecipientService));
         }
 
         [HttpGet]
-        public async Task<ActionResult<ServiceRecipientsModel>> GetAllAsync(string orderId)
+        public async Task<ActionResult<ServiceRecipientsModel>> GetAllAsync(CallOffId callOffId)
         {
-            var order = await orderRepository.GetOrderByIdAsync(orderId);
-
-            if (order is null)
-            {
+            if (!await context.Order.AnyAsync(o => o.Id == callOffId.Id))
                 return NotFound();
-            }
 
-            var serviceRecipients = (await serviceRecipientRepository.ListServiceRecipientsByOrderIdAsync(
-                orderId)).ToList();
+            var recipients = await context.Order
+                .Where(o => o.Id == callOffId.Id)
+                .SelectMany(o => o.SelectedServiceRecipients)
+                .Select(r => new ServiceRecipientModel { Name = r.Recipient.Name, OdsCode = r.Recipient.OdsCode })
+                .AsNoTracking()
+                .ToListAsync();
 
-            var recipientModelList = serviceRecipients
-                .Select(recipient => new ServiceRecipientModel
-                {
-                    OdsCode = recipient.OdsCode,
-                    Name = recipient.Name,
-                })
-                .OrderBy(serviceRecipientModel => serviceRecipientModel.Name)
-                .ToList();
-
-            var model = new ServiceRecipientsModel
-            {
-                ServiceRecipients = recipientModelList,
-            };
-
-            return model;
+            return new ServiceRecipientsModel { ServiceRecipients = recipients };
         }
 
         [HttpPut]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult> UpdateAsync(string orderId, ServiceRecipientsModel model)
+        public async Task<ActionResult> UpdateAsync(CallOffId callOffId, ServiceRecipientsModel model)
         {
             if (model is null)
-            {
                 throw new ArgumentNullException(nameof(model));
-            }
 
-            var order = await orderRepository.GetOrderByIdAsync(orderId);
+            var order = await context.Order
+                .Where(o => o.Id == callOffId.Id)
+                .Include(o => o.SelectedServiceRecipients)
+                .SingleOrDefaultAsync();
+
             if (order is null)
-            {
                 return NotFound();
-            }
 
-            var serviceRecipients = model.ServiceRecipients.Select(recipient => new ServiceRecipient
+            var recipients = await serviceRecipientService.AddOrUpdateServiceRecipients(model.ServiceRecipients);
+
+            var serviceRecipients = model.ServiceRecipients.Select(r => new SelectedServiceRecipient
             {
-                Name = recipient.Name,
-                OdsCode = recipient.OdsCode,
-                Order = order,
+                Recipient = recipients[r.OdsCode],
             }).ToList();
 
-            await serviceRecipientRepository.UpdateAsync(order.OrderId, serviceRecipients);
+            order.SetSelectedServiceRecipients(serviceRecipients);
 
-            if (serviceRecipients.Count is 0)
-            {
-                order.CatalogueSolutionsViewed = false;
-            }
-
-            order.ServiceRecipientsViewed = true;
-            order.SetLastUpdatedBy(User.GetUserId(), User.GetUserName());
-
-            await orderRepository.UpdateOrderAsync(order);
+            await context.SaveChangesAsync();
 
             return NoContent();
         }

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using FluentAssertions;
+using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
 using NUnit.Framework;
-using NUnit.Framework.Interfaces;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 {
@@ -11,74 +10,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
     [Parallelizable(ParallelScope.All)]
     internal static class OrderItemTests
     {
-        [TestCase(null)]
-        [TestCase("")]
-        [TestCase("    ")]
-        public static void Constructor_NullOrEmptyCatalogueItemId_ThrowsArgumentException(string catalogueItemIdInput)
-        {
-            void Test()
-            {
-                OrderItemBuilder
-                    .Create()
-                    .WithCatalogueItemId(catalogueItemIdInput)
-                    .Build();
-            }
-
-            Assert.Throws<ArgumentException>(Test);
-        }
-
-        [TestCase(null)]
-        [TestCase("")]
-        [TestCase("    ")]
-        public static void Constructor_NullOrEmptyCurrencyCode_ThrowsArgumentException(string currencyCodeInput)
-        {
-            void Test()
-            {
-                OrderItemBuilder
-                    .Create()
-                    .WithCurrencyCode(currencyCodeInput)
-                    .Build();
-            }
-
-            Assert.Throws<ArgumentException>(Test);
-        }
-
-        [TestCase(null)]
-        [TestCase("")]
-        [TestCase("    ")]
-        public static void Constructor_NullOrEmptyCatalogueItemName_ThrowsArgumentException(string catalogueItemNameInput)
-        {
-            void Test()
-            {
-                OrderItemBuilder
-                    .Create()
-                    .WithCatalogueItemName(catalogueItemNameInput)
-                    .Build();
-            }
-
-            Assert.Throws<ArgumentException>(Test);
-        }
-
-        [Test]
-        public static void Constructor_NullCataloguePriceUnit_ThrowsArgumentNullException()
-        {
-            static void Test()
-            {
-                OrderItemBuilder
-                    .Create()
-                    .WithCataloguePriceUnit(null)
-                    .Build();
-            }
-
-            Assert.Throws<ArgumentNullException>(Test);
-        }
-
         [Test]
         public static void MarkOrderSectionAsViewed_NullOrder_ThrowsArgumentNullException()
         {
             var orderItem = OrderItemBuilder
                 .Create()
-                .WithCatalogueItemType(CatalogueItemType.Solution)
+                .WithCatalogueItem(new CatalogueItem { CatalogueItemType = CatalogueItemType.Solution })
                 .Build();
 
             Assert.Throws<ArgumentNullException>(() => orderItem.MarkOrderSectionAsViewed(null));
@@ -89,7 +26,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         {
             var orderItem = OrderItemBuilder
                 .Create()
-                .WithCatalogueItemType(CatalogueItemType.Solution)
+                .WithCatalogueItem(new CatalogueItem { CatalogueItemType = CatalogueItemType.Solution })
                 .Build();
 
             var order = OrderBuilder
@@ -99,7 +36,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
             orderItem.MarkOrderSectionAsViewed(order);
 
-            order.CatalogueSolutionsViewed.Should().BeTrue();
+            order.Progress.CatalogueSolutionsViewed.Should().BeTrue();
         }
 
         [Test]
@@ -107,7 +44,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         {
             var orderItem = OrderItemBuilder
                 .Create()
-                .WithCatalogueItemType(CatalogueItemType.AdditionalService)
+                .WithCatalogueItem(new CatalogueItem { CatalogueItemType = CatalogueItemType.AdditionalService })
                 .Build();
 
             var order = OrderBuilder
@@ -117,150 +54,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
             orderItem.MarkOrderSectionAsViewed(order);
 
-            order.AdditionalServicesViewed.Should().BeTrue();
-        }
-
-        [Test]
-        public static void ChangePrice_ChangeValues_ExpectedPropertiesUpdated()
-        {
-            var orderItem = OrderItemBuilder
-                .Create()
-                .WithProvisioningType(ProvisioningType.OnDemand)
-                .WithDeliveryDate(DateTime.UtcNow)
-                .WithEstimationPeriod(TimeUnit.PerYear)
-                .Build();
-
-            var expected = new
-            {
-                DeliveryDate = orderItem.DeliveryDate?.AddDays(1),
-                Quantity = orderItem.Quantity + 1,
-                EstimationPeriod = TimeUnit.PerMonth,
-                Price = orderItem.Price + 1m,
-            };
-
-            orderItem.ChangePrice(
-                expected.DeliveryDate,
-                expected.Quantity,
-                expected.EstimationPeriod,
-                expected.Price,
-                null);
-
-            orderItem.Should().BeEquivalentTo(expected);
-        }
-
-        [Test]
-        public static void UpdateFrom_ExpectedPropertiesUpdated()
-        {
-            var orderItem = OrderItemBuilder
-                .Create()
-                .WithProvisioningType(ProvisioningType.OnDemand)
-                .WithDeliveryDate(DateTime.UtcNow)
-                .WithEstimationPeriod(TimeUnit.PerYear)
-                .Build();
-
-            var expected = new
-            {
-                DeliveryDate = orderItem.DeliveryDate?.AddDays(1),
-                Quantity = orderItem.Quantity + 1,
-                EstimationPeriod = TimeUnit.PerMonth,
-                Price = orderItem.Price + 1.00m,
-            };
-
-            var updatedOrderItem = OrderItemBuilder
-                .Create()
-                .WithDeliveryDate(expected.DeliveryDate)
-                .WithEstimationPeriod(expected.EstimationPeriod)
-                .WithQuantity(expected.Quantity)
-                .WithPrice(expected.Price)
-                .Build();
-
-            orderItem.UpdateFrom(updatedOrderItem);
-
-            orderItem.Should().BeEquivalentTo(expected);
-        }
-
-        [Test]
-        public static void ChangePrice_ChangeValues_NullEstimationPeriod_ExpectedPropertiesUpdated()
-        {
-            var orderItem = OrderItemBuilder
-                .Create()
-                .WithProvisioningType(ProvisioningType.Patient)
-                .WithDeliveryDate(DateTime.UtcNow)
-                .WithEstimationPeriod(TimeUnit.PerYear)
-                .Build();
-
-            var expected = new
-            {
-                DeliveryDate = orderItem.DeliveryDate?.AddDays(1),
-                Quantity = orderItem.Quantity + 1,
-                EstimationPeriod = TimeUnit.PerYear,
-                Price = orderItem.Price + 1m,
-            };
-
-            orderItem.ChangePrice(
-                expected.DeliveryDate,
-                expected.Quantity,
-                null,
-                expected.Price,
-                null);
-
-            orderItem.Should().BeEquivalentTo(expected);
-        }
-
-        [TestCaseSource(nameof(ChangePriceTestCases))]
-        public static void ChangePrice_SetsExpectedUpdatedValue(
-            OrderItem orderItem,
-            DateTime deliveryDate,
-            TimeUnit estimationPeriod,
-            int quantity,
-            decimal price,
-            bool expectedValue)
-        {
-            orderItem.Updated.Should().BeFalse();
-
-            orderItem.ChangePrice(deliveryDate, quantity, estimationPeriod, price, null);
-
-            orderItem.Updated.Should().Be(expectedValue);
-        }
-
-        [TestCase(0, 0, false, 0, 0)]
-        [TestCase(1, 0, false, 0, 1)]
-        [TestCase(0, 1, false, 0, 1)]
-        [TestCase(0, 0, true, 0, 1)]
-        [TestCase(0, 0, false, 1, 1)]
-        public static void ChangePrice_Callback_ReturnsExpectedCallbackCount(
-            int deliveryDateChangeInput,
-            int quantityChangeInput,
-            bool estimationPeriodChangeInput,
-            decimal priceChangeInput,
-            int expectedCount)
-        {
-            int callbackCounter = 0;
-
-            var orderItem = OrderItemBuilder
-                .Create()
-                .WithProvisioningType(ProvisioningType.OnDemand)
-                .WithEstimationPeriod(TimeUnit.PerYear)
-                .Build();
-
-            orderItem.ChangePrice(
-                orderItem.DeliveryDate?.AddDays(deliveryDateChangeInput),
-                orderItem.Quantity + quantityChangeInput,
-                estimationPeriodChangeInput ? TimeUnit.PerMonth : TimeUnit.PerYear,
-                orderItem.Price + priceChangeInput,
-                () => callbackCounter++);
-
-            callbackCounter.Should().Be(expectedCount);
+            order.Progress.AdditionalServicesViewed.Should().BeTrue();
         }
 
         [Test]
         public static void Equals_DifferentType_ReturnsFalse()
         {
             var item = OrderItemBuilder.Create().Build();
+
             var anonItem = new
             {
-                item.OdsCode,
-                item.CatalogueItemId,
+                Order = item.OrderId,
+                item.CatalogueItem,
             };
 
             var isEqual = item.Equals(anonItem);
@@ -289,67 +94,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public static void Equals_TwoNewOrderItem_AreNotEqual()
+        public static void Equals_DifferentOrderId_AreNotEqual()
         {
-            var actual = OrderItemBuilder
-                .Create()
-                .Build();
+            var orderItem1 = OrderItemBuilder.Create().Build();
+            var orderItem2 = OrderItemBuilder.Create().WithOrderId(2).Build();
 
-            var expected = OrderItemBuilder
-                .Create()
-                .Build();
-
-            actual.Equals(expected).Should().BeFalse();
-        }
-
-        [TestCase(123, 456, false)]
-        [TestCase(123, 123, true)]
-        public static void Equals_DifferentOrderItemId_AreNotEqual(
-            int firstOrderItemIdInput,
-            int secondOrderItemIdInput,
-            bool expected)
-        {
-            var orderItem = OrderItemBuilder
-                .Create()
-                .WithOrderItemId(firstOrderItemIdInput)
-                .Build();
-
-            var comparisonObject = OrderItemBuilder
-                .Create()
-                .WithOrderItemId(secondOrderItemIdInput)
-                .Build();
-
-            orderItem.Equals(comparisonObject).Should().Be(expected);
-        }
-
-        [Test]
-        public static void GetHashCode_MatchOrderItemId()
-        {
-            const int expected = 123;
-
-            var orderItem = OrderItemBuilder
-                .Create()
-                .WithOrderItemId(expected)
-                .Build();
-
-            orderItem.GetHashCode().Should().Be(expected);
-        }
-
-        [Test]
-        public static void GetHashCode_TwoOrderItems_HashCodeNotEqual()
-        {
-            var orderItem = OrderItemBuilder
-                .Create()
-                .Build();
-
-            var orderItemComparison = OrderItemBuilder
-                .Create()
-                .Build();
-
-            var actual = orderItem.GetHashCode();
-            var expected = orderItemComparison.GetHashCode();
-
-            actual.Should().NotBe(expected);
+            orderItem1.Equals(orderItem2).Should().BeFalse();
         }
 
         [Test]
@@ -358,7 +108,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             var orderItem = OrderItemBuilder
                 .Create()
                 .WithPrice(1m)
-                .WithQuantity(10)
+                .WithRecipient(new OrderItemRecipient { Quantity = 10 })
                 .WithPriceTimeUnit(TimeUnit.PerMonth)
                 .Build();
 
@@ -366,12 +116,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public static void CalculateCost_WithPriceTypePerYear_CalculatesCostCorrectly()
+        public static void CalculateTotalCostPerYear_WithPriceTypePerYear_CalculatesCostCorrectly()
         {
             var orderItem = OrderItemBuilder
                 .Create()
                 .WithPrice(1m)
-                .WithQuantity(10)
+                .WithRecipient(new OrderItemRecipient { Quantity = 10 })
                 .WithPriceTimeUnit(TimeUnit.PerYear)
                 .Build();
 
@@ -384,7 +134,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             var orderItem = OrderItemBuilder
                 .Create()
                 .WithPrice(0.1m)
-                .WithQuantity(10)
+                .WithRecipient(new OrderItemRecipient { Quantity = 10 })
                 .WithPriceTimeUnit(null)
                 .WithEstimationPeriod(TimeUnit.PerMonth)
                 .Build();
@@ -398,7 +148,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             var orderItem = OrderItemBuilder
                 .Create()
                 .WithPrice(0.1m)
-                .WithQuantity(10)
+                .WithRecipient(new OrderItemRecipient { Quantity = 10 })
                 .WithPriceTimeUnit(null)
                 .WithEstimationPeriod(TimeUnit.PerYear)
                 .Build();
@@ -407,7 +157,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public static void CalculateCost_WithNoPriceTypeOrEstimationPeriod_PriceIsPriceTimesQuantity()
+        public static void CalculateTotalCostPerYear_WithNoPriceTypeOrEstimationPeriod_PriceIsPriceTimesQuantity()
         {
             const int price = 26;
             const int quantity = 13;
@@ -415,7 +165,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             var orderItem = OrderItemBuilder
                 .Create()
                 .WithPrice(price)
-                .WithQuantity(quantity)
+                .WithRecipient(new OrderItemRecipient { Quantity = quantity })
                 .WithPriceTimeUnit(null)
                 .WithEstimationPeriod(null)
                 .Build();
@@ -446,34 +196,56 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             orderItem.CostType.Should().Be(costType);
         }
 
-        private static IEnumerable<ITestCaseData> ChangePriceTestCases()
+        [Test]
+        [CommonAutoData]
+        public static void GetHashCode_EqualItems_ReturnsExpectedValue(int orderId, CatalogueItem catalogueItem)
         {
-            const TimeUnit estimationPeriod = TimeUnit.PerMonth;
-            const int quantity = 1;
-            const decimal price = 1.00m;
+            var orderItem1 = new OrderItem { OrderId = orderId, CatalogueItem = catalogueItem };
+            var orderItem2 = new OrderItem { OrderId = orderId, CatalogueItem = catalogueItem };
 
-            var deliveryDate = DateTime.UtcNow;
+            var hash1 = orderItem1.GetHashCode();
+            var hash2 = orderItem2.GetHashCode();
 
-            OrderItem OrderItem() =>
-                OrderItemBuilder.Create()
-                    .WithDeliveryDate(deliveryDate)
-                    .WithEstimationPeriod(estimationPeriod)
-                    .WithPrice(price)
-                    .WithQuantity(quantity)
-                    .Build();
+            hash1.Should().Be(hash2);
+        }
 
-            yield return new TestCaseData(OrderItem(), deliveryDate, estimationPeriod, quantity, price, false);
-            yield return new TestCaseData(OrderItem(), deliveryDate.AddDays(1), estimationPeriod, quantity, price, true);
-            yield return new TestCaseData(OrderItem(), deliveryDate, TimeUnit.PerYear, quantity, price, true);
-            yield return new TestCaseData(OrderItem(), deliveryDate, estimationPeriod, quantity + 1, price, true);
-            yield return new TestCaseData(OrderItem(), deliveryDate, estimationPeriod, quantity, price + 1.00m, true);
+        [Test]
+        [CommonAutoData]
+        public static void GetHashCode_DifferentOrderId_ReturnsExpectedValue(
+            int orderId1,
+            int orderId2,
+            CatalogueItem catalogueItem)
+        {
+            var orderItem1 = new OrderItem { OrderId = orderId1, CatalogueItem = catalogueItem };
+            var orderItem2 = new OrderItem { OrderId = orderId2, CatalogueItem = catalogueItem };
+
+            var hash1 = orderItem1.GetHashCode();
+            var hash2 = orderItem2.GetHashCode();
+
+            hash1.Should().NotBe(hash2);
+        }
+
+        [Test]
+        [CommonAutoData]
+        public static void GetHashCode_DifferentCatalogueItem_ReturnsExpectedValue(
+            int orderId,
+            CatalogueItem catalogueItem1,
+            CatalogueItem catalogueItem2)
+        {
+            var orderItem1 = new OrderItem { OrderId = orderId, CatalogueItem = catalogueItem1 };
+            var orderItem2 = new OrderItem { OrderId = orderId, CatalogueItem = catalogueItem2 };
+
+            var hash1 = orderItem1.GetHashCode();
+            var hash2 = orderItem2.GetHashCode();
+
+            hash1.Should().NotBe(hash2);
         }
 
         private static OrderItem CreateOrderItem(CatalogueItemType catalogueItemType, ProvisioningType provisioningType)
         {
             return OrderItemBuilder
                 .Create()
-                .WithCatalogueItemType(catalogueItemType)
+                .WithCatalogueItem(new CatalogueItem { CatalogueItemType = catalogueItemType })
                 .WithProvisioningType(provisioningType)
                 .Build();
         }

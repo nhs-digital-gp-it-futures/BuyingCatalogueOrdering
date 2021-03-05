@@ -1,213 +1,122 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NHSD.BuyingCatalogue.Ordering.Api.Attributes;
 using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Api.Models.Errors;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
-using NHSD.BuyingCatalogue.Ordering.Api.Services.UpdateOrderItem;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
-    [Route("api/v1/orders/{orderId}/order-items")]
+    [Route("api/v1/orders/{callOffId}/order-items")]
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     [AuthorizeOrganisation]
     public sealed class OrderItemsController : ControllerBase
     {
-        private readonly IOrderRepository orderRepository;
-        private readonly IUpdateOrderItemService updateOrderItemService;
+        private readonly ApplicationDbContext context;
         private readonly ICreateOrderItemService createOrderItemService;
 
         public OrderItemsController(
-            IOrderRepository orderRepository,
-            IUpdateOrderItemService updateOrderItemService,
+            ApplicationDbContext context,
             ICreateOrderItemService createOrderItemService)
         {
-            this.orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
-            this.updateOrderItemService = updateOrderItemService ?? throw new ArgumentNullException(nameof(updateOrderItemService));
+            this.context = context ?? throw new ArgumentNullException(nameof(context));
             this.createOrderItemService = createOrderItemService ?? throw new ArgumentNullException(nameof(createOrderItemService));
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetOrderItemModel>>> ListAsync(
-            string orderId,
-            [FromQuery] string catalogueItemType)
+        public async Task<ActionResult<List<GetOrderItemModel>>> ListAsync(
+            CallOffId callOffId,
+            [FromQuery] CatalogueItemType? catalogueItemType)
         {
-            static void ConfigureQuery(IOrderQuery query) => query
-                .WithOrderItems()
-                .WithServiceInstanceItems()
-                .WithServiceRecipients()
-                .WithoutTracking();
-
-            var order = await orderRepository.GetOrderByIdAsync(
-                orderId,
-                ConfigureQuery);
-
-            if (order is null)
-            {
+            if (!await context.Order.AnyAsync(o => o.Id == callOffId.Id))
                 return NotFound();
-            }
 
-            IEnumerable<OrderItem> orderItems = order.OrderItems;
+            Expression<Func<Order, IEnumerable<OrderItem>>> orderItems = catalogueItemType is null
+                ? o => o.OrderItems
+                : o => o.OrderItems.Where(i => i.CatalogueItem.CatalogueItemType == catalogueItemType.Value);
 
-            if (!string.IsNullOrWhiteSpace(catalogueItemType))
-            {
-                var catalogueItemTypeFromName = OrderingEnums.Parse<CatalogueItemType>(catalogueItemType);
-                if (catalogueItemTypeFromName is null)
-                {
-                    return new List<GetOrderItemModel>();
-                }
-
-                orderItems = orderItems.Where(i => i.CatalogueItemType.Equals(catalogueItemTypeFromName));
-            }
-
-            var serviceInstanceItems = order.ServiceInstanceItems.ToDictionary(i => i.OrderItemId, i => i.ServiceInstanceId);
-            var serviceRecipients = order.ServiceRecipients.ToDictionary(r => r.OdsCode, StringComparer.OrdinalIgnoreCase);
-            serviceRecipients.TryAdd(
-                order.OrganisationOdsCode,
-                new ServiceRecipient { OdsCode = order.OrganisationOdsCode, Name = order.OrganisationName });
-
-            GetOrderItemModel Selector(OrderItem item) => new(
-                item,
-                serviceRecipients[item.OdsCode],
-                serviceInstanceItems.GetValueOrDefault(item.OrderItemId));
-
-            return orderItems
-                .OrderBy(i => i.Created)
-                .Select(Selector)
-                .ToList();
+            return await context.Order
+                .Where(o => o.Id == callOffId.Id)
+                .Include(orderItems).ThenInclude(i => i.CatalogueItem)
+                .Include(orderItems).ThenInclude(i => i.OrderItemRecipients).ThenInclude(r => r.Recipient)
+                .Include(orderItems).ThenInclude(i => i.PricingUnit)
+                .SelectMany(orderItems)
+                .OrderBy(i => i.CatalogueItem.Name)
+                .Select(i => new GetOrderItemModel(i))
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         [HttpGet]
-        [Route("{orderItemId}")]
-        public async Task<ActionResult<GetOrderItemModel>> GetAsync(string orderId, int orderItemId)
+        [Route("{catalogueItemId}")]
+        public async Task<ActionResult<GetOrderItemModel>> GetAsync(CallOffId callOffId, CatalogueItemId catalogueItemId)
         {
-            var order = await orderRepository.GetOrderByIdAsync(orderId);
-            if (order is null)
-            {
+            Expression<Func<Order, IEnumerable<OrderItem>>> orderItems = o =>
+                o.OrderItems.Where(i => i.CatalogueItem.Id == catalogueItemId);
+
+            var model = await context.Order
+                .Where(o => o.Id == callOffId.Id)
+                .Include(orderItems).ThenInclude(i => i.CatalogueItem)
+                .Include(orderItems).ThenInclude(i => i.OrderItemRecipients).ThenInclude(r => r.Recipient)
+                .Include(orderItems).ThenInclude(i => i.PricingUnit)
+                .SelectMany(orderItems)
+                .Select(i => new GetOrderItemModel(i))
+                .SingleOrDefaultAsync();
+
+            if (model is null)
                 return NotFound();
-            }
 
-            OrderItem orderItem = order.OrderItems.FirstOrDefault(i => i.OrderItemId == orderItemId);
-            if (orderItem is null)
-                return NotFound();
-
-            var serviceRecipientDictionary = order.ServiceRecipients.ToDictionary(r => r.OdsCode.ToUpperInvariant());
-
-            serviceRecipientDictionary.TryAdd(
-                order.OrganisationOdsCode.ToUpperInvariant(),
-                new ServiceRecipient { OdsCode = order.OrganisationOdsCode, Name = order.OrganisationName });
-
-            serviceRecipientDictionary.TryGetValue(orderItem.OdsCode.ToUpperInvariant(), out var serviceRecipient);
-
-            return new GetOrderItemModel(orderItem, serviceRecipient);
+            return model;
         }
 
-        [HttpPost]
+        [HttpPut("{catalogueItemId}")]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult<CreateOrderItemResponseModel>> CreateOrderItemAsync(
-            string orderId,
+        [UseValidationProblemDetails]
+        public async Task<IActionResult> CreateOrderItemAsync(
+            CallOffId callOffId,
+            CatalogueItemId catalogueItemId,
             CreateOrderItemModel model)
         {
             if (model is null)
                 throw new ArgumentNullException(nameof(model));
 
-            var order = await orderRepository.GetOrderByIdAsync(orderId);
-            if (order is null)
-            {
-                return NotFound();
-            }
+            var order = await context.Order
+                .Where(o => o.Id == callOffId.Id)
+                .Include(o => o.DefaultDeliveryDates)
+                .Include(o => o.OrderItems).ThenInclude(i => i.CatalogueItem)
+                .Include(o => o.OrderItems).ThenInclude(i => i.OrderItemRecipients)
+                .SingleOrDefaultAsync();
 
-            var createOrderItemResponse = new CreateOrderItemResponseModel();
-
-            var result = await createOrderItemService.CreateAsync(model.ToRequest(order));
-
-            if (result.IsSuccess)
-            {
-                createOrderItemResponse.OrderItemId = result.Value;
-                return CreatedAtAction(nameof(GetAsync).TrimAsync(), "OrderItems", new { orderId, orderItemId = createOrderItemResponse.OrderItemId }, createOrderItemResponse);
-            }
-
-            createOrderItemResponse.Errors = result.Errors.Select(d => new ErrorModel(d.Id, d.Field));
-            return BadRequest(createOrderItemResponse);
-        }
-
-        [HttpPost("batch")]
-        [Authorize(Policy = PolicyName.CanManageOrders)]
-        [UseValidationProblemDetails]
-        public async Task<IActionResult> CreateOrderItemsAsync(
-            string orderId,
-            IEnumerable<CreateOrderItemModel> model)
-        {
-            if (model is null)
-                throw new ArgumentNullException(nameof(model));
-
-            var order = await orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
                 return NotFound();
 
-            var validationResult = await createOrderItemService.CreateAsync(
-                order,
-                model.Select(item => item.ToRequest(order)).ToList());
+            var validationResult = await createOrderItemService.CreateAsync(order, catalogueItemId, model);
 
             if (validationResult.Success)
-                return NoContent();
+            {
+                return CreatedAtAction(
+                    nameof(GetAsync).TrimAsync(),
+                    new { callOffId = callOffId.ToString(), catalogueItemId = catalogueItemId.ToString() },
+                    null);
+            }
 
             foreach ((string key, string errorMessage) in validationResult.ToModelErrors())
                 ModelState.AddModelError(key, errorMessage);
 
             return ValidationProblem(ModelState);
-        }
-
-        [HttpPut]
-        [Route("{orderItemId}")]
-        [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult<UpdateOrderItemResponseModel>> UpdateOrderItemAsync(
-            string orderId,
-            int orderItemId,
-            UpdateOrderItemModel model)
-        {
-            if (model is null)
-                throw new ArgumentNullException(nameof(model));
-
-            var order = await orderRepository.GetOrderByIdAsync(orderId);
-            if (order is null)
-                return NotFound();
-
-            var orderItem = order.OrderItems.FirstOrDefault(
-                item => orderItemId.Equals(item.OrderItemId));
-
-            if (orderItem is null)
-                return NotFound();
-
-            // TODO: remove this hack (consider custom model binder or HybridModelBinding package)
-            model.OrderItemId = orderItemId;
-
-            var result = await updateOrderItemService.UpdateAsync(
-                new UpdateOrderItemRequest(order, model),
-                orderItem.CatalogueItemType,
-                orderItem.ProvisioningType);
-
-            if (result.IsSuccess)
-                return NoContent();
-
-            var updateOrderItemResponse = new UpdateOrderItemResponseModel
-            {
-                Errors = result.Errors.Select(d => new ErrorModel(d.Id, d.Field)),
-            };
-
-            return BadRequest(updateOrderItemResponse);
         }
     }
 }

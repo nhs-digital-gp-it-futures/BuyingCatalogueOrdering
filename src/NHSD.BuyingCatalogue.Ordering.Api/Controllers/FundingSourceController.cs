@@ -1,66 +1,61 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
-using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
+using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
-    [Route("api/v1/orders/{orderId}/funding-source")]
+    [Route("api/v1/orders/{callOffId}/funding-source")]
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     [Authorize(Policy = PolicyName.CanAccessOrders)]
     [AuthorizeOrganisation]
     public sealed class FundingSourceController : Controller
     {
-        private readonly IOrderRepository orderRepository;
+        private readonly ApplicationDbContext context;
 
-        public FundingSourceController(IOrderRepository orderRepository)
+        public FundingSourceController(ApplicationDbContext context)
         {
-            this.orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
         [HttpGet]
-        public async Task<ActionResult<GetFundingSourceModel>> GetAsync(string orderId)
+        public async Task<ActionResult<GetFundingSourceModel>> GetAsync(CallOffId callOffId)
         {
-            var order = await orderRepository.GetOrderByIdAsync(orderId);
-            if (order is null)
-            {
-                return NotFound();
-            }
+            var model = await context.Order
+                .Where(o => o.Id == callOffId.Id)
+                .Select(o => new GetFundingSourceModel { OnlyGms = o.FundingSourceOnlyGms })
+                .AsNoTracking()
+                .SingleOrDefaultAsync();
 
-            return new GetFundingSourceModel
-            {
-                OnlyGms = order.FundingSourceOnlyGms,
-            };
+            if (model is null)
+                return NotFound();
+
+            return model;
         }
 
         [HttpPut]
         [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult> PutFundingSourceAsync(string orderId, UpdateFundingSourceModel model)
+        public async Task<ActionResult> PutFundingSourceAsync([FromRoute] Order order, UpdateFundingSourceModel model)
         {
             if (model is null)
-            {
                 throw new ArgumentNullException(nameof(model));
-            }
 
-            var order = await orderRepository.GetOrderByIdAsync(orderId);
             if (order is null)
-            {
                 return NotFound();
-            }
 
             order.FundingSourceOnlyGms = model.OnlyGms;
 
-            var name = User.GetUserName();
-            order.SetLastUpdatedBy(User.GetUserId(), name);
+            await context.SaveChangesAsync();
 
-            await orderRepository.UpdateOrderAsync(order);
             return NoContent();
         }
     }

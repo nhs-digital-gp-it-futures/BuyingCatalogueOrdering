@@ -4,13 +4,13 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoFixture;
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument;
-using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Builders.Services;
+using NHSD.BuyingCatalogue.Ordering.Application;
+using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
@@ -90,7 +90,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        [OrderingAutoData]
+        [CommonAutoData]
         public static async Task CreatePriceTypeCsvAsync_InvokesCreateCsvAsync(
             [Frozen] Mock<ICsvStreamWriter<OdooOrderItem>> csvWriter,
             CreatePurchasingDocumentService service,
@@ -105,17 +105,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        [OrderingAutoData]
+        [CommonAutoData]
         public static async Task CreatePriceTypeCsvAsync_CreatesExpectedPriceType(
             [Frozen] Mock<ICsvStreamWriter<OdooOrderItem>> csvWriter,
-            CreatePurchasingDocumentService service,
-            OdsOrganisation odsOrganisation)
+            [Frozen] OrderItem item,
+            Order order,
+            CreatePurchasingDocumentService service)
         {
-            var fixture = new Fixture();
-            fixture.Customize(new SingleServiceRecipientOrderCustomization(odsOrganisation));
-
-            var item = fixture.Freeze<OrderItem>();
-            var order = fixture.Create<Order>();
+            item.SetRecipients(new[] { item.OrderItemRecipients[0] });
+            order.AddOrUpdateOrderItem(item);
 
             IReadOnlyList<OdooOrderItem> actualOrderItems = null;
             void SaveOrderItems(Stream s, IEnumerable<OdooOrderItem> orderItems) => actualOrderItems = orderItems.ToList();
@@ -128,7 +126,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             actualOrderItems.Should().NotBeNull();
             actualOrderItems.Should().HaveCount(1);
-            actualOrderItems[0].Should().BeEquivalentTo(new OdooOrderItem(order, item, odsOrganisation.Name));
+            actualOrderItems[0].Should().BeEquivalentTo(new OdooOrderItem(order.FlattenOrderItems()[0]));
         }
 
         private sealed class CreatePurchasingDocumentServiceTestContext

@@ -1,111 +1,88 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using JetBrains.Annotations;
 using NHSD.BuyingCatalogue.Ordering.Domain.Orders;
 using NHSD.BuyingCatalogue.Ordering.Domain.Results;
 
 namespace NHSD.BuyingCatalogue.Ordering.Domain
 {
-    public sealed class Order
+    public sealed class Order : IAudited, IEquatable<Order>
     {
+        private readonly List<DefaultDeliveryDate> defaultDeliveryDates = new();
         private readonly List<OrderItem> orderItems = new();
-        private readonly List<ServiceRecipient> serviceRecipients = new();
+        private readonly List<SelectedServiceRecipient> selectedServiceRecipients = new();
         private readonly List<ServiceInstanceItem> serviceInstanceItems = new();
 
         private DateTime? completed;
+        private DateTime lastUpdated;
+        private Guid lastUpdatedBy;
+        private string lastUpdatedByName;
 
-        private Order()
-        {
-        }
+#pragma warning disable 0649 // Set by EF Core
 
-        private Order(OrderDescription orderDescription, Guid organisationId)
-            : this()
-        {
-            Description = orderDescription ?? throw new ArgumentNullException(nameof(orderDescription));
-            OrganisationId = organisationId;
-            OrderStatus = OrderStatus.Incomplete;
-            Created = DateTime.UtcNow;
-        }
+        [SuppressMessage("Style", "IDE0044:Add read-only modifier", Justification = "Set by EF Core")]
+        [UsedImplicitly]
+        private int id;
 
-        public string OrderId { get; set; }
+#pragma warning restore 0649
 
-        public OrderDescription Description { get; private set; }
+        // The private set is required here as EF core will use this to identity the property as read/write,
+        // so that it can set this value when an order item is persisted to the database.
+        // ReSharper disable once ConvertToAutoProperty
+        [UsedImplicitly]
+        public int Id => id;
 
-        public Guid OrganisationId { get; }
+        public byte Revision { get; init; } = 1;
 
-        public string OrganisationName { get; set; }
+        public CallOffId CallOffId { get; init; }
 
-        public string OrganisationOdsCode { get; set; }
+        public string Description { get; set; }
 
-        [ForeignKey("OrganisationAddressId")]
-        public Address OrganisationAddress { get; set; }
+        public OrderingParty OrderingParty { get; init; }
 
-        [ForeignKey("OrganisationContactId")]
-        public Contact OrganisationContact { get; set; }
+        public Contact OrderingPartyContact { get; set; }
 
-        public DateTime Created { get; set; }
+        public Supplier Supplier { get; set; }
+
+        public Contact SupplierContact { get; set; }
+
+        public DateTime? CommencementDate { get; set; }
+
+        public bool? FundingSourceOnlyGms { get; set; }
+
+        public DateTime Created { get; } = DateTime.UtcNow;
+
+        // Backing field required so that EF Core can set value
+        // ReSharper disable once ConvertToAutoPropertyWithPrivateSetter
+        public DateTime LastUpdated => lastUpdated;
+
+        // Backing field required so that EF Core can set value
+        // ReSharper disable once ConvertToAutoPropertyWithPrivateSetter
+        public Guid LastUpdatedBy => lastUpdatedBy;
+
+        // Backing field required so that EF Core can set value
+        // ReSharper disable once ConvertToAutoPropertyWithPrivateSetter
+        public string LastUpdatedByName => lastUpdatedByName;
 
         // Backing field is initialized by EF Core (allowing property to be read-only)
         // ReSharper disable once ConvertToAutoPropertyWithPrivateSetter
         public DateTime? Completed => completed;
 
-        public DateTime LastUpdated { get; set; }
+        public OrderProgress Progress { get; init; } = new();
 
-        public Guid LastUpdatedBy { get; set; }
-
-        public string LastUpdatedByName { get; set; }
-
-        public OrderStatus OrderStatus { get; set; }
-
-        public bool ServiceRecipientsViewed { get; set; }
-
-        public bool CatalogueSolutionsViewed { get; set; }
-
-        public string SupplierId { get; set; }
-
-        public string SupplierName { get; set; }
-
-        [ForeignKey("SupplierAddressId")]
-        public Address SupplierAddress { get; set; }
-
-        [ForeignKey("SupplierContactId")]
-        public Contact SupplierContact { get; set; }
-
-        public DateTime? CommencementDate { get; set; }
-
-        public bool AdditionalServicesViewed { get; set; }
-
-        public bool AssociatedServicesViewed { get; set; }
-
-        public bool? FundingSourceOnlyGms { get; set; }
+        public OrderStatus OrderStatus { get; set; } = OrderStatus.Incomplete;
 
         public bool IsDeleted { get; set; }
 
-        public IReadOnlyList<OrderItem> OrderItems =>
-            orderItems.AsReadOnly();
+        public IReadOnlyList<OrderItem> OrderItems => orderItems.AsReadOnly();
 
-        public IReadOnlyList<ServiceRecipient> ServiceRecipients =>
-            serviceRecipients.AsReadOnly();
+        public IReadOnlyList<DefaultDeliveryDate> DefaultDeliveryDates => defaultDeliveryDates.AsReadOnly();
 
-        public IReadOnlyList<ServiceInstanceItem> ServiceInstanceItems =>
-            serviceInstanceItems.AsReadOnly();
+        public IReadOnlyList<SelectedServiceRecipient> SelectedServiceRecipients => selectedServiceRecipients.AsReadOnly();
 
-        public static Order Create(
-            OrderDescription orderDescription,
-            Guid organisationId,
-            Guid lastUpdatedBy,
-            string lastUpdatedByName)
-        {
-            var order = new Order(orderDescription, organisationId);
-            order.SetLastUpdatedBy(lastUpdatedBy, lastUpdatedByName);
-            return order;
-        }
-
-        public void SetDescription(OrderDescription orderDescription)
-        {
-            Description = orderDescription ?? throw new ArgumentNullException(nameof(orderDescription));
-        }
+        public IReadOnlyList<ServiceInstanceItem> ServiceInstanceItems => serviceInstanceItems.AsReadOnly();
 
         public decimal CalculateCostPerYear(CostType costType)
         {
@@ -119,89 +96,66 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             return CalculateCostPerYear(CostType.OneOff) + (defaultContractLength * CalculateCostPerYear(CostType.Recurring));
         }
 
-        public void SetLastUpdatedBy(Guid userId, string name)
+        public DeliveryDateResult SetDefaultDeliveryDate(CatalogueItemId catalogueItemId, DateTime date)
         {
-            LastUpdatedBy = userId;
-            LastUpdatedByName = name ?? throw new ArgumentNullException(nameof(name));
-            LastUpdated = DateTime.UtcNow;
+            var result = DeliveryDateResult.Updated;
+
+            var existingDate = DefaultDeliveryDates.SingleOrDefault(d => d.CatalogueItemId == catalogueItemId);
+            if (existingDate is null)
+            {
+                existingDate = new DefaultDeliveryDate
+                {
+                    CatalogueItemId = catalogueItemId,
+                    OrderId = Id,
+                };
+
+                defaultDeliveryDates.Add(existingDate);
+                result = DeliveryDateResult.Added;
+            }
+
+            existingDate.DeliveryDate = date;
+            return result;
         }
 
-        public void AddOrderItem(
-            OrderItem orderItem,
-            Guid userId,
-            string name)
+        public void SetSelectedServiceRecipients(IReadOnlyList<SelectedServiceRecipient> selectedRecipients)
+        {
+            if (selectedRecipients is null)
+                throw new ArgumentNullException(nameof(selectedRecipients));
+
+            selectedServiceRecipients.Clear();
+            selectedServiceRecipients.AddRange(selectedRecipients);
+
+            if (selectedRecipients.Count == 0)
+                Progress.CatalogueSolutionsViewed = false;
+
+            Progress.ServiceRecipientsViewed = true;
+        }
+
+        public void SetLastUpdatedBy(Guid userId, string userName)
+        {
+            lastUpdatedBy = userId;
+            lastUpdatedByName = userName ?? throw new ArgumentNullException(nameof(userName));
+            lastUpdated = DateTime.UtcNow;
+        }
+
+        public OrderItem AddOrUpdateOrderItem(OrderItem orderItem)
         {
             if (orderItem is null)
                 throw new ArgumentNullException(nameof(orderItem));
 
-            if (orderItems.Contains(orderItem))
-                return;
-
-            orderItems.Add(orderItem);
-            orderItem.MarkOrderSectionAsViewed(this);
-
-            SetLastUpdatedBy(userId, name);
-        }
-
-        public void UpdateOrderItem(
-            int orderItemId,
-            DateTime? deliveryDate,
-            int quantity,
-            TimeUnit? estimationPeriod,
-            decimal? price,
-            Guid userId,
-            string name)
-        {
-            var orderItem = orderItems.FirstOrDefault(item => orderItemId.Equals(item.OrderItemId));
-
-            orderItem?.ChangePrice(
-                deliveryDate,
-                quantity,
-                estimationPeriod,
-                price,
-                () => SetLastUpdatedBy(userId, name));
-        }
-
-        public void MergeOrderItems(OrderItemMerge merge)
-        {
-            if (merge is null)
-                throw new ArgumentNullException(nameof(merge));
-
-            var startingOrderItemsHash = GetOrderItemsHash();
-            var itemsToUpdate = orderItems.Intersect(merge.UpdatedItems.Values);
-
-            foreach (var orderItem in itemsToUpdate)
+            var existingItem = orderItems.SingleOrDefault(o => o.Equals(orderItem));
+            if (existingItem is null)
             {
-                var updatedItem = merge.UpdatedItems[orderItem.OrderItemId];
-                orderItem.UpdateFrom(updatedItem);
+                orderItems.Add(orderItem);
+                orderItem.MarkOrderSectionAsViewed(this);
+
+                return orderItem;
             }
 
-            orderItems.AddRange(merge.NewItems);
-            serviceRecipients.AddRange(merge.Recipients.Except(ServiceRecipients));
-            merge.MarkOrderSectionsAsViewed(this);
+            existingItem.EstimationPeriod = orderItem.EstimationPeriod;
+            existingItem.Price = orderItem.Price;
 
-            if (startingOrderItemsHash != GetOrderItemsHash())
-                SetLastUpdatedBy(merge.UserId, merge.UserName);
-        }
-
-        public void SetServiceRecipients(IEnumerable<OdsOrganisation> recipients, Guid userId, string lastUpdatedName)
-        {
-            if (recipients is null)
-                throw new ArgumentNullException(nameof(recipients));
-
-            serviceRecipients.Clear();
-
-            foreach ((string code, string name) in recipients)
-            {
-                serviceRecipients.Add(new ServiceRecipient
-                {
-                    Name = name,
-                    OdsCode = code,
-                    Order = this,
-                });
-            }
-
-            SetLastUpdatedBy(userId, lastUpdatedName);
+            return existingItem;
         }
 
         public bool CanComplete()
@@ -209,24 +163,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             if (!FundingSourceOnlyGms.HasValue)
                 return false;
 
-            int serviceRecipientsCount = ServiceRecipients.Count;
-            int catalogueSolutionsCount = OrderItems.Count(o => o.CatalogueItemType.Equals(CatalogueItemType.Solution));
-            int associatedServicesCount = OrderItems.Count(o => o.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
+            var serviceRecipientsCount = OrderItems.SelectMany(i => i.OrderItemRecipients).Count();
+            int catalogueSolutionsCount = OrderItems.Count(o => o.CatalogueItem.CatalogueItemType.Equals(CatalogueItemType.Solution));
+            int associatedServicesCount = OrderItems.Count(o => o.CatalogueItem.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
 
             var solutionAndAssociatedServices = catalogueSolutionsCount > 0
                 && associatedServicesCount > 0;
 
             var solutionAndNoAssociatedServices = catalogueSolutionsCount > 0
                 && associatedServicesCount == 0
-                && AssociatedServicesViewed;
+                && Progress.AssociatedServicesViewed;
 
             var noSolutionsAndAssociatedServices = serviceRecipientsCount > 0
                 && catalogueSolutionsCount == 0
-                && CatalogueSolutionsViewed
+                && Progress.CatalogueSolutionsViewed
                 && associatedServicesCount > 0;
 
             var recipientsAndAssociatedServices = serviceRecipientsCount == 0
-                && ServiceRecipientsViewed
+                && Progress.ServiceRecipientsViewed
                 && associatedServicesCount > 0;
 
             return solutionAndNoAssociatedServices
@@ -235,7 +189,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 || noSolutionsAndAssociatedServices;
         }
 
-        public Result Complete(Guid lastUpdatedBy, string lastUpdatedByName)
+        public Result Complete()
         {
             if (!CanComplete())
                 return Result.Failure(OrderErrors.OrderNotComplete());
@@ -243,21 +197,25 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             OrderStatus = OrderStatus.Complete;
             completed = DateTime.UtcNow;
 
-            SetLastUpdatedBy(lastUpdatedBy, lastUpdatedByName);
-
             return Result.Success();
         }
 
-        private int GetOrderItemsHash()
+        public bool Equals(Order other)
         {
-            var hash = default(HashCode);
-            foreach (var orderItem in orderItems)
-            {
-                hash.Add(orderItem.GetHashCode());
-                hash.Add(orderItem.Updated.GetHashCode());
-            }
+            if (ReferenceEquals(null, other))
+                return false;
 
-            return hash.ToHashCode();
+            return ReferenceEquals(this, other) || Id == other.Id;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Order);
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
         }
     }
 }

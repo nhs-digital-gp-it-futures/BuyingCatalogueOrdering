@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using FluentValidation;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
@@ -6,8 +8,10 @@ using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Validation
 {
-    internal sealed class CreateOrderItemModelValidator : UpdateOrderItemModelValidator<CreateOrderItemModel>
+    internal sealed class CreateOrderItemModelValidator : AbstractValidator<CreateOrderItemModel>
     {
+        internal const decimal MaxPrice = 999999999999999.999m;
+
         public CreateOrderItemModelValidator()
         {
             RuleFor(m => m.CatalogueItemType)
@@ -23,26 +27,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Validation
 
                         Unless(IsAssociatedService, () =>
                         {
-                            RuleFor(m => m.ServiceRecipient).Required();
-
                             RuleFor(m => m.TimeUnit)
                                 .Required()
                                 .When(HasProvisioningType)
                                 .Unless(IsOnDemand);
                         });
 
-                        RuleFor(m => m.DeliveryDate)
-                            .Required()
+                        RuleFor(m => m.ServiceRecipients).Required();
+                        RuleForEach(m => m.ServiceRecipients).SetValidator(new OrderItemRecipientModelValidator());
+                        RuleForEach(m => m.ServiceRecipients)
+                            .ChildRules(v => v.RuleFor(r => r.DeliveryDate).Required())
                             .When(IsSolution);
+
+                        RuleFor(m => m.ServiceRecipients)
+                            .Must(NotContainDuplicates)
+                            .WithMessage("{PropertyName}ContainsDuplicates");
                     });
 
             RuleFor(m => m.ProvisioningType)
                 .Required()
                 .IsEnumName<CreateOrderItemModel, ProvisioningType>();
-
-            RuleFor(m => m.CatalogueItemId)
-                .Required()
-                .MaxLength(14);
 
             RuleFor(m => m.CatalogueItemName)
                 .Required()
@@ -64,6 +68,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Validation
                 .WithValidValueMessage()
                 .When(HasProvisioningType)
                 .When(IsOnDemand);
+
+            RuleFor(m => m.Price)
+                .Required()
+                .GreaterThanOrEqualTo(0.00m).WithMessage("{PropertyName}GreaterThanOrEqualToZero")
+                .LessThanOrEqualToMax(MaxPrice);
+        }
+
+        private static bool NotContainDuplicates(IReadOnlyList<OrderItemRecipientModel> recipients)
+        {
+            var recipientCodes = new HashSet<string>();
+            return recipients?.All(recipient => recipientCodes.Add(recipient.OdsCode)) ?? true;
         }
 
         private static bool BeValidEstimationPeriod(string estimationPeriod)

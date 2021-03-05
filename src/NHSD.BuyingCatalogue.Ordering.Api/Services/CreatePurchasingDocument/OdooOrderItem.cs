@@ -1,32 +1,33 @@
 ﻿using System;
+using NHSD.BuyingCatalogue.Ordering.Application;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
 {
     public sealed class OdooOrderItem
     {
-        public OdooOrderItem(Order order, OrderItem orderItem, string serviceRecipientName)
+        public OdooOrderItem(FlattenedOrderItem orderItem)
         {
-            if (order is null)
-                throw new ArgumentNullException(nameof(order));
-
             if (orderItem is null)
                 throw new ArgumentNullException(nameof(orderItem));
 
-            CallOffAgreementId = order.OrderId;
-            CallOffOrderingPartyId = order.OrganisationOdsCode;
-            CallOffOrderingPartyName = order.OrganisationName;
+            var order = orderItem.Order;
+            var recipient = orderItem.Recipient;
+
+            CallOffAgreementId = order.CallOffId.ToString();
+            CallOffOrderingPartyId = order.OrderingParty.OdsCode;
+            CallOffOrderingPartyName = order.OrderingParty.Name;
             CallOffCommencementDate = order.CommencementDate;
-            ServiceRecipientId = orderItem.OdsCode;
-            ServiceRecipientName = serviceRecipientName;
-            ServiceRecipientItemId = $"{order.OrderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}";
-            SupplierId = order.SupplierId;
-            SupplierName = order.SupplierName;
-            ProductId = orderItem.CatalogueItemId;
-            ProductName = orderItem.CatalogueItemName;
-            ProductType = orderItem.CatalogueItemType.DisplayName();
+            ServiceRecipientId = recipient.OdsCode;
+            ServiceRecipientName = recipient.Name;
+            ServiceRecipientItemId = $"{order.CallOffId}-{recipient.OdsCode}-{orderItem.ItemId}";
+            SupplierId = order.Supplier.Id;
+            SupplierName = order.Supplier.Name;
+            ProductId = orderItem.CatalogueItem.Id.ToString();
+            ProductName = orderItem.CatalogueItem.Name;
+            ProductType = orderItem.CatalogueItem.CatalogueItemType.DisplayName();
             QuantityOrdered = orderItem.Quantity;
-            UnitOfOrder = orderItem.CataloguePriceUnit.Description;
+            UnitOfOrder = orderItem.PricingUnit.Description;
             UnitTime = orderItem.PriceTimeUnit?.Description();
 
             EstimationPeriod = orderItem.ProvisioningType.Equals(ProvisioningType.Declarative)

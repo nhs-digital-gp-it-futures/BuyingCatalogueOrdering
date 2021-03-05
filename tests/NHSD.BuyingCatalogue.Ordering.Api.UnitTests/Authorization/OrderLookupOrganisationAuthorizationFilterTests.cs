@@ -1,16 +1,14 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
-using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Authorization
@@ -21,8 +19,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Authorization
     internal static class OrderLookupOrganisationAuthorizationFilterTests
     {
         [Test]
-        [OrderingAutoData]
-        public static async Task OnAuthorizationAsync_OrderNotFound_ReturnsExpectedValue(
+        [InMemoryDbAutoData(nameof(OnAuthorizationAsync_InvalidCallOffId_ReturnsExpectedValue))]
+        public static async Task OnAuthorizationAsync_InvalidCallOffId_ReturnsExpectedValue(
             OrderLookupOrganisationAuthorizationFilter filter)
         {
             const string parameterName = OrderLookupOrganisationAuthorizationFilter.DefaultParameterName;
@@ -51,10 +49,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Authorization
         }
 
         [Test]
-        [OrderingAutoData]
-        public static async Task OnAuthorizationAsync_LooksUpExpectedOrderId(
-            string orderId,
-            [Frozen] Mock<IOrderRepository> orderRepositoryMock,
+        [InMemoryDbAutoData(nameof(OnAuthorizationAsync_OrderNotFound_ReturnsExpectedValue))]
+        public static async Task OnAuthorizationAsync_OrderNotFound_ReturnsExpectedValue(
+            [Frozen] CallOffId callOffId,
             OrderLookupOrganisationAuthorizationFilter filter)
         {
             const string parameterName = OrderLookupOrganisationAuthorizationFilter.DefaultParameterName;
@@ -72,68 +69,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Authorization
 
             var context = AuthorizationFilterContextBuilder.Create()
                 .WithActionDescription(actionDescriptor)
-                .WithRouteValue(parameterName, orderId)
+                .WithRouteValue(parameterName, callOffId.ToString())
                 .WithUser(user)
                 .Build();
 
             await filter.OnAuthorizationAsync(context);
 
-            orderRepositoryMock.Verify(r => r.GetOrderByIdAsync(
-                It.Is<string>(s => s == orderId),
-                It.IsNotNull<Action<IOrderQuery>>()));
+            context.Result.Should().NotBeNull();
+            context.Result.Should().BeOfType<NotFoundResult>();
         }
 
         [Test]
-        [OrderingAutoData]
-        public static async Task OnAuthorizationAsync_UsesExpectedOrderQuery(
-            Mock<IOrderQuery> orderQueryMock,
-            [Frozen] Mock<IOrderRepository> orderRepositoryMock,
-            OrderLookupOrganisationAuthorizationFilter filter)
-        {
-            const string parameterName = OrderLookupOrganisationAuthorizationFilter.DefaultParameterName;
-
-            var user = ClaimsPrincipalBuilder.Create()
-                .WithClaim(ApplicationClaimTypes.Ordering)
-                .WithClaim(UserClaimTypes.PrimaryOrganisationId)
-                .Build();
-
-            var actionDescriptor = new ActionDescriptor
-            {
-                EndpointMetadata = new object[] { new AuthorizeOrganisationAttribute() },
-                Parameters = new[] { new ParameterDescriptor { Name = parameterName } },
-            };
-
-            var context = AuthorizationFilterContextBuilder.Create()
-                .WithActionDescription(actionDescriptor)
-                .WithRouteValue(parameterName, string.Empty)
-                .WithUser(user)
-                .Build();
-
-            Action<IOrderQuery> queryConfigured = null;
-            orderRepositoryMock
-                .Setup(r => r.GetOrderByIdAsync(It.IsAny<string>(), It.IsNotNull<Action<IOrderQuery>>()))
-                .Callback<string, Action<IOrderQuery>>((_, configureQuery) => queryConfigured = configureQuery);
-
-            await filter.OnAuthorizationAsync(context);
-            queryConfigured(orderQueryMock.Object);
-
-            orderQueryMock.Verify(q => q.WithoutTracking());
-            orderQueryMock.VerifyNoOtherCalls();
-        }
-
-        [Test]
-        [OrderingAutoData]
+        [InMemoryDbAutoData(nameof(OnAuthorizationAsync_UserHasSamePrimaryOrganisationId_ReturnsExpectedValue))]
         public static async Task OnAuthorizationAsync_UserHasSamePrimaryOrganisationId_ReturnsExpectedValue(
+            [Frozen] ApplicationDbContext dbContext,
+            [Frozen] CallOffId callOffId,
             Order order,
-            [Frozen] Mock<IOrderRepository> orderRepositoryMock,
             OrderLookupOrganisationAuthorizationFilter filter)
         {
+            dbContext.Order.Add(order);
+            await dbContext.SaveChangesAsync();
+
             const string parameterName = OrderLookupOrganisationAuthorizationFilter.DefaultParameterName;
-            var orderId = order.OrderId;
 
             var user = ClaimsPrincipalBuilder.Create()
                 .WithClaim(ApplicationClaimTypes.Ordering)
-                .WithClaim(UserClaimTypes.PrimaryOrganisationId, order.OrganisationId.ToString())
+                .WithClaim(UserClaimTypes.PrimaryOrganisationId, order.OrderingParty.Id.ToString())
                 .Build();
 
             var actionDescriptor = new ActionDescriptor
@@ -144,13 +105,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Authorization
 
             var context = AuthorizationFilterContextBuilder.Create()
                 .WithActionDescription(actionDescriptor)
-                .WithRouteValue(parameterName, orderId)
+                .WithRouteValue(parameterName, callOffId.ToString())
                 .WithUser(user)
                 .Build();
-
-            orderRepositoryMock
-                .Setup(r => r.GetOrderByIdAsync(It.Is<string>(s => s == orderId), It.IsNotNull<Action<IOrderQuery>>()))
-                .ReturnsAsync(order);
 
             await filter.OnAuthorizationAsync(context);
 

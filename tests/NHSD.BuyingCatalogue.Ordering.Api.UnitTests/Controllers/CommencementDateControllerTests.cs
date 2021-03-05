@@ -1,130 +1,125 @@
 ﻿using System;
-using System.Security.Claims;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
+using AutoFixture;
+using AutoFixture.AutoMoq;
+using AutoFixture.Idioms;
+using AutoFixture.NUnit3;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Application.Persistence;
-using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders;
+using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Domain;
+using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
-    [Parallelizable(ParallelScope.All)]
+    [Parallelizable(ParallelScope.Children)]
+    [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class CommencementDateControllerTests
     {
         [Test]
-        public static async Task Update_ValidDateTime_UpdatesAndReturnsNoContent()
+        public static void Constructor_VerifyGuardClauses()
         {
-            var context = CommencementDateControllerTestContext.Setup();
-            var model = new CommencementDateModel { CommencementDate = DateTime.Now };
-            var result = await context.Controller.Update("myOrder", model);
-            context.OrderRepositoryMock.Verify(r => r.UpdateOrderAsync(It.Is<Order>(order => order.CommencementDate == model.CommencementDate)));
+            var fixture = new Fixture().Customize(new AutoMoqCustomization());
+            var assertion = new GuardClauseAssertion(fixture);
+            var constructors = typeof(CommencementDateController).GetConstructors();
+
+            assertion.Verify(constructors);
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(GetAsync_OrderNotFound_ReturnsNotFound))]
+        public static async Task GetAsync_OrderNotFound_ReturnsNotFound(CommencementDateController controller)
+        {
+            var result = await controller.GetAsync(default);
+
+            result.Result.Should().BeOfType<NotFoundResult>();
+            result.Value.Should().BeNull();
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(GetAsync_ReturnsExpectedResult))]
+        public static async Task GetAsync_ReturnsExpectedResult(
+            [Frozen] ApplicationDbContext context,
+            Order order1,
+            Order order2,
+            CommencementDateController controller)
+        {
+            context.Order.AddRange(order1, order2);
+            await context.SaveChangesAsync();
+
+            var expectedResult = new CommencementDateModel { CommencementDate = order2.CommencementDate };
+
+            var result = await controller.GetAsync(order2.CallOffId);
+
+            result.Value.Should().BeEquivalentTo(expectedResult);
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(UpdateAsync_NullOrder_ReturnsNotFound))]
+        public static async Task UpdateAsync_NullOrder_ReturnsNotFound(
+            CommencementDateModel model,
+            CommencementDateController controller)
+        {
+            var result = await controller.UpdateAsync(null, model);
+
+            result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(UpdateAsync_NullModel_ThrowsException))]
+        public static void UpdateAsync_NullModel_ThrowsException(
+            Order order,
+            CommencementDateController controller)
+        {
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await controller.UpdateAsync(order, null));
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(UpdateAsync_UpdatesCommencementDate))]
+        public static async Task UpdateAsync_UpdatesCommencementDate(
+            Order order,
+            CommencementDateModel model,
+            CommencementDateController controller)
+        {
+            order.CommencementDate.Should().NotBeSameDateAs(model.CommencementDate.GetValueOrDefault());
+
+            await controller.UpdateAsync(order, model);
+
+            order.CommencementDate.Should().Be(model.CommencementDate);
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(UpdateAsync_SuccessfulUpdate_ReturnsNoContentResult))]
+        public static async Task UpdateAsync_SuccessfulUpdate_ReturnsNoContentResult(
+            Order order,
+            CommencementDateModel model,
+            CommencementDateController controller)
+        {
+            var result = await controller.UpdateAsync(order, model);
+
             result.Should().BeOfType<NoContentResult>();
         }
 
         [Test]
-        public static void Update_NullModel_ThrowsException()
+        [InMemoryDbAutoData(nameof(UpdateAsync_SavesChangesToDb))]
+        public static async Task UpdateAsync_SavesChangesToDb(
+            [Frozen] ApplicationDbContext context,
+            Order order,
+            CommencementDateModel model,
+            CommencementDateController controller)
         {
-            var context = CommencementDateControllerTestContext.Setup();
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await context.Controller.Update("myOrder", null));
-        }
+            context.Add(order);
+            await context.SaveChangesAsync();
 
-        [Test]
-        public static void Update_NullDateTime_ThrowsException()
-        {
-            var context = CommencementDateControllerTestContext.Setup();
-            var model = new CommencementDateModel { CommencementDate = null };
-            Assert.ThrowsAsync<ArgumentException>(async () => await context.Controller.Update("myOrder", model));
-        }
+            await controller.UpdateAsync(order, model);
 
-        [Test]
-        public static async Task Update_NoOrderFound_ReturnsNotFound()
-        {
-            var context = CommencementDateControllerTestContext.Setup();
-            context.Order = null;
-            var model = new CommencementDateModel { CommencementDate = DateTime.Now };
-            var result = await context.Controller.Update("myOrder", model);
-            result.Should().BeOfType<NotFoundResult>();
-        }
-
-        [TestCase("01/20/2012")]
-        [TestCase(null)]
-        public static async Task GetAsync_WithCommencementDate_ReturnsOkResult(DateTime? commencementDate)
-        {
-            var context = CommencementDateControllerTestContext.Setup();
-            context.Order.CommencementDate = commencementDate;
-
-            var result = await context.Controller.GetAsync("myOrder");
-
-            result.Should().BeOfType<OkObjectResult>();
-            result.As<OkObjectResult>().Value.Should().BeOfType<CommencementDateModel>();
-            result.As<OkObjectResult>().Value.As<CommencementDateModel>()
-                .CommencementDate.Should().Be(context.Order.CommencementDate);
-        }
-
-        [Test]
-        public static async Task GetAsync_OrderNotFound_ReturnsNotFound()
-        {
-            var context = CommencementDateControllerTestContext.Setup();
-            context.Order = null;
-            var result = await context.Controller.GetAsync("myOrder");
-            result.Should().BeOfType<NotFoundResult>();
-        }
-
-        [Test]
-        public static void Constructor_NullRepository_ThrowsException()
-        {
-            Assert.Throws<ArgumentNullException>(() => _ = new CommencementDateController(null));
-        }
-
-        private sealed class CommencementDateControllerTestContext
-        {
-            private CommencementDateControllerTestContext()
-            {
-                PrimaryOrganisationId = Guid.NewGuid();
-                Order = OrderBuilder
-                    .Create()
-                    .WithOrganisationId(PrimaryOrganisationId)
-                    .Build();
-
-                OrderRepositoryMock = new Mock<IOrderRepository>();
-                OrderRepositoryMock.Setup(r => r.GetOrderByIdAsync(It.IsAny<string>())).ReturnsAsync(() => Order);
-                ClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(
-                    new[]
-                    {
-                        new Claim("Ordering", "Manage"),
-                        new Claim("primaryOrganisationId", PrimaryOrganisationId.ToString()),
-                        new Claim(ClaimTypes.Name, "Test User"),
-                        new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
-                    },
-                    "mock"));
-
-                Controller = new CommencementDateController(OrderRepositoryMock.Object)
-                {
-                    ControllerContext = new ControllerContext
-                    {
-                        HttpContext = new DefaultHttpContext { User = ClaimsPrincipal },
-                    },
-                };
-            }
-
-            internal Mock<IOrderRepository> OrderRepositoryMock { get; }
-
-            internal Order Order { get; set; }
-
-            internal CommencementDateController Controller { get; }
-
-            private Guid PrimaryOrganisationId { get; }
-
-            private ClaimsPrincipal ClaimsPrincipal { get; }
-
-            internal static CommencementDateControllerTestContext Setup() => new();
+            context.Set<Order>().First(o => o.Equals(order)).CommencementDate.Should().Be(model.CommencementDate);
         }
     }
 }
