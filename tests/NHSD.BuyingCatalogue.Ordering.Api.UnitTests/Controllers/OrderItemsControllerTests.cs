@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.Idioms;
 using AutoFixture.NUnit3;
 using FluentAssertions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -20,6 +22,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Api.Validation;
+using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 using NUnit.Framework;
@@ -321,6 +324,110 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             response.Should().BeOfType<BadRequestObjectResult>();
             response.As<BadRequestObjectResult>().Value.Should().BeOfType<ValidationProblemDetails>();
+        }
+
+        [Test]
+        public static void DeleteOrderItemAsync_HttpDeleteAttribute_HasExpectedTemplate()
+        {
+            typeof(OrderItemsController)
+                .GetMethod(nameof(OrderItemsController.DeleteOrderItemAsync))
+                .GetCustomAttribute<HttpDeleteAttribute>()
+                .Template.Should().Be("{catalogueItemId}");
+        }
+
+        [Test]
+        public static void DeleteOrderItemAsync_AuthorizeAttribute_HasExpectedPolicy()
+        {
+            typeof(OrderItemsController)
+                .GetMethod(nameof(OrderItemsController.DeleteOrderItemAsync))
+                .GetCustomAttribute<AuthorizeAttribute>()
+                .Policy.Should().Be(PolicyName.CanManageOrders);
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(DeleteOrderItemAsync_OrderItemExistsInOrder_ReturnsNoContentResult))]
+        public static async Task DeleteOrderItemAsync_OrderItemExistsInOrder_DeletesOrderItem(
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            List<OrderItem> orderItems,
+            OrderItemsController controller)
+        {
+            orderItems.ForEach(o => order.AddOrUpdateOrderItem(o));
+            await context.Order.AddAsync(order);
+            await context.SaveChangesAsync();
+
+            await controller.DeleteOrderItemAsync(callOffId, orderItems[1].CatalogueItem.Id);
+
+            var finalOrder = await context.Order.FindAsync(order.Id);
+            finalOrder.OrderItems.Contains(orderItems[1]).Should().BeFalse();
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(DeleteOrderItemAsync_OrderItemExistsInOrder_ReturnsNoContentResult))]
+        public static async Task DeleteOrderItemAsync_OrderItemExistsInOrder_ReturnsNoContentResult(
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            List<OrderItem> orderItems,
+            OrderItemsController controller)
+        {
+            orderItems.ForEach(o => order.AddOrUpdateOrderItem(o));
+            await context.Order.AddAsync(order);
+            await context.SaveChangesAsync();
+
+            var response = await controller.DeleteOrderItemAsync(callOffId, orderItems[1].CatalogueItem.Id);
+
+            response.Should().BeOfType<NoContentResult>();
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(DeleteOrderItemAsync_OrderItemDoesNotExistInOrder_ReturnsNotFoundResult))]
+        public static async Task DeleteOrderItemAsync_OrderItemDoesNotExistInOrder_ReturnsNotFoundResult(
+            [Frozen] CallOffId callOffId,
+            [Frozen] ApplicationDbContext context,
+            Order order,
+            OrderItemsController controller)
+        {
+            order.OrderItems.Count.Should().Be(0);
+            await context.AddAsync(order);
+            await context.SaveChangesAsync();
+
+            var response = await controller.DeleteOrderItemAsync(callOffId, new CatalogueItemId(42, "111"));
+
+            response.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(DeleteOrderItemAsync_OrderDeleted_ReturnsNotFoundResult))]
+        public static async Task DeleteOrderItemAsync_OrderDeleted_ReturnsNotFoundResult(
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            OrderItem orderItem,
+            OrderItemsController controller)
+        {
+            order.AddOrUpdateOrderItem(orderItem);
+            order.IsDeleted = false;
+            await context.SaveChangesAsync();
+
+            var response = await controller.DeleteOrderItemAsync(callOffId, orderItem.CatalogueItem.Id);
+
+            response.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(DeleteOrderItemAsync_OrderDoesNotExist_ReturnsNotFoundResult))]
+        public static async Task DeleteOrderItemAsync_OrderDoesNotExist_ReturnsNotFoundResult(
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            OrderItemsController controller)
+        {
+            (await context.Order.FindAsync(callOffId.Id)).Should().BeNull();
+
+            var response = await controller.DeleteOrderItemAsync(callOffId, new CatalogueItemId(42, "111"));
+
+            response.Should().BeOfType<NotFoundResult>();
         }
 
         private sealed class TestProblemDetailsFactory : ProblemDetailsFactory
