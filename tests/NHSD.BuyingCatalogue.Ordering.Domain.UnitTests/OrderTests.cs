@@ -430,7 +430,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
         [Test]
         [CommonAutoData]
-        public static void DeleteSingleOrderItems_OrderItemPresent_DeletesOrderItem(
+        public static void DeleteOrderItem_OrderItemPresent_DeletesOrderItem(
             OrderItem orderItem1,
             OrderItem orderItem2,
             Order order)
@@ -446,26 +446,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
         [Test]
         [CommonAutoData]
-        public static void DeleteSingleOrderItems_OrderItemPresent_ReturnsTrue(
+        public static void DeleteOrderItem_OrderItemPresent_ReturnsTrue(
             OrderItem orderItem,
             Order order)
         {
             order.AddOrUpdateOrderItem(orderItem);
 
-            var actualResult = order.DeleteOrderItem(orderItem.CatalogueItem.Id);
+            var actual = order.DeleteOrderItem(orderItem.CatalogueItem.Id);
 
-            actualResult.Should().BeTrue();
+            actual.Should().BeTrue();
         }
 
         [Test]
         [CommonAutoData]
-        public static void DeleteSingleOrderItem_NoOrderItem_ReturnsFalse(Order order)
+        public static void DeleteOrderItem_NoOrderItem_ReturnsFalse(Order order)
         {
             order.OrderItems.Count.Should().Be(0);
 
-            var actualResult = order.DeleteOrderItem(default(CatalogueItemId));
+            var actual = order.DeleteOrderItem(default(CatalogueItemId));
 
-            actualResult.Should().BeFalse();
+            actual.Should().BeFalse();
         }
 
         [Test]
