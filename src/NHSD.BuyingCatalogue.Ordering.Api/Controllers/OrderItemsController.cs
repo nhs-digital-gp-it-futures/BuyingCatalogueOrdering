@@ -118,5 +118,36 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             return ValidationProblem(ModelState);
         }
+
+        [Authorize(Policy = PolicyName.CanManageOrders)]
+        [HttpDelete("{catalogueItemId}")]
+        public async Task<ActionResult> DeleteOrderItemAsync(
+            CallOffId callOffId,
+            CatalogueItemId catalogueItemId)
+        {
+            Expression<Func<Order, IEnumerable<OrderItem>>> orderItems = o =>
+                o.OrderItems.Where(i => i.CatalogueItem.Id == catalogueItemId);
+
+            var order = await context.Order
+                .Where(o => o.Id == callOffId.Id)
+                .Include(orderItems)
+                .ThenInclude(x => x.CatalogueItem)
+                .SingleOrDefaultAsync();
+
+            if (order is null || order.IsDeleted)
+            {
+                return NotFound();
+            }
+
+            var deleted = order.DeleteOrderItem(catalogueItemId);
+            if (!deleted)
+            {
+                return NotFound();
+            }
+
+            await context.SaveChangesAsync();
+
+            return NoContent();
+        }
     }
 }

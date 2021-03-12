@@ -200,6 +200,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             return Result.Success();
         }
 
+        public bool DeleteOrderItem(CatalogueItemId catalogueItemId)
+        {
+            var orderItem = orderItems.SingleOrDefault(x => x.CatalogueItem.Id == catalogueItemId);
+            if (orderItem == null)
+                return false;
+
+            orderItems.Remove(orderItem);
+            return true;
+        }
+
         public bool Equals(Order other)
         {
             if (ReferenceEquals(null, other))

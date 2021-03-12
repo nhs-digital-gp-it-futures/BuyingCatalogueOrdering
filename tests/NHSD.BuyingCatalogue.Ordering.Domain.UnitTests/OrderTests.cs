@@ -430,6 +430,46 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
         [Test]
         [CommonAutoData]
+        public static void DeleteSingleOrderItems_OrderItemPresent_DeletesOrderItem(
+            OrderItem orderItem1,
+            OrderItem orderItem2,
+            Order order)
+        {
+            order.AddOrUpdateOrderItem(orderItem1);
+            order.AddOrUpdateOrderItem(orderItem2);
+            order.OrderItems.Count.Should().Be(2);
+
+            order.DeleteOrderItem(orderItem1.CatalogueItem.Id);
+
+            order.OrderItems.Count.Should().Be(1);
+        }
+
+        [Test]
+        [CommonAutoData]
+        public static void DeleteSingleOrderItems_OrderItemPresent_ReturnsTrue(
+            OrderItem orderItem,
+            Order order)
+        {
+            order.AddOrUpdateOrderItem(orderItem);
+
+            var actualResult = order.DeleteOrderItem(orderItem.CatalogueItem.Id);
+
+            actualResult.Should().BeTrue();
+        }
+
+        [Test]
+        [CommonAutoData]
+        public static void DeleteSingleOrderItem_NoOrderItem_ReturnsFalse(Order order)
+        {
+            order.OrderItems.Count.Should().Be(0);
+
+            var actualResult = order.DeleteOrderItem(default(CatalogueItemId));
+
+            actualResult.Should().BeFalse();
+        }
+
+        [Test]
+        [CommonAutoData]
         public static void SetDefaultDeliveryDate_AddsNewDate(Order order)
         {
             var item = new OrderItem
