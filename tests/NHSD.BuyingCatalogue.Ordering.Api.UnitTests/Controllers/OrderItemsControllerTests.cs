@@ -345,7 +345,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(DeleteOrderItemAsync_OrderItemExistsInOrder_ReturnsNoContentResult))]
+        [InMemoryDbAutoData(nameof(DeleteOrderItemAsync_OrderItemExistsInOrder_DeletesOrderItem))]
         public static async Task DeleteOrderItemAsync_OrderItemExistsInOrder_DeletesOrderItem(
             [Frozen] ApplicationDbContext context,
             [Frozen] CallOffId callOffId,
