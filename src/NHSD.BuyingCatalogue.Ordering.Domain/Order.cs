@@ -202,12 +202,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public bool DeleteOrderItem(CatalogueItemId catalogueItemId)
         {
-            var orderItem = orderItems.SingleOrDefault(x => x.CatalogueItem.Id == catalogueItemId);
+            var orderItem = orderItems.SingleOrDefault(o => o.CatalogueItem.Id == catalogueItemId);
             if (orderItem == null)
                 return false;
 
-            orderItems.Remove(orderItem);
-            return true;
+            return orderItems.Remove(orderItem);
         }
 
         public bool Equals(Order other)

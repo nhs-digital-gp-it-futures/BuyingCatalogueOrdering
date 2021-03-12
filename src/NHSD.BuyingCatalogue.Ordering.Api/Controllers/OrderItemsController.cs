@@ -131,7 +131,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             var order = await context.Order
                 .Where(o => o.Id == callOffId.Id)
                 .Include(orderItems)
-                .ThenInclude(x => x.CatalogueItem)
+                .ThenInclude(i => i.CatalogueItem)
                 .SingleOrDefaultAsync();
 
             if (order is null || order.IsDeleted)
@@ -139,8 +139,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return NotFound();
             }
 
-            var deleted = order.DeleteOrderItem(catalogueItemId);
-            if (!deleted)
+            if (!order.DeleteOrderItem(catalogueItemId))
             {
                 return NotFound();
             }
