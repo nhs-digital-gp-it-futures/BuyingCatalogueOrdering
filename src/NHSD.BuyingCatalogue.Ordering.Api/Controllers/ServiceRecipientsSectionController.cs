@@ -41,6 +41,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             var recipients = await context.Order
                 .Where(o => o.Id == callOffId.Id)
                 .SelectMany(o => o.SelectedServiceRecipients)
+                .OrderBy(r => r.Recipient.Name)
                 .Select(r => new ServiceRecipientModel { Name = r.Recipient.Name, OdsCode = r.Recipient.OdsCode })
                 .AsNoTracking()
                 .ToListAsync();
@@ -57,6 +58,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             var order = await context.Order
                 .Where(o => o.Id == callOffId.Id)
+                .Include(o => o.Progress)
                 .Include(o => o.SelectedServiceRecipients)
                 .SingleOrDefaultAsync();
 

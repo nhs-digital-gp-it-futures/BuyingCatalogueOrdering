@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
@@ -38,7 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [Route("{callOffId}/sections/{sectionId}")]
         [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<IActionResult> UpdateStatusAsync(
-            [FromRoute] Order order,
+            CallOffId callOffId,
             string sectionId,
             UpdateOrderSectionModel sectionStatus)
         {
@@ -47,6 +49,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             if (sectionId is null)
                 throw new ArgumentNullException(nameof(sectionId));
+
+            var order = await context.Order
+                .Where(o => o.Id == callOffId.Id)
+                .Include(o => o.Progress)
+                .SingleOrDefaultAsync();
 
             if (order is null)
                 return NotFound();
