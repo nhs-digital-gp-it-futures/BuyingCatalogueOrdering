@@ -178,7 +178,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var orderingParties = context.Set<OrderingParty>();
             orderingParties.Should().HaveCount(1);
-            orderingParties.First().Id.Should().Be(model.OrganisationId);
+            orderingParties.First().Id.Should().Be(model.OrganisationId!.Value);
         }
 
         [Test]

@@ -35,48 +35,51 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData(nameof(UpdateStatusAsync_SectionStatusIsNull_ThrowsArgumentNullException))]
         public static void UpdateStatusAsync_SectionStatusIsNull_ThrowsArgumentNullException(
-            Order order,
             string sectionId,
             SectionStatusController controller)
         {
             Assert.ThrowsAsync<ArgumentNullException>(
-                async () => await controller.UpdateStatusAsync(order, sectionId, null));
+                async () => await controller.UpdateStatusAsync(default, sectionId, null));
         }
 
         [Test]
         [InMemoryDbAutoData(nameof(UpdateStatusAsync_SectionIdIsNull_ThrowsArgumentNullException))]
         public static void UpdateStatusAsync_SectionIdIsNull_ThrowsArgumentNullException(
-            Order order,
             UpdateOrderSectionModel model,
             SectionStatusController controller)
         {
             Assert.ThrowsAsync<ArgumentNullException>(
-                async () => await controller.UpdateStatusAsync(order, null, model));
-        }
-
-        [Test]
-        [InMemoryDbAutoData(nameof(UpdateStatusAsync_OrderIsNull_ReturnsNotFound))]
-        public static async Task UpdateStatusAsync_OrderIsNull_ReturnsNotFound(
-            string sectionId,
-            UpdateOrderSectionModel model,
-            SectionStatusController controller)
-        {
-            var result = await controller.UpdateStatusAsync(null, sectionId, model);
-
-            result.Should().BeOfType<NotFoundResult>();
+                async () => await controller.UpdateStatusAsync(default, null, model));
         }
 
         [Test]
         [InMemoryDbAutoData(nameof(UpdateStatusAsync_WrongSectionId_ReturnsForbidden))]
         public static async Task UpdateStatusAsync_WrongSectionId_ReturnsForbidden(
+            string sectionId,
+            [Frozen] ApplicationDbContext context,
             Order order,
+            UpdateOrderSectionModel model,
+            SectionStatusController controller)
+        {
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
+
+            var result = await controller.UpdateStatusAsync(order.CallOffId, sectionId, model);
+
+            result.Should().BeOfType<ForbidResult>();
+        }
+
+        [Test]
+        [InMemoryDbAutoData(nameof(UpdateStatusAsync_OrderNotFound_ReturnsNotFound))]
+        public static async Task UpdateStatusAsync_OrderNotFound_ReturnsNotFound(
+            CallOffId callOffId,
             string sectionId,
             UpdateOrderSectionModel model,
             SectionStatusController controller)
         {
-            var result = await controller.UpdateStatusAsync(order, sectionId, model);
+            var result = await controller.UpdateStatusAsync(callOffId, sectionId, model);
 
-            result.Should().BeOfType<ForbidResult>();
+            result.Should().BeOfType<NotFoundResult>();
         }
 
         [Test]
@@ -88,6 +91,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             bool additionalServicesViewed,
             bool catalogueSolutionsViewed,
             bool associatedServicesViewed,
+            [Frozen] ApplicationDbContext context,
             Order order,
             SectionStatusController controller)
         {
@@ -96,7 +100,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             order.Progress.CatalogueSolutionsViewed = false;
             order.Progress.ServiceRecipientsViewed = false;
 
-            await controller.UpdateStatusAsync(order, sectionId, new UpdateOrderSectionModel { Status = "complete" });
+            order.Progress.CatalogueSolutionsViewed = false;
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
+
+            await controller.UpdateStatusAsync(order.CallOffId, sectionId, new UpdateOrderSectionModel { Status = "complete" });
 
             order.Progress.AdditionalServicesViewed.Should().Be(additionalServicesViewed);
             order.Progress.AssociatedServicesViewed.Should().Be(associatedServicesViewed);
@@ -116,7 +124,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             await context.SaveChangesAsync();
 
             await controller.UpdateStatusAsync(
-                order,
+                order.CallOffId,
                 "catalogue-solutions",
                 new UpdateOrderSectionModel { Status = "complete" });
 
@@ -126,11 +134,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData(nameof(UpdateStatusAsync_CorrectSectionId_ReturnsNoContentResult))]
         public static async Task UpdateStatusAsync_CorrectSectionId_ReturnsNoContentResult(
+            [Frozen] ApplicationDbContext context,
             Order order,
             SectionStatusController controller)
         {
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
+
             var response = await controller.UpdateStatusAsync(
-                order,
+                order.CallOffId,
                 "catalogue-solutions",
                 new UpdateOrderSectionModel { Status = "complete" });
 
