@@ -54,9 +54,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 .Include(o => o.OrderingPartyContact)
                 .Include(o => o.Supplier).ThenInclude(s => s.Address)
                 .Include(o => o.SupplierContact)
-
-                // TODO: update service instance items view and reinstate
-                // .Include(o => o.ServiceInstanceItems)
+                .Include(o => o.ServiceInstanceItems)
                 .Include(o => o.OrderItems).ThenInclude(i => i.CatalogueItem)
                 .Include(o => o.OrderItems).ThenInclude(i => i.OrderItemRecipients).ThenInclude(r => r.Recipient)
                 .Include(o => o.OrderItems).ThenInclude(i => i.PricingUnit)

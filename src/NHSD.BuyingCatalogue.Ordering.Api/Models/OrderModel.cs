@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
@@ -61,6 +62,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
                 foreach (var recipient in orderItem.OrderItemRecipients)
                 {
                     var odsCode = recipient.Recipient.OdsCode;
+                    bool ServiceInstancePredicate(ServiceInstanceItem serviceInstanceItem) =>
+                        serviceInstanceItem.CatalogueItemId == orderItem.CatalogueItem.Id.ToString()
+                        && serviceInstanceItem.OdsCode == recipient.Recipient.OdsCode;
+
                     var recipientModel = new ExtendedOrderItemRecipientModel
                     {
                         DeliveryDate = recipient.DeliveryDate,
@@ -69,8 +74,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
                         OdsCode = odsCode,
                         Quantity = recipient.Quantity,
 
-                        // TODO: correct as part of service instance ID fix-up
-                        ServiceInstanceId = "ServiceInstanceId",
+                        // TODO: consider refactor
+                        ServiceInstanceId = order.ServiceInstanceItems.FirstOrDefault(ServiceInstancePredicate)?.ServiceInstanceId,
                     };
 
                     recipientModels.Add(recipientModel);

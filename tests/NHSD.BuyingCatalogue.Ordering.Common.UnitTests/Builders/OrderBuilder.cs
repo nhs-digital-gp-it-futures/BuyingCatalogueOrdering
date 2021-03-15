@@ -11,17 +11,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
         private readonly Address organisationAddress;
         private readonly IList<OrderItem> orderItems = new List<OrderItem>();
         private readonly IList<ServiceInstanceItem> serviceInstanceItems = new List<ServiceInstanceItem>();
-        private readonly List<SelectedServiceRecipient> serviceRecipients = new();
+        private readonly string orderDescription;
+        private readonly Guid organisationId;
+        private readonly Contact organisationContact;
+        private readonly DateTime lastUpdated;
+        private readonly string supplierId;
+        private readonly string supplierName;
+        private readonly Address supplierAddress;
+        private readonly DateTime? completed;
+
         private int orderId;
-        private string orderDescription;
-        private Guid organisationId;
-        private Contact organisationContact;
-        private DateTime lastUpdated;
-        private Guid lastUpdatedBy;
-        private string lastUpdatedByName;
-        private string supplierId;
-        private string supplierName;
-        private Address supplierAddress;
         private Contact supplierContact;
         private DateTime? commencementDate;
         private bool serviceRecipientsViewed;
@@ -29,7 +28,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
         private bool additionalServicesViewed;
         private bool associatedServicesViewed;
         private bool? fundingSourceOnlyGms;
-        private DateTime? completed;
 
         private OrderBuilder()
         {
@@ -42,8 +40,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             organisationAddress = AddressBuilder.Create().WithLine1("1 Some Ordering Party").Build();
             organisationContact = null;
             lastUpdated = DateTime.UtcNow;
-            lastUpdatedBy = Guid.NewGuid();
-            lastUpdatedByName = "Bob Smith";
             supplierId = "Some supplier id";
             supplierName = "Some supplier name";
             supplierAddress = AddressBuilder.Create().WithLine1("1 Some Supplier").Build();
@@ -62,42 +58,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
         public OrderBuilder WithOrderId(int id)
         {
             orderId = id;
-            return this;
-        }
-
-        public OrderBuilder WithDescription(string description)
-        {
-            orderDescription = description;
-            return this;
-        }
-
-        public OrderBuilder WithOrganisationId(Guid id)
-        {
-            organisationId = id;
-            return this;
-        }
-
-        public OrderBuilder WithOrganisationContact(Contact contact)
-        {
-            organisationContact = contact;
-            return this;
-        }
-
-        public OrderBuilder WithSupplierId(string id)
-        {
-            supplierId = id;
-            return this;
-        }
-
-        public OrderBuilder WithSupplierName(string name)
-        {
-            supplierName = name;
-            return this;
-        }
-
-        public OrderBuilder WithSupplierAddress(Address address)
-        {
-            supplierAddress = address;
             return this;
         }
 
@@ -143,58 +103,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             return this;
         }
 
-        public OrderBuilder WithLastUpdatedBy(Guid updatedBy)
-        {
-            lastUpdatedBy = updatedBy;
-            return this;
-        }
-
-        public OrderBuilder WithLastUpdatedByName(string name)
-        {
-            lastUpdatedByName = name;
-            return this;
-        }
-
-        public OrderBuilder WithLastUpdated(DateTime updated)
-        {
-            lastUpdated = updated;
-            return this;
-        }
-
-        public OrderBuilder WithCompleted(DateTime? dateCompleted)
-        {
-            completed = dateCompleted;
-            return this;
-        }
-
         public OrderBuilder WithOrderItem(OrderItem orderItem)
         {
             orderItems.Add(orderItem);
-            return this;
-        }
-
-        public OrderBuilder WithServiceRecipient(string code, string name)
-        {
-            return WithServiceRecipient(new SelectedServiceRecipient { Recipient = new ServiceRecipient(code, name) });
-        }
-
-        public OrderBuilder WithServiceRecipient(SelectedServiceRecipient serviceRecipient)
-        {
-            serviceRecipients.Add(serviceRecipient);
-            return this;
-        }
-
-        public OrderBuilder WithServiceInstanceId(OrderItem forOrderItem, int increment)
-        {
-            if (forOrderItem is null)
-                throw new ArgumentNullException(nameof(forOrderItem));
-
-            serviceInstanceItems.Add(new ServiceInstanceItem
-            {
-                OrderItemId = 1, // forOrderItem.OrderItemId,
-                ServiceInstanceId = $"SI{increment}-{forOrderItem.OrderItemRecipients[0].Recipient.OdsCode}",
-            });
-
             return this;
         }
 
@@ -233,8 +144,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             {
                 order.AddOrUpdateOrderItem(orderItem);
             }
-
-            order.SetSelectedServiceRecipients(serviceRecipients);
 
             BackingField.SetValue(order, nameof(Order.LastUpdated), lastUpdated);
             BackingField.SetValue(order, nameof(Order.Id), orderId);
