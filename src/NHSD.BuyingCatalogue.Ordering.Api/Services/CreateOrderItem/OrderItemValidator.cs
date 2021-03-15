@@ -37,7 +37,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 
         private static ErrorDetails DeliveryDateError(string error)
         {
-            return new(nameof(CreateOrderItemModel.ServiceRecipients), nameof(OrderItemRecipientModel.DeliveryDate), error);
+            return new(
+                nameof(CreateOrderItemModel.ServiceRecipients),
+                nameof(OrderItemRecipientModel.DeliveryDate),
+                nameof(OrderItemRecipientModel.DeliveryDate) + error);
         }
 
         private static IReadOnlyList<ErrorDetails> NoErrors() => Array.Empty<ErrorDetails>();

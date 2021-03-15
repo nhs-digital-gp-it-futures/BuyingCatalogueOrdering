@@ -76,6 +76,9 @@
     <Build Include="Tables\SelectedServiceRecipients.sql" />
     <Build Include="Tables\ServiceRecipient.sql" />
     <Build Include="Tables\OrderProgress.sql" />
+    <Build Include="Functions\GetServiceInstanceIncrement.sql" />
+    <Build Include="Functions\HasParentSolution.sql" />
+    <Build Include="Views\ServiceInstanceItem.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\OrderStatus.sql" />

@@ -11,6 +11,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 
         internal OrderItemModel(OrderItem orderItem, IReadOnlyList<ExtendedOrderItemRecipientModel> recipients)
         {
+            CatalogueItemId = orderItem.CatalogueItem.Id.ToString();
             CataloguePriceType = orderItem.CataloguePriceType.ToString();
             CatalogueItemType = orderItem.CatalogueItem.CatalogueItemType.ToString();
             CatalogueItemName = orderItem.CatalogueItem.Name;
@@ -23,7 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
             ServiceRecipients = recipients;
         }
 
-        public string ItemId { get; init; }
+        public string CatalogueItemId { get; init; }
 
         public string CataloguePriceType { get; init; }
 

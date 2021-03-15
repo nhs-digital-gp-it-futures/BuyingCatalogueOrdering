@@ -13,7 +13,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
                 throw new ArgumentNullException(nameof(builder));
 
             builder.ToView(nameof(ServiceInstanceItem));
-            builder.HasKey(orderItem => orderItem.OrderItemId);
+            builder.HasKey(i => new { i.OrderId, i.CatalogueItemId, i.OdsCode });
         }
     }
 }

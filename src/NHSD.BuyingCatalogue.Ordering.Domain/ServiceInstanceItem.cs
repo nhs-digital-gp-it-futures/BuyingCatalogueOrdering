@@ -2,7 +2,11 @@
 {
     public sealed class ServiceInstanceItem
     {
-        public int OrderItemId { get; set; }
+        public int OrderId { get; set; }
+
+        public string CatalogueItemId { get; set; }
+
+        public string OdsCode { get; set; }
 
         public string ServiceInstanceId { get; set; }
     }

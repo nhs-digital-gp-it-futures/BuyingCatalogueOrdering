@@ -98,6 +98,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 .Include(o => o.DefaultDeliveryDates)
                 .Include(o => o.OrderItems).ThenInclude(i => i.CatalogueItem)
                 .Include(o => o.OrderItems).ThenInclude(i => i.OrderItemRecipients)
+                .Include(o => o.Progress)
                 .SingleOrDefaultAsync();
 
             if (order is null)
