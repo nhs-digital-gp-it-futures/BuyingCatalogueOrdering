@@ -6,19 +6,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 {
     public sealed class OrderEntity : EntityBase
     {
-        public string OrderId { get; set; }
+        public int Id { get; set; }
+
+        public byte Revision { get; set; }
+
+        public string CallOffId { get; set; }
 
         public string Description { get; set; }
 
-        public Guid OrganisationId { get; set; }
+        public Guid OrderingPartyId { get; set; }
 
-        public string OrganisationName { get; set; }
-
-        public string OrganisationOdsCode { get; set; }
-
-        public int? OrganisationAddressId { get; set; }
-
-        public int? OrganisationContactId { get; set; }
+        public int? OrderingPartyContactId { get; set; }
 
         public OrderStatus OrderStatus { get; set; }
 
@@ -34,115 +32,80 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 
         public string LastUpdatedByName { get; set; }
 
-        public bool ServiceRecipientsViewed { get; set; }
-
         public string SupplierId { get; set; }
 
-        public string SupplierName { get; set; }
-
-        public int? SupplierAddressId { get; set; }
-
         public int? SupplierContactId { get; set; }
-
-        public bool CatalogueSolutionsViewed { get; set; }
-
-        public bool AdditionalServicesViewed { get; set; }
-
-        public bool AssociatedServicesViewed { get; set; }
 
         public bool? FundingSourceOnlyGms { get; set; }
 
         public bool IsDeleted { get; set; }
 
-        protected override string InsertSql =>
-            @"INSERT INTO dbo.[Order]
+        protected override string InsertSql => @"
+            SET IDENTITY_INSERT dbo.[Order] ON;
+
+            INSERT INTO dbo.[Order]
             (
-                OrderId,
+                Id,
                 Description,
-                OrganisationId,
-                OrganisationName,
-                OrganisationOdsCode,
-                OrganisationAddressId,
-                OrganisationContactId,
+                OrderingPartyId,
+                OrderingPartyContactId,
                 OrderStatusId,
                 Created,
                 LastUpdated,
                 LastUpdatedBy,
                 LastUpdatedByName,
                 SupplierId,
-                SupplierName,
                 CommencementDate,
-                SupplierAddressId,
                 SupplierContactId,
-                ServiceRecipientsViewed,
-                CatalogueSolutionsViewed,
-                AdditionalServicesViewed,
-                AssociatedServicesViewed,
                 FundingSourceOnlyGMS,
                 IsDeleted,
                 Completed
             )
             VALUES
             (
-                @OrderId,
+                @Id,
                 @Description,
-                @OrganisationId,
-                @OrganisationName,
-                @OrganisationOdsCode,
-                @OrganisationAddressId,
-                @OrganisationContactId,
+                @OrderingPartyId,
+                @OrderingPartyContactId,
                 @OrderStatus,
                 @Created,
                 @LastUpdated,
                 @LastUpdatedBy,
                 @LastUpdatedByName,
                 @SupplierId,
-                @SupplierName,
                 @CommencementDate,
-                @SupplierAddressId,
                 @SupplierContactId,
-                @ServiceRecipientsViewed,
-                @CatalogueSolutionsViewed,
-                @AdditionalServicesViewed,
-                @AssociatedServicesViewed,
                 @FundingSourceOnlyGMS,
                 @IsDeleted,
                 @Completed
-            );";
+            );
 
-        public static async Task<OrderEntity> FetchOrderByOrderId(string connectionString, string orderId)
+            SET IDENTITY_INSERT dbo.[Order] OFF;";
+
+        public static async Task<OrderEntity> FetchOrderByOrderId(string connectionString, int id)
         {
             const string sql =
-                @"SELECT OrderId,
+                @"SELECT Id,
+                         Revision,
+                         CallOffId,
                          [Description],
-                         OrganisationId,
-                         OrganisationName,
-                         OrganisationOdsCode,
-                         OrganisationAddressId,
-                         OrganisationContactId,
+                         OrderingPartyId,
+                         OrderingPartyContactId,
                          OrderStatusId AS OrderStatus,
                          Created,
                          SupplierId,
-                         SupplierName,
-                         SupplierAddressId,
                          SupplierContactId,
                          LastUpdated,
                          LastUpdatedBy,
                          CommencementDate,
                          LastUpdatedByName,
-                         SupplierId,
-                         SupplierName,
-                         ServiceRecipientsViewed,
-                         CatalogueSolutionsViewed,
-                         AdditionalServicesViewed,
-                         AssociatedServicesViewed,
                          FundingSourceOnlyGMS,
                          IsDeleted,
                          Completed
                     FROM dbo.[Order]
-                   WHERE OrderId = @orderId;";
+                   WHERE Id = @id;";
 
-            return await SqlRunner.QueryFirstAsync<OrderEntity>(connectionString, sql, new { orderId });
+            return await SqlRunner.QueryFirstAsync<OrderEntity>(connectionString, sql, new { id });
         }
     }
 }

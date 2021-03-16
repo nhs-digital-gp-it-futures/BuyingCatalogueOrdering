@@ -4,7 +4,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 {
     public sealed class ContactEntity : EntityBase
     {
-        public int ContactId { get; set; }
+        public int Id { get; set; }
 
         public string FirstName { get; set; }
 
@@ -14,9 +14,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 
         public string Phone { get; set; }
 
-        protected override string InsertSql =>
-            @"INSERT INTO dbo.Contact
+        protected override string InsertSql => @"
+            SET IDENTITY_INSERT dbo.Contact ON;
+
+            INSERT INTO dbo.Contact
             (
+                Id,
                 FirstName,
                 LastName,
                 Email,
@@ -24,30 +27,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
             )
             VALUES
             (
+                @Id,
                 @FirstName,
                 @LastName,
                 @Email,
                 @Phone
             );
-            SELECT SCOPE_IDENTITY();";
 
-        public static async Task<ContactEntity> FetchContactById(string connectionString, int? contactId)
+            SET IDENTITY_INSERT dbo.Contact OFF;";
+
+        public static async Task<ContactEntity> FetchContactById(string connectionString, int? id)
         {
-            if (contactId is null)
+            if (id is null)
             {
                 return null;
             }
 
             const string sql =
-                @"SELECT ContactId,
+                @"SELECT Id,
                          FirstName,
                          LastName,
                          Email,
                          Phone
                     FROM dbo.Contact
-                   WHERE ContactId = @contactId;";
+                   WHERE Id = @id;";
 
-            return await SqlRunner.QueryFirstAsync<ContactEntity>(connectionString, sql, new { contactId });
+            return await SqlRunner.QueryFirstAsync<ContactEntity>(connectionString, sql, new { id });
         }
     }
 }

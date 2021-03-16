@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
+﻿namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 {
     public sealed class ServiceRecipientEntity : EntityBase
     {
@@ -9,31 +6,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 
         public string Name { get; set; }
 
-        public string OrderId { get; set; }
+        public int OrderId { get; set; }
 
         protected override string InsertSql =>
             @"INSERT INTO dbo.ServiceRecipient
             (
                 OdsCode,
-                Name,
-                OrderId
+                [Name]
             )
             VALUES
             (
                 @OdsCode,
-                @Name,
-                @OrderId
+                @Name
             );";
-
-        public static async Task<IEnumerable<ServiceRecipientEntity>> FetchAllServiceRecipients(string connectionString)
-        {
-            const string sql =
-                @"SELECT OdsCode,
-                         [Name],
-                         OrderId
-                    FROM dbo.ServiceRecipient;";
-
-            return await SqlRunner.QueryAsync<ServiceRecipientEntity>(connectionString, sql);
-        }
     }
 }
