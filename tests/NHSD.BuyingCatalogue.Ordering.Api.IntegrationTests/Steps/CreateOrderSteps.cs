@@ -43,7 +43,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class CreateOrderPayload
         {
-            public Guid OrganisationId { get; init; }
+            public Guid? OrganisationId { get; init; }
 
             public string Description { get; init; }
         }

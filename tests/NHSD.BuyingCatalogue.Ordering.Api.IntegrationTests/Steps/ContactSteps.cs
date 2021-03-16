@@ -5,7 +5,7 @@ using JetBrains.Annotations;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
-using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder;
+using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
@@ -26,27 +26,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             this.settings = settings;
         }
 
-        [Given(@"Contacts exist")]
+        [Given(@"contacts exist")]
         public async Task GivenContactsExist(Table table)
         {
-            foreach (var contactItem in table.CreateSet<ContactTable>())
+            foreach (var entity in table.CreateSet<ContactEntity>())
             {
-                var contact = ContactEntityBuilder
-                    .Create()
-                    .WithFirstName(contactItem.FirstName)
-                    .WithLastName(contactItem.LastName)
-                    .WithEmail(contactItem.EmailAddress)
-                    .WithPhone(contactItem.TelephoneNumber)
-                    .Build();
-
-                var contactId = await contact.InsertAsync<int>(settings.ConnectionString);
-                contact.ContactId = contactId;
-
-                orderContext.ContactReferenceList.Add(contact);
+                await entity.InsertAsync(settings.OrderingDbAdminConnectionString);
+                orderContext.ContactReferenceList.Add(entity.Id, entity);
             }
         }
 
-        [Then(@"the Contact section (.*) is returned")]
+        [Then(@"the contact section (.*) is returned")]
         public async Task ThenTheContactPrimaryContactIsReturned(string section, Table table)
         {
             var expected = table.CreateSet<ContactTable>().FirstOrDefault();

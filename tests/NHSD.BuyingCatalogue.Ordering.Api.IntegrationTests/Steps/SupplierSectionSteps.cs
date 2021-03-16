@@ -33,11 +33,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             this.response = response;
             this.settings = settings;
 
-            orderSupplierSectionUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/supplier";
+            orderSupplierSectionUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/C{0}-01/sections/supplier";
         }
 
-        [When(@"the user makes a request to retrieve the order supplier section with the ID (.*)")]
-        public async Task WhenTheUserMakesARequestToRetrieveTheOrderSupplierSectionWithId(string orderId)
+        [When(@"the user makes a request to retrieve the order supplier section with the ID (\d{1,6})")]
+        public async Task WhenTheUserMakesARequestToRetrieveTheOrderSupplierSectionWithId(int orderId)
         {
             await request.GetAsync(string.Format(CultureInfo.InvariantCulture, orderSupplierSectionUrl, orderId));
         }
@@ -131,21 +131,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 null);
         }
 
-        [Then(@"the supplier address for order (.*) is")]
-        public async Task ThenTheSupplierAddressForOrderIs(string orderId, Table table)
+        [Then(@"the supplier address for order (\d{1,6}) is")]
+        public async Task ThenTheSupplierAddressForOrderIs(int orderId, Table table)
         {
+            var order = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);
+            var supplier = await SupplierEntity.FetchById(settings.ConnectionString, order.SupplierId);
+
+            var actual = await AddressEntity.FetchAddressById(settings.ConnectionString, supplier.AddressId);
             var address = table.CreateInstance<SupplierAddressTable>();
-
-            var addressId = (await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId))
-                .SupplierAddressId;
-
-            var actual = await AddressEntity.FetchAddressById(settings.ConnectionString, addressId);
 
             actual.Should().BeEquivalentTo(address);
         }
 
         [Then(@"the supplier contact for order (.*) is")]
-        public async Task ThenTheSupplierContactIdContactForOrderIs(string orderId, Table table)
+        public async Task ThenTheSupplierContactIdContactForOrderIs(int orderId, Table table)
         {
             var contact = table.CreateInstance<SupplierContactTable>();
 
@@ -156,15 +155,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(contact);
         }
 
-        [Then(@"the supplier for order (.*) is updated")]
-        public async Task ThenTheSupplierForOrderIsUpdated(string orderId, Table table)
+        [Then(@"the supplier for order (\d{1,6}) is updated")]
+        public async Task ThenTheSupplierForOrderIsUpdated(int orderId, Table table)
         {
-            var supplier = table.CreateInstance<SupplierSectionTable>();
+            var expectedSupplier = table.CreateInstance<SupplierSectionTable>();
 
             var order = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);
+            var supplier = await SupplierEntity.FetchById(settings.ConnectionString, order.SupplierId);
 
-            var actual = new { order.SupplierId, order.SupplierName };
-            actual.Should().BeEquivalentTo(supplier);
+            var actual = new { order.SupplierId, SupplierName = supplier.Name };
+            actual.Should().BeEquivalentTo(expectedSupplier);
         }
 
         [Given(@"the user wants to update the supplier address section")]

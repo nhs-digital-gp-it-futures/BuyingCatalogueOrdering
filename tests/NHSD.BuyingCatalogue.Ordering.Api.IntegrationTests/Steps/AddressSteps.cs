@@ -1,10 +1,11 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using JetBrains.Annotations;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
-using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder;
+using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
@@ -25,32 +26,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             this.orderContext = orderContext;
         }
 
-        [Given(@"Addresses exist")]
+        [Given(@"addresses exist")]
         public async Task GivenAddressesExist(Table table)
         {
-            foreach (var addressItem in table.CreateSet<AddressTable>())
+            foreach (var entity in table.CreateSet<AddressEntity>())
             {
-                var address = AddressEntityBuilder
-                    .Create()
-                    .WithLine1(addressItem.Line1)
-                    .WithLine2(addressItem.Line2)
-                    .WithLine3(addressItem.Line3)
-                    .WithLine4(addressItem.Line4)
-                    .WithLine5(addressItem.Line5)
-                    .WithTown(addressItem.Town)
-                    .WithCounty(addressItem.County)
-                    .WithPostcode(addressItem.Postcode)
-                    .WithCountry(addressItem.Country)
-                    .Build();
+                await entity.InsertAsync(settings.OrderingDbAdminConnectionString);
 
-                var addressId = await address.InsertAsync<int>(settings.ConnectionString);
-                address.AddressId = addressId;
-
-                orderContext.AddressReferenceList.Add(address);
+                orderContext.AddressReferenceList.Add(entity.Id, entity);
             }
         }
 
-        [Then(@"the Address is returned")]
+        [Then(@"the address is returned")]
         public async Task ThenTheAddressSectionIsReturned(Table table)
         {
             var expected = table.CreateSet<AddressTable>().FirstOrDefault();
@@ -58,7 +45,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             Assert.NotNull(address);
 
-            var actual = new AddressTable
+            var actual = new AddressEntity
             {
                 Line1 = address.Value<string>("line1"),
                 Line2 = address.Value<string>("line2"),
@@ -74,6 +61,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected);
         }
 
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class AddressTable
         {
             public string Line1 { get; init; }
