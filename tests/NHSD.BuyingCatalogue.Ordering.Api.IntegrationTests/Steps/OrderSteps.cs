@@ -40,71 +40,54 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             orderOrganisationsUrl = this.settings.OrderingApiBaseUrl + "/api/v1/organisations/{0}/orders";
         }
 
-        [Given(@"the order with orderId (.*) has a primary contact")]
-        public async Task ThenTheOrderHasAPrimaryContact(string orderId)
+        [Given(@"the order with ID (\d{1,6}) has a primary contact")]
+        public async Task ThenTheOrderHasAPrimaryContact(int orderId)
         {
             var order = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);
-            order.OrganisationContactId.Should().NotBeNull();
+            order.OrderingPartyContactId.Should().NotBeNull();
         }
 
-        [Given(@"the order with orderId (.*) does not have a primary contact")]
-        public async Task ThenTheOrderDoesNotHaveAPrimaryContact(string orderId)
+        [Given(@"the order with ID (\d{1,6}) does not have a primary contact")]
+        public async Task ThenTheOrderDoesNotHaveAPrimaryContact(int orderId)
         {
             var order = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);
-            order.OrganisationContactId.Should().BeNull();
+            order.OrderingPartyContactId.Should().BeNull();
         }
 
-        [Given(@"Orders exist")]
+        [Given(@"orders exist")]
         public async Task GivenOrdersExist(Table table)
         {
             foreach (var ordersTableItem in table.CreateSet<OrdersTable>())
             {
-                var addressReferenceList = orderContext.AddressReferenceList;
-                var contactReferenceList = orderContext.ContactReferenceList;
-
-                int? organisationAddressId = addressReferenceList.GetByPostcode(ordersTableItem.OrganisationAddressPostcode)?.AddressId;
-                int? organisationContactId = contactReferenceList.GetByEmail(ordersTableItem.OrganisationContactEmail)?.ContactId;
-
-                int? supplierAddressId = addressReferenceList.GetByPostcode(ordersTableItem.SupplierAddressPostcode)?.AddressId;
-                int? supplierContactId = contactReferenceList.GetByEmail(ordersTableItem.SupplierContactEmail)?.ContactId;
-
                 DateTime? commencementDate = null;
                 if (ordersTableItem.CommencementDate != DateTime.MinValue)
                 {
                     commencementDate = ordersTableItem.CommencementDate;
                 }
 
+                var now = DateTime.UtcNow;
                 var orderId = ordersTableItem.OrderId;
 
                 var order = OrderEntityBuilder
                     .Create()
                     .WithOrderId(orderId)
                     .WithDescription(ordersTableItem.Description)
-                    .WithOrganisationId(ordersTableItem.OrganisationId)
-                    .WithOrganisationName(ordersTableItem.OrganisationName)
-                    .WithOrganisationOdsCode(ordersTableItem.OrganisationOdsCode)
-                    .WithOrganisationAddressId(organisationAddressId)
-                    .WithOrganisationContactId(organisationContactId)
+                    .WithOrganisationId(ordersTableItem.OrderingPartyId)
+                    .WithOrganisationContactId(ordersTableItem.OrderingPartyContactId)
                     .WithOrderStatus(ordersTableItem.OrderStatus)
-                    .WithDateCreated(ordersTableItem.Created != DateTime.MinValue ? ordersTableItem.Created : DateTime.UtcNow)
+                    .WithDateCreated(ordersTableItem.Created != DateTime.MinValue ? ordersTableItem.Created : now)
                     .WithLastUpdatedBy(ordersTableItem.LastUpdatedBy)
                     .WithLastUpdatedName(ordersTableItem.LastUpdatedByName)
-                    .WithLastUpdated(ordersTableItem.LastUpdated != DateTime.MinValue ? ordersTableItem.LastUpdated : DateTime.UtcNow)
-                    .WithServiceRecipientsViewed(ordersTableItem.ServiceRecipientsViewed)
-                    .WithCatalogueSolutionsViewed(ordersTableItem.CatalogueSolutionsViewed)
-                    .WithAdditionalServicesViewed(ordersTableItem.AdditionalServicesViewed)
-                    .WithAssociatedServicesViewed(ordersTableItem.AssociatedServicesViewed)
+                    .WithLastUpdated(ordersTableItem.LastUpdated != DateTime.MinValue ? ordersTableItem.LastUpdated : now)
                     .WithFundingSourceOnlyGms(ordersTableItem.FundingSourceOnlyGms)
                     .WithSupplierId(ordersTableItem.SupplierId)
-                    .WithSupplierName(ordersTableItem.SupplierName)
-                    .WithSupplierAddressId(supplierAddressId)
-                    .WithSupplierContactId(supplierContactId)
+                    .WithSupplierContactId(ordersTableItem.SupplierContactId)
                     .WithCommencementDate(commencementDate)
                     .WithIsDeleted(ordersTableItem.IsDeleted)
                     .WithDateCompleted(ordersTableItem.Completed)
                     .Build();
 
-                await order.InsertAsync(settings.ConnectionString);
+                await order.InsertAsync(settings.OrderingDbAdminConnectionString);
 
                 orderContext.OrderReferenceList.Add(orderId, order);
             }
@@ -133,51 +116,66 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             orders.Count().Should().Be(0);
         }
 
-        [Then(@"the order with orderId (.*) is updated in the database with data")]
-        public async Task ThenTheOrderIsUpdatedInTheDatabase(string orderId, Table table)
+        [Then(@"the order with ID (\d{1,6}) is updated in the database with data")]
+        public async Task ThenTheOrderIsUpdatedInTheDatabase(int orderId, Table table)
         {
             var actual = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);
             table.CompareToInstance(actual);
         }
 
-        [Then(@"the order is created in the database with orderId (.*) and data")]
-        public async Task ThenTheOrderIsCreatedInTheDatabase(string orderId, Table table)
+        [Then(@"the order is created in the database with ID (\d{1,6}) and data")]
+        public async Task ThenTheOrderIsCreatedInTheDatabase(int orderId, Table table)
         {
             var actual = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);
             table.CompareToInstance(actual);
         }
 
-        [Then(@"the order with orderId (.*) is updated and has a primary contact with data")]
-        public async Task ThenTheOrderWithOrderIdHasContactData(string orderId, Table table)
+        [Then(@"the order with ID (\d{1,6}) is updated and has a primary contact with data")]
+        public async Task ThenTheOrderWithOrderIdHasContactData(int orderId, Table table)
         {
             var expected = table.CreateInstance<ContactEntity>();
 
             var order = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);
-            var actual = await ContactEntity.FetchContactById(settings.ConnectionString, order.OrganisationContactId);
+            var actual = await ContactEntity.FetchContactById(settings.ConnectionString, order.OrderingPartyContactId);
 
-            actual.Should().BeEquivalentTo(expected, options => options.Excluding(c => c.ContactId));
+            actual.Should().BeEquivalentTo(expected, options => options.Excluding(c => c.Id));
         }
 
-        [Then(@"the order with orderId (.*) is updated and has a Organisation Address with data")]
-        public async Task ThenTheOrderWithOrderIdHasOrganisationAddressData(string orderId, Table table)
+        [Then(@"the order with ID (\d{1,6}) is updated and has an ordering party address with data")]
+        public async Task ThenTheOrderWithOrderIdHasOrganisationAddressData(int orderId, Table table)
         {
             var order = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);
-            var actual = await AddressEntity.FetchAddressById(settings.ConnectionString, order.OrganisationAddressId);
+            var orderingParty = await OrderingPartyEntity.FetchById(settings.ConnectionString, order.OrderingPartyId);
+            var actual = await AddressEntity.FetchAddressById(settings.ConnectionString, orderingParty.AddressId);
             table.CompareToInstance(actual);
         }
 
-        [Then(@"the order with orderId (.*) has LastUpdated time present and it is the current time")]
-        public async Task ThenOrderOrderIdHasLastUpdatedAtCurrentTime(string orderId)
+        [Then(@"the order with ID (\d{1,6}) has LastUpdated time present and it is the current time")]
+        public async Task ThenOrderOrderIdHasLastUpdatedAtCurrentTime(int orderId)
         {
             var actual = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);
             actual.LastUpdated.Should().BeWithin(TimeSpan.FromSeconds(3)).Before(DateTime.UtcNow);
         }
 
-        [Then(@"the order with orderId (.*) has Created time present and it is the current time")]
-        public async Task ThenOrderOrderIdHasCreatedAtCurrentTime(string orderId)
+        [Then(@"the order with ID (\d{1,6}) has Created time present and it is the current time")]
+        public async Task ThenOrderOrderIdHasCreatedAtCurrentTime(int orderId)
         {
             var actual = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);
             actual.Created.Should().BeWithin(TimeSpan.FromSeconds(3)).Before(DateTime.UtcNow);
+        }
+
+        [Then(@"the order with ID (\d{1,6}) has call-off ID (.*)")]
+        public async Task ThenOrderWithOrderIdHasCallOffId(int orderId, string callOffId)
+        {
+            var actual = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);
+            actual.CallOffId.Should().Be(callOffId);
+        }
+
+        [Then(@"the order with ID (\d{1,6}) has revision (\d{1,2})")]
+        public async Task ThenOrderWithOrderIdHasRevision(int orderId, byte revision)
+        {
+            var actual = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);
+            actual.Revision.Should().Be(revision);
         }
 
         private static object CreateOrders(JToken token)
@@ -216,17 +214,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class OrdersTable
         {
-            public string OrderId { get; init; }
+            public int OrderId { get; init; }
 
             public string Description { get; init; }
 
-            public Guid OrganisationId { get; init; }
+            public Guid OrderingPartyId { get; init; }
 
-            public string OrganisationName { get; init; }
-
-            public string OrganisationOdsCode { get; init; } = "test";
-
-            public string OrganisationAddressPostcode { get; init; }
+            public int? OrderingPartyContactId { get; init; }
 
             public string OrganisationContactEmail { get; init; }
 
@@ -242,21 +236,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             public string SupplierId { get; init; }
 
-            public string SupplierName { get; init; }
-
-            public string SupplierAddressPostcode { get; init; }
+            public int? SupplierContactId { get; init; }
 
             public string SupplierContactEmail { get; init; }
 
             public DateTime? CommencementDate { get; init; }
-
-            public bool ServiceRecipientsViewed { get; init; }
-
-            public bool CatalogueSolutionsViewed { get; init; }
-
-            public bool AdditionalServicesViewed { get; init; }
-
-            public bool AssociatedServicesViewed { get; init; }
 
             public bool? FundingSourceOnlyGms { get; init; }
 

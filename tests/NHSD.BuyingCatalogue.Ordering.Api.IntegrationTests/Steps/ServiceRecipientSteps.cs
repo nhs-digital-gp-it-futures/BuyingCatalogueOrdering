@@ -32,10 +32,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             this.settings = settings;
             this.orderContext = orderContext;
 
-            serviceRecipientUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/service-recipients";
+            serviceRecipientUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/C{0}-01/sections/service-recipients";
         }
 
-        [Given(@"Service Recipients exist")]
+        [Given(@"service recipients exist")]
         public async Task GivenServiceRecipientsExist(Table table)
         {
             foreach (var serviceRecipientItem in table.CreateSet<ServiceRecipientTable>())
@@ -44,23 +44,22 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .Create()
                     .WithOdsCode(serviceRecipientItem.OdsCode)
                     .WithName(serviceRecipientItem.Name)
-                    .WithOrderId(serviceRecipientItem.OrderId)
                     .Build();
 
                 await serviceRecipient.InsertAsync(settings.ConnectionString);
 
-                orderContext.ServiceRecipientReferenceList.Add(serviceRecipient);
+                orderContext.ServiceRecipientReferenceList.Add(serviceRecipient.OdsCode, serviceRecipient);
             }
         }
 
-        [When(@"the user makes a request to retrieve the service-recipients section with order ID (.*)")]
-        public async Task WhenTheUserMakesARequestToRetrieveTheService_RecipientsSectionWithOrderID(string orderId)
+        [When(@"the user makes a request to retrieve the service-recipients section with order ID (\d{1,6})")]
+        public async Task WhenTheUserMakesARequestToRetrieveTheService_RecipientsSectionWithOrderID(int orderId)
         {
             await request.GetAsync(string.Format(CultureInfo.InvariantCulture, serviceRecipientUrl, orderId));
         }
 
-        [When(@"the user makes a request to set the service-recipients section with order ID (.*)")]
-        public async Task WhenTheUserMakesARequestToRetrieveTheService_RecipientsSectionWithOrderID(string orderId, Table table)
+        [When(@"the user makes a request to set the service-recipients section with order ID (\d{1,6})")]
+        public async Task WhenTheUserMakesARequestToRetrieveTheService_RecipientsSectionWithOrderID(int orderId, Table table)
         {
             var payload = new ServiceRecipientsTable { ServiceRecipients = table.CreateSet<ServiceRecipientTable>() };
             await request.PutJsonAsync(string.Format(CultureInfo.InvariantCulture, serviceRecipientUrl, orderId), payload);
@@ -79,11 +78,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 conf => conf.Excluding(r => r.OrderId).WithStrictOrdering());
         }
 
-        [Then(@"the persisted service recipients are")]
+        [Then(@"the persisted selected service recipients are")]
         public async Task ThenThePersistedServiceRecipientsAreReturned(Table table)
         {
             var expected = table.CreateSet<ServiceRecipientTable>();
-            var actual = await ServiceRecipientEntity.FetchAllServiceRecipients(settings.ConnectionString);
+            var actual = await SelectedServiceRecipientEntity.FetchAllServiceRecipients(settings.ConnectionString);
             expected.Should().BeEquivalentTo(actual);
         }
 
@@ -109,7 +108,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string Name { get; init; }
 
             [UsedImplicitly]
-            public string OrderId { get; init; }
+            public int OrderId { get; init; }
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
@@ -29,8 +28,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             this.orderContext = orderContext ?? throw new ArgumentNullException(nameof(orderContext));
         }
 
-        [Given(@"the user creates a request to retrieve the details of an order by ID '(.*)'")]
-        public void GivenTheUserCreatesARequestToRetrieveTheDetailsOfAnOrderById(string orderId)
+        [Given(@"the user creates a request to retrieve the details of an order by ID (\d{1,6})")]
+        public void GivenTheUserCreatesARequestToRetrieveTheDetailsOfAnOrderById(int orderId)
         {
             getOrderRequest = new GetOrderRequest(
                 request,
@@ -47,29 +46,37 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Then(@"the expected service instance ID is included for each order item as follows")]
         public void ThenTheExpectedServiceInstanceIdIsIncludedForEachOrderItemAsFollows(Table table)
         {
-            var expected = table.CreateSet<ServiceInstanceItem>();
+            var expected = table.CreateSet<GetOrderServiceInstanceItem>();
             getOrderResponse.AssertServiceInstanceId(expected);
         }
 
         [Then(@"the get order response displays the expected order")]
         public void ThenTheGetOrderResponseDisplaysTheExpectedOrder()
         {
-            var order = orderContext.OrderReferenceList.GetByOrderId(getOrderRequest.OrderId);
-            var orderingPartyAddress = orderContext.AddressReferenceList.GetByAddressId(order.OrganisationAddressId);
-            var orderingPartyContact = orderContext.ContactReferenceList.GetByContactId(order.OrganisationContactId);
-            var supplierAddress = orderContext.AddressReferenceList.GetByAddressId(order.SupplierAddressId);
-            var supplierContact = orderContext.ContactReferenceList.GetByContactId(order.SupplierContactId);
-            var orderItems = orderContext.OrderItemReferenceList.FindByOrderId(getOrderRequest.OrderId);
-            var serviceRecipients = orderContext.ServiceRecipientReferenceList.FindByOrderId(getOrderRequest.OrderId);
+            var order = orderContext.OrderReferenceList[getOrderRequest.OrderId];
+
+            var orderingParty = orderContext.OrderingPartyReferenceList[order.OrderingPartyId];
+            var orderingPartyAddress = orderContext.AddressReferenceList[orderingParty.AddressId.GetValueOrDefault()];
+            var orderingPartyContact = orderContext.ContactReferenceList[order.OrderingPartyContactId.GetValueOrDefault()];
+
+            var supplier = orderContext.SupplierReferenceList[order.SupplierId];
+            var supplierAddress = orderContext.AddressReferenceList[supplier.AddressId];
+            var supplierContact = orderContext.ContactReferenceList[order.SupplierContactId.GetValueOrDefault()];
+
+            var orderItems = orderContext.OrderItemReferenceList[getOrderRequest.OrderId].Values;
 
             getOrderResponse.AssertOrder(
                 order,
+                orderingParty,
+                supplier,
                 orderingPartyAddress,
                 orderingPartyContact,
                 supplierAddress,
                 supplierContact,
                 orderItems,
-                serviceRecipients);
+                orderContext.OrderItemRecipientsReferenceList,
+                orderContext.PricingUnitReferenceList,
+                orderContext.CatalogueItemReferenceList);
         }
 
         [Then(@"the get order response contains a yearly value of (.*)")]
@@ -84,10 +91,52 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             getOrderResponse.AssertRecurringCost(item, amount);
         }
 
+        [Then(@"each order item in the order has the expected service instance ID as follows")]
+        public void ThenEachOrderItemHasTheExpectedServiceInstanceIdAsFollows(Table table)
+        {
+            var expected = table.CreateSet<ServiceInstanceItem>();
+            getOrderResponse.AssertServiceInstanceIdAsync(expected);
+        }
+
+        private sealed class GetOrderRequest
+        {
+            private readonly Request request;
+            private readonly string getOrderUrl;
+
+            public GetOrderRequest(
+                Request request,
+                string orderingApiBaseAddress,
+                int orderId)
+            {
+                this.request = request ?? throw new ArgumentNullException(nameof(request));
+                OrderId = orderId;
+
+                getOrderUrl = $"{orderingApiBaseAddress}/api/v1/orders/C{orderId}-01";
+            }
+
+            public int OrderId { get; }
+
+            public async Task<GetOrderResponse> ExecuteAsync()
+            {
+                var response = await request.GetAsync(getOrderUrl);
+                return await GetOrderResponse.CreateAsync(response);
+            }
+        }
+
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
+        private sealed class GetOrderServiceInstanceItem
+        {
+            public string ItemId { get; init; }
+
+            public string ServiceInstanceId { get; init; }
+        }
+
         [UsedImplicitly(ImplicitUseTargetFlags.Members)]
         private sealed class ServiceInstanceItem
         {
-            public string ItemId { get; init; }
+            public string CatalogueItemId { get; init; }
+
+            public string OdsCode { get; init; }
 
             public string ServiceInstanceId { get; init; }
         }

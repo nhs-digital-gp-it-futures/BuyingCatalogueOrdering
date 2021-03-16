@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using FluentAssertions;
-using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
@@ -23,8 +22,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
         }
 
-        [Given(@"the user creates a request to delete the order with ID '(.*)'")]
-        public void GivenTheUserCreatesARequestToDeleteAnOrderById(string orderId)
+        [Given(@"the user creates a request to delete the order with ID (\d{1,6})")]
+        public void GivenTheUserCreatesARequestToDeleteAnOrderById(int orderId)
         {
             deleteOrderRequest = new DeleteOrderRequest(
                 request,
@@ -43,6 +42,30 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var order = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, deleteOrderRequest.OrderId);
             order.IsDeleted.Should().BeTrue();
+        }
+
+        private sealed class DeleteOrderRequest
+        {
+            private readonly Request request;
+            private readonly string deleteOrderUrl;
+
+            public DeleteOrderRequest(
+                Request request,
+                string orderingApiBaseAddress,
+                int orderId)
+            {
+                this.request = request ?? throw new ArgumentNullException(nameof(request));
+                OrderId = orderId;
+
+                deleteOrderUrl = $"{orderingApiBaseAddress}/api/v1/orders/C{orderId}-01";
+            }
+
+            public int OrderId { get; }
+
+            public async Task ExecuteAsync()
+            {
+                await request.DeleteAsync(deleteOrderUrl);
+            }
         }
     }
 }

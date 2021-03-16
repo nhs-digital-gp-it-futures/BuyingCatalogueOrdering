@@ -25,11 +25,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             this.request = request;
             this.settings = settings;
 
-            orderDescriptionUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/description";
+            orderDescriptionUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/C{0}-01/sections/description";
         }
 
-        [When(@"the user makes a request to retrieve the order description section with the ID (.*)")]
-        public async Task WhenAGetRequestIsMadeForAnOrdersDescriptionWithOrderId(string orderId)
+        [When(@"the user makes a request to retrieve the order description section with the ID (\d{1,6})")]
+        public async Task WhenAGetRequestIsMadeForAnOrdersDescriptionWithOrderId(int orderId)
         {
             await request.GetAsync(string.Format(CultureInfo.InvariantCulture, orderDescriptionUrl, orderId));
         }
@@ -49,7 +49,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected);
         }
 
-        [When(@"the user makes a request to update the description with the ID (.*)")]
+        [When(@"the user makes a request to update the description for the order with ID (\d{1,6})")]
         public async Task WhenTheUserMakesARequestToUpdateTheDescriptionWithOrderId(string orderId, Table table)
         {
             var data = table.CreateInstance<OrderDescriptionTable>();
@@ -57,14 +57,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await request.PutJsonAsync(string.Format(CultureInfo.InvariantCulture, orderDescriptionUrl, orderId), data);
         }
 
-        [When(@"the user makes a request to update the description with the ID (.*) with no model")]
-        public async Task WhenTheUserMakesARequestToUpdateTheDescriptionWithOrderIdWithNoModel(string orderId)
+        [When(@"the user makes a request to update the description for the order with ID (\d{1,6}) with no model")]
+        public async Task WhenTheUserMakesARequestToUpdateTheDescriptionWithOrderIdWithNoModel(int orderId)
         {
             await request.PutJsonAsync(string.Format(CultureInfo.InvariantCulture, orderDescriptionUrl, orderId), null);
         }
 
-        [Then(@"the order description for order with id (.*) is set to")]
-        public async Task ThenTheOrderDescriptionForOrderWithIdIsSetTo(string orderId, Table table)
+        [Then(@"the order description for the order with ID (\d{1,6}) is set to")]
+        public async Task ThenTheOrderDescriptionForOrderWithIdIsSetTo(int orderId, Table table)
         {
             var expected = table.CreateInstance<OrderDescriptionTable>().Description;
 
@@ -72,8 +72,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected);
         }
 
-        [Then(@"the lastUpdatedName is updated in the database to (.*) with orderId (.*)")]
-        public async Task ThenTheLastUpdatedNameIsUpdatedInTheDatabase(string expected, string orderId)
+        [Then(@"the lastUpdatedName is updated in the database to (.*) for the order with ID (\d{1,6})")]
+        public async Task ThenTheLastUpdatedNameIsUpdatedInTheDatabase(string expected, int orderId)
         {
             var actual = (await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId)).LastUpdatedByName;
             actual.Should().BeEquivalentTo(expected);
