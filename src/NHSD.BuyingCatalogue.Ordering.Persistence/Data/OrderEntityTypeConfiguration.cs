@@ -16,6 +16,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
                 .HasComputedColumnSql("(concat('C',format([Id],'000000'),'-',format([Revision],'00')))", false)
                 .HasConversion(id => id.ToString(), id => CallOffId.Parse(id).Id);
 
+            builder.Property(o => o.Completed);
             builder.Property(o => o.CommencementDate).HasColumnType("date");
             builder.Property(o => o.Created).HasDefaultValueSql("(getutcdate())");
 
