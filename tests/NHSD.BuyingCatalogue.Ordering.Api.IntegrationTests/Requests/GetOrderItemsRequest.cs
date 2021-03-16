@@ -12,14 +12,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
         public GetOrderItemsRequest(
             Request request,
             string orderingApiBaseAddress,
-            string orderId,
+            int orderId,
             string catalogueItemType)
         {
             this.request = request;
             OrderId = orderId;
             CatalogueItemType = catalogueItemType;
 
-            getOrderItemUrl = $"{orderingApiBaseAddress}/api/v1/orders/{orderId}/order-items";
+            getOrderItemUrl = $"{orderingApiBaseAddress}/api/v1/orders/C{orderId}-01/order-items";
 
             if (!string.IsNullOrWhiteSpace(CatalogueItemType))
             {
@@ -27,7 +27,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             }
         }
 
-        public string OrderId { get; }
+        public int OrderId { get; }
 
         public string CatalogueItemType { get; }
 

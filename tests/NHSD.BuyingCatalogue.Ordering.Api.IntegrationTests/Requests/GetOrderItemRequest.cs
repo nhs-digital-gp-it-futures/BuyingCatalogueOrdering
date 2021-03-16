@@ -13,20 +13,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
         public GetOrderItemRequest(
             Request request,
             string orderingApiBaseAddress,
-            string orderId,
-            int orderItemId)
+            int orderId,
+            string catalogueItemId)
         {
             this.request = request ?? throw new ArgumentNullException(nameof(request));
 
-            OrderId = orderId ?? throw new ArgumentNullException(nameof(orderId));
-            OrderItemId = orderItemId;
+            OrderId = orderId;
+            CatalogueItemId = catalogueItemId;
 
-            getOrderItemUrl = $"{orderingApiBaseAddress}/api/v1/orders/{orderId}/order-items/{orderItemId}";
+            getOrderItemUrl = $"{orderingApiBaseAddress}/api/v1/orders/C{orderId}-01/order-items/{catalogueItemId}";
         }
 
-        public string OrderId { get; }
+        public int OrderId { get; }
 
-        public int OrderItemId { get; }
+        public string CatalogueItemId { get; }
 
         public async Task<GetOrderItemResponse> ExecuteAsync()
         {

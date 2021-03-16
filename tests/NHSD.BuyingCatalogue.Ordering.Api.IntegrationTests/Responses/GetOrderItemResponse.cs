@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Newtonsoft.Json.Linq;
@@ -24,11 +25,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 
         public void AssertBody(
             OrderItemEntity orderItemEntity,
-            ServiceRecipientEntity serviceRecipient)
+            IDictionary<string, ServiceRecipientEntity> serviceRecipients,
+            IList<OrderItemRecipientEntity> orderItemRecipients,
+            IDictionary<string, PricingUnitEntity> pricingUnits)
         {
             var actual = ReadOrderItem(JToken.Parse(content));
 
-            var expected = ConvertToExpectedBody(orderItemEntity, serviceRecipient);
+            var expected = ConvertToExpectedBody(
+                orderItemEntity,
+                serviceRecipients,
+                orderItemRecipients,
+                pricingUnits);
+
             actual.Should().BeEquivalentTo(expected);
         }
     }

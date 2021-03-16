@@ -13,15 +13,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
         public GetFundingSourceRequest(
             Request request,
             string orderingApiBaseAddress,
-            string orderId)
+            int orderId)
         {
             this.request = request ?? throw new ArgumentNullException(nameof(request));
-            OrderId = orderId ?? throw new ArgumentNullException(nameof(orderId));
+            OrderId = orderId;
 
-            getFundingSourceUrl = $"{orderingApiBaseAddress}/api/v1/orders/{orderId}/funding-source";
+            getFundingSourceUrl = $"{orderingApiBaseAddress}/api/v1/orders/C{orderId}-01/funding-source";
         }
 
-        public string OrderId { get; }
+        public int OrderId { get; }
 
         public async Task<GetFundingSourceResponse> ExecuteAsync()
         {
