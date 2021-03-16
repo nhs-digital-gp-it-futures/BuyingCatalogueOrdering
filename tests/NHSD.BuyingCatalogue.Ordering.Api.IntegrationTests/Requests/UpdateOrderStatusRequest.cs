@@ -20,16 +20,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
             { "order-status-missing", () => new UpdateOrderStatusRequestPayload { Status = null } },
         };
 
-        public UpdateOrderStatusRequest(Request request, string orderingApiBaseAddress, string orderId)
+        public UpdateOrderStatusRequest(Request request, string orderingApiBaseAddress, int orderId)
         {
             this.request = request ?? throw new ArgumentNullException(nameof(request));
-            OrderId = orderId ?? throw new ArgumentNullException(nameof(orderId));
+            OrderId = orderId;
 
-            updateOrderStatusUrl =
-                $"{orderingApiBaseAddress}/api/v1/orders/{orderId}/status";
+            updateOrderStatusUrl = $"{orderingApiBaseAddress}/api/v1/orders/C{orderId}-01/status";
         }
 
-        public string OrderId { get; set; }
+        public int OrderId { get; set; }
 
         public UpdateOrderStatusRequestPayload Payload { get; private set; }
 
