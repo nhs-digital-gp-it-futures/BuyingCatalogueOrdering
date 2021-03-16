@@ -1,67 +1,63 @@
-﻿Feature: Default Delivery Date Get
+﻿Feature: default delivery date GET
     As a buyer
     I want to be able to get the default delivery date of a catalogue item
     So that I can edit it
 
 Background:
-    Given Orders exist
-        | OrderId    | Description            | SupplierId | SupplierName | OrganisationId                       | OrganisationOdsCode | OrganisationName       | CommencementDate | CatalogueSolutionsViewed | AssociatedServicesViewed | FundingSourceOnlyGMS | Completed |
-        | C000014-01 | Some Description       | 10101      | Supplier 1   | 4af62b99-638c-4247-875e-965239cd0c48 | OrgOds              | NHS NORTHUMBERLAND CCG | 15/12/2020       | True                     | True                     | True                 | NULL      |
-    And Service Recipients exist
-        | OrderId    | OdsCode | Name    |
-        | C000014-01 | eu      | EU Test |
-    And Order items exist
-        | OrderId    | CatalogueItemId | CatalogueItemName | CatalogueItemType | OdsCode | PriceTimeUnit | EstimationPeriod | DeliveryDate | Price  | ProvisioningType |
-        | C000014-01 | 10001-001       | Item 1            | Solution          | eu      | Month         | Month            | 05/09/2021   | 599.99 | Patient          |
-        | C000014-01 | 10001-002       | Item 2            | Solution          | eu      | Year          | Year             | 24/12/2021   | NULL   | Patient          |
+    Given ordering parties exist
+        | Id                                   |
+        | 4af62b99-638c-4247-875e-965239cd0c48 |
+    And orders exist
+        | OrderId | Description      | OrderingPartyId                      | CommencementDate |
+        | 10001   | Some Description | 4af62b99-638c-4247-875e-965239cd0c48 | 15/12/2020       |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @8952
-Scenario: Get an existing default delivery date of a catalogue item
+Scenario: get an existing default delivery date of a catalogue item
     Given the following default delivery dates have already been set
-        | OrderId    | CatalogueItemId | PriceId | DeliveryDate |
-        | C000014-01 | 10001-001       | 1       | 31/12/2020   |
+        | OrderId | CatalogueItemId | DeliveryDate |
+        | 10001   | 10001-001       | 31/12/2020   |
     When the user gets the default delivery date for the catalogue item with the following details
-        | OrderId    | CatalogueItemId | PriceId |
-        | C000014-01 | 10001-001       | 1       |
+        | OrderId | CatalogueItemId |
+        | 10001   | 10001-001       |
     Then a response with status code 200 is returned
     And the default delivery date returned is 31/12/2020
 
 @8952
-Scenario: Get a default delivery date that does not exist
+Scenario: get a default delivery date that does not exist
     When the user gets the default delivery date for the catalogue item with the following details
-        | OrderId    | CatalogueItemId | PriceId |
-        | C000014-01 | 10001-001       | 1       |
+        | OrderId | CatalogueItemId |
+        | 10001   | 10001-001       |
     Then a response with status code 404 is returned
 
 @8952
-Scenario: If a user is not authorized then they cannot get a default delivery date
+Scenario: if a user is not authorized then they cannot get a default delivery date
     Given no user is logged in
     When the user gets the default delivery date for the catalogue item with the following details
-        | OrderId    | CatalogueItemId | PriceId |
-        | C000014-01 | 10001-001       | 1       |
+        | OrderId | CatalogueItemId |
+        | 10001   | 10001-001       |
     Then a response with status code 401 is returned
 
 @8952
-Scenario: A non buyer user cannot get a default delivery date
+Scenario: a non-buyer user cannot get a default delivery date
     Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
     When the user gets the default delivery date for the catalogue item with the following details
-        | OrderId    | CatalogueItemId | PriceId |
-        | C000014-01 | 10001-001       | 1       |
+        | OrderId | CatalogueItemId |
+        | 10001   | 10001-001       |
     Then a response with status code 403 is returned
 
 @8952
-Scenario: A buyer user cannot get the default delivery of an order for an organisation they don't belong to
+Scenario: a buyer user cannot get the default delivery of an order for an organisation they don't belong to
     Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
     When the user gets the default delivery date for the catalogue item with the following details
-        | OrderId    | CatalogueItemId | PriceId |
-        | C000014-01 | 10001-001       | 1       |
+        | OrderId | CatalogueItemId |
+        | 10001   | 10001-001       |
     Then a response with status code 403 is returned
 
 @8952
-Scenario: A service failure causes the expected response to be returned when getting a default delivery date
+Scenario: a service failure causes the expected response to be returned when getting a default delivery date
     Given the call to the database will fail
     When the user gets the default delivery date for the catalogue item with the following details
-        | OrderId    | CatalogueItemId | PriceId |
-        | C000014-01 | 10001-001       | 1       |
+        | OrderId | CatalogueItemId |
+        | 10001   | 10001-001       |
     Then a response with status code 500 is returned
