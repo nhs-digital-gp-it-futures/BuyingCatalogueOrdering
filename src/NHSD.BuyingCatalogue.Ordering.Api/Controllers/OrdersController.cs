@@ -166,8 +166,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             var order = await context.Order
                 .Where(o => o.Id == callOffId.Id)
+                .Include(o => o.OrderingParty)
+                .Include(o => o.Supplier)
                 .Include(o => o.OrderItems).ThenInclude(i => i.CatalogueItem)
-                .AsNoTracking()
+                .Include(o => o.OrderItems).ThenInclude(i => i.OrderItemRecipients).ThenInclude(r => r.Recipient)
+                .Include(o => o.OrderItems).ThenInclude(i => i.PricingUnit)
+                .Include(o => o.Progress)
                 .SingleOrDefaultAsync();
 
             if (order is null)

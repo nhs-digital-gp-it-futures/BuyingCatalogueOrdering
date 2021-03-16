@@ -9,7 +9,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
     {
         internal static IReadOnlyList<OrderItemRecipientModel> ToModelList(this IReadOnlyList<OrderItemRecipient> recipients)
         {
-            return recipients.Select(r => new OrderItemRecipientModel
+            return recipients.OrderBy(r => r.Recipient.Name).Select(r => new OrderItemRecipientModel
             {
                 DeliveryDate = r.DeliveryDate,
                 Name = r.Recipient.Name,

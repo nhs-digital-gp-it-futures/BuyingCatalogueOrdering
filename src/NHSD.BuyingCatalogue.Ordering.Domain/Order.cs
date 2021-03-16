@@ -135,7 +135,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         {
             lastUpdatedBy = userId;
             lastUpdatedByName = userName ?? throw new ArgumentNullException(nameof(userName));
-            lastUpdated = DateTime.UtcNow;
+            lastUpdated = completed ?? DateTime.UtcNow;
         }
 
         public OrderItem AddOrUpdateOrderItem(OrderItem orderItem)
