@@ -6,12 +6,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
 {
     public sealed class OrderEntityBuilder
     {
-        private string orderId;
+        private int orderId;
         private string description;
         private Guid organisationId;
-        private string organisationName;
-        private string organisationOdsCode;
-        private int? organisationAddressId;
         private int? organisationContactId;
         private OrderStatus orderStatus;
         private DateTime lastUpdated;
@@ -20,25 +17,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
         private DateTime created;
         private DateTime? completed;
         private string supplierId;
-        private string supplierName;
-        private int? supplierAddressId;
         private int? supplierContactId;
         private DateTime? commencementDate;
-        private bool serviceRecipientsViewed;
-        private bool catalogueSolutionsViewed;
-        private bool additionalServicesViewed;
-        private bool associatedServicesViewed;
         private bool? fundingSourceOnlyGms;
         private bool isDeleted;
 
         private OrderEntityBuilder()
         {
-            orderId = null;
             description = "Some Description";
             organisationId = Guid.NewGuid();
-            organisationName = null;
-            organisationOdsCode = "test";
-            organisationAddressId = null;
             organisationContactId = null;
             orderStatus = 0;
             lastUpdated = DateTime.UtcNow;
@@ -46,13 +33,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
             lastUpdatedByName = "Alice Smith";
             created = DateTime.UtcNow;
             supplierId = null;
-            supplierName = null;
-            supplierAddressId = null;
             supplierContactId = null;
             commencementDate = null;
-            serviceRecipientsViewed = false;
-            catalogueSolutionsViewed = false;
-            additionalServicesViewed = false;
             fundingSourceOnlyGms = null;
             isDeleted = false;
         }
@@ -62,7 +44,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
             return new();
         }
 
-        public OrderEntityBuilder WithOrderId(string id)
+        public OrderEntityBuilder WithOrderId(int id)
         {
             orderId = id;
             return this;
@@ -77,24 +59,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
         public OrderEntityBuilder WithOrganisationId(Guid id)
         {
             organisationId = id;
-            return this;
-        }
-
-        public OrderEntityBuilder WithOrganisationName(string name)
-        {
-            organisationName = name;
-            return this;
-        }
-
-        public OrderEntityBuilder WithOrganisationOdsCode(string odsCode)
-        {
-            organisationOdsCode = odsCode;
-            return this;
-        }
-
-        public OrderEntityBuilder WithOrganisationAddressId(int? addressId)
-        {
-            organisationAddressId = addressId;
             return this;
         }
 
@@ -140,18 +104,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
             return this;
         }
 
-        public OrderEntityBuilder WithSupplierName(string name)
-        {
-            supplierName = name;
-            return this;
-        }
-
-        public OrderEntityBuilder WithSupplierAddressId(int? addressId)
-        {
-            supplierAddressId = addressId;
-            return this;
-        }
-
         public OrderEntityBuilder WithSupplierContactId(int? contactId)
         {
             supplierContactId = contactId;
@@ -161,30 +113,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
         public OrderEntityBuilder WithCommencementDate(DateTime? date)
         {
             commencementDate = date;
-            return this;
-        }
-
-        public OrderEntityBuilder WithServiceRecipientsViewed(bool viewed)
-        {
-            serviceRecipientsViewed = viewed;
-            return this;
-        }
-
-        public OrderEntityBuilder WithCatalogueSolutionsViewed(bool viewed)
-        {
-            catalogueSolutionsViewed = viewed;
-            return this;
-        }
-
-        public OrderEntityBuilder WithAdditionalServicesViewed(bool viewed)
-        {
-            additionalServicesViewed = viewed;
-            return this;
-        }
-
-        public OrderEntityBuilder WithAssociatedServicesViewed(bool viewed)
-        {
-            associatedServicesViewed = viewed;
             return this;
         }
 
@@ -210,27 +138,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
         {
             return new()
             {
-                OrderId = orderId,
+                Id = orderId,
                 Description = description,
-                OrganisationId = organisationId,
-                OrganisationName = organisationName,
-                OrganisationOdsCode = organisationOdsCode,
-                OrganisationAddressId = organisationAddressId,
-                OrganisationContactId = organisationContactId,
+                OrderingPartyId = organisationId,
+                OrderingPartyContactId = organisationContactId,
                 OrderStatus = orderStatus,
                 LastUpdated = lastUpdated,
                 LastUpdatedBy = lastUpdatedBy,
                 LastUpdatedByName = lastUpdatedByName,
                 Created = created,
                 SupplierId = supplierId,
-                SupplierName = supplierName,
-                SupplierAddressId = supplierAddressId,
                 SupplierContactId = supplierContactId,
                 CommencementDate = commencementDate,
-                ServiceRecipientsViewed = serviceRecipientsViewed,
-                CatalogueSolutionsViewed = catalogueSolutionsViewed,
-                AdditionalServicesViewed = additionalServicesViewed,
-                AssociatedServicesViewed = associatedServicesViewed,
                 FundingSourceOnlyGms = fundingSourceOnlyGms,
                 IsDeleted = isDeleted,
                 Completed = completed,
