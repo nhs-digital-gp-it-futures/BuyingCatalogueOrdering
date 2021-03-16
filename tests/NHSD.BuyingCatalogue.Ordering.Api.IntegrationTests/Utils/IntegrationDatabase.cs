@@ -18,12 +18,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
             // ReSharper disable StringLiteralTypo
             await databaseConnection.ExecuteAsync("ALTER ROLE db_datareader ADD MEMBER [NHSD-ORDAPI];");
             await databaseConnection.ExecuteAsync("ALTER ROLE db_datawriter ADD MEMBER [NHSD-ORDAPI];");
-            await databaseConnection.ExecuteAsync("DELETE FROM dbo.OrderItem;");
-            await databaseConnection.ExecuteAsync("DELETE FROM dbo.ServiceRecipient;");
+
+            // ReSharper restore StringLiteralTypo
             await databaseConnection.ExecuteAsync("DELETE FROM dbo.[Order];");
+            await databaseConnection.ExecuteAsync("DELETE FROM dbo.OrderingParty;");
+            await databaseConnection.ExecuteAsync("DELETE FROM dbo.Supplier;");
             await databaseConnection.ExecuteAsync("DELETE FROM dbo.[Address];");
+            await databaseConnection.ExecuteAsync("DELETE FROM dbo.CatalogueItem;");
             await databaseConnection.ExecuteAsync("DELETE FROM dbo.Contact;");
-            await databaseConnection.ExecuteAsync("DBCC CHECKIDENT ('dbo.OrderItem', RESEED, 0);");
+            await databaseConnection.ExecuteAsync("DELETE FROM dbo.PricingUnit;");
+            await databaseConnection.ExecuteAsync("DELETE FROM dbo.ServiceRecipient;");
+
+            // ReSharper disable StringLiteralTypo
+            await databaseConnection.ExecuteAsync("DBCC CHECKIDENT ('dbo.[Order]', RESEED, 10000);");
 
             // ReSharper restore StringLiteralTypo
         }

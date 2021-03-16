@@ -8,7 +8,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
     {
         public int Id { get; set; }
 
-        public byte Revision { get; set; }
+        public byte Revision { get; set; } = 1;
 
         public string CallOffId { get; set; }
 

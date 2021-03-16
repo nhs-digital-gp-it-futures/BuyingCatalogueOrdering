@@ -24,14 +24,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
 
         private OrderEntityBuilder()
         {
+            var now = DateTime.UtcNow;
+
             description = "Some Description";
             organisationId = Guid.NewGuid();
             organisationContactId = null;
             orderStatus = 0;
-            lastUpdated = DateTime.UtcNow;
+            lastUpdated = now;
             lastUpdatedBy = Guid.NewGuid();
             lastUpdatedByName = "Alice Smith";
-            created = DateTime.UtcNow;
+            created = now;
             supplierId = null;
             supplierContactId = null;
             commencementDate = null;
