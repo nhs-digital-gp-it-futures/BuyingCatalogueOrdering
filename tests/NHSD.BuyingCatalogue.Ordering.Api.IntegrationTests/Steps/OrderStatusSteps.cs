@@ -33,8 +33,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             this.emailServerDriver = emailServerDriver;
         }
 
-        [Given(@"the user creates a request to update the order status for the order with ID '(.*)'")]
-        public void GivenTheUserCreatesARequestToUpdateTheStatusForTheOrderWithId(string orderId)
+        [Given(@"the user creates a request to update the order status for the order with ID (\d{1,6})")]
+        public void GivenTheUserCreatesARequestToUpdateTheStatusForTheOrderWithId(int orderId)
         {
             updateOrderStatusRequest = new UpdateOrderStatusRequest(request, settings.OrderingApiBaseUrl, orderId);
         }
@@ -75,7 +75,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var attachment = email.Attachments.First(a => a.FileName.Contains(Path.ChangeExtension(csvFile, ".csv"), StringComparison.OrdinalIgnoreCase));
             using var attachmentReader = new StreamReader(new MemoryStream(attachment.AttachmentData.ToArray()));
 
-            using var csvReader = new CsvReader(attachmentReader, CultureInfo.InvariantCulture);
+            using var csvReader = new CsvReader(attachmentReader, CultureInfo.CurrentCulture);
             var csvRecords = csvReader.GetRecords<dynamic>().ToList();
 
             table.CompareToDynamicSet(csvRecords, new PreservePropertyNameFormatter(), false);

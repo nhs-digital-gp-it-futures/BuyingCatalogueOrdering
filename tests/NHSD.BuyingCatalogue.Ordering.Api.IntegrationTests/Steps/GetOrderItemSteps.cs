@@ -28,42 +28,38 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             this.orderContext = orderContext ?? throw new ArgumentNullException(nameof(orderContext));
         }
 
-        [Given(@"the user creates a request to retrieve an order item with catalogue item name '(.*)' and order ID '(.*)'")]
+        [Given(@"the user creates a request to retrieve an order item with catalogue item ID '(.*)' and order ID (\d{1,6})")]
         public void GivenTheUserCreatesARequestToRetrieveAnOrderItemWithCatalogueItemNameAndOrderId(
-            string catalogueSolutionName,
-            string orderId)
+            string catalogueItemId,
+            int orderId)
         {
-            var orderItem = orderContext.OrderItemReferenceList.GetByOrderCatalogueItemName(catalogueSolutionName);
-
             getOrderItemRequest = new GetOrderItemRequest(
                 request,
                 settings.OrderingApiBaseUrl,
                 orderId,
-                orderItem.OrderItemId);
+                catalogueItemId);
         }
 
         [Given(@"the user creates a request to retrieve an order item that does not exist")]
         public void GivenTheUserCreatesARequestToRetrieveAnOrderItemThatDoesNotExist()
         {
-            var order = orderContext.OrderReferenceList.GetAll().First();
+            var order = orderContext.OrderReferenceList.Values.First();
 
             getOrderItemRequest = new GetOrderItemRequest(
                 request,
                 settings.OrderingApiBaseUrl,
-                order.OrderId,
-                999);
+                order.Id,
+                "999-09");
         }
 
         [Given(@"the user creates a request to retrieve an order item for an order that does not exist")]
         public void GivenTheUserCreatesARequestToRetrieveAnOrderItemForAnOrderThatDoesNotExist()
         {
-            var orderItem = orderContext.OrderItemReferenceList.GetAll().First();
-
             getOrderItemRequest = new GetOrderItemRequest(
                 request,
                 settings.OrderingApiBaseUrl,
-                Guid.NewGuid().ToString(),
-                orderItem.OrderItemId);
+                99,
+                "999");
         }
 
         [When(@"the user sends the retrieve an order item request")]
@@ -75,13 +71,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Then(@"the response contains the expected order item")]
         public void ThenTheResponseContainsTheExpectedOrderItem()
         {
-            var orderItem = orderContext
-                .OrderItemReferenceList.FindByOrderItemId(getOrderItemRequest.OrderItemId);
+            var orderItem = orderContext.OrderItemReferenceList[getOrderItemRequest.OrderId][getOrderItemRequest.CatalogueItemId];
+            var orderItemRecipients = orderContext.OrderItemRecipientsReferenceList[(orderItem.OrderId, orderItem.CatalogueItemId)];
 
-            var serviceRecipient = orderContext
-                .ServiceRecipientReferenceList.Get(getOrderItemRequest.OrderId, orderItem.OdsCode);
-
-            getOrderItemResponse.AssertBody(orderItem, serviceRecipient);
+            getOrderItemResponse.AssertBody(
+                orderItem,
+                orderContext.ServiceRecipientReferenceList,
+                orderItemRecipients,
+                orderContext.PricingUnitReferenceList);
         }
     }
 }

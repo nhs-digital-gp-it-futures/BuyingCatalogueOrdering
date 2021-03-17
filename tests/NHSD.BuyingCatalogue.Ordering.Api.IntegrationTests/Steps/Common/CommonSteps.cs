@@ -44,7 +44,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common
         public async Task TheResponseContainsNoData()
         {
             var jsonResponse = await response.ReadBodyAsStringAsync();
-            jsonResponse.Should().BeEmpty();
+            jsonResponse.Should().Be("{}");
         }
 
         [UsedImplicitly(ImplicitUseTargetFlags.Members)]

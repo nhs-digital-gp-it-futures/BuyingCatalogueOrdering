@@ -22,16 +22,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests
         public UpdateFundingSourceRequest(
             Request request,
             string orderingApiBaseAddress,
-            string orderId)
+            int orderId)
         {
             this.request = request ?? throw new ArgumentNullException(nameof(request));
-            OrderId = orderId ?? throw new ArgumentNullException(nameof(orderId));
+            OrderId = orderId;
 
-            updateFundingSourceUrl =
-                $"{orderingApiBaseAddress}/api/v1/orders/{orderId}/funding-source";
+            updateFundingSourceUrl = $"{orderingApiBaseAddress}/api/v1/orders/C{orderId}-01/funding-source";
         }
 
-        public string OrderId { get; set; }
+        public int OrderId { get; set; }
 
         public UpdateFundingSourceRequestPayload Payload { get; private set; }
 

@@ -21,8 +21,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             this.settings = settings;
         }
 
-        [Given(@"the user creates a request to update the funding source for the order with ID '(.*)'")]
-        public void GivenTheUserCreatesARequestToUpdateFundingSourceForOrderWithId(string orderId)
+        [Given(@"the user creates a request to update the funding source for the order with ID (\d*)")]
+        public void GivenTheUserCreatesARequestToUpdateFundingSourceForOrderWithId(int orderId)
         {
             fundingSourceRequest = new UpdateFundingSourceRequest(request, settings.OrderingApiBaseUrl, orderId);
         }

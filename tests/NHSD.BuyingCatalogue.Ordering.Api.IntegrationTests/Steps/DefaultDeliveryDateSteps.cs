@@ -16,7 +16,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private readonly Response response;
         private readonly Settings settings;
 
-        private DefaultDeliveryDateEntity payload;
+        private DefaultDeliveryDatePayload payload;
 
         public DefaultDeliveryDateSteps(Request request, Response response, Settings settings)
         {
@@ -46,14 +46,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             await request.PutJsonAsync(
                 settings.OrderingApiBaseUrl,
-                new { payload.DeliveryDate },
+                new { payload.Entity.DeliveryDate },
                 "api",
                 "v1",
                 "orders",
-                payload.OrderId,
+                payload.CallOffId,
                 "default-delivery-date",
-                payload.CatalogueItemId,
-                payload.PriceId);
+                payload.Entity.CatalogueItemId);
         }
 
         [When(@"the user gets the default delivery date for the catalogue item with the following details")]
@@ -66,16 +65,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 "api",
                 "v1",
                 "orders",
-                payload.OrderId,
+                payload.CallOffId,
                 "default-delivery-date",
-                payload.CatalogueItemId,
-                payload.PriceId);
+                payload.Entity.CatalogueItemId);
         }
 
         [Then(@"the default delivery date is set correctly")]
         public async Task ThenTheDefaultDeliveryDateIsSetCorrectly()
         {
-            await DateIsAsExpected(payload);
+            await DateIsAsExpected(payload.Entity);
         }
 
         [Then(@"the default delivery date returned is (.*)")]
@@ -102,6 +100,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             deliveryDate.Should().BeEquivalentTo(expected);
         }
 
-        private void SavePayload(Table table) => payload = table.CreateInstance<DefaultDeliveryDateEntity>();
+        private void SavePayload(Table table) => payload = new DefaultDeliveryDatePayload(table);
+
+        private sealed class DefaultDeliveryDatePayload
+        {
+            internal DefaultDeliveryDatePayload(Table table)
+            {
+                Entity = table.CreateInstance<DefaultDeliveryDateEntity>();
+                CallOffId = $"C{Entity.OrderId}-01";
+            }
+
+            internal string CallOffId { get; }
+
+            internal DefaultDeliveryDateEntity Entity { get; }
+        }
     }
 }

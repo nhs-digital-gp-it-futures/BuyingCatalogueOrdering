@@ -1,5 +1,7 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Data;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
@@ -8,33 +10,31 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 {
     internal abstract class GetOrderItemResponseBase
     {
-        [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Lower required for test")]
         protected static object ConvertToExpectedBody(
             OrderItemEntity orderItemEntity,
-            ServiceRecipientEntity serviceRecipient)
+            IDictionary<string, ServiceRecipientEntity> serviceRecipients,
+            IList<OrderItemRecipientEntity> orderItemRecipients,
+            IDictionary<string, PricingUnitEntity> pricingUnits)
         {
             return new
             {
-                orderItemEntity.OrderItemId,
                 orderItemEntity.CatalogueItemId,
-                orderItemEntity.CatalogueItemType,
-                orderItemEntity.CatalogueItemName,
                 orderItemEntity.CurrencyCode,
-                orderItemEntity.DeliveryDate,
                 EstimationPeriod = orderItemEntity.EstimationPeriod?.ToString(),
                 ItemUnit = new
                 {
                     Name = orderItemEntity.PricingUnitName,
-                    Description = orderItemEntity.PricingUnitDescription,
+                    pricingUnits[orderItemEntity.PricingUnitName].Description,
                 },
                 orderItemEntity.Price,
                 orderItemEntity.ProvisioningType,
-                orderItemEntity.Quantity,
-                ServiceRecipient = new
+                ServiceRecipients = orderItemRecipients.Select(r => new
                 {
-                    orderItemEntity.OdsCode,
-                    serviceRecipient.Name,
-                },
+                    r.DeliveryDate,
+                    serviceRecipients[r.OdsCode].Name,
+                    r.OdsCode,
+                    r.Quantity,
+                }).ToArray(),
                 TimeUnit = orderItemEntity.TimeUnit is null ? null : new
                 {
                     Name = orderItemEntity.TimeUnit.ToString()?.ToLowerInvariant(),
@@ -48,17 +48,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
         {
             return new
             {
-                OrderItemId = responseBody.Value<int>("orderItemId"),
                 CatalogueItemId = responseBody.Value<string>("catalogueItemId"),
-                CatalogueItemType = Enum.Parse<CatalogueItemType>(responseBody.Value<string>("catalogueItemType")),
-                CatalogueItemName = responseBody.Value<string>("catalogueItemName"),
                 CurrencyCode = responseBody.Value<string>("currencyCode"),
                 DeliveryDate = responseBody.Value<DateTime?>("DeliveryDate"),
                 ItemUnit = ReadItemUnit(responseBody),
                 Price = responseBody.Value<decimal?>("price"),
                 ProvisioningType = Enum.Parse<ProvisioningType>(responseBody.Value<string>("provisioningType")),
                 Quantity = responseBody.Value<int>("quantity"),
-                ServiceRecipient = ReadServiceRecipient(responseBody),
+                ServiceRecipients = responseBody.SelectToken("serviceRecipients")?.Select(ReadOrderItemRecipient).ToArray(),
                 TimeUnit = ReadTimeUnit(responseBody),
                 Type = Enum.Parse<CataloguePriceType>(responseBody.Value<string>("type")),
                 EstimationPeriod = ReadEstimationPeriod(responseBody),
@@ -105,21 +102,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
             return timeUnit;
         }
 
-        private static object ReadServiceRecipient(JToken responseBody)
+        private static object ReadOrderItemRecipient(JToken responseBody)
         {
-            object serviceRecipient = null;
-
-            var serviceRecipientToken = responseBody.SelectToken("serviceRecipient");
-            if (serviceRecipientToken is not null)
+            return new
             {
-                serviceRecipient = new
-                {
-                    OdsCode = serviceRecipientToken.Value<string>("odsCode"),
-                    Name = serviceRecipientToken.Value<string>("name"),
-                };
-            }
-
-            return serviceRecipient;
+                DeliveryDate = DateTime.Parse(responseBody.Value<string>("deliveryDate"), CultureInfo.InvariantCulture),
+                Name = responseBody.Value<string>("name"),
+                OdsCode = responseBody.Value<string>("odsCode"),
+                Quantity = int.Parse(responseBody.Value<string>("quantity"), CultureInfo.InvariantCulture),
+            };
         }
     }
 }

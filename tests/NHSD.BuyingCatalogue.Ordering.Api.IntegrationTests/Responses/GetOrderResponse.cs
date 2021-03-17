@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
+using JetBrains.Annotations;
 using Newtonsoft.Json.Linq;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Data;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
+using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 {
@@ -50,28 +52,33 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 
         public void AssertServiceInstanceId(IEnumerable<object> expectedServiceInstanceIds)
         {
-            var actual = ReadOrderItems(ContentAsJson);
+            var actual = ReadOrderItems(ContentAsJson).SelectMany(d => d.ServiceRecipients);
             actual.Should().BeEquivalentTo(expectedServiceInstanceIds, c => c.IncludingAllDeclaredProperties());
         }
 
         public void AssertOrder(
             OrderEntity orderEntity,
+            OrderingPartyEntity orderingPartyEntity,
+            SupplierEntity supplierEntity,
             AddressEntity orderingPartyAddress,
             ContactEntity orderPartyContact,
             AddressEntity supplierAddress,
             ContactEntity supplierContact,
             IEnumerable<OrderItemEntity> orderItems,
-            IEnumerable<ServiceRecipientEntity> serviceRecipients)
+            IDictionary<(int OrderId, string CatalogueItemId), IList<OrderItemRecipientEntity>> serviceRecipients,
+            IDictionary<string, PricingUnitEntity> pricingUnits,
+            IDictionary<string, CatalogueItemEntity> catalogueItems)
         {
             var responseContent = ContentAsJson;
+            var i = 1;
 
             var expected = new
             {
                 orderEntity.Description,
                 OrderParty = new
                 {
-                    Name = orderEntity.OrganisationName,
-                    OdsCode = orderEntity.OrganisationOdsCode,
+                    orderingPartyEntity.Name,
+                    orderingPartyEntity.OdsCode,
                     Address = new
                     {
                         orderingPartyAddress?.Line1,
@@ -92,10 +99,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                         TelephoneNumber = orderPartyContact.Phone,
                     },
                 },
-                orderEntity.CommencementDate,
                 Supplier = new
                 {
-                    Name = orderEntity.SupplierName,
+                    supplierEntity.Name,
                     Address = new
                     {
                         supplierAddress?.Line1,
@@ -116,25 +122,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                         TelephoneNumber = supplierContact.Phone,
                     },
                 },
+                orderEntity.CommencementDate,
                 OrderItems = orderItems.Select(orderItem => new
                 {
-                    ItemId = $"{orderEntity.OrderId}-{orderItem.OdsCode}-{orderItem.OrderItemId}",
-                    ServiceRecipientsOdsCode = orderItem.OdsCode,
                     CataloguePriceType = orderItem.CataloguePriceType.ToString(),
-                    CatalogueItemType = orderItem.CatalogueItemType.ToString(),
-                    orderItem.CatalogueItemName,
+                    CatalogueItemType = catalogueItems[orderItem.CatalogueItemId].CatalogueItemType.ToString(),
+                    CatalogueItemName = catalogueItems[orderItem.CatalogueItemId].Name,
                     ProvisioningType = orderItem.ProvisioningType.ToString(),
-                    ItemUnitDescription = orderItem.PricingUnitDescription,
-                    TimeUnitDescription = orderItem.TimeUnit?.ToDescription(),
-                    QuantityPeriodDescription = orderItem.EstimationPeriod?.ToDescription(),
                     orderItem.Price,
-                    orderItem.Quantity,
-                    orderItem.DeliveryDate,
-                }),
-                ServiceRecipients = serviceRecipients.Select(serviceRecipient => new
-                {
-                    serviceRecipient.Name,
-                    serviceRecipient.OdsCode,
+                    ItemUnitDescription = pricingUnits[orderItem.PricingUnitName].Description,
+                    TimeUnitDescription = orderItem.TimeUnit?.ToDescription(),
+                    ServiceRecipients = serviceRecipients[(orderItem.OrderId, orderItem.CatalogueItemId)].Select(r => new
+                    {
+                        ItemId = $"C{orderEntity.Id:D6}-{orderEntity.Revision:D2}-{r.OdsCode}-{i++}",
+                        r.DeliveryDate,
+                        r.OdsCode,
+                        r.Quantity,
+                    }),
+                    QuantityPeriodDescription = orderItem.EstimationPeriod?.ToDescription(),
                 }),
                 OrderStatus = orderEntity.OrderStatus.ToString(),
                 orderEntity.Completed,
@@ -143,6 +148,34 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
             var actual = ReadOrder(responseContent);
 
             actual.Should().BeEquivalentTo(expected);
+        }
+
+        public void AssertServiceInstanceIdAsync(IEnumerable<object> expected)
+        {
+            var responseContent = ContentAsJson;
+            var orderItems = responseContent.SelectToken("orderItems") as JArray;
+
+            Assert.NotNull(orderItems);
+
+            var allServiceInstanceIds = new List<object>();
+
+            foreach (var orderItem in orderItems)
+            {
+                var serviceInstanceIds = ReadServiceInstanceItem(orderItem, orderItem.Value<string>("catalogueItemId"));
+                allServiceInstanceIds.AddRange(serviceInstanceIds);
+            }
+
+            allServiceInstanceIds.Should().BeEquivalentTo(expected);
+        }
+
+        private static IEnumerable<object> ReadServiceInstanceItem(JToken responseBody, string catalogueItemId)
+        {
+            return responseBody.SelectToken("serviceRecipients")?.Select(t => new
+            {
+                CatalogueItemId = catalogueItemId,
+                OdsCode = t.Value<string>("odsCode"),
+                ServiceInstanceId = t.Value<string>("serviceInstanceId"),
+            });
         }
 
         private static object ReadOrder(JToken responseContent)
@@ -154,12 +187,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 CommencementDate = responseContent.Value<DateTime?>("commencementDate"),
                 Supplier = ReadSupplier(responseContent.SelectToken("supplier")),
                 OrderItems = ReadOrderItems(responseContent),
-                ServiceRecipients = ReadServiceRecipients(responseContent),
-                OrderStatus = responseContent.Value<string>("status"),
                 TotalOneOffCost = responseContent.Value<decimal>("totalOneOffCost"),
                 TotalRecurringCostPerMonth = responseContent.Value<decimal>("totalRecurringCostPerMonth"),
                 TotalRecurringCostPerYear = responseContent.Value<decimal>("totalRecurringCostPerYear"),
                 TotalOwnershipCost = responseContent.Value<decimal>("totalOwnershipCost"),
+                OrderStatus = responseContent.Value<string>("status"),
                 Completed = responseContent.Value<DateTime?>("dateCompleted"),
             };
         }
@@ -212,37 +244,64 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
             };
         }
 
-        private static IEnumerable<dynamic> ReadOrderItems(JToken responseContent)
+        private static IEnumerable<ExpectedOrderItem> ReadOrderItems(JToken responseContent)
         {
             var orderItemsToken = responseContent.SelectToken("orderItems");
 
-            return orderItemsToken?.Select(orderItem => new
+            return orderItemsToken?.Select(orderItem => new ExpectedOrderItem
             {
-                ItemId = orderItem.Value<string>("itemId"),
-                ServiceRecipientsOdsCode = orderItem.Value<string>("serviceRecipientsOdsCode"),
+                CatalogueItemId = orderItem.Value<string>("catalogueItemId"),
                 CataloguePriceType = orderItem.Value<string>("cataloguePriceType"),
                 CatalogueItemType = orderItem.Value<string>("catalogueItemType"),
                 CatalogueItemName = orderItem.Value<string>("catalogueItemName"),
                 ProvisioningType = orderItem.Value<string>("provisioningType"),
+                Price = orderItem.Value<decimal?>("price"),
                 ItemUnitDescription = orderItem.Value<string>("itemUnitDescription"),
                 TimeUnitDescription = orderItem.Value<string>("timeUnitDescription"),
+                ServiceRecipients = ReadRecipients(orderItem),
                 QuantityPeriodDescription = orderItem.Value<string>("quantityPeriodDescription"),
-                Price = orderItem.Value<decimal?>("price"),
-                Quantity = orderItem.Value<int>("quantity"),
-                DeliveryDate = orderItem.Value<DateTime?>("deliveryDate"),
                 CostPerYear = orderItem.Value<decimal>("costPerYear"),
-                ServiceInstanceId = orderItem.Value<string>("serviceInstanceId"),
             });
         }
 
-        private static IEnumerable<object> ReadServiceRecipients(JToken responseContent)
+        private static IEnumerable<object> ReadRecipients(JToken responseContent)
         {
             return responseContent.SelectToken("serviceRecipients")?
                 .Select(serviceRecipient => new
                 {
-                    OdsCode = serviceRecipient.Value<string>("odsCode"),
+                    ItemId = serviceRecipient.Value<string>("itemId"),
+                    ServiceInstanceId = serviceRecipient.Value<string>("serviceInstanceId"),
+                    DeliveryDate = serviceRecipient.Value<DateTime>("deliveryDate"),
                     Name = serviceRecipient.Value<string>("name"),
+                    OdsCode = serviceRecipient.Value<string>("odsCode"),
+                    Quantity = serviceRecipient.Value<int>("quantity"),
                 });
+        }
+
+        [UsedImplicitly(ImplicitUseTargetFlags.Members)]
+        private sealed class ExpectedOrderItem
+        {
+            public string CatalogueItemId { get; init; }
+
+            public string CataloguePriceType { get; init; }
+
+            public string CatalogueItemType { get; init; }
+
+            public string CatalogueItemName { get; init; }
+
+            public string ProvisioningType { get; init; }
+
+            public decimal? Price { get; init; }
+
+            public string ItemUnitDescription { get; init; }
+
+            public string TimeUnitDescription { get; init; }
+
+            public IEnumerable<object> ServiceRecipients { get; init; }
+
+            public string QuantityPeriodDescription { get; init; }
+
+            public decimal CostPerYear { get; init; }
         }
     }
 }

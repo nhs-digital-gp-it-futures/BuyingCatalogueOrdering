@@ -7,7 +7,9 @@ using FluentAssertions;
 using JetBrains.Annotations;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
+using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
+using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
 
@@ -19,48 +21,67 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private readonly Response response;
         private readonly Request request;
         private readonly string orderingPartyUrl;
+        private readonly OrderContext orderContext;
         private readonly ScenarioContext context;
+        private readonly Settings settings;
 
-        public OrderingPartySteps(Response response, Request request, Settings settings, ScenarioContext context)
+        public OrderingPartySteps(
+            Response response,
+            Request request,
+            Settings settings,
+            ScenarioContext context,
+            OrderContext orderContext)
         {
             this.response = response;
             this.request = request;
             this.context = context;
-            orderingPartyUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/ordering-party";
+            this.orderContext = orderContext;
+            this.settings = settings;
+            orderingPartyUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/C{0}-01/sections/ordering-party";
         }
 
-        [Given(@"an order party update request exist for order ID (.*)")]
-        public void GivenAnOrderPartyUpdateRequestExistForOrderId(string orderId)
+        [Given(@"ordering parties exist")]
+        public async Task GivenOrderingPartiesExist(Table table)
+        {
+            foreach (var entity in table.CreateSet<OrderingPartyEntity>())
+            {
+                await entity.InsertAsync(settings.ConnectionString);
+                orderContext.OrderingPartyReferenceList.Add(entity.Id, entity);
+            }
+        }
+
+        [Given(@"an order party update request exist for order ID (\d{1,6})")]
+        public void GivenAnOrderPartyUpdateRequestExistForOrderId(int orderId)
         {
             SetOrganisationPartyPayloadByOrderId(context, orderId, new OrganisationPartyPayload());
         }
 
-        [Given(@"the update request for order ID (.*) has a contact")]
-        public void GivenTheUpdateRequestForOrderIdHasAContact(string orderId, Table table)
+        [Given(@"the update request for order ID (\d{1,6}) has a contact")]
+        public void GivenTheUpdateRequestForOrderIdHasAContact(int orderId, Table table)
         {
             var payload = GetOrganisationPartyPayloadByOrderId(context, orderId);
             payload.PrimaryContact = table.CreateInstance<ContactPayload>();
         }
 
-        [Given(@"the order party update request for order ID (.*) has a address")]
-        public void GivenTheOrderPartyUpdateRequestForOrderIdHasAAddress(string orderId, Table table)
+        [Given(@"the order party update request for order ID (\d{1,6}) has an address")]
+        public void GivenTheOrderPartyUpdateRequestForOrderIdHasAAddress(int orderId, Table table)
         {
             var payload = GetOrganisationPartyPayloadByOrderId(context, orderId);
 
             payload.Address = table.CreateInstance<AddressPayload>();
         }
 
-        [Given(@"the order party update request for order ID (.*) has a Name of (.*)")]
-        public void GivenTheOrderPartyUpdateRequestForOrderIdHasANameOf(string orderId, string name)
+        [Given(@"the order party update request for order ID (\d{1,6}) has a Name of (.*)")]
+        public void GivenTheOrderPartyUpdateRequestForOrderIdHasANameOf(int orderId, string name)
         {
             var payload = GetOrganisationPartyPayloadByOrderId(context, orderId);
 
             payload.Name = name;
         }
 
-        [Given(@"the order party update request for order ID (.*) has a OdsCode of (.*)")]
+        [Given(@"the order party update request for order ID (\d{1,6}) has a OdsCode of (.*)")]
         public void GivenTheOrderPartyUpdateRequestForOrderIdHasAOrganisationOdsCodeOfTestCareOds(
-            string orderId,
+            int orderId,
             string odsCode)
         {
             var payload = GetOrganisationPartyPayloadByOrderId(context, orderId);
@@ -68,21 +89,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             payload.OdsCode = odsCode;
         }
 
-        [When(@"the user makes a request to retrieve the ordering-party section with the ID (.*)")]
-        public async Task GivenTheUserMakesARequestToRetrieveTheOrdering_PartySectionWithTheID(string orderId)
+        [When(@"the user makes a request to retrieve the ordering-party section with the ID (\d{1,6})")]
+        public async Task GivenTheUserMakesARequestToRetrieveTheOrdering_PartySectionWithTheID(int orderId)
         {
             await request.GetAsync(string.Format(CultureInfo.InvariantCulture, orderingPartyUrl, orderId));
         }
 
-        [When(@"the user makes a request to update the order party on the order with the ID (.*)")]
-        public async Task WhenTheUserMakesARequestToUpdateTheOrderPartyWithOrderId(string orderId)
+        [When(@"the user makes a request to update the order party on the order with the ID (\d{1,6})")]
+        public async Task WhenTheUserMakesARequestToUpdateTheOrderPartyWithOrderId(int orderId)
         {
             var payload = GetOrganisationPartyPayloadByOrderId(context, orderId);
             await request.PutJsonAsync(string.Format(CultureInfo.InvariantCulture, orderingPartyUrl, orderId), payload);
         }
 
-        [When(@"the user makes a request to update the order party with order ID (.*) with no model")]
-        public async Task WhenTheUserMakesARequestToUpdateTheOrderPartyWithOrderIdWithNoModel(string orderId)
+        [When(@"the user makes a request to update the order party with order ID (\d{1,6}) with no model")]
+        public async Task WhenTheUserMakesARequestToUpdateTheOrderPartyWithOrderIdWithNoModel(int orderId)
         {
             await request.PutJsonAsync(string.Format(CultureInfo.InvariantCulture, orderingPartyUrl, orderId), null);
         }
@@ -90,11 +111,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Then(@"the ordering-party is returned")]
         public async Task ThenTheOrdering_PartyOrganisationIsReturned(Table table)
         {
-            var expected = table.CreateSet<OrganisationTable>().FirstOrDefault();
+            var expected = table.CreateSet<OrderingPartyTable>().FirstOrDefault();
 
             var jsonResponse = await response.ReadBodyAsJsonAsync();
 
-            var actual = new OrganisationTable
+            var actual = new OrderingPartyTable
             {
                 Name = jsonResponse.Value<string>("name"),
                 OdsCode = jsonResponse.Value<string>("odsCode"),
@@ -103,28 +124,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected);
         }
 
+        [Then(@"the ordering party with ID (.*) has the following details")]
+        public async Task ThenTheOrderingPartyWithIdHasTheFollowingDetails(Guid id, Table table)
+        {
+            var actual = await OrderingPartyEntity.FetchById(settings.ConnectionString, id);
+            table.CompareToInstance(actual);
+        }
+
         private static OrganisationPartyPayload GetOrganisationPartyPayloadByOrderId(
             ScenarioContext context,
-            string orderId)
+            int orderId)
         {
             if (context is null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (orderId is null)
-                return null;
-
-            var payloadDictionary = context.Get<IDictionary<string, OrganisationPartyPayload>>(
+            var payloadDictionary = context.Get<IDictionary<int, OrganisationPartyPayload>>(
                 ScenarioContextKeys.OrganisationPayloadDictionary,
-                new Dictionary<string, OrganisationPartyPayload>());
+                new Dictionary<int, OrganisationPartyPayload>());
 
             return payloadDictionary.TryGetValue(orderId, out var payload) ? payload : null;
         }
 
         private static void SetOrganisationPartyPayloadByOrderId(
             ScenarioContext context,
-            string orderId,
+            int orderId,
             OrganisationPartyPayload payload)
         {
             if (context is null)
@@ -135,9 +160,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             if (payload is null)
                 return;
 
-            var payloadDictionary = context.Get<IDictionary<string, OrganisationPartyPayload>>(
+            var payloadDictionary = context.Get<IDictionary<int, OrganisationPartyPayload>>(
                 ScenarioContextKeys.OrganisationPayloadDictionary,
-                new Dictionary<string, OrganisationPartyPayload>());
+                new Dictionary<int, OrganisationPartyPayload>());
 
             payloadDictionary[orderId] = payload;
 
@@ -148,8 +173,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [UsedImplicitly(ImplicitUseTargetFlags.Members)]
-        private sealed class OrganisationTable
+        private sealed class OrderingPartyTable
         {
+            public Guid Id { get; init; }
+
             public string Name { get; init; }
 
             public string OdsCode { get; init; }
