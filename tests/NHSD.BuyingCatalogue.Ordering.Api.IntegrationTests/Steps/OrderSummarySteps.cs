@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using JetBrains.Annotations;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
-using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
@@ -22,24 +21,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
         private readonly string orderSummaryUrl;
 
-        private readonly OrderSummaryDataFactory dataFactory;
-
-        public OrderSummarySteps(Response response, Request request, Settings settings, OrderSummaryDataFactory dataFactory)
+        public OrderSummarySteps(Response response, Request request, Settings settings)
         {
             this.response = response;
             this.request = request;
-            orderSummaryUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/summary";
-            this.dataFactory = dataFactory;
-        }
-
-        [Given(@"the user creates a new ""(.*)"" order with id (.*)")]
-        public async Task GivenTheUserCreatesANewOrderWithOrderId(string dataSetKey, string orderId)
-        {
-            await dataFactory.CreateData(dataSetKey, orderId);
+            orderSummaryUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/C{0}-01/summary";
         }
 
         [When(@"the user makes a request to retrieve the order summary with the ID (.*)")]
-        public async Task WhenTheUserMakesARequestToRetrieveTheOrderSummaryWithTheId(string orderId)
+        public async Task WhenTheUserMakesARequestToRetrieveTheOrderSummaryWithTheId(int orderId)
         {
             await request.GetAsync(string.Format(CultureInfo.InvariantCulture, orderSummaryUrl, orderId));
         }

@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
@@ -18,35 +19,48 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             this.request = request;
             this.settings = settings;
-            sectionStatusUpdateUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/{0}/sections/{1}";
+            sectionStatusUpdateUrl = settings.OrderingApiBaseUrl + "/api/v1/orders/C{0}-01/sections/{1}";
         }
 
-        [When(@"the user makes a request to complete order section with order Id (.*) section Id (.*)")]
-        public async Task WhenTheUserMakesARequestToRetrieveTheOrderSummaryWithTheId(string orderId, string sectionId)
+        [When(@"the user makes a request to complete order section with order Id (\d{1,6}) section Id (.*)")]
+        public async Task WhenTheUserMakesARequestToRetrieveTheOrderSummaryWithTheId(int orderId, string sectionId)
         {
             var payload = new { Status = "complete" };
             await request.PutJsonAsync(string.Format(CultureInfo.InvariantCulture, sectionStatusUpdateUrl, orderId, sectionId), payload);
         }
 
-        [Then(@"the order with ID (.*) has catalogue solutions viewed set to (.*)")]
-        public async Task TheOrderWithIdHasCatalogueSolutionsViewedSet(string orderId, bool viewed)
+        [Then(@"the order with ID (\d{1,6}) has catalogue solutions viewed set to (.*)")]
+        public async Task TheOrderWithIdHasCatalogueSolutionsViewedSet(int orderId, bool viewed)
         {
-            var actual = (await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId)).CatalogueSolutionsViewed;
-            actual.Should().Be(viewed);
+            await ProgressPropertyHasExpectedValue(orderId, p => p.CatalogueSolutionsViewed, viewed);
         }
 
-        [Then(@"the order with ID (.*) has additional services viewed set to (.*)")]
-        public async Task TheOrderWithIdHasAdditionalServicesViewedSet(string orderId, bool viewed)
+        [Then(@"the order with ID (\d{1,6}) has additional services viewed set to (.*)")]
+        public async Task TheOrderWithIdHasAdditionalServicesViewedSet(int orderId, bool viewed)
         {
-            var actual = (await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId)).AdditionalServicesViewed;
-            actual.Should().Be(viewed);
+            await ProgressPropertyHasExpectedValue(orderId, p => p.AdditionalServicesViewed, viewed);
         }
 
-        [Then(@"the order with ID (.*) has associated services viewed set to (.*)")]
-        public async Task TheOrderWithIdHasAssociatedServicesViewedSet(string orderId, bool viewed)
+        [Then(@"the order with ID (\d{1,6}) has associated services viewed set to (.*)")]
+        public async Task TheOrderWithIdHasAssociatedServicesViewedSet(int orderId, bool viewed)
         {
-            var actual = (await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId)).AssociatedServicesViewed;
-            actual.Should().Be(viewed);
+            await ProgressPropertyHasExpectedValue(orderId, p => p.AssociatedServicesViewed, viewed);
+        }
+
+        [Then(@"the order with ID (\d{1,6}) has service recipients viewed set to (.*)")]
+        public async Task TheOrderWithIdHasServiceRecipientsViewedSet(int orderId, bool viewed)
+        {
+            await ProgressPropertyHasExpectedValue(orderId, p => p.ServiceRecipientsViewed, viewed);
+        }
+
+        private async Task ProgressPropertyHasExpectedValue(
+            int orderId,
+            Func<OrderProgressEntity, bool> propertySelector,
+            bool expectedValue)
+        {
+            var progress = await OrderProgressEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);
+            var actual = propertySelector(progress);
+            actual.Should().Be(expectedValue);
         }
     }
 }

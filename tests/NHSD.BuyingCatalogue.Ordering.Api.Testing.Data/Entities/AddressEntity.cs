@@ -4,7 +4,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 {
     public sealed class AddressEntity : EntityBase
     {
-        public int AddressId { get; set; }
+        public int Id { get; set; }
 
         public string Line1 { get; set; }
 
@@ -24,9 +24,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 
         public string Country { get; set; }
 
-        protected override string InsertSql =>
-            @"INSERT INTO dbo.[Address]
+        protected override string InsertSql => @"
+            SET IDENTITY_INSERT dbo.[Address] ON;
+
+            INSERT INTO dbo.[Address]
             (
+                Id,
                 Line1,
                 Line2,
                 Line3,
@@ -39,6 +42,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
             )
             VALUES
             (
+                @Id,
                 @Line1,
                 @Line2,
                 @Line3,
@@ -49,30 +53,29 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
                 @Postcode,
                 @Country
             );
-            SELECT SCOPE_IDENTITY();";
 
-        public static async Task<AddressEntity> FetchAddressById(string connectionString, int? addressId)
+            SET IDENTITY_INSERT dbo.[Address] OFF;";
+
+        public static async Task<AddressEntity> FetchAddressById(string connectionString, int? id)
         {
-            if (addressId is null)
-            {
+            if (id is null)
                 return null;
-            }
 
-            const string sql =
-                @"SELECT AddressId,
-                         Line1,
-                         Line2,
-                         Line3,
-                         Line4,
-                         Line5,
-                         Town,
-                         County,
-                         Postcode,
-                         Country
-                    FROM dbo.[Address]
-                   WHERE AddressId = @addressId;";
+            const string sql = @"
+                SELECT Id,
+                       Line1,
+                       Line2,
+                       Line3,
+                       Line4,
+                       Line5,
+                       Town,
+                       County,
+                       Postcode,
+                       Country
+                  FROM dbo.[Address]
+                 WHERE Id = @id;";
 
-            return await SqlRunner.QueryFirstAsync<AddressEntity>(connectionString, sql, new { addressId });
+            return await SqlRunner.QueryFirstAsync<AddressEntity>(connectionString, sql, new { id });
         }
     }
 }

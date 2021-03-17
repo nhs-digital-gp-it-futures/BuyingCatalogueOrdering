@@ -27,8 +27,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             this.orderContext = orderContext ?? throw new ArgumentNullException(nameof(orderContext));
         }
 
-        [Given(@"the user creates a request to retrieve the funding source for order with ID '(.*)'")]
-        public void GivenTheUserCreatesARequestToRetrieveTheFundingSourceForOrderWithId(string orderId)
+        [Given(@"the user creates a request to retrieve the funding source for order with ID (\d{1,6})")]
+        public void GivenTheUserCreatesARequestToRetrieveTheFundingSourceForOrderWithId(int orderId)
         {
             getFundingSourceRequest = new GetFundingSourceRequest(
                 request,
@@ -45,7 +45,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Then(@"the response contains the expected funding source details")]
         public void ThenTheResponseContainsTheExpectedFundingSourceDetails()
         {
-            var order = orderContext.OrderReferenceList.GetByOrderId(getFundingSourceRequest.OrderId);
+            var order = orderContext.OrderReferenceList[getFundingSourceRequest.OrderId];
             getFundingSourceResponse.AssertBody(order.FundingSourceOnlyGms);
         }
     }
