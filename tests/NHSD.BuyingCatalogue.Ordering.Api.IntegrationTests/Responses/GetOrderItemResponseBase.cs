@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using Newtonsoft.Json.Linq;
@@ -10,6 +11,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 {
     internal abstract class GetOrderItemResponseBase
     {
+        [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "TimeUnit name must be lower case")]
         protected static object ConvertToExpectedBody(
             OrderItemEntity orderItemEntity,
             IDictionary<string, ServiceRecipientEntity> serviceRecipients,
