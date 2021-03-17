@@ -38,7 +38,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (!await context.Order.AnyAsync(o => o.Id == callOffId.Id))
                 return NotFound();
 
-            var recipients = await context.Order
+            var selectedRecipients = await context.Order
                 .Where(o => o.Id == callOffId.Id)
                 .SelectMany(o => o.SelectedServiceRecipients)
                 .OrderBy(r => r.Recipient.Name)
@@ -46,7 +46,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 .AsNoTracking()
                 .ToListAsync();
 
-            return new ServiceRecipientsModel { ServiceRecipients = recipients };
+            if (selectedRecipients.Count == 0)
+            {
+                selectedRecipients = await context.Order
+                    .Where(o => o.Id == callOffId.Id)
+                    .SelectMany(o => o.OrderItems)
+                    .Where(o => o.CatalogueItem.CatalogueItemType == CatalogueItemType.Solution)
+                    .SelectMany(o => o.OrderItemRecipients)
+                    .Select(r => new ServiceRecipientModel { Name = r.Recipient.Name, OdsCode = r.Recipient.OdsCode })
+                    .Distinct()
+                    .OrderBy(r => r.Name)
+                    .AsNoTracking()
+                    .ToListAsync();
+            }
+
+            return new ServiceRecipientsModel { ServiceRecipients = selectedRecipients };
         }
 
         [HttpPut]

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -22,6 +23,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
     [Parallelizable(ParallelScope.Children)]
+    [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class ServiceRecipientsSectionControllerTests
     {
         [Test]
@@ -67,8 +69,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(GetAllAsync_ReturnsExpectedResult))]
-        public static async Task GetAllAsync_ReturnsExpectedResult(
+        [InMemoryDbAutoData(nameof(GetAllAsync_HasSelectedServiceRecipients_ReturnsExpectedResult))]
+        public static async Task GetAllAsync_HasSelectedServiceRecipients_ReturnsExpectedResult(
             [Frozen] ApplicationDbContext context,
             [Frozen] CallOffId callOffId,
             IReadOnlyList<SelectedServiceRecipient> serviceRecipients,

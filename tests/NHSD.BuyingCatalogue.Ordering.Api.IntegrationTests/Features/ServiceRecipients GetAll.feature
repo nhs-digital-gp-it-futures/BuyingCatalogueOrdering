@@ -41,6 +41,27 @@ Scenario: get the selected service recipients from an exisiting ordering ID
         | ODS1    | Recipient Z |
 
 @7412
+Scenario: get the service recipients from an exisiting ordering ID when there are no selected service recipients
+    Given order items exist
+        | OrderId | CatalogueItemId |
+        | 10001   | 1000-001        |
+        | 10001   | 1000-002        |
+        | 10001   | 1000-003        |
+        | 10002   | 1000-001        |
+    And order item recipients exist
+        | OrderId | CatalogueItemId | OdsCode |
+        | 10001   | 1000-001        | ODS1    |
+        | 10001   | 1000-002        | ODS3    |
+        | 10001   | 1000-003        | ODS1    |
+        | 10002   | 1000-001        | ODS2    |
+    When the user makes a request to retrieve the service-recipients section with order ID 10001
+    Then a response with status code 200 is returned
+    And the service recipients are returned
+        | OdsCode | Name        |
+        | ODS3    | Recipient Y |
+        | ODS1    | Recipient Z |
+
+@7412
 Scenario: if an order does not exist, return not found
     When the user makes a request to retrieve the service-recipients section with order ID 10000
     Then a response with status code 404 is returned
