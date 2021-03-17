@@ -1,21 +1,37 @@
-﻿Feature: Display the Order Summary in an Authority Section
-    As an Authority User
+﻿Feature: display the order summary in an authority section
+    As an authority user
     I want to be able to view the summary for a given order
     So that I can ensure that the information is complete
 
 Background:
-    Given Orders exist
-        | OrderId    | Description   | OrganisationId                       | OrderStatus |
-        | C000014-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | Complete    |
+    Given ordering parties exist
+        | Id                                   |
+        | 4af62b99-638c-4247-875e-965239cd0c48 |
+    And orders exist
+        | OrderId | Description   | OrderingPartyId                      | OrderStatus | Created    |
+        | 10001   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | Complete    | 10/03/2021 |
+    And pricing units exist
+        | Name    | Description |
+        | patient | per patient |
+    And catalogue items exist
+        | Id           | Name                 | CatalogueItemType | ParentCatalogueItemId |
+        | 1000-001     | Solution 1           | Solution          | NULL                  |
+        | 1000-001-A01 | Additional Service 1 | AdditionalService | 1000-001              |
+        | 1000-S-01    | Associated Service 1 | AssociatedService | NULL                  |
+    And service recipients exist
+         | OdsCode | Name        |
+         | ODS1    | Recipient 1 |
+         | ODS2    | Recipient 2 |
+         | ODS3    | Recipient 2 |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @5321
-Scenario: Get the order summary
-    When the user makes a request to retrieve the order summary with the ID C000014-01
+Scenario: get the order summary
+    When the user makes a request to retrieve the order summary with the ID 10001
     Then a response with status code 200 is returned
     And the order summary is returned with the following values
-        | OrderId    | OrganisationId                       | Description   | OrderStatus |
-        | C000014-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description | Complete    |
+        | OrderId    | OrganisationId                       | Description   | OrderStatus | Created    |
+        | C010001-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description | Complete    | 10/03/2021 |
     And the order Summary Sections have the following values
         | Id                  | Status     | Count |
         | description         | complete   |       |
@@ -29,14 +45,14 @@ Scenario: Get the order summary
         | funding-source      | incomplete |       |
 
 @4619
-Scenario: Get the order summary when the order has a primary ordering party contact
-    Given Contacts exist
-        | FirstName | LastName | EmailAddress            | TelephoneNumber |
-        | Fred      | Robinson | Fred.robinson@email.com | 12312543212     |
-    And Orders exist
-        | OrderId    | Description   | OrganisationId                       | OrganisationContactEmail |
-        | C000015-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | Fred.robinson@email.com  |
-    When the user makes a request to retrieve the order summary with the ID C000015-01
+Scenario: get the order summary when the order has a primary ordering party contact
+    Given contacts exist
+        | Id | FirstName | LastName | Email | Phone |
+        | 1  | Fred      | Robinson | Fred.robinson@email.com | 12312543212 |
+    And orders exist
+        | OrderId | Description   | OrderingPartyId                      | OrderingPartyContactId | Created    |
+        | 10002   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | 1                      | 10/03/2021 |
+    When the user makes a request to retrieve the order summary with the ID 10002
     Then a response with status code 200 is returned
     And the order Summary Sections have the following values
         | Id                  | Status     | Count |
@@ -51,14 +67,14 @@ Scenario: Get the order summary when the order has a primary ordering party cont
         | funding-source      | incomplete |       |
 
 @4619
-Scenario: Get the order summary when the order has a primary supplier contact
-    Given Contacts exist
-        | FirstName | LastName | EmailAddress            | TelephoneNumber |
-        | Fred      | Robinson | Fred.robinson@email.com | 12312543212     |
-    And Orders exist
-        | OrderId    | Description   | OrganisationId                       | SupplierContactEmail    |
-        | C000015-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | Fred.robinson@email.com |
-    When the user makes a request to retrieve the order summary with the ID C000015-01
+Scenario: get the order summary when the order has a primary supplier contact
+    Given contacts exist
+        | Id | FirstName | LastName | Email | Phone |
+        | 1  | Fred      | Robinson | Fred.robinson@email.com | 12312543212 |
+    And orders exist
+        | OrderId | Description   | OrderingPartyId                      | SupplierContactId | Created    |
+        | 10002   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | 1                 | 10/03/2021 |
+    When the user makes a request to retrieve the order summary with the ID 10002
     Then a response with status code 200 is returned
     And the order Summary Sections have the following values
         | Id                  | Status     | Count |
@@ -73,11 +89,11 @@ Scenario: Get the order summary when the order has a primary supplier contact
         | funding-source      | incomplete |       |
 
 @4619
-Scenario: Get the order summary when the order has a commencement date
-    Given Orders exist
-        | OrderId    | Description   | OrganisationId                       | CommencementDate |
-        | C000015-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | 31/05/2020       |
-    When the user makes a request to retrieve the order summary with the ID C000015-01
+Scenario: get the order summary when the order has a commencement date
+    Given orders exist
+        | OrderId | Description   | OrderingPartyId                      | CommencementDate | Created    |
+        | 10002   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | 31/05/2020       | 10/03/2021 |
+    When the user makes a request to retrieve the order summary with the ID 10002
     Then a response with status code 200 is returned
     And the order Summary Sections have the following values
         | Id                  | Status     | Count |
@@ -92,11 +108,14 @@ Scenario: Get the order summary when the order has a commencement date
         | funding-source      | incomplete |       |
 
 @5115
-Scenario: Get the order summary after a section has been viewed
-    Given Orders exist
-        | OrderId    | Description   | OrganisationId                       | ServiceRecipientsViewed     | AdditionalServicesViewed     | CatalogueSolutionsViewed     | AssociatedServicesViewed     | FundingSourceOnlyGMS      |
-        | C000015-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | <service-recipients-viewed> | <additional-services-viewed> | <catalogue-solutions-viewed> | <associated-services-viewed> | <funding-source-only-gms> |
-    When the user makes a request to retrieve the order summary with the ID C000015-01
+Scenario: get the order summary after a section has been viewed
+    Given orders exist
+        | OrderId | Description   | OrderingPartyId                      | FundingSourceOnlyGMS      | Created    |
+        | 10002   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | <funding-source-only-gms> | 10/03/2021 |
+    And order progress exists
+        | OrderId | ServiceRecipientsViewed     | AdditionalServicesViewed     | CatalogueSolutionsViewed     | AssociatedServicesViewed     |
+        | 10002   | <service-recipients-viewed> | <additional-services-viewed> | <catalogue-solutions-viewed> | <associated-services-viewed> |
+    When the user makes a request to retrieve the order summary with the ID 10002
     Then a response with status code 200 is returned
     And the order Summary Sections have the following values
         | Id                  | Status                       | Count |
@@ -119,15 +138,18 @@ Scenario: Get the order summary after a section has been viewed
         | False                     | False                      | False                      | False                      | True                    | incomplete                | incomplete                 | incomplete                 | incomplete                 | complete              |
 
 @4629
-Scenario: Get the order summary that includes a list of service recipients
-    Given Orders exist
-        | OrderId    | Description   | OrganisationId                       | ServiceRecipientsViewed |
-        | C000016-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                    |
-    And Service Recipients exist
-        | OdsCode | Name                      | OrderId    |
-        | Ods1    | Updated Service Recipient | C000016-01 |
-        | Ods2    | Another Name              | C000016-01 |
-    When the user makes a request to retrieve the order summary with the ID C000016-01
+Scenario: get the order summary that includes a list of service recipients
+    Given orders exist
+        | OrderId | Description   | OrderingPartyId                      | Created    |
+        | 10003   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | 10/03/2021 |
+    And order progress exists
+        | OrderId | ServiceRecipientsViewed |
+        | 10003   | true                    |
+    And selected service recipients exist
+        | OrderId | OdsCode |
+        | 10003   | ODS1    |
+        | 10003   | ODS2    |
+    When the user makes a request to retrieve the order summary with the ID 10003
     Then a response with status code 200 is returned
     And the order Summary Sections have the following values
         | Id                  | Status     | Count |
@@ -142,19 +164,26 @@ Scenario: Get the order summary that includes a list of service recipients
         | funding-source      | incomplete |       |
 
 @5123
-Scenario: Get the order summary that includes a list of Catalogue Solutions
-    Given Orders exist
-        | OrderId    | Description   | OrganisationId                       | CatalogueSolutionsViewed |
-        | C000016-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                     |
-    And Service Recipients exist
-        | OdsCode | Name                      | OrderId    |
-        | Ods1    | Updated Service Recipient | C000016-01 |
-        | Ods2    | Another Name              | C000016-01 |
-    And Order items exist
-        | OrderId    | OdsCode | CatalogueItemName | CatalogueItemType |
-        | C000016-01 | Ods1    | Order Item 1      | Solution          |
-        | C000016-01 | Ods2    | Order Item 2      | Solution          |
-    When the user makes a request to retrieve the order summary with the ID C000016-01
+Scenario: get the order summary that includes a list of Catalogue Solutions
+    Given orders exist
+        | OrderId | Description   | OrderingPartyId                      | Created    |
+        | 10003   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | 10/03/2021 |
+    And order progress exists
+        | OrderId | CatalogueSolutionsViewed |
+        | 10003   | true                     |
+    And selected service recipients exist
+        | OrderId | OdsCode |
+        | 10003   | ODS1    |
+        | 10003   | ODS2    |
+    And catalogue items exist
+        | Id        | Name         | CatalogueItemType |
+        | 10003-001 | Order Item 1 | Solution          |
+        | 10003-002 | Order Item 2 | Solution          |
+    And order items exist
+        | OrderId | CatalogueItemId |
+        | 10003   | 10003-001       |
+        | 10003   | 10003-002       |
+    When the user makes a request to retrieve the order summary with the ID 10003
     Then a response with status code 200 is returned
     And the order Summary Sections have the following values
         | Id                  | Status     | Count |
@@ -169,18 +198,25 @@ Scenario: Get the order summary that includes a list of Catalogue Solutions
         | funding-source      | incomplete |       |
 
 @5115
-Scenario: Get the order summary that includes a list of associated services
-    Given Orders exist
-        | OrderId    | Description   | OrganisationId                       | AssociatedServicesViewed |
-        | C000016-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                     |
-    And Service Recipients exist
-        | OdsCode | Name                      | OrderId    |
-        | Ods1    | Updated Service Recipient | C000016-01 |
-    And Order items exist
-        | OrderId    | OdsCode | CatalogueItemName | CatalogueItemType |
-        | C000016-01 | Ods1    | Associated Item 1 | AssociatedService |
-        | C000016-01 | Ods1    | Associated Item 2 | AssociatedService |
-    When the user makes a request to retrieve the order summary with the ID C000016-01
+Scenario: get the order summary that includes a list of associated services
+    Given orders exist
+        | OrderId | Description   | OrderingPartyId                      | Created    |
+        | 10003   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | 10/03/2021 |
+    And order progress exists
+        | OrderId | AssociatedServicesViewed |
+        | 10003   | true                     |
+    And selected service recipients exist
+        | OrderId | OdsCode |
+        | 10003   | ODS1    |
+    And catalogue items exist
+        | Id        | Name              | CatalogueItemType |
+        | 10003-001 | Associated Item 1 | AssociatedService |
+        | 10003-002 | Associated Item 2 | AssociatedService |
+    And order items exist
+        | OrderId | CatalogueItemId |
+        | 10003   | 10003-001       |
+        | 10003   | 10003-002       |
+    When the user makes a request to retrieve the order summary with the ID 10003
     Then a response with status code 200 is returned
     And the order Summary Sections have the following values
         | Id                  | Status     | Count |
@@ -195,22 +231,29 @@ Scenario: Get the order summary that includes a list of associated services
         | funding-source      | incomplete |       |
 
 @5115
-Scenario: Get the order summary that includes a list of additional services
-    Given Orders exist
-        | OrderId    | Description   | OrganisationId                       | AdditionalServicesViewed |
-        | C000016-01 | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                     |
-    And Service Recipients exist
-        | OdsCode | Name                      | OrderId    |
-        | Ods1    | Updated Service Recipient | C000016-01 |
-    And Order items exist
-        | OrderId    | OdsCode | CatalogueItemName | CatalogueItemType |
-        | C000016-01 | Ods1    | Additional Item 1 | AdditionalService |
-        | C000016-01 | Ods1    | Additional Item 2 | AdditionalService |
-    When the user makes a request to retrieve the order summary with the ID C000016-01
+Scenario: get the order summary that includes a list of additional services
+    Given orders exist
+        | OrderId | Description   | OrderingPartyId                      | Created    |
+        | 10003   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | 10/03/2021 |
+    And order progress exists
+        | OrderId | AdditionalServicesViewed |
+        | 10003   | true                     |
+    And selected service recipients exist
+        | OrderId | OdsCode |
+        | 10003   | ODS1    |
+    And catalogue items exist
+        | Id        | Name              | CatalogueItemType |
+        | 10003-001 | Additional Item 1 | AdditionalService |
+        | 10003-002 | Additional Item 2 | AdditionalService |
+    And order items exist
+        | OrderId | CatalogueItemId |
+        | 10003   | 10003-001       |
+        | 10003   | 10003-002       |
+    When the user makes a request to retrieve the order summary with the ID 10003
     Then a response with status code 200 is returned
     And the order summary is returned with the following values
         | OrderId    | OrganisationId                       | Description   |
-        | C000016-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
+        | C010003-01 | 4af62b99-638c-4247-875e-965239cd0c48 | A Description |
     And the order Summary Sections have the following values
         | Id                  | Status     | Count |
         | description         | complete   |       |
@@ -223,52 +266,31 @@ Scenario: Get the order summary that includes a list of additional services
         | additional-services | complete   | 2     |
         | funding-source      | incomplete |       |
 
-@5291
-Scenario:10. Get the order section status is set when conditions are met
-    Given the user creates a new "<OrderDataKey>" order with id <OrderId>
-    When the user makes a request to retrieve the order summary with the ID <OrderId>
-    Then a response with status code 200 is returned
-    And the order Section Status is <SectionStatus>
-
-    Examples: OrderData
-        | OrderId    | OrderDataKey                                                                                      | SectionStatus |
-        | C000016-01 | complete                                                                                          | complete      |
-        | C000016-01 | complete-with-1-recipient-1-associated-service-funding-complete                                   | complete      |
-        | C000017-01 | complete-with-0-recipient-1-associated-service-funding-complete                                   | complete      |
-        | C000018-01 | complete-with-1-solution-1-associated-service-funding-complete                                    | complete      |
-        | C000019-01 | complete-with-1-solution-0-associated-service-funding-complete                                    | complete      |
-        | C000020-01 | funding-incomplete                                                                                | incomplete    |
-        | C000021-01 | incomplete-with-0-recipient-0-solution-0-associated-service-funding-complete                      | incomplete    |
-        | C000022-01 | incomplete-with-1-recipient-0-solution-0-associated-service-funding-complete                      | incomplete    |
-        | C000023-01 | incomplete-with-1-recipient-1-solution-0-associated-service-funding-complete                      | incomplete    |
-        | C000025-01 | incomplete-with-0-recipient-0-solution-1-associated-service-funding-complete                      | incomplete    |
-        | C000024-01 | incomplete-with-1-recipient-1-solution-1-additional-service-0-associated-service-funding-complete | incomplete    |
-
 @5321
-Scenario: 11. If the order ID does not exist, return not found
-    When the user makes a request to retrieve the order summary with the ID INVALID
+Scenario: if the order ID does not exist, return not found
+    When the user makes a request to retrieve the order summary with the ID 10000
     Then a response with status code 404 is returned
 
 @5321
-Scenario: 12. If a user is not authorised then they cannot access the order summary
+Scenario: if a user is not authorised then they cannot access the order summary
     Given no user is logged in
-    When the user makes a request to retrieve the order summary with the ID C000014-01
+    When the user makes a request to retrieve the order summary with the ID 10001
     Then a response with status code 401 is returned
 
 @5321
-Scenario: 13. A non buyer user cannot access the order summary
+Scenario: a non-buyer user cannot access the order summary
     Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
-    When the user makes a request to retrieve the order summary with the ID C000014-01
+    When the user makes a request to retrieve the order summary with the ID 10001
     Then a response with status code 403 is returned
 
 @5321
-Scenario: 14. A buyer user cannot access the order summary for an organisation they don't belong to
+Scenario: a buyer user cannot access the order summary for an organisation they don't belong to
     Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
-    When the user makes a request to retrieve the order summary with the ID C000014-01
+    When the user makes a request to retrieve the order summary with the ID 10001
     Then a response with status code 403 is returned
 
 @5321
-Scenario: 15. Service Failure
+Scenario: service failure
     Given the call to the database will fail
-    When the user makes a request to retrieve the order summary with the ID C000014-01
+    When the user makes a request to retrieve the order summary with the ID 10001
     Then a response with status code 500 is returned
