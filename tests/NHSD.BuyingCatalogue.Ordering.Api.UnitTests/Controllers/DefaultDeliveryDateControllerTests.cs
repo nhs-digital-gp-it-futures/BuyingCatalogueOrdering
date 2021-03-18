@@ -21,7 +21,7 @@ using NUnit.Framework;
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
-    [Parallelizable(ParallelScope.Children)]
+    [Parallelizable(ParallelScope.All)]
     [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class DefaultDeliveryDateControllerTests
     {
@@ -36,7 +36,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(AddOrUpdateAsync_NullDefaultDeliveryDateModel_ThrowsArgumentNullException))]
+        [InMemoryDbAutoData]
         public static void AddOrUpdateAsync_NullDefaultDeliveryDateModel_ThrowsArgumentNullException(
             CallOffId callOffId,
             CatalogueItemId catalogueItemId,
@@ -46,7 +46,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(AddOrUpdateAsync_BadOrderId_ReturnsNotFound))]
+        [InMemoryDbAutoData]
         public static async Task AddOrUpdateAsync_BadOrderId_ReturnsNotFound(
             CallOffId callOffId,
             CatalogueItemId catalogueItemId,
@@ -59,7 +59,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(AddOrUpdateAsync_NotValid_ReturnsExpectedResponse))]
+        [InMemoryDbAutoData]
         public static async Task AddOrUpdateAsync_NotValid_ReturnsExpectedResponse(
             [Frozen] ApplicationDbContext context,
             [Frozen] CallOffId callOffId,
@@ -82,7 +82,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(AddOrUpdateAsync_AddsDefaultDeliveryDate))]
+        [InMemoryDbAutoData]
         public static async Task AddOrUpdateAsync_AddsDefaultDeliveryDate(
             [Frozen] ApplicationDbContext context,
             [Frozen] CallOffId callOffId,
@@ -115,7 +115,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(AddOrUpdateAsync_SavesToDb))]
+        [InMemoryDbAutoData]
         public static async Task AddOrUpdateAsync_SavesToDb(
             [Frozen] ApplicationDbContext context,
             [Frozen] CallOffId callOffId,
@@ -148,7 +148,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(AddOrUpdateAsync_Add_ReturnsExpectedStatusCode))]
+        [InMemoryDbAutoData]
         public static async Task AddOrUpdateAsync_Add_ReturnsExpectedStatusCode(
             [Frozen] ApplicationDbContext context,
             [Frozen] CallOffId callOffId,
@@ -180,7 +180,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(AddOrUpdateAsync_Update_ReturnsExpectedStatusCode))]
+        [InMemoryDbAutoData]
         public static async Task AddOrUpdateAsync_Update_ReturnsExpectedStatusCode(
             [Frozen] ApplicationDbContext context,
             [Frozen] CallOffId callOffId,
@@ -204,7 +204,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(GetAsync_NotFound_ReturnsExpectedStatusCode))]
+        [InMemoryDbAutoData]
         public static async Task GetAsync_NotFound_ReturnsExpectedStatusCode(
             CallOffId callOffId,
             CatalogueItemId catalogueItemId,
@@ -217,7 +217,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(GetAsync_ReturnsExpectedResult))]
+        [InMemoryDbAutoData]
         public static async Task GetAsync_ReturnsExpectedResult(
             [Frozen] ApplicationDbContext context,
             [Frozen] CallOffId callOffId,

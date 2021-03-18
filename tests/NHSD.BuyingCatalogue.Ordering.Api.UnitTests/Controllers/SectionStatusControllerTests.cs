@@ -18,7 +18,7 @@ using NUnit.Framework;
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
-    [Parallelizable(ParallelScope.Children)]
+    [Parallelizable(ParallelScope.All)]
     [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class SectionStatusControllerTests
     {
@@ -33,7 +33,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateStatusAsync_SectionStatusIsNull_ThrowsArgumentNullException))]
+        [InMemoryDbAutoData]
         public static void UpdateStatusAsync_SectionStatusIsNull_ThrowsArgumentNullException(
             string sectionId,
             SectionStatusController controller)
@@ -43,7 +43,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateStatusAsync_SectionIdIsNull_ThrowsArgumentNullException))]
+        [InMemoryDbAutoData]
         public static void UpdateStatusAsync_SectionIdIsNull_ThrowsArgumentNullException(
             UpdateOrderSectionModel model,
             SectionStatusController controller)
@@ -53,7 +53,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateStatusAsync_WrongSectionId_ReturnsForbidden))]
+        [InMemoryDbAutoData]
         public static async Task UpdateStatusAsync_WrongSectionId_ReturnsForbidden(
             string sectionId,
             [Frozen] ApplicationDbContext context,
@@ -70,7 +70,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateStatusAsync_OrderNotFound_ReturnsNotFound))]
+        [InMemoryDbAutoData]
         public static async Task UpdateStatusAsync_OrderNotFound_ReturnsNotFound(
             CallOffId callOffId,
             string sectionId,
@@ -83,9 +83,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbInlineAutoData(nameof(UpdateStatusAsync_WithSectionId_UpdatesTheSelectedStatus), "additional-services", true, false, false)]
-        [InMemoryDbInlineAutoData(nameof(UpdateStatusAsync_WithSectionId_UpdatesTheSelectedStatus), "catalogue-solutions", false, true, false)]
-        [InMemoryDbInlineAutoData(nameof(UpdateStatusAsync_WithSectionId_UpdatesTheSelectedStatus), "associated-services", false, false, true)]
+        [InMemoryDbInlineAutoData("additional-services", true, false, false)]
+        [InMemoryDbInlineAutoData("catalogue-solutions", false, true, false)]
+        [InMemoryDbInlineAutoData("associated-services", false, false, true)]
         public static async Task UpdateStatusAsync_WithSectionId_UpdatesTheSelectedStatus(
             string sectionId,
             bool additionalServicesViewed,
@@ -113,7 +113,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateStatusAsync_WithSectionId_UpdatesDb))]
+        [InMemoryDbAutoData]
         public static async Task UpdateStatusAsync_WithSectionId_UpdatesDb(
             [Frozen] ApplicationDbContext context,
             Order order,
@@ -132,7 +132,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateStatusAsync_CorrectSectionId_ReturnsNoContentResult))]
+        [InMemoryDbAutoData]
         public static async Task UpdateStatusAsync_CorrectSectionId_ReturnsNoContentResult(
             [Frozen] ApplicationDbContext context,
             Order order,

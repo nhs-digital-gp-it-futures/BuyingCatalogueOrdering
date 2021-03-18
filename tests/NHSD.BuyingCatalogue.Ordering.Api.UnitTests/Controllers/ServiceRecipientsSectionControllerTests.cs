@@ -22,7 +22,7 @@ using NUnit.Framework;
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
-    [Parallelizable(ParallelScope.Children)]
+    [Parallelizable(ParallelScope.All)]
     [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class ServiceRecipientsSectionControllerTests
     {
@@ -37,7 +37,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(GetAllAsync_OrderDoesNotExist_ReturnsNotFound))]
+        [InMemoryDbAutoData]
         public static async Task GetAllAsync_OrderDoesNotExist_ReturnsNotFound(
             CallOffId callOffId,
             ServiceRecipientsSectionController controller)
@@ -48,7 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(GetAllAsync_NoServiceRecipient_ReturnsEmptyList))]
+        [InMemoryDbAutoData]
         public static async Task GetAllAsync_NoServiceRecipient_ReturnsEmptyList(
             [Frozen] ApplicationDbContext context,
             [Frozen] CallOffId callOffId,
@@ -69,7 +69,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(GetAllAsync_HasSelectedServiceRecipients_ReturnsExpectedResult))]
+        [InMemoryDbAutoData]
         public static async Task GetAllAsync_HasSelectedServiceRecipients_ReturnsExpectedResult(
             [Frozen] ApplicationDbContext context,
             [Frozen] CallOffId callOffId,
@@ -92,7 +92,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_ModelIsNull_ThrowsArgumentNullException))]
+        [InMemoryDbAutoData]
         public static void UpdateAsync_ModelIsNull_ThrowsArgumentNullException(
             ServiceRecipientsSectionController controller)
         {
@@ -100,7 +100,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_OrderDoesNotExist_ReturnsNotFound))]
+        [InMemoryDbAutoData]
         public static async Task UpdateAsync_OrderDoesNotExist_ReturnsNotFound(
             ServiceRecipientsModel model,
             ServiceRecipientsSectionController controller)
@@ -111,7 +111,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_OrderDoesNotExist_ReturnsNotFound))]
+        [InMemoryDbAutoData]
         public static async Task UpdateAsync_InvokesAddOrUpdateServiceRecipients(
             [Frozen] ApplicationDbContext context,
             [Frozen] Mock<IServiceRecipientService> serviceRecipientService,
@@ -139,7 +139,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_UpdatesOrder))]
+        [InMemoryDbAutoData]
         public static async Task UpdateAsync_UpdatesOrder(
             [Frozen] ApplicationDbContext context,
             [Frozen] Mock<IServiceRecipientService> serviceRecipientService,
@@ -169,7 +169,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_UpdatesDb))]
+        [InMemoryDbAutoData]
         public static async Task UpdateAsync_UpdatesDb(
             [Frozen] ApplicationDbContext context,
             [Frozen] Mock<IServiceRecipientService> serviceRecipientService,
@@ -199,7 +199,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_ReturnsNoContent))]
+        [InMemoryDbAutoData]
         public static async Task UpdateAsync_ReturnsNoContent(
             [Frozen] ApplicationDbContext context,
             [Frozen] Mock<IServiceRecipientService> serviceRecipientService,

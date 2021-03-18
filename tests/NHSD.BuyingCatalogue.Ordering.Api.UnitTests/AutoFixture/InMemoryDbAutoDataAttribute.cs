@@ -1,19 +1,17 @@
-﻿using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.AutoFixture;
+﻿using System;
+using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.AutoFixture;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
 {
     public sealed class InMemoryDbAutoDataAttribute : CommonAutoDataAttribute
     {
-        public InMemoryDbAutoDataAttribute(string dbName)
+        public InMemoryDbAutoDataAttribute()
             : base(
                 new ControllerBaseCustomization(),
                 new EnumValueByNameCustomization(),
                 new OrderCustomization(),
-                new InMemoryDbCustomization(dbName))
+                new InMemoryDbCustomization(Guid.NewGuid().ToString()))
         {
-            DbName = dbName;
         }
-
-        public string DbName { get; }
     }
 }

@@ -28,7 +28,7 @@ using NUnit.Framework;
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
-    [Parallelizable(ParallelScope.Children)]
+    [Parallelizable(ParallelScope.All)]
     [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class OrdersControllerTests
     {
@@ -43,7 +43,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(GetAsync_OrderDoesNotExist_ReturnsNotFound))]
+        [InMemoryDbAutoData]
         public static async Task GetAsync_OrderDoesNotExist_ReturnsNotFound(
             CallOffId callOffId,
             OrdersController controller)
@@ -54,7 +54,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(GetAsync_OrderExists_ReturnsExpectedResult))]
+        [InMemoryDbAutoData]
         public static async Task GetAsync_OrderExists_ReturnsExpectedResult(
             [Frozen] ApplicationDbContext context,
             [Frozen] CallOffId callOffId,
@@ -74,7 +74,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(GetAllAsync_NoOrdersExist_ReturnsEmptyResult))]
+        [InMemoryDbAutoData]
         public static async Task GetAllAsync_NoOrdersExist_ReturnsEmptyResult(
             Guid organisationId,
             OrdersController controller)
@@ -85,7 +85,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(GetAllAsync_OrdersExist_ReturnsExpectedResult))]
+        [InMemoryDbAutoData]
         public static async Task GetAllAsync_OrdersExist_ReturnsExpectedResult(
             [Frozen] ApplicationDbContext context,
             [Frozen] OrderingParty orderingParty,
@@ -103,7 +103,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(GetOrderSummaryAsync_OrderNotFound_ReturnsNotFound))]
+        [InMemoryDbAutoData]
         public static async Task GetOrderSummaryAsync_OrderNotFound_ReturnsNotFound(
             CallOffId callOffId,
             OrdersController controller)
@@ -114,7 +114,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(GetOrderSummaryAsync_ReturnsExpectedResult))]
+        [InMemoryDbAutoData]
         public static async Task GetOrderSummaryAsync_ReturnsExpectedResult(
             [Frozen] ApplicationDbContext context,
             [Frozen] CallOffId callOffId,
@@ -138,7 +138,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(CreateOrderAsync_NullModel_ThrowsArgumentNullException))]
+        [InMemoryDbAutoData]
         public static void CreateOrderAsync_NullModel_ThrowsArgumentNullException(
             OrdersController controller)
         {
@@ -146,7 +146,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(CreateOrderAsync_UnauthorizedUser_ReturnsExpectedResult))]
+        [InMemoryDbAutoData]
         public static async Task CreateOrderAsync_UnauthorizedUser_ReturnsExpectedResult(
             Guid orderingPartyId,
             [Frozen] Mock<HttpContext> httpContextMock,
@@ -163,7 +163,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(CreateOrderAsync_CreatesOrderingParty))]
+        [InMemoryDbAutoData]
         public static async Task CreateOrderAsync_CreatesOrderingParty(
             [Frozen] ApplicationDbContext context,
             [Frozen] Mock<HttpContext> httpContextMock,
@@ -182,7 +182,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(CreateOrderAsync_CreatesOrder))]
+        [InMemoryDbAutoData]
         public static async Task CreateOrderAsync_CreatesOrder(
             [Frozen] ApplicationDbContext context,
             [Frozen] Mock<HttpContext> httpContextMock,
@@ -207,7 +207,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(CreateOrderAsync_ReturnsExpectedResult))]
+        [InMemoryDbAutoData]
         public static async Task CreateOrderAsync_ReturnsExpectedResult(
             [Frozen] Mock<HttpContext> httpContextMock,
             OrderingParty orderingParty,
@@ -226,7 +226,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(DeleteOrderAsync_NullOrder_ReturnsNotFound))]
+        [InMemoryDbAutoData]
         public static async Task DeleteOrderAsync_NullOrder_ReturnsNotFound(
             OrdersController controller)
         {
@@ -236,7 +236,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(DeleteOrderAsync_OrderIsDeleted_ReturnsNotFound))]
+        [InMemoryDbAutoData]
         public static async Task DeleteOrderAsync_OrderIsDeleted_ReturnsNotFound(
             Order order,
             OrdersController controller)
@@ -249,7 +249,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(DeleteOrderAsync_UpdatesOrder))]
+        [InMemoryDbAutoData]
         public static async Task DeleteOrderAsync_UpdatesOrder(
             Order order,
             OrdersController controller)
@@ -262,7 +262,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(DeleteOrderAsync_UpdatesDb))]
+        [InMemoryDbAutoData]
         public static async Task DeleteOrderAsync_UpdatesDb(
             [Frozen] ApplicationDbContext context,
             Order order,
@@ -278,7 +278,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(DeleteOrderAsync_ReturnsExpectedResult))]
+        [InMemoryDbAutoData]
         public static async Task DeleteOrderAsync_ReturnsExpectedResult(
             Order order,
             OrdersController controller)
@@ -291,7 +291,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateStatusAsync_NullModel_ThrowsException))]
+        [InMemoryDbAutoData]
         public static void UpdateStatusAsync_NullModel_ThrowsException(
             OrdersController controller)
         {
@@ -299,7 +299,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateStatusAsync_InvalidOrderStatus_ReturnsInvalidOrderStatusError))]
+        [InMemoryDbAutoData]
         public static async Task UpdateStatusAsync_InvalidOrderStatus_ReturnsInvalidOrderStatusError(
             StatusModel model,
             OrdersController controller)
@@ -316,7 +316,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateStatusAsync_IncompleteOrderStatus_ReturnsInvalidOrderStatusError))]
+        [InMemoryDbAutoData]
         public static async Task UpdateStatusAsync_IncompleteOrderStatus_ReturnsInvalidOrderStatusError(
             StatusModel model,
             OrdersController controller)
@@ -335,7 +335,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateStatusAsync_OrderDoesNotExist_ReturnsNotFound))]
+        [InMemoryDbAutoData]
         public static async Task UpdateStatusAsync_OrderDoesNotExist_ReturnsNotFound(
             StatusModel model,
             OrdersController controller)
@@ -348,7 +348,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateStatusAsync_OrderStatus_Complete_CompleteOrderServiceCalledOnce))]
+        [InMemoryDbAutoData]
         public static async Task UpdateStatusAsync_OrderStatus_Complete_CompleteOrderServiceCalledOnce(
             [Frozen] Mock<ICompleteOrderService> completeOrderServiceMock,
             [Frozen] ApplicationDbContext context,
@@ -374,7 +374,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateStatusAsync_CompleteOrderFailed_ReturnsError))]
+        [InMemoryDbAutoData]
         public static async Task UpdateStatusAsync_CompleteOrderFailed_ReturnsError(
             [Frozen] Mock<ICompleteOrderService> completeOrderServiceMock,
             [Frozen] ApplicationDbContext context,
@@ -408,7 +408,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateStatusAsync_OrderIsComplete_ReturnsNoContent))]
+        [InMemoryDbAutoData]
         public static async Task UpdateStatusAsync_OrderIsComplete_ReturnsNoContent(
             [Frozen] Mock<ICompleteOrderService> completeOrderServiceMock,
             [Frozen] ApplicationDbContext context,

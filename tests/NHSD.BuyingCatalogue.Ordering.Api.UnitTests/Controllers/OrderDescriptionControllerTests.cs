@@ -18,7 +18,7 @@ using NUnit.Framework;
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
-    [Parallelizable(ParallelScope.Children)]
+    [Parallelizable(ParallelScope.All)]
     [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class OrderDescriptionControllerTests
     {
@@ -33,7 +33,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(Get_OrderIdDoesNotExist_ReturnsNotFound))]
+        [InMemoryDbAutoData]
         public static async Task Get_OrderIdDoesNotExist_ReturnsNotFound(
             CallOffId callOffId,
             OrderDescriptionController controller)
@@ -44,7 +44,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(Get_OrderIdExists_ReturnsTheOrdersDescription))]
+        [InMemoryDbAutoData]
         public static async Task Get_OrderIdExists_ReturnsTheOrdersDescription(
             [Frozen] ApplicationDbContext context,
             [Frozen] CallOffId callOffId,
@@ -63,7 +63,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_OrderIsNull_ReturnsNotFound))]
+        [InMemoryDbAutoData]
         public static async Task UpdateAsync_OrderIsNull_ReturnsNotFound(
             OrderDescriptionModel model,
             OrderDescriptionController controller)
@@ -74,7 +74,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_ModelIsNull_ThrowsArgumentExceptionNull))]
+        [InMemoryDbAutoData]
         public static void UpdateAsync_ModelIsNull_ThrowsArgumentExceptionNull(
             Order order,
             OrderDescriptionController controller)
@@ -83,7 +83,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_UpdatesDescription))]
+        [InMemoryDbAutoData]
         public static async Task UpdateAsync_UpdatesDescription(
             Order order,
             OrderDescriptionModel model,
@@ -97,7 +97,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_SuccessfulUpdate_ReturnsNoContentResult))]
+        [InMemoryDbAutoData]
         public static async Task UpdateAsync_SuccessfulUpdate_ReturnsNoContentResult(
             Order order,
             OrderDescriptionModel model,
@@ -109,7 +109,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_SavesChangesToDb))]
+        [InMemoryDbAutoData]
         public static async Task UpdateAsync_SavesChangesToDb(
             [Frozen] ApplicationDbContext context,
             Order order,

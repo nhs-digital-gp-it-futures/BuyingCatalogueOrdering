@@ -21,7 +21,7 @@ using NUnit.Framework;
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
-    [Parallelizable(ParallelScope.Children)]
+    [Parallelizable(ParallelScope.All)]
     [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class SupplierSectionControllerTests
     {
@@ -36,7 +36,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(GetAsync_OrderDoesNotExist_ReturnsNotFound))]
+        [InMemoryDbAutoData]
         public static async Task GetAsync_OrderDoesNotExist_ReturnsNotFound(
             CallOffId callOffId,
             SupplierSectionController controller)
@@ -48,7 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(GetAsync_OrderIdExists_SupplierSectionDetailsReturned))]
+        [InMemoryDbAutoData]
         public static async Task GetAsync_OrderIdExists_SupplierSectionDetailsReturned(
             [Frozen] ApplicationDbContext context,
             [Frozen] CallOffId callOffId,
@@ -69,7 +69,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_ModelIsNull_ThrowsArgumentNullException))]
+        [InMemoryDbAutoData]
         public static void UpdateAsync_ModelIsNull_ThrowsArgumentNullException(
             CallOffId callOffId,
             SupplierSectionController controller)
@@ -78,7 +78,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_OrderDoesNotExist_ReturnsNotFound))]
+        [InMemoryDbAutoData]
         public static async Task UpdateAsync_OrderDoesNotExist_ReturnsNotFound(
             CallOffId callOffId,
             SupplierModel model,
@@ -90,7 +90,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_UpdatesOrderingParty))]
+        [InMemoryDbAutoData]
         public static async Task UpdateAsync_UpdatesOrderingParty(
             [Frozen] Mock<IContactDetailsService> contactDetailsService,
             [Frozen] ApplicationDbContext context,
@@ -114,7 +114,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_InvokesAddOrUpdateAddress))]
+        [InMemoryDbAutoData]
         public static async Task UpdateAsync_InvokesAddOrUpdateAddress(
             [Frozen] Mock<IContactDetailsService> contactDetailsService,
             [Frozen] ApplicationDbContext context,
@@ -140,7 +140,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_InvokesAddOrUpdatePrimaryContact))]
+        [InMemoryDbAutoData]
         public static async Task UpdateAsync_InvokesAddOrUpdatePrimaryContact(
             [Frozen] Mock<IContactDetailsService> contactDetailsService,
             [Frozen] ApplicationDbContext context,
@@ -166,7 +166,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_SavesToDb))]
+        [InMemoryDbAutoData]
         public static async Task UpdateAsync_SavesToDb(
             [Frozen] Mock<IContactDetailsService> contactDetailsService,
             [Frozen] ApplicationDbContext context,
@@ -190,7 +190,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_SuccessfulUpdate_ReturnsNoContentResult))]
+        [InMemoryDbAutoData]
         public static async Task UpdateAsync_SuccessfulUpdate_ReturnsNoContentResult(
             [Frozen] Mock<IContactDetailsService> contactDetailsService,
             [Frozen] ApplicationDbContext context,

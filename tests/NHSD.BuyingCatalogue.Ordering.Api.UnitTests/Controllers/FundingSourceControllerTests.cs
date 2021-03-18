@@ -18,7 +18,7 @@ using NUnit.Framework;
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
-    [Parallelizable(ParallelScope.Children)]
+    [Parallelizable(ParallelScope.All)]
     [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class FundingSourceControllerTests
     {
@@ -33,7 +33,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(GetAsync_OrderDoesNotExist_ReturnsNotFound))]
+        [InMemoryDbAutoData]
         public static async Task GetAsync_OrderDoesNotExist_ReturnsNotFound(
             CallOffId callOffId,
             FundingSourceController controller)
@@ -44,7 +44,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(GetAsync_OrderExists_FundingSourceDetailsReturned))]
+        [InMemoryDbAutoData]
         public static async Task GetAsync_OrderExists_FundingSourceDetailsReturned(
             [Frozen] ApplicationDbContext context,
             [Frozen] CallOffId callOffId,
@@ -63,7 +63,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(PutFundingSourceAsync_NullModel_ThrowsException))]
+        [InMemoryDbAutoData]
         public static void PutFundingSourceAsync_NullModel_ThrowsException(
             Order order,
             FundingSourceController controller)
@@ -72,7 +72,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(PutFundingSourceAsync_OrderIsNull_ReturnsNotFound))]
+        [InMemoryDbAutoData]
         public static async Task PutFundingSourceAsync_OrderIsNull_ReturnsNotFound(
             UpdateFundingSourceModel model,
             FundingSourceController controller)
@@ -83,7 +83,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(PutFundingSourceAsync_UpdatesFundingSourceOnlyGms))]
+        [InMemoryDbAutoData]
         public static async Task PutFundingSourceAsync_UpdatesFundingSourceOnlyGms(
             Order order,
             UpdateFundingSourceModel model,
@@ -98,7 +98,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(PutFundingSourceAsync_SuccessfulUpdate_ReturnsNoContentResult))]
+        [InMemoryDbAutoData]
         public static async Task PutFundingSourceAsync_SuccessfulUpdate_ReturnsNoContentResult(
             Order order,
             UpdateFundingSourceModel model,
@@ -110,7 +110,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(PutFundingSourceAsync_SavesChangesToDb))]
+        [InMemoryDbAutoData]
         public static async Task PutFundingSourceAsync_SavesChangesToDb(
             [Frozen] ApplicationDbContext context,
             Order order,
