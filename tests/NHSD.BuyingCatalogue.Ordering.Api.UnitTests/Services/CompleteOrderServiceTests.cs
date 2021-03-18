@@ -47,7 +47,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(CompleteAsync_UpdatesDb))]
+        [InMemoryDbAutoData]
         public static async Task CompleteAsync_UpdatesDb(
             [Frozen] ApplicationDbContext context,
             OrderItem orderItem,
@@ -66,7 +66,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(CompleteAsync_NotGms_ReturnsExpectedResult))]
+        [InMemoryDbAutoData]
         public static async Task CompleteAsync_NotGms_ReturnsExpectedResult(
             OrderItem orderItem,
             Order order,
@@ -82,7 +82,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(CompleteAsync_NotGms_DoesNotCreateCsv))]
+        [InMemoryDbAutoData]
         public static async Task CompleteAsync_NotGms_DoesNotCreateCsv(
             [Frozen] Mock<ICreatePurchasingDocumentService> createPurchasingDocumentServiceMock,
             OrderItem orderItem,
@@ -99,7 +99,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(CompleteAsync_NotGms_DoesNotSendEmail))]
+        [InMemoryDbAutoData]
         public static async Task CompleteAsync_NotGms_DoesNotSendEmail(
             [Frozen] Mock<IEmailService> emailServiceMock,
             OrderItem orderItem,
@@ -116,7 +116,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(CompleteAsync_Gms_PurchasingDocumentService_CreateCsvAsync_CalledOnce))]
+        [InMemoryDbAutoData]
         public static async Task CompleteAsync_Gms_PurchasingDocumentService_CreateCsvAsync_CalledOnce(
             [Frozen] Mock<ICreatePurchasingDocumentService> createPurchasingDocumentServiceMock,
             OrderItem orderItem,
@@ -135,7 +135,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(CompleteAsync_EmailServiceSubjectIsSet_SubjectIsChanged))]
+        [InMemoryDbAutoData]
         public static async Task CompleteAsync_EmailServiceSubjectIsSet_SubjectIsChanged(
             [Frozen] Mock<IEmailService> emailServiceMock,
             OrderItem orderItem,
@@ -157,7 +157,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(CompleteAsync_EmailService_CalledOnce))]
+        [InMemoryDbAutoData]
         public static async Task CompleteAsync_EmailService_CalledOnce(
             [Frozen] Mock<IEmailService> emailServiceMock,
             OrderItem orderItem,
@@ -174,7 +174,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(CompleteAsync_CompleteOrderRequest_ReturnsSuccessfulResult))]
+        [InMemoryDbAutoData]
         public static async Task CompleteAsync_CompleteOrderRequest_ReturnsSuccessfulResult(
             OrderItem orderItem,
             Order order,

@@ -18,7 +18,7 @@ using NUnit.Framework;
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 {
     [TestFixture]
-    [Parallelizable(ParallelScope.Children)]
+    [Parallelizable(ParallelScope.All)]
     [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class CommencementDateControllerTests
     {
@@ -33,7 +33,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(GetAsync_OrderNotFound_ReturnsNotFound))]
+        [InMemoryDbAutoData]
         public static async Task GetAsync_OrderNotFound_ReturnsNotFound(CommencementDateController controller)
         {
             var result = await controller.GetAsync(default);
@@ -43,7 +43,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(GetAsync_ReturnsExpectedResult))]
+        [InMemoryDbAutoData]
         public static async Task GetAsync_ReturnsExpectedResult(
             [Frozen] ApplicationDbContext context,
             Order order1,
@@ -61,7 +61,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_NullOrder_ReturnsNotFound))]
+        [InMemoryDbAutoData]
         public static async Task UpdateAsync_NullOrder_ReturnsNotFound(
             CommencementDateModel model,
             CommencementDateController controller)
@@ -72,7 +72,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_NullModel_ThrowsException))]
+        [InMemoryDbAutoData]
         public static void UpdateAsync_NullModel_ThrowsException(
             Order order,
             CommencementDateController controller)
@@ -81,7 +81,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_UpdatesCommencementDate))]
+        [InMemoryDbAutoData]
         public static async Task UpdateAsync_UpdatesCommencementDate(
             Order order,
             CommencementDateModel model,
@@ -95,7 +95,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_SuccessfulUpdate_ReturnsNoContentResult))]
+        [InMemoryDbAutoData]
         public static async Task UpdateAsync_SuccessfulUpdate_ReturnsNoContentResult(
             Order order,
             CommencementDateModel model,
@@ -107,7 +107,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(UpdateAsync_SavesChangesToDb))]
+        [InMemoryDbAutoData]
         public static async Task UpdateAsync_SavesChangesToDb(
             [Frozen] ApplicationDbContext context,
             Order order,

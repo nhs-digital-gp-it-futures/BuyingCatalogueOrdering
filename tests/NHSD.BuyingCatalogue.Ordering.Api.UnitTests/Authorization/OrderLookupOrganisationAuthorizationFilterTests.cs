@@ -19,7 +19,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Authorization
     internal static class OrderLookupOrganisationAuthorizationFilterTests
     {
         [Test]
-        [InMemoryDbAutoData(nameof(OnAuthorizationAsync_InvalidCallOffId_ReturnsExpectedValue))]
+        [InMemoryDbAutoData]
         public static async Task OnAuthorizationAsync_InvalidCallOffId_ReturnsExpectedValue(
             OrderLookupOrganisationAuthorizationFilter filter)
         {
@@ -49,7 +49,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Authorization
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(OnAuthorizationAsync_OrderNotFound_ReturnsExpectedValue))]
+        [InMemoryDbAutoData]
         public static async Task OnAuthorizationAsync_OrderNotFound_ReturnsExpectedValue(
             [Frozen] CallOffId callOffId,
             OrderLookupOrganisationAuthorizationFilter filter)
@@ -80,7 +80,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Authorization
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(OnAuthorizationAsync_UserHasSamePrimaryOrganisationId_ReturnsExpectedValue))]
+        [InMemoryDbAutoData]
         public static async Task OnAuthorizationAsync_UserHasSamePrimaryOrganisationId_ReturnsExpectedValue(
             [Frozen] ApplicationDbContext dbContext,
             [Frozen] CallOffId callOffId,

@@ -32,9 +32,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.ModelBinding
         }
 
         [Test]
-        [InMemoryDbInlineAutoData(nameof(BindModelAsync_NullOrWhiteSpaceModelName_UsesDefault), null)]
-        [InMemoryDbInlineAutoData(nameof(BindModelAsync_NullOrWhiteSpaceModelName_UsesDefault), "")]
-        [InMemoryDbInlineAutoData(nameof(BindModelAsync_NullOrWhiteSpaceModelName_UsesDefault), "\t")]
+        [InMemoryDbInlineAutoData(null)]
+        [InMemoryDbInlineAutoData("")]
+        [InMemoryDbInlineAutoData("\t")]
         public static async Task BindModelAsync_NullOrWhiteSpaceModelName_UsesDefault(
             string modelName,
             Mock<IValueProvider> valueProviderMock,
@@ -52,7 +52,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.ModelBinding
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(BindModelAsync_NoValue_ResultIsFailed))]
+        [InMemoryDbAutoData]
         public static async Task BindModelAsync_NoValue_ResultIsFailed(
             Mock<IValueProvider> valueProviderMock,
             Mock<ModelBindingContext> contextMock,
@@ -70,9 +70,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.ModelBinding
         }
 
         [Test]
-        [InMemoryDbInlineAutoData(nameof(BindModelAsync_ValueIsNullOrWhiteSpace_ResultIsFailed), null)]
-        [InMemoryDbInlineAutoData(nameof(BindModelAsync_ValueIsNullOrWhiteSpace_ResultIsFailed), "")]
-        [InMemoryDbInlineAutoData(nameof(BindModelAsync_ValueIsNullOrWhiteSpace_ResultIsFailed), "\t")]
+        [InMemoryDbInlineAutoData(null)]
+        [InMemoryDbInlineAutoData("")]
+        [InMemoryDbInlineAutoData("\t")]
         public static async Task BindModelAsync_ValueIsNullOrWhiteSpace_ResultIsFailed(
             string value,
             Mock<IValueProvider> valueProviderMock,
@@ -93,7 +93,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.ModelBinding
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(BindModelAsync_InvalidCallOffId_AddsModelError))]
+        [InMemoryDbAutoData]
         public static async Task BindModelAsync_InvalidCallOffId_AddsModelError(
             [Frozen] Mock<IValueProvider> valueProviderMock,
             Mock<ModelBindingContext> contextMock,
@@ -114,7 +114,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.ModelBinding
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(BindModelAsync_InvalidCallOffId_ResultIsFailed))]
+        [InMemoryDbAutoData]
         public static async Task BindModelAsync_InvalidCallOffId_ResultIsFailed(
             Mock<IValueProvider> valueProviderMock,
             Mock<ModelBindingContext> contextMock,
@@ -134,7 +134,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.ModelBinding
         }
 
         [Test]
-        [InMemoryDbAutoData(nameof(BindModelAsync_ReturnsSuccessWithOrder))]
+        [InMemoryDbAutoData]
         public static async Task BindModelAsync_ReturnsSuccessWithOrder(
             [Frozen] ApplicationDbContext dbContext,
             [Frozen] CallOffId callOffId,
