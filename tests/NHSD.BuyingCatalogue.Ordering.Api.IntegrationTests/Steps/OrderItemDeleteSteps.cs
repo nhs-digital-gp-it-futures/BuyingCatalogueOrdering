@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Data.SqlClient;
 using System.Threading.Tasks;
 using FluentAssertions;
-using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Requests;
-using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses;
-using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
@@ -16,7 +12,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     internal sealed class OrderItemDeleteSteps
     {
         private readonly Request request;
-        private readonly Response response;
         private readonly Settings settings;
         private readonly OrderContext orderContext;
         private DeleteOrderItemRequest deleteOrderItemRequest;
@@ -24,12 +19,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
         public OrderItemDeleteSteps(
             Request request,
-            Response response,
             Settings settings,
             OrderContext orderContext)
         {
             this.request = request;
-            this.response = response;
             this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
             this.orderContext = orderContext;
         }
@@ -37,7 +30,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Given(@"the user creates a request to delete order item with catalogue item ID (.*) for order ID (\d{1,6})")]
         public void GivenTheUserCreatesARequestToDeleteOrderItemForOrder(string catalogueItemId, int orderId)
         {
-            originalOrderItemsCount = orderContext.OrderItemReferenceList.Count;
+            originalOrderItemsCount = orderContext.OrderItemReferenceList[orderId].Values.Count;
 
             deleteOrderItemRequest = new DeleteOrderItemRequest(
                 request,
