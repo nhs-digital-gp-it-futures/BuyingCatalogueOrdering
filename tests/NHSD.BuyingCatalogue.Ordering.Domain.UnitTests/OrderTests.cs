@@ -433,11 +433,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         public static void DeleteOrderItem_OrderItemPresent_DeletesOrderItem(
             OrderItem orderItem1,
             OrderItem orderItem2,
+            OrderItem orderItem3,
             Order order)
         {
+            orderItem3.CatalogueItem.ParentCatalogueItemId = orderItem1.CatalogueItem.Id;
             order.AddOrUpdateOrderItem(orderItem1);
             order.AddOrUpdateOrderItem(orderItem2);
-            order.OrderItems.Count.Should().Be(2);
+            order.AddOrUpdateOrderItem(orderItem3);
+            order.OrderItems.Count.Should().Be(3);
 
             order.DeleteOrderItem(orderItem1.CatalogueItem.Id);
 
@@ -446,26 +449,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
         [Test]
         [CommonAutoData]
-        public static void DeleteOrderItem_OrderItemPresent_ReturnsTrue(
-            OrderItem orderItem,
+        public static void DeleteOrderItem_OrderItemPresent_ReturnsNumberOfItemsDeleted(
+            OrderItem orderItem1,
+            OrderItem orderItem2,
+            OrderItem orderItem3,
             Order order)
         {
-            order.AddOrUpdateOrderItem(orderItem);
+            orderItem3.CatalogueItem.ParentCatalogueItemId = orderItem1.CatalogueItem.Id;
+            order.AddOrUpdateOrderItem(orderItem1);
+            order.AddOrUpdateOrderItem(orderItem2);
+            order.AddOrUpdateOrderItem(orderItem3);
+            order.OrderItems.Count.Should().Be(3);
 
-            var actual = order.DeleteOrderItem(orderItem.CatalogueItem.Id);
+            var actual = order.DeleteOrderItem(orderItem1.CatalogueItem.Id);
 
-            actual.Should().BeTrue();
+            actual.Should().Be(2);
         }
 
         [Test]
         [CommonAutoData]
-        public static void DeleteOrderItem_NoOrderItem_ReturnsFalse(Order order)
+        public static void DeleteOrderItem_NoOrderItem_ReturnsZero(Order order)
         {
             order.OrderItems.Count.Should().Be(0);
 
             var actual = order.DeleteOrderItem(default(CatalogueItemId));
 
-            actual.Should().BeFalse();
+            actual.Should().Be(0);
         }
 
         [Test]

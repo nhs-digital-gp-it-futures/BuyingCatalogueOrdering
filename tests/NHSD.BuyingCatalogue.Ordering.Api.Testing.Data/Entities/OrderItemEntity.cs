@@ -81,5 +81,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 
             return await SqlRunner.QueryFirstAsync<OrderItemEntity>(connectionString, sql, new { orderId, catalogueItemId });
         }
+
+        public static async Task<int> GetItemIdsForOrderId(
+            string connectionString,
+            int orderId)
+        {
+            const string sql = @"
+                SELECT COUNT(1)
+                  FROM dbo.OrderItem
+                 WHERE OrderId = @orderId;";
+
+            return await SqlRunner.QueryFirstAsync<int>(connectionString, sql, new { orderId });
+        }
     }
 }

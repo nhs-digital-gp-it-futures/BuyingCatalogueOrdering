@@ -353,6 +353,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             List<OrderItem> orderItems,
             OrderItemsController controller)
         {
+            orderItems[2].CatalogueItem.ParentCatalogueItemId = orderItems[1].CatalogueItem.Id;
             orderItems.ForEach(o => order.AddOrUpdateOrderItem(o));
             await context.Order.AddAsync(order);
             await context.SaveChangesAsync();
@@ -361,6 +362,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
             var finalOrder = await context.Order.FindAsync(order.Id);
             finalOrder.OrderItems.Contains(orderItems[1]).Should().BeFalse();
+            finalOrder.OrderItems.Contains(orderItems[2]).Should().BeFalse();
         }
 
         [Test]
