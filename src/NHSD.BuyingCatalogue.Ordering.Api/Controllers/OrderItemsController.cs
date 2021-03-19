@@ -127,7 +127,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             CatalogueItemId catalogueItemId)
         {
             Expression<Func<Order, IEnumerable<OrderItem>>> orderItems = o =>
-                o.OrderItems.Where(i => i.CatalogueItem.Id == catalogueItemId);
+                o.OrderItems.Where(i => i.CatalogueItem.Id == catalogueItemId
+                || i.CatalogueItem.ParentCatalogueItemId == catalogueItemId);
 
             var order = await context.Order
                 .Where(o => o.Id == callOffId.Id)
@@ -140,7 +141,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return NotFound();
             }
 
-            if (!order.DeleteOrderItem(catalogueItemId))
+            if (order.DeleteOrderItem(catalogueItemId) < 1)
             {
                 return NotFound();
             }
