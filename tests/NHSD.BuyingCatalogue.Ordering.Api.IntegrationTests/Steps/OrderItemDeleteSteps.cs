@@ -46,7 +46,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         }
 
         [Then(@"the expected order items and additional services are deleted")]
-        public async Task ThenTheExpectedOrderItemsAndAdditonalServicesAreDeleted()
+        public async Task ThenTheExpectedOrderItemsAndAdditionalServicesAreDeleted()
         {
             var orderItemsCount = await OrderItemEntity.GetOrderItemCountForOrder(
                 settings.ConnectionString,
