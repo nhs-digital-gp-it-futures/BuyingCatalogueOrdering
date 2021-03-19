@@ -1,19 +1,19 @@
 ﻿Feature: Delete the order items for an order
-    As a Buyer User
-    I want to update the order items for a given order
-    So that I can keep my order up to date
+   As a Buyer User
+   I want to update the order items for a given order
+   So that I can keep my order up to date
 
 Background:
 	Given ordering parties exist
 		| Id                                   |
 		| 4af62b99-638c-4247-875e-965239cd0c48 |
 	Given orders exist
-		| OrderId | Description      | OrderingPartyId                      | LastUpdatedBy                        | LastUpdatedByName | OrganisationId                       | CommencementDate |
-		| 10001   | Some Description | 4af62b99-638c-4247-875e-965239cd0c48 | 335392e4-4bb1-413b-9de5-36a85c9c0422 | Tom Smith         | 4af62b99-638c-4247-875e-965239cd0c48 | 01/01/2021       |
+		| OrderId | Description      | OrderingPartyId                      | LastUpdatedBy                        | LastUpdatedByName | CommencementDate |
+		| 10001   | Some Description | 4af62b99-638c-4247-875e-965239cd0c48 | 335392e4-4bb1-413b-9de5-36a85c9c0422 | Tom Smith         | 01/01/2021       |
 	And pricing units exist
-        | Name    | Description |
-        | patient | per patient |
-    And service recipients exist
+		| Name    | Description |
+		| patient | per patient |
+	And service recipients exist
 		| OdsCode | Name                |
 		| ODS1    | Service Recipient 1 |
 		| ODS2    | Service Recipient 2 |

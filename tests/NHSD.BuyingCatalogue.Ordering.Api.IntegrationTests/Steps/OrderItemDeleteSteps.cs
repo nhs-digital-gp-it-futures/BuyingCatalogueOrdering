@@ -36,7 +36,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             try
             {
-                originalOrderItemsCount = await OrderItemEntity.GetItemIdsForOrderId(
+                originalOrderItemsCount = await OrderItemEntity.GetOrderItemCountForOrder(
                         settings.ConnectionString,
                         orderId);
             }
@@ -60,7 +60,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Then(@"the expected order items and additional services are deleted")]
         public async Task ThenTheExpectedOrderItemsAndAdditonalServicesAreDeleted()
         {
-            var orderItemsCount = await OrderItemEntity.GetItemIdsForOrderId(
+            var orderItemsCount = await OrderItemEntity.GetOrderItemCountForOrder(
                 settings.ConnectionString,
                 deleteOrderItemRequest.OrderId);
 
@@ -70,7 +70,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         [Then(@"the order is not updated")]
         public async Task ThenTheOrderIsNotUpdated()
         {
-            var finalOrderItemsCount = await OrderItemEntity.GetItemIdsForOrderId(
+            var finalOrderItemsCount = await OrderItemEntity.GetOrderItemCountForOrder(
                 settings.ConnectionString,
                 deleteOrderItemRequest.OrderId);
 
