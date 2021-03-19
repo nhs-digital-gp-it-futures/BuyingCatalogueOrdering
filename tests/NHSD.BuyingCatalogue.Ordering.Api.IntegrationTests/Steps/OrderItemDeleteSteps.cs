@@ -18,31 +18,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         private readonly Request request;
         private readonly Response response;
         private readonly Settings settings;
+        private readonly OrderContext orderContext;
         private DeleteOrderItemRequest deleteOrderItemRequest;
         private int originalOrderItemsCount;
 
         public OrderItemDeleteSteps(
             Request request,
             Response response,
-            Settings settings)
+            Settings settings,
+            OrderContext orderContext)
         {
             this.request = request;
             this.response = response;
             this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            this.orderContext = orderContext;
         }
 
         [Given(@"the user creates a request to delete order item with catalogue item ID (.*) for order ID (\d{1,6})")]
-        public async Task GivenTheUserCreatesARequestToDeleteOrderItemForOrder(string catalogueItemId, int orderId)
+        public void GivenTheUserCreatesARequestToDeleteOrderItemForOrder(string catalogueItemId, int orderId)
         {
-            try
-            {
-                originalOrderItemsCount = await OrderItemEntity.GetOrderItemCountForOrder(
-                        settings.ConnectionString,
-                        orderId);
-            }
-            catch (SqlException)
-            {
-            }
+            originalOrderItemsCount = orderContext.OrderItemReferenceList.Count;
 
             deleteOrderItemRequest = new DeleteOrderItemRequest(
                 request,
