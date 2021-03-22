@@ -92,7 +92,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 new { commencementDate = date });
         }
 
-        [Then(@"the order commencement date for order with ID (\d*) is set to today")]
+        [Then(@"the order commencement date for the order with ID (\d*) is set to today")]
         public async Task ThenTheOrderDescriptionForOrderWithIdIsSetToToday(int orderId)
         {
             var actual = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);
@@ -100,7 +100,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.CommencementDate?.Date.Should().Be(DateTime.Today.Date);
         }
 
-        [Then(@"the order commencement date for order with ID (\d*) is set to ([0-9]+) days in the future")]
+        [Then(@"the order commencement date for the order with ID (\d*) is set to ([0-9]+) days in the future")]
         public async Task ThenTheOrderDescriptionForOrderWithIdIsSetToDaysInTheFuture(int orderId, int days)
         {
             var actual = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);
@@ -108,7 +108,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.CommencementDate?.Date.Should().Be(DateTime.Today.Date + TimeSpan.FromDays(days));
         }
 
-        [Then(@"the order commencement date for order with ID (\d*) is set to ([0-9]+) days in the past")]
+        [Then(@"the order commencement date for the order with ID (\d*) is set to ([0-9]+) days in the past")]
         public async Task ThenTheOrderDescriptionForOrderWithIdIsSetToDaysAgo(int orderId, int days)
         {
             var actual = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, orderId);

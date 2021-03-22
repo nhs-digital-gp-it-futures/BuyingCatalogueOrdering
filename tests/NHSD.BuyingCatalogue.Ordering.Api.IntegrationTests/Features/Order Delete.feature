@@ -8,12 +8,10 @@ Background:
         | Id                                   |
         | 4af62b99-638c-4247-875e-965239cd0c48 |
     And orders exist
-        | OrderId | Description   | OrderingPartyId                      |
-        | 10001   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 |
+        | OrderId | Description   | OrderingPartyId                      | Created    |
+        | 10001   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | 22/03/2021 |
         And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
-# Possible issue with integration DB initialization (intermittent scenario failure, passes when run in isolation)
-@ignore
 @5287
 Scenario: delete an existing order
     Given the user creates a request to delete the order with ID 10001
@@ -21,8 +19,6 @@ Scenario: delete an existing order
     Then a response with status code 204 is returned
     And the expected order is deleted
 
-# Possible issue with integration DB initialization (intermittent scenario failure, passes when run in isolation)
-@ignore
 @5287
 Scenario: deleting an order updates the order's last updated information
     Given the user creates a request to delete the order with ID 10001
@@ -38,8 +34,6 @@ Scenario: a non-existent order ID returns not found
     When the user sends the delete order request
     Then a response with status code 404 is returned
 
-# Possible issue with integration DB initialization (intermittent scenario failure, passes when run in isolation)
-@ignore
 @5287
 Scenario: a previously deleted order ID returns not found
     Given the user creates a request to delete the order with ID 10001

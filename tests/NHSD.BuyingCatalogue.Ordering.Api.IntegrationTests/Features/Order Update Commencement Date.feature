@@ -17,7 +17,7 @@ Scenario: updating an orders commencement date to be today
     Given the user sets the commencement date to today
     When the user makes a request to update the commencement date with the ID 10001
     Then a response with status code 204 is returned
-    And the order commencement date for order with id 10001 is set to today
+    And the order commencement date for the order with ID 10001 is set to today
     And the lastUpdatedName is updated in the database to Bob Smith for the order with ID 10001
     And the order with ID 10001 is updated in the database with data
         | LastUpdatedBy                        | LastUpdatedByName |
@@ -29,7 +29,7 @@ Scenario: updating an orders commencement date to be in the future
     Given the user sets the commencement date to 59 days in the future
     When the user makes a request to update the commencement date with the ID 10001
     Then a response with status code 204 is returned
-    And the order commencement date for order with id 10001 is set to 59 days in the future
+    And the order commencement date for the order with ID 10001 is set to 59 days in the future
     And the lastUpdatedName is updated in the database to Bob Smith for the order with ID 10001
     And the order with ID 10001 is updated in the database with data
         | LastUpdatedBy                        | LastUpdatedByName |
@@ -41,7 +41,7 @@ Scenario: updating an orders commencement date to be in the allowable past
     Given the user sets the commencement date to 59 days in the past
     When the user makes a request to update the commencement date with the ID 10001
     Then a response with status code 204 is returned
-    And the order commencement date for order with id 10001 is set to 59 days in the past
+    And the order commencement date for the order with ID 10001 is set to 59 days in the past
     And the lastUpdatedName is updated in the database to Bob Smith for the order with ID 10001
     And the order with ID 10001 is updated in the database with data
         | LastUpdatedBy                        | LastUpdatedByName |
