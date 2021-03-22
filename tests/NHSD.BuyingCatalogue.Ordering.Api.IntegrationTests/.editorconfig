@@ -8,8 +8,3 @@
 
 # CA1812: Avoid uninstantiated internal classes (typically instantiated by BoDI)
 dotnet_diagnostic.CA1812.severity = none
-
-# Don't use tabs for indentation.
-[*]
-indent_style = space
-insert_final_newline = true

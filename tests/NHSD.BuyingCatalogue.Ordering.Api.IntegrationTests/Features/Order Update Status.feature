@@ -17,11 +17,11 @@ Background:
         | Name    | Description |
         | patient | per patient |
     And orders exist
-        | OrderId | Description            | OrderingPartyId                      | SupplierId | CommencementDate | FundingSourceOnlyGMS | Completed |
-        | 10001   | Some Description       | 4af62b99-638c-4247-875e-965239cd0c48 | 10101      | 15/12/2020       | True                 | NULL      |
-        | 10002   | Some Other Description | 4af62b99-638c-4247-875e-965239cd0c48 | 10101      | 01/10/2020       | NULL                 | NULL      |
-        | 10003   | Another Description    | 4af62b99-638c-4247-875e-965239cd0c48 | 10101      | 01/01/2020       | False                | NULL      |
-        | 10004   | A Description          | 4af62b99-638c-4247-875e-965239cd0c48 | 10101      | 07/05/2020       | True                 | NULL      |
+        | OrderId | Description            | OrderingPartyId                      | SupplierId | CommencementDate | FundingSourceOnlyGMS | Completed | Created    |
+        | 10001   | Some Description       | 4af62b99-638c-4247-875e-965239cd0c48 | 10101      | 15/12/2020       | True                 | NULL      | 05/05/2020 |
+        | 10002   | Some Other Description | 4af62b99-638c-4247-875e-965239cd0c48 | 10101      | 01/10/2020       | NULL                 | NULL      | 05/05/2020 |
+        | 10003   | Another Description    | 4af62b99-638c-4247-875e-965239cd0c48 | 10101      | 01/01/2020       | False                | NULL      | 05/05/2020 |
+        | 10004   | A Description          | 4af62b99-638c-4247-875e-965239cd0c48 | 10101      | 07/05/2020       | True                 | NULL      | 05/05/2020 |
     And order progress exists
         | OrderId | CatalogueSolutionsViewed | AssociatedServicesViewed |
         | 10001   | True                     | True                     |
