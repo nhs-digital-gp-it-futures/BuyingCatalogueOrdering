@@ -9,6 +9,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Data;
+using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder;
 using TechTalk.SpecFlow;
 using TechTalk.SpecFlow.Assist;
@@ -106,6 +107,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         {
             var orderItems = await response.ReadBodyAsJsonAsync();
             orderItems.Count().Should().Be(0);
+        }
+
+        [Then(@"the following order items exist for the order with ID (\d{1,6})")]
+        public async Task ThenTheFollowingOrderItemsExist(int orderId, Table table)
+        {
+            var orderItems = await OrderItemEntity.FetchByOrderId(settings.ConnectionString, orderId);
+            table.CompareToSet(orderItems);
         }
 
         [UsedImplicitly(ImplicitUseTargetFlags.Members)]

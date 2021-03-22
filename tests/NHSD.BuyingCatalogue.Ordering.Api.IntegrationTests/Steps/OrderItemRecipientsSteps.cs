@@ -35,5 +35,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 refList[key].Add(item);
             }
         }
+
+        [Then(@"the following order item recipients exist for the order with ID (\d{1,6})")]
+        public async Task ThenTheFollowingOrderItemRecipientsExist(int orderId, Table table)
+        {
+            var recipients = await OrderItemRecipientEntity.FetchByOrderId(settings.ConnectionString, orderId);
+            table.CompareToSet(recipients);
+        }
     }
 }

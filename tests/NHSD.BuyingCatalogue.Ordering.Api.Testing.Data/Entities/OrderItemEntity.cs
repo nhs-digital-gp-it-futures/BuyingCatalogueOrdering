@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Data;
 
@@ -82,16 +83,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
             return await SqlRunner.QueryFirstAsync<OrderItemEntity>(connectionString, sql, new { orderId, catalogueItemId });
         }
 
-        public static async Task<int> GetOrderItemCountForOrder(
+        public static async Task<IEnumerable<OrderItemEntity>> FetchByOrderId(
             string connectionString,
             int orderId)
         {
             const string sql = @"
-                SELECT COUNT(*)
+                SELECT OrderId,
+                       CatalogueItemId,
+                       ProvisioningTypeId AS ProvisioningType,
+                       CataloguePriceTypeId AS CataloguePriceType,
+                       PricingUnitName,
+                       TimeUnitId AS TimeUnit,
+                       CurrencyCode,
+                       EstimationPeriodId AS EstimationPeriod,
+                       Price,
+                       Created,
+                       LastUpdated
                   FROM dbo.OrderItem
                  WHERE OrderId = @orderId;";
 
-            return await SqlRunner.QueryFirstAsync<int>(connectionString, sql, new { orderId });
+            return await SqlRunner.QueryAsync<OrderItemEntity>(connectionString, sql, new { orderId });
         }
     }
 }
