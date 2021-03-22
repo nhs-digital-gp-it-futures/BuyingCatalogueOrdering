@@ -9,7 +9,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
         public string Name { get; set; }
 
         [Required(ErrorMessage = "ItemUnitDescriptionRequired")]
-        [MaxLength(40, ErrorMessage = "ItemUnitDescriptionTooLong")]
+        [MaxLength(100, ErrorMessage = "ItemUnitDescriptionTooLong")]
         public string Description { get; set; }
     }
 }
