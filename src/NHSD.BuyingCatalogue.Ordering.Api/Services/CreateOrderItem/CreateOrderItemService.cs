@@ -53,7 +53,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
                 OrderId = order.Id,
                 Price = model.Price,
                 PricingUnit = pricingUnit,
-                PriceTimeUnit = model.TimeUnit.ToTimeUnit(),
+                PriceTimeUnit = model.TimeUnit?.ToTimeUnit(),
                 ProvisioningType = Enum.Parse<ProvisioningType>(model.ProvisioningType, true),
             });
 
