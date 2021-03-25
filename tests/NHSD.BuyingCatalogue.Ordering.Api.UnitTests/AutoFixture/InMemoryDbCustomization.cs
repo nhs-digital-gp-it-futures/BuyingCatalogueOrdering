@@ -2,7 +2,7 @@
 using AutoFixture;
 using AutoFixture.Kernel;
 using Microsoft.EntityFrameworkCore;
-using NHSD.BuyingCatalogue.Ordering.Application.Services;
+using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture

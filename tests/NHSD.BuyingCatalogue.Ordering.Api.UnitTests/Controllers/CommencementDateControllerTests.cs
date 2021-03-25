@@ -8,9 +8,11 @@ using AutoFixture.Idioms;
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
+using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 using NUnit.Framework;
@@ -22,6 +24,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
     [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class CommencementDateControllerTests
     {
+        private static Mock<IOrderService> moqorderService;
+
+        [SetUp]
+        public static void Setup()
+        {
+            moqorderService = new Mock<IOrderService>();
+        }
+
         [Test]
         public static void Constructor_VerifyGuardClauses()
         {
@@ -46,16 +56,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [InMemoryDbAutoData]
         public static async Task GetAsync_ReturnsExpectedResult(
             [Frozen] ApplicationDbContext context,
-            Order order1,
-            Order order2,
+            Order order,
             CommencementDateController controller)
         {
-            context.Order.AddRange(order1, order2);
-            await context.SaveChangesAsync();
+            controller = new CommencementDateController(context, moqorderService.Object);
 
-            var expectedResult = new CommencementDateModel { CommencementDate = order2.CommencementDate };
+            var expectedResult = new CommencementDateModel { CommencementDate = order.CommencementDate };
+            moqorderService.Setup(o => o.GetCommencementDate(order.CallOffId)).ReturnsAsync(order.CommencementDate);
 
-            var result = await controller.GetAsync(order2.CallOffId);
+            var result = await controller.GetAsync(order.CallOffId);
+            moqorderService.Verify(o => o.GetCommencementDate(order.CallOffId));
 
             result.Value.Should().BeEquivalentTo(expectedResult);
         }
@@ -82,20 +92,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task UpdateAsync_UpdatesCommencementDate(
-            Order order,
-            CommencementDateModel model,
-            CommencementDateController controller)
-        {
-            order.CommencementDate.Should().NotBeSameDateAs(model.CommencementDate.GetValueOrDefault());
-
-            await controller.UpdateAsync(order, model);
-
-            order.CommencementDate.Should().Be(model.CommencementDate);
-        }
-
-        [Test]
-        [InMemoryDbAutoData]
         public static async Task UpdateAsync_SuccessfulUpdate_ReturnsNoContentResult(
             Order order,
             CommencementDateModel model,
@@ -104,22 +100,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var result = await controller.UpdateAsync(order, model);
 
             result.Should().BeOfType<NoContentResult>();
-        }
-
-        [Test]
-        [InMemoryDbAutoData]
-        public static async Task UpdateAsync_SavesChangesToDb(
-            [Frozen] ApplicationDbContext context,
-            Order order,
-            CommencementDateModel model,
-            CommencementDateController controller)
-        {
-            context.Add(order);
-            await context.SaveChangesAsync();
-
-            await controller.UpdateAsync(order, model);
-
-            context.Set<Order>().First(o => o.Equals(order)).CommencementDate.Should().Be(model.CommencementDate);
         }
     }
 }

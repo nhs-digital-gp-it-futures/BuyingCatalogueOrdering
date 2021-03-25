@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NHSD.BuyingCatalogue.Ordering.Application.Services
+namespace NHSD.BuyingCatalogue.Ordering.Contracts
 {
     public interface IIdentityService
     {
@@ -8,6 +8,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Application.Services
 
         string GetUserName();
 
-        IdentityUser GetUserInfo();
+        IIdentityUser GetUserInfo();
     }
 }

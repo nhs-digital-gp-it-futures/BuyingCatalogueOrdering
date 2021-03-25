@@ -12,7 +12,7 @@ using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
 {
-    internal sealed class CompleteOrderService : ICompleteOrderService
+    public sealed class CompleteOrderService : ICompleteOrderService
     {
         private readonly ApplicationDbContext context;
         private readonly ICreatePurchasingDocumentService createPurchasingDocumentService;
@@ -33,7 +33,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder
 
         public async Task<Result> CompleteAsync(Order order)
         {
-            var result = order.Complete();
+            var result = order?.Complete();
             if (!result.IsSuccess)
                 return result;
 

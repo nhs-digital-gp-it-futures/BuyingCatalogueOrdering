@@ -2,7 +2,8 @@
 using AutoFixture;
 using AutoFixture.Kernel;
 using Moq;
-using NHSD.BuyingCatalogue.Ordering.Application.Services;
+using NHSD.BuyingCatalogue.Ordering.Contracts;
+using NHSD.BuyingCatalogue.Ordering.Services;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
 {

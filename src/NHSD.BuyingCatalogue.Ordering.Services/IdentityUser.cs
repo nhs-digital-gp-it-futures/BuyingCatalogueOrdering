@@ -1,8 +1,9 @@
 ﻿using System;
+using NHSD.BuyingCatalogue.Ordering.Contracts;
 
-namespace NHSD.BuyingCatalogue.Ordering.Application.Services
+namespace NHSD.BuyingCatalogue.Ordering.Services
 {
-    public sealed class IdentityUser
+    public sealed class IdentityUser : IIdentityUser
     {
         public IdentityUser(Guid id, string name)
         {

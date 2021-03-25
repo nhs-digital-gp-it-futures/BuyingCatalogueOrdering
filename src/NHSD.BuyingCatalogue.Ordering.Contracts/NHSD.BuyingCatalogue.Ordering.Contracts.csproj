@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>D:\Project\GPITFutures\API\13236_ORDAPI\BuyingCatalogueOrdering\NHSD.BuyingCatalogue.Ordering.Contracts\NHSD.BuyingCatalogue.Ordering.Contracts.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NHSD.BuyingCatalogue.Ordering.Domain\NHSD.BuyingCatalogue.Ordering.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

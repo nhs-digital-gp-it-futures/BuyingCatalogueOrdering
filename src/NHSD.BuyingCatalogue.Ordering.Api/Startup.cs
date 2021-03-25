@@ -29,9 +29,10 @@ using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument;
 using NHSD.BuyingCatalogue.Ordering.Api.Settings;
 using NHSD.BuyingCatalogue.Ordering.Api.Validation;
-using NHSD.BuyingCatalogue.Ordering.Application.Services;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
+using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
+using NHSD.BuyingCatalogue.Ordering.Services;
 using Serilog;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api
@@ -96,7 +97,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 .AddScoped<ICsvStreamWriter<OdooOrderItem>, CsvStreamStreamWriter<OdooOrderItem, OdooOrderItemMap>>()
                 .AddScoped<IDefaultDeliveryDateValidator, DefaultDeliveryDateValidator>()
                 .AddScoped<ICreateOrderItemValidator, OrderItemValidator>()
-                .AddScoped<IAsyncAuthorizationFilter, OrderLookupOrganisationAuthorizationFilter>();
+                .AddScoped<IAsyncAuthorizationFilter, OrderLookupOrganisationAuthorizationFilter>()
+                .AddScoped<IOrderService, OrderService>();
 
             services
                 .AddSingleton(smtpSettings)

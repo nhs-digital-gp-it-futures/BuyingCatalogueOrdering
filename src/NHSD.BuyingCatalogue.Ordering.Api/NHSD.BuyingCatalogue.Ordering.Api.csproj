@@ -47,6 +47,7 @@
     <ProjectReference Include="..\NHSD.BuyingCatalogue.Ordering.Common\NHSD.BuyingCatalogue.Ordering.Common.csproj" />
     <ProjectReference Include="..\NHSD.BuyingCatalogue.Ordering.Domain\NHSD.BuyingCatalogue.Ordering.Domain.csproj" />
     <ProjectReference Include="..\NHSD.BuyingCatalogue.Ordering.Persistence\NHSD.BuyingCatalogue.Ordering.Persistence.csproj" />
+    <ProjectReference Include="..\NHSD.BuyingCatalogue.Ordering.Services\NHSD.BuyingCatalogue.Ordering.Services.csproj" />
   </ItemGroup>
 
   <ItemGroup>
