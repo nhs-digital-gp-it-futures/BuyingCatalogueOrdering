@@ -48,8 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             var result = await controller.GetAsync(default);
 
-            result.Result.Should().BeOfType<NotFoundResult>();
-            result.Value.Should().BeNull();
+            result.Value.CommencementDate.Should().BeNull();
         }
 
         [Test]
