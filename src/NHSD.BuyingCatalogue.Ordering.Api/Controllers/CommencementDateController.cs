@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NHSD.BuyingCatalogue.Ordering.Domain;
-using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -21,13 +18,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [AuthorizeOrganisation]
     public sealed class CommencementDateController : ControllerBase
     {
-        private readonly ApplicationDbContext context;
-
         private readonly IOrderService orderService;
 
-        public CommencementDateController(ApplicationDbContext context, IOrderService orderService)
+        public CommencementDateController(IOrderService orderService)
         {
-            this.context = context ?? throw new ArgumentNullException(nameof(context));
             this.orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
         }
 

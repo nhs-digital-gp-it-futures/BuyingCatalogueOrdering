@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using NHSD.BuyingCatalogue.Ordering.Contracts;
@@ -10,13 +8,11 @@ using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Services
 {
-    public class OrderService : IOrderService
+    public sealed class OrderService : IOrderService
     {
         private readonly ApplicationDbContext context;
 
-#pragma warning disable CS3001 // Argument type is not CLS-compliant
         public OrderService(ApplicationDbContext context)
-#pragma warning restore CS3001 // Argument type is not CLS-compliant
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
@@ -24,9 +20,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Services
         public async Task<DateTime?> GetCommencementDate(CallOffId callOffId)
         {
             return await context.Order
-                                .Where(o => o.Id == callOffId.Id)
-                                .Select(o => o.CommencementDate)
-                                .SingleOrDefaultAsync();
+                .Where(o => o.Id == callOffId.Id)
+                .Select(o => o.CommencementDate)
+                .SingleOrDefaultAsync();
         }
 
         public async Task SetCommencementDate(Order order, DateTime? commencementDate)

@@ -6,9 +6,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Logging
 {
     public static class SerilogRequestLoggingOptions
     {
-        public const string HealthCheckEndpointDisplayName = "Health checks";
+        internal const string HealthCheckEndpointDisplayName = "Health checks";
 
-        public static LogEventLevel GetLevel(HttpContext httpContext, double elapsed, Exception exception)
+        internal static LogEventLevel GetLevel(HttpContext httpContext, double elapsed, Exception exception)
         {
             _ = elapsed;
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.AutoMoq;
@@ -24,14 +23,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
     [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class CommencementDateControllerTests
     {
-        private static Mock<IOrderService> moqorderService;
-
-        [SetUp]
-        public static void Setup()
-        {
-            moqorderService = new Mock<IOrderService>();
-        }
-
         [Test]
         public static void Constructor_VerifyGuardClauses()
         {
@@ -54,17 +45,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task GetAsync_ReturnsExpectedResult(
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderService> orderService,
             Order order,
             CommencementDateController controller)
         {
-            controller = new CommencementDateController(context, moqorderService.Object);
+            controller = new CommencementDateController(orderService.Object);
 
             var expectedResult = new CommencementDateModel { CommencementDate = order.CommencementDate };
-            moqorderService.Setup(o => o.GetCommencementDate(order.CallOffId)).ReturnsAsync(order.CommencementDate);
+            orderService.Setup(o => o.GetCommencementDate(order.CallOffId)).ReturnsAsync(order.CommencementDate);
 
             var result = await controller.GetAsync(order.CallOffId);
-            moqorderService.Verify(o => o.GetCommencementDate(order.CallOffId));
+            orderService.Verify(o => o.GetCommencementDate(order.CallOffId));
 
             result.Value.Should().BeEquivalentTo(expectedResult);
         }
@@ -87,6 +78,27 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             CommencementDateController controller)
         {
             Assert.ThrowsAsync<ArgumentNullException>(async () => await controller.UpdateAsync(order, null));
+        }
+
+        [Test]
+        [InMemoryDbAutoData]
+        public static async Task UpdateAsync_UpdatesCommencementDate(
+            [Frozen] Mock<IOrderService> orderService,
+            Order order,
+            CommencementDateModel model,
+            CommencementDateController controller)
+        {
+            order.CommencementDate.Should().NotBeSameDateAs(model.CommencementDate.GetValueOrDefault());
+
+            orderService.Setup(o => o.SetCommencementDate(order, model.CommencementDate)).Callback(() =>
+            {
+                order.CommencementDate = model.CommencementDate;
+            });
+
+            await controller.UpdateAsync(order, model);
+            orderService.Verify(o => o.SetCommencementDate(order, model.CommencementDate));
+
+            order.CommencementDate.Should().Be(model.CommencementDate);
         }
 
         [Test]

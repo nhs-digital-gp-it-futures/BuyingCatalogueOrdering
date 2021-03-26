@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.Services;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
-using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services

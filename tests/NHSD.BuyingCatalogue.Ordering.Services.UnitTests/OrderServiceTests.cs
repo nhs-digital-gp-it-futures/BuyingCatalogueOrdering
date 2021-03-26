@@ -6,7 +6,6 @@ using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
-using NHSD.BuyingCatalogue.Ordering.Services;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
@@ -37,7 +36,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
 
             var result = await service.GetCommencementDate(order2.CallOffId);
 
-            result.Value.Should().Be(expectedResult.Value);
+            Assert.NotNull(result);
+            result.Value.Should().Be(expectedResult!.Value);
         }
 
         [Test]
