@@ -28,7 +28,7 @@
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.Network" Version="5.0.4" />
     <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="5.0.2" />
-    <PackageReference Include="CsvHelper" Version="26.0.1" />
+    <PackageReference Include="CsvHelper" Version="26.1.0" />
     <PackageReference Include="Enums.NET" Version="4.0.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="9.5.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.4" />
