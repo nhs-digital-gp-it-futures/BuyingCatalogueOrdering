@@ -36,9 +36,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         {
             var commencementDate = await orderService.GetCommencementDate(callOffId);
 
-            if (commencementDate is null)
-                return NotFound();
-
             return new CommencementDateModel { CommencementDate = commencementDate };
         }
 
