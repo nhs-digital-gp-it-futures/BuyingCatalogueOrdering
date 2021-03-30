@@ -42,13 +42,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
 
         [Test]
         [InMemoryDbAutoData]
-        public static void UpdateAsync_NullModel_ThrowsException(
-            Order order,
+        public static void UpdateAsync_NullOrder_ThrowsException(
             DateTime? commencementDate,
             OrderService service)
         {
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await service.SetCommencementDate(order, null));
             Assert.ThrowsAsync<ArgumentNullException>(async () => await service.SetCommencementDate(null, commencementDate));
+        }
+
+        [Test]
+        [InMemoryDbAutoData]
+        public static void UpdateAsync_NullCommencementDate_ThrowsException(
+            Order order,
+            OrderService service)
+        {
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await service.SetCommencementDate(order, null));
         }
 
         [Test]

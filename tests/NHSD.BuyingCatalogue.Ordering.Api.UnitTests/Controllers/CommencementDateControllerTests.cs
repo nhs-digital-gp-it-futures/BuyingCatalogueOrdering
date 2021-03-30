@@ -13,7 +13,6 @@ using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NHSD.BuyingCatalogue.Ordering.Domain;
-using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
@@ -49,8 +48,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             Order order,
             CommencementDateController controller)
         {
-            controller = new CommencementDateController(orderService.Object);
-
             var expectedResult = new CommencementDateModel { CommencementDate = order.CommencementDate };
             orderService.Setup(o => o.GetCommencementDate(order.CallOffId)).ReturnsAsync(order.CommencementDate);
 

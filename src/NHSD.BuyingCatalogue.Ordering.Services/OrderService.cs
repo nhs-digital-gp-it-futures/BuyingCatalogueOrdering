@@ -33,7 +33,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services
             if (commencementDate is null)
                 throw new ArgumentNullException(nameof(commencementDate));
 
-            order.CommencementDate = commencementDate!.Value;
+            order.CommencementDate = commencementDate.Value;
             await context.SaveChangesAsync();
         }
     }
