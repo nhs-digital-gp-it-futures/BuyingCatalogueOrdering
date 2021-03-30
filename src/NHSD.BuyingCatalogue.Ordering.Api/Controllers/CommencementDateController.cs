@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
+using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NHSD.BuyingCatalogue.Ordering.Domain;
-using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -20,26 +18,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [AuthorizeOrganisation]
     public sealed class CommencementDateController : ControllerBase
     {
-        private readonly ApplicationDbContext context;
+        private readonly IOrderService orderService;
 
-        public CommencementDateController(ApplicationDbContext context)
+        public CommencementDateController(IOrderService orderService)
         {
-            this.context = context ?? throw new ArgumentNullException(nameof(context));
+            this.orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
         }
 
         [HttpGet]
         public async Task<ActionResult<CommencementDateModel>> GetAsync(CallOffId callOffId)
         {
-            var model = await context.Order
-                .Where(o => o.Id == callOffId.Id)
-                .Select(o => new CommencementDateModel { CommencementDate = o.CommencementDate })
-                .AsNoTracking()
-                .SingleOrDefaultAsync();
+            var commencementDate = await orderService.GetCommencementDate(callOffId);
 
-            if (model is null)
-                return NotFound();
-
-            return model;
+            return new CommencementDateModel { CommencementDate = commencementDate };
         }
 
         [HttpPut]
@@ -52,9 +43,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (model is null)
                 throw new ArgumentNullException(nameof(model));
 
-            order.CommencementDate = model.CommencementDate!.Value;
-
-            await context.SaveChangesAsync();
+            await orderService.SetCommencementDate(order, model.CommencementDate);
 
             return NoContent();
         }

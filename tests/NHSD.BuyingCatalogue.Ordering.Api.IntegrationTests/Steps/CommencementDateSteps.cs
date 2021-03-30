@@ -57,6 +57,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actual.Should().BeEquivalentTo(expected);
         }
 
+        [Then(@"the order has no commencement date")]
+        public async Task ThenTheOrderHasNoCommencementDate()
+        {
+            var apiResponse = await response.ReadBodyAsJsonAsync();
+
+            var actual = apiResponse.Value<DateTime?>("commencementDate");
+
+            actual.Should().BeNull();
+        }
+
         [Given(@"the user sets the commencement date to today")]
         public void GivenTheUserSetsCommencementDateToToday()
         {

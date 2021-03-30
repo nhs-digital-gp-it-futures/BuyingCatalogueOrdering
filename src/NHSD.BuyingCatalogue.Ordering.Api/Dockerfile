@@ -12,6 +12,8 @@ COPY ["src/NHSD.BuyingCatalogue.Ordering.Common/NHSD.BuyingCatalogue.Ordering.Co
 COPY ["src/NHSD.BuyingCatalogue.Ordering.Application/NHSD.BuyingCatalogue.Ordering.Application.csproj", "src/NHSD.BuyingCatalogue.Ordering.Application/"]
 COPY ["src/NHSD.BuyingCatalogue.Ordering.Domain/NHSD.BuyingCatalogue.Ordering.Domain.csproj", "src/NHSD.BuyingCatalogue.Ordering.Domain/"]
 COPY ["src/NHSD.BuyingCatalogue.Ordering.Persistence/NHSD.BuyingCatalogue.Ordering.Persistence.csproj", "src/NHSD.BuyingCatalogue.Ordering.Persistence/"]
+COPY ["src/NHSD.BuyingCatalogue.Ordering.Contracts/NHSD.BuyingCatalogue.Ordering.Contracts.csproj", "src/NHSD.BuyingCatalogue.Ordering.Contracts/"]
+COPY ["src/NHSD.BuyingCatalogue.Ordering.Services/NHSD.BuyingCatalogue.Ordering.Services.csproj", "src/NHSD.BuyingCatalogue.Ordering.Services/"]
 COPY ["NuGet.config", "."]
 RUN dotnet restore "src/NHSD.BuyingCatalogue.Ordering.Api/NHSD.BuyingCatalogue.Ordering.Api.csproj"
 COPY . .

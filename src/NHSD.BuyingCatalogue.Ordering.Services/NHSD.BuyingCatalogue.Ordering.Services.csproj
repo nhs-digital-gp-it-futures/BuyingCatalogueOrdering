@@ -1,7 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
   </PropertyGroup>
 
@@ -10,18 +11,12 @@
     <WarningsAsErrors />
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-
+  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="4.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.4" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.333">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -29,9 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NHSD.BuyingCatalogue.Ordering.Application\NHSD.BuyingCatalogue.Ordering.Application.csproj" />
     <ProjectReference Include="..\NHSD.BuyingCatalogue.Ordering.Contracts\NHSD.BuyingCatalogue.Ordering.Contracts.csproj" />
     <ProjectReference Include="..\NHSD.BuyingCatalogue.Ordering.Domain\NHSD.BuyingCatalogue.Ordering.Domain.csproj" />
+    <ProjectReference Include="..\NHSD.BuyingCatalogue.Ordering.Persistence\NHSD.BuyingCatalogue.Ordering.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

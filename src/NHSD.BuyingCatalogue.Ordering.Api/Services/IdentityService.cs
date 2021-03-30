@@ -1,11 +1,12 @@
 ﻿using System;
 using Microsoft.AspNetCore.Http;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
-using NHSD.BuyingCatalogue.Ordering.Application.Services;
+using NHSD.BuyingCatalogue.Ordering.Contracts;
+using NHSD.BuyingCatalogue.Ordering.Services;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services
 {
-    internal sealed class IdentityService : IIdentityService
+    public sealed class IdentityService : IIdentityService
     {
         private readonly IHttpContextAccessor context;
 
@@ -30,6 +31,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services
             return context.HttpContext.User.GetUserName();
         }
 
-        public IdentityUser GetUserInfo() => new(GetUserIdentity(), GetUserName());
+        public IIdentityUser GetUserInfo() => new IdentityUser(GetUserIdentity(), GetUserName());
     }
 }

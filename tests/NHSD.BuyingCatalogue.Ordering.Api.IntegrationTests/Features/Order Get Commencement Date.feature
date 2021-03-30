@@ -8,8 +8,9 @@ Background:
         | Id                                   |
         | 4af62b99-638c-4247-875e-965239cd0c48 |
     And orders exist
-        | OrderId | Description      | OrderingPartyId                      | CommencementDate |
-        | 10001   | Some Description | 4af62b99-638c-4247-875e-965239cd0c48 | 01/01/2021       |
+        | OrderId | Description         | OrderingPartyId                      | CommencementDate |
+        | 10001   | Some Description    | 4af62b99-638c-4247-875e-965239cd0c48 | 01/01/2021       |
+        | 10002   | Order Description   | 4af62b99-638c-4247-875e-965239cd0c48 | NULL             |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
     
 @4619
@@ -19,6 +20,12 @@ Scenario: get an order's commencement date
     And the order commencement date is returned
         | CommencementDate |
         | 01/01/2021       |
+
+@4619
+Scenario: get an order with no commencement date
+    When the user makes a request to retrieve the order commencement date section with the ID 10002
+    Then a response with status code 200 is returned
+    And the order has no commencement date
 
 @4619
 Scenario: a non-existent order ID returns not found

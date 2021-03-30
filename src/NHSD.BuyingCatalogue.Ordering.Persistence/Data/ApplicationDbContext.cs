@@ -2,8 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using NHSD.BuyingCatalogue.Ordering.Application.Services;
+using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
