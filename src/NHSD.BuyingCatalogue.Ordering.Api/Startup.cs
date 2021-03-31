@@ -98,7 +98,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 .AddScoped<IDefaultDeliveryDateValidator, DefaultDeliveryDateValidator>()
                 .AddScoped<ICreateOrderItemValidator, OrderItemValidator>()
                 .AddScoped<IAsyncAuthorizationFilter, OrderLookupOrganisationAuthorizationFilter>()
-                .AddScoped<IOrderService, OrderService>();
+                .AddScoped<IOrderService, OrderService>()
+                .AddScoped<IFundingSourceService, FundingSourceService>();
 
             services
                 .AddSingleton(smtpSettings)
