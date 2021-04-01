@@ -206,6 +206,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 || o.CatalogueItem.ParentCatalogueItemId == catalogueItemId);
         }
 
+        public bool HasSolution()
+        {
+            return OrderItems.Any(o => o.CatalogueItem.CatalogueItemType.Equals(CatalogueItemType.Solution));
+        }
+
         public bool Equals(Order other)
         {
             if (ReferenceEquals(null, other))

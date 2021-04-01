@@ -479,6 +479,29 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
         [Test]
         [CommonAutoData]
+        public static void HasSolution_HasSolutionItem_ReturnsTrue(Order order)
+        {
+            order.AddOrUpdateOrderItem(OrderItemBuilder.Create()
+                .WithOrderId(42)
+                .WithCatalogueItem(new CatalogueItem { CatalogueItemType = CatalogueItemType.Solution })
+                .Build());
+
+            var actual = order.HasSolution();
+
+            actual.Should().BeTrue();
+        }
+
+        [Test]
+        [CommonAutoData]
+        public static void HasSolution_HasNoSolutionItem_ReturnsFalse(Order order)
+        {
+            var actual = order.HasSolution();
+
+            actual.Should().BeFalse();
+        }
+
+        [Test]
+        [CommonAutoData]
         public static void SetDefaultDeliveryDate_AddsNewDate(Order order)
         {
             var item = new OrderItem

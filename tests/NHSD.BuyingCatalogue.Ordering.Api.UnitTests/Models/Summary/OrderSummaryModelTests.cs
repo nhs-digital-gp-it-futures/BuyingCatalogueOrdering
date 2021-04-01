@@ -256,12 +256,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models.Summary
             order.OrderStatus = OrderStatus.Incomplete;
             order.AddOrUpdateOrderItem(new OrderItem
             {
+                OrderId = 22,
                 CatalogueItem = new CatalogueItem { CatalogueItemType = CatalogueItemType.AdditionalService },
+            });
+            order.AddOrUpdateOrderItem(new OrderItem
+            {
+                OrderId = 42,
+                CatalogueItem = new CatalogueItem { CatalogueItemType = CatalogueItemType.Solution },
             });
 
             var model = OrderSummaryModel.Create(order);
 
-            model.Sections.Should().ContainEquivalentOf(SectionModel.AdditionalServices.WithStatus(Complete).WithCount(1));
+            var expected = SectionModel.AdditionalServices.WithStatus(Complete).WithCount(1);
+            model.Sections.Should().ContainEquivalentOf(expected);
         }
 
         [Test]
