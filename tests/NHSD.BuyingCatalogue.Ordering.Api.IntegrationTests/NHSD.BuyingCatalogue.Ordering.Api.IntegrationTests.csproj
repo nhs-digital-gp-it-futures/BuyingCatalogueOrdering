@@ -48,7 +48,7 @@
     <PackageReference Include="NHSD.BuyingCatalogue.EmailClient.IntegrationTesting" Version="4.0.16" />
     <PackageReference Include="nunit" Version="3.13.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
     <PackageReference Include="SpecFlow" Version="3.7.38" />
     <PackageReference Include="SpecFlow.Assist.Dynamic" Version="1.5.0-alpha" />
     <PackageReference Include="SpecFlow.NUnit" Version="3.7.38" />
