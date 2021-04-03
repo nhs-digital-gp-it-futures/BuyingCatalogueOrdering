@@ -160,7 +160,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
             actual.Should().BeFalse();
         }
 
-
         [Test]
         public static void IsFundingSourceComplete_OrderFundingViewed_ReturnsTrue()
         {

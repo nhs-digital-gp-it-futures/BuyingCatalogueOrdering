@@ -267,8 +267,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models.Summary
 
             var model = OrderSummaryModel.Create(order);
 
-            var expected = SectionModel.AdditionalServices.WithStatus(Complete).WithCount(1);
-            model.Sections.Should().ContainEquivalentOf(expected);
+            model.Sections.Should().ContainEquivalentOf(SectionModel.AdditionalServices.WithStatus(Complete).WithCount(1));
         }
 
         [Test]
