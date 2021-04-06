@@ -168,7 +168,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             int associatedServicesCount = OrderItems.Count(o => o.CatalogueItem.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
 
             var solutionAndAssociatedServices = catalogueSolutionsCount > 0
-                && associatedServicesCount > 0;
+                || associatedServicesCount > 0;
 
             var solutionAndNoAssociatedServices = catalogueSolutionsCount > 0
                 && associatedServicesCount == 0
