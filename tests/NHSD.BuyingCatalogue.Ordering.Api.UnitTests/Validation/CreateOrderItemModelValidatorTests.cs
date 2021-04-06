@@ -421,9 +421,28 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [CommonInlineAutoData(nameof(CatalogueItemType.AdditionalService))]
+        [AutoData]
+        public static void Validate_DeliveryDateIsValid_IsAdditionalService_DoesNotHaveError(
+            DateTime deliveryDate,
+            CreateOrderItemModel model,
+            CreateOrderItemModelValidator validator)
+        {
+            var recipient = new OrderItemRecipientModel { DeliveryDate = deliveryDate };
+            model.CatalogueItemType = nameof(CatalogueItemType.AdditionalService);
+            model.ServiceRecipients = new List<OrderItemRecipientModel> { recipient };
+
+            var expectedPropertyName =
+                $"{nameof(CreateOrderItemModel.ServiceRecipients)}[0].{nameof(OrderItemRecipientModel.DeliveryDate)}";
+
+            var result = validator.Validate(model);
+            var failure = result.Errors.FirstOrDefault(e => e.PropertyName == expectedPropertyName);
+
+            failure.Should().BeNull();
+        }
+
+        [Test]
         [CommonInlineAutoData(nameof(CatalogueItemType.AssociatedService))]
-        public static void Validate_DeliveryDateIsNull_IsNotSolution_DoesNotHaveError(
+        public static void Validate_DeliveryDateIsNull_IsAssociatedService_DoesNotHaveError(
             string catalogueItemType,
             CreateOrderItemModel model,
             CreateOrderItemModelValidator validator)

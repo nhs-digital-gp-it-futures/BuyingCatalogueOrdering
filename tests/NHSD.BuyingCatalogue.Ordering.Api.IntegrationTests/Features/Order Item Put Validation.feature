@@ -164,6 +164,9 @@ Scenario: create additional service order item with a missing or invalid recipie
         | ODS1                   | Recipient 1              | NULL       | 15/03/2021   | QuantityRequired                  | Quantity     |
         | ODS1                   | Recipient 1              | 0          | 15/03/2021   | QuantityGreaterThanZero           | Quantity     |
         | ODS1                   | Recipient 1              | 2147483647 | 15/03/2021   | QuantityLessThanMax               | Quantity     |
+        | ODS1                   | Recipient 1              | 1          | NULL         | DeliveryDateRequired              | DeliveryDate |
+        | ODS1                   | Recipient 1              | 1          | 31/12/2020   | DeliveryDateOutsideDeliveryWindow | DeliveryDate |
+        | ODS1                   | Recipient 1              | 1          | 01/01/2026   | DeliveryDateOutsideDeliveryWindow | DeliveryDate |
 
 @6306
 Scenario: create associated service order item with a missing or invalid field
