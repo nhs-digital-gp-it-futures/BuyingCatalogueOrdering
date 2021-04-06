@@ -482,7 +482,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         public static void HasSolution_HasSolutionItem_ReturnsTrue(Order order)
         {
             order.AddOrUpdateOrderItem(OrderItemBuilder.Create()
-                .WithOrderId(42)
                 .WithCatalogueItem(new CatalogueItem { CatalogueItemType = CatalogueItemType.Solution })
                 .Build());
 
