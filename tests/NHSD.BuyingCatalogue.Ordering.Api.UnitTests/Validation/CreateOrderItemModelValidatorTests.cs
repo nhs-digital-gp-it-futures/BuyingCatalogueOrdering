@@ -381,13 +381,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [AutoData]
-        public static void Validate_DeliveryDateIsNull_IsSolution_HasError(
+        [CommonInlineAutoData(nameof(CatalogueItemType.Solution))]
+        [CommonInlineAutoData(nameof(CatalogueItemType.AdditionalService))]
+        public static void Validate_DeliveryDateIsNull_IsSolutionOrAdditionalService_HasError(
+            string catalogueItemType,
             CreateOrderItemModel model,
             CreateOrderItemModelValidator validator)
         {
             var recipient = new OrderItemRecipientModel();
-            model.CatalogueItemType = nameof(CatalogueItemType.Solution);
+            model.CatalogueItemType = catalogueItemType;
             model.ServiceRecipients = new List<OrderItemRecipientModel> { recipient };
 
             var expectedPropertyName =
@@ -401,14 +403,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [AutoData]
-        public static void Validate_DeliveryDateIsValid_IsSolution_DoesNotHaveError(
+        [CommonInlineAutoData(nameof(CatalogueItemType.Solution))]
+        [CommonInlineAutoData(nameof(CatalogueItemType.AdditionalService))]
+        public static void Validate_DeliveryDateIsValid_IsSolutionOrAdditionalService_DoesNotHaveError(            
+            string catalogueItemType,
             DateTime deliveryDate,
             CreateOrderItemModel model,
             CreateOrderItemModelValidator validator)
         {
             var recipient = new OrderItemRecipientModel { DeliveryDate = deliveryDate };
-            model.CatalogueItemType = nameof(CatalogueItemType.Solution);
+            model.CatalogueItemType = catalogueItemType;
             model.ServiceRecipients = new List<OrderItemRecipientModel> { recipient };
 
             var expectedPropertyName =
@@ -418,46 +422,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             var failure = result.Errors.FirstOrDefault(e => e.PropertyName == expectedPropertyName);
 
             failure.Should().BeNull();
-        }
-
-        [Test]
-        [AutoData]
-        public static void Validate_DeliveryDateIsValid_IsAdditionalService_DoesNotHaveError(
-            DateTime deliveryDate,
-            CreateOrderItemModel model,
-            CreateOrderItemModelValidator validator)
-        {
-            var recipient = new OrderItemRecipientModel { DeliveryDate = deliveryDate };
-            model.CatalogueItemType = nameof(CatalogueItemType.AdditionalService);
-            model.ServiceRecipients = new List<OrderItemRecipientModel> { recipient };
-
-            var expectedPropertyName =
-                $"{nameof(CreateOrderItemModel.ServiceRecipients)}[0].{nameof(OrderItemRecipientModel.DeliveryDate)}";
-
-            var result = validator.Validate(model);
-            var failure = result.Errors.FirstOrDefault(e => e.PropertyName == expectedPropertyName);
-
-            failure.Should().BeNull();
-        }
-
-        [Test]
-        [AutoData]
-        public static void Validate_DeliveryDateIsNull_IsAdditionalService_HasError(
-            CreateOrderItemModel model,
-            CreateOrderItemModelValidator validator)
-        {
-            var recipient = new OrderItemRecipientModel();
-            model.CatalogueItemType = nameof(CatalogueItemType.AdditionalService);
-            model.ServiceRecipients = new List<OrderItemRecipientModel> { recipient };
-
-            var expectedPropertyName =
-                $"{nameof(CreateOrderItemModel.ServiceRecipients)}[0].{nameof(OrderItemRecipientModel.DeliveryDate)}";
-
-            var result = validator.Validate(model);
-            var failure = result.Errors.FirstOrDefault(e => e.PropertyName == expectedPropertyName);
-
-            Assert.NotNull(failure);
-            failure.ErrorMessage.Should().Be($"{nameof(OrderItemRecipientModel.DeliveryDate)}Required");
         }
 
         [Test]
