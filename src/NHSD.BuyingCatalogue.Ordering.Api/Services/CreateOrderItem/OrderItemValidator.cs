@@ -49,7 +49,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 
         private IReadOnlyList<ErrorDetails> ValidateDeliveryDate(DateTime? deliveryDate, DateTime commencementDate, CatalogueItemType itemType)
         {
-            if (!itemType.Equals(CatalogueItemType.Solution))
+            if (itemType.Equals(CatalogueItemType.AssociatedService))
                 return NoErrors();
 
             if (deliveryDate is null)
