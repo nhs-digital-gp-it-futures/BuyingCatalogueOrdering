@@ -250,13 +250,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models.Summary
 
         [Test]
         [CommonAutoData]
-        public static void Create_SetsExpectedAdditionalServicesSectionStatus(Order order)
+        public static void Create_SetsExpectedAdditionalServicesSectionStatus(
+            Order order,
+            CatalogueItemId catalogueItemId01,
+            CatalogueItemId catalogueItemId02)
         {
             order.Progress.AdditionalServicesViewed = true;
             order.OrderStatus = OrderStatus.Incomplete;
             order.AddOrUpdateOrderItem(new OrderItem
             {
-                CatalogueItem = new CatalogueItem { CatalogueItemType = CatalogueItemType.AdditionalService },
+                CatalogueItem = new CatalogueItem { Id = catalogueItemId01, CatalogueItemType = CatalogueItemType.AdditionalService },
+            });
+            order.AddOrUpdateOrderItem(new OrderItem
+            {
+                CatalogueItem = new CatalogueItem { Id = catalogueItemId02, CatalogueItemType = CatalogueItemType.Solution },
             });
 
             var model = OrderSummaryModel.Create(order);

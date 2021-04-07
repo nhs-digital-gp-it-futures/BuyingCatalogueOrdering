@@ -38,7 +38,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Validation
                         RuleForEach(m => m.ServiceRecipients).SetValidator(new OrderItemRecipientModelValidator());
                         RuleForEach(m => m.ServiceRecipients)
                             .ChildRules(v => v.RuleFor(r => r.DeliveryDate).Required())
-                            .When(IsSolution);
+                            .Unless(IsAssociatedService);
 
                         RuleFor(m => m.ServiceRecipients)
                             .Must(NotContainDuplicates)

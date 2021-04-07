@@ -381,13 +381,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [AutoData]
-        public static void Validate_DeliveryDateIsNull_IsSolution_HasError(
+        [CommonInlineAutoData(nameof(CatalogueItemType.Solution))]
+        [CommonInlineAutoData(nameof(CatalogueItemType.AdditionalService))]
+        public static void Validate_DeliveryDateIsNull_IsSolutionOrAdditionalService_HasError(
+            string catalogueItemType,
             CreateOrderItemModel model,
             CreateOrderItemModelValidator validator)
         {
             var recipient = new OrderItemRecipientModel();
-            model.CatalogueItemType = nameof(CatalogueItemType.Solution);
+            model.CatalogueItemType = catalogueItemType;
             model.ServiceRecipients = new List<OrderItemRecipientModel> { recipient };
 
             var expectedPropertyName =
@@ -401,14 +403,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [AutoData]
-        public static void Validate_DeliveryDateIsValid_IsSolution_DoesNotHaveError(
+        [CommonInlineAutoData(nameof(CatalogueItemType.Solution))]
+        [CommonInlineAutoData(nameof(CatalogueItemType.AdditionalService))]
+        public static void Validate_DeliveryDateIsValid_IsSolutionOrAdditionalService_DoesNotHaveError(            
+            string catalogueItemType,
             DateTime deliveryDate,
             CreateOrderItemModel model,
             CreateOrderItemModelValidator validator)
         {
             var recipient = new OrderItemRecipientModel { DeliveryDate = deliveryDate };
-            model.CatalogueItemType = nameof(CatalogueItemType.Solution);
+            model.CatalogueItemType = catalogueItemType;
             model.ServiceRecipients = new List<OrderItemRecipientModel> { recipient };
 
             var expectedPropertyName =
@@ -421,15 +425,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         }
 
         [Test]
-        [CommonInlineAutoData(nameof(CatalogueItemType.AdditionalService))]
-        [CommonInlineAutoData(nameof(CatalogueItemType.AssociatedService))]
-        public static void Validate_DeliveryDateIsNull_IsNotSolution_DoesNotHaveError(
-            string catalogueItemType,
+        [AutoData]
+        public static void Validate_DeliveryDateIsNull_IsAssociatedService_DoesNotHaveError(
+            DateTime deliveryDate,
             CreateOrderItemModel model,
             CreateOrderItemModelValidator validator)
         {
-            var recipient = new OrderItemRecipientModel();
-            model.CatalogueItemType = catalogueItemType;
+            var recipient = new OrderItemRecipientModel() { DeliveryDate = deliveryDate };
+            model.CatalogueItemType = nameof(CatalogueItemType.AssociatedService);
             model.ServiceRecipients = new List<OrderItemRecipientModel> { recipient };
 
             var expectedPropertyName =

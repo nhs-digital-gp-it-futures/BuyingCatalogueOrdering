@@ -128,8 +128,35 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         [TestCase(true)]
         public static void IsAssociatedServicesSectionComplete_ToggleViewed_ReturnsExpectedValue(bool viewed)
         {
-            var order = OrderBuilder.Create().WithAdditionalServicesViewed(viewed).Build();
+            var order = OrderBuilder.Create().WithAssociatedServicesViewed(viewed).Build();
             var actual = order.IsAssociatedServicesSectionComplete();
+            actual.Should().Be(viewed);
+        }
+
+        [Test]
+        public static void IsAdditionalServicesSectionComplete_NullOrder_ReturnsFalse()
+        {
+            var actual = OrderExtensions.IsAdditionalServicesSectionComplete(null);
+            actual.Should().BeFalse();
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public static void IsAdditionalServicesSectionComplete_OrderHasSolution_ToggleViewed_ReturnsExpectedValue(bool viewed)
+        {
+            var order = OrderBuilder.Create()
+                .WithCatalogueSolution()
+                .WithAdditionalServicesViewed(viewed).Build();
+            var actual = order.IsAdditionalServicesSectionComplete();
+            actual.Should().Be(viewed);
+        }
+
+        [TestCase(false)]
+        [TestCase(true)]
+        public static void IsAdditionalServicesSectionComplete_OrderHasNoSolution_ToggleViewed_ReturnsFalse(bool viewed)
+        {
+            var order = OrderBuilder.Create().WithAdditionalServicesViewed(viewed).Build();
+            var actual = order.IsAdditionalServicesSectionComplete();
             actual.Should().BeFalse();
         }
 
