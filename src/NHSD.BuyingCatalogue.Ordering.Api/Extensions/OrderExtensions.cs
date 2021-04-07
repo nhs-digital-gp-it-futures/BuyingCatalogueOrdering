@@ -31,7 +31,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 
         public static bool IsAdditionalServicesSectionComplete(this Order order)
         {
-            return order is not null && order.Progress.AdditionalServicesViewed;
+            return order is not null && order.HasSolution() && order.Progress.AdditionalServicesViewed;
         }
 
         public static bool IsFundingSourceComplete(this Order order)

@@ -13,7 +13,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Persistence.Data
             builder.Property(u => u.Name).HasMaxLength(20);
             builder.Property(u => u.Description)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(40);
         }
     }
 }
