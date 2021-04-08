@@ -181,7 +181,7 @@ Scenario: the order section status is set for an imcomplete order with one solut
         | 10001   | 1000-001        | ODS1    |
     When the user makes a request to retrieve the order summary with the ID 10001
     Then a response with status code 200 is returned
-    And the order Section Status is complete
+    And the order Section Status is incomplete
 
 @5291
 Scenario: the order section status is set for an incomplete order with one solution and one additional service
@@ -201,7 +201,7 @@ Scenario: the order section status is set for an incomplete order with one solut
         | 10001   | 1000-001-A01    | ODS2    |
     When the user makes a request to retrieve the order summary with the ID 10001
     Then a response with status code 200 is returned
-    And the order Section Status is complete
+    And the order Section Status is incomplete
 
 @5291
 Scenario: the order section status is set for an incomplete order with one associated service only
