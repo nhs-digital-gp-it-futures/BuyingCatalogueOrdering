@@ -43,6 +43,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
             actual.Should().Be(orderItemCost);
         }
 
+        public void AssertOrderItemRecipientCost(string odsCode, decimal orderItemCost)
+        {
+            var item = ReadOrderItems(ContentAsJson).First(i => i.CatalogueItemName is not null);
+            ExpectedServiceRecipient serviceRecipient = item.ServiceRecipients.First(i => i.OdsCode == odsCode);
+
+            serviceRecipient.CostPerYear.Should().Be(orderItemCost);
+        }
+
         public void AssertRecurringCost(string item, decimal recurringCost)
         {
             var responseContent = ContentAsJson;
@@ -264,10 +272,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
             });
         }
 
-        private static IEnumerable<object> ReadRecipients(JToken responseContent)
+        private static IEnumerable<ExpectedServiceRecipient> ReadRecipients(JToken responseContent)
         {
             return responseContent.SelectToken("serviceRecipients")?
-                .Select(serviceRecipient => new
+                .Select(serviceRecipient => new ExpectedServiceRecipient
                 {
                     ItemId = serviceRecipient.Value<string>("itemId"),
                     ServiceInstanceId = serviceRecipient.Value<string>("serviceInstanceId"),
@@ -275,6 +283,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                     Name = serviceRecipient.Value<string>("name"),
                     OdsCode = serviceRecipient.Value<string>("odsCode"),
                     Quantity = serviceRecipient.Value<int>("quantity"),
+                    CostPerYear = serviceRecipient.Value<int>("costPerYear"),
                 });
         }
 
@@ -297,11 +306,28 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 
             public string TimeUnitDescription { get; init; }
 
-            public IEnumerable<object> ServiceRecipients { get; init; }
+            public IEnumerable<ExpectedServiceRecipient> ServiceRecipients { get; init; }
 
             public string QuantityPeriodDescription { get; init; }
 
             public decimal CostPerYear { get; init; }
+        }
+
+        private sealed class ExpectedServiceRecipient
+        {
+            public string ItemId { get; init; }
+
+            public string ServiceInstanceId { get; init; }
+
+            public DateTime? DeliveryDate { get; init; }
+
+            public string Name { get; init; }
+
+            public string OdsCode { get; init; }
+
+            public int? Quantity { get; init; }
+
+            public decimal? CostPerYear { get; init; }
         }
     }
 }
