@@ -12,5 +12,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
         public string OdsCode { get; init; }
 
         public int? Quantity { get; init; }
+
+        public decimal? CostPerYear { get; init; }
     }
 }

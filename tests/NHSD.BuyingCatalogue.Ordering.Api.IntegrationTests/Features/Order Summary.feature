@@ -132,7 +132,7 @@ Scenario: get the order summary after a section has been viewed
     Examples: Sections
         | service-recipients-viewed | additional-services-viewed | catalogue-solutions-viewed | associated-services-viewed | funding-source-only-gms | service-recipients-status | additional-services-status | catalogue-solutions-status | associated-services-status | funding-source-status |
         | True                      | False                      | False                      | False                      | NULL                    | complete                  | incomplete                 | incomplete                 | incomplete                 | incomplete            |
-        | False                     | True                       | False                      | False                      | NULL                    | incomplete                | complete                   | incomplete                 | incomplete                 | incomplete            |
+        | False                     | True                       | False                      | False                      | NULL                    | incomplete                | incomplete                 | incomplete                 | incomplete                 | incomplete            |
         | False                     | False                      | True                       | False                      | NULL                    | incomplete                | incomplete                 | complete                   | incomplete                 | incomplete            |
         | False                     | False                      | False                      | True                       | False                   | incomplete                | incomplete                 | incomplete                 | complete                   | complete              |
         | False                     | False                      | False                      | False                      | True                    | incomplete                | incomplete                 | incomplete                 | incomplete                 | complete              |
@@ -245,10 +245,12 @@ Scenario: get the order summary that includes a list of additional services
         | Id        | Name              | CatalogueItemType |
         | 10003-001 | Additional Item 1 | AdditionalService |
         | 10003-002 | Additional Item 2 | AdditionalService |
+        | 10003-003 | Order Item 2      | Solution          |
     And order items exist
         | OrderId | CatalogueItemId |
         | 10003   | 10003-001       |
         | 10003   | 10003-002       |
+        | 10003   | 10003-003       |
     When the user makes a request to retrieve the order summary with the ID 10003
     Then a response with status code 200 is returned
     And the order summary is returned with the following values
@@ -262,7 +264,7 @@ Scenario: get the order summary that includes a list of additional services
         | commencement-date   | incomplete |       |
         | associated-services | incomplete | 0     |
         | service-recipients  | incomplete | 1     |
-        | catalogue-solutions | incomplete | 0     |
+        | catalogue-solutions | incomplete | 1     |
         | additional-services | complete   | 2     |
         | funding-source      | incomplete |       |
 

@@ -109,6 +109,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             return this;
         }
 
+        public OrderBuilder WithCatalogueSolution()
+        {
+            orderItems.Add(OrderItemBuilder.Create()
+                .WithCatalogueItem(new CatalogueItem { CatalogueItemType = CatalogueItemType.Solution })
+                .Build());
+            return this;
+        }
+
         public Order Build()
         {
             var order = new Order
