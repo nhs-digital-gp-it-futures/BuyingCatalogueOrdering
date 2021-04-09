@@ -85,6 +85,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             getOrderResponse.AssertOrderItemCost(amount);
         }
 
+        [Then(@"the get order response contains a recipient with (.*) for catalogue item ID (.*) and a yearly value of (.*)")]
+        public void ThenTheGetOrderResponseContainsRecipientWithAYearlyValueOf(string odsCode, string catalogueItemId, decimal amount)
+        {
+            getOrderResponse.AssertOrderItemRecipientCost(odsCode, catalogueItemId, amount);
+        }
+
         [Then(@"the get order response contains a (.*) of (.*) for the order")]
         public void ThenTheGetOrderResponseContainsARecurringCostForTheOrder(string item, decimal amount)
         {
