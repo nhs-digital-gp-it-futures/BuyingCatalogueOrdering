@@ -28,8 +28,8 @@ Scenario: get a default delivery date that does not exist
     When the user gets the default delivery date for the catalogue item with the following details
         | OrderId | CatalogueItemId |
         | 10001   | 10001-001       |
-    Then a response with status code 404 is returned
-
+    Then the default delivery date does not exists
+    
 @8952
 Scenario: if a user is not authorized then they cannot get a default delivery date
     Given no user is logged in

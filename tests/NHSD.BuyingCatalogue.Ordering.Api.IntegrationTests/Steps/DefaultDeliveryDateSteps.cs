@@ -85,6 +85,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             actualDate.Should().Be(expectedDeliveryDate);
         }
 
+        [Then(@"the default delivery date does not exists")]
+        public async Task ThenTheDefaultDeliveryDateReturnedIs()
+        {
+            var result = await response.ReadBodyAsJsonAsync();
+            var actualDate = result.Value<DateTime?>("deliveryDate");
+
+            actualDate.Should().BeNull();
+        }
+
         [Then(@"the following default delivery dates remain unchanged")]
         public async Task ThenTheFollowingDefaultDeliveryDatesRemainUnchanged(Table table)
         {
