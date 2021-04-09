@@ -37,15 +37,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
 
         public void AssertOrderItemCost(decimal orderItemCost)
         {
-            var item = ReadOrderItems(ContentAsJson).First(i => i.CatalogueItemName is not null);
-            decimal actual = item.CostPerYear;
+            decimal actual = ReadOrderItems(ContentAsJson).Sum(c => c.CostPerYear);
 
             actual.Should().Be(orderItemCost);
         }
 
-        public void AssertOrderItemRecipientCost(string odsCode, decimal orderItemCost)
+        public void AssertOrderItemRecipientCost(string odsCode, string catalogueItemId, decimal orderItemCost)
         {
-            var item = ReadOrderItems(ContentAsJson).First(i => i.CatalogueItemName is not null);
+            var item = ReadOrderItems(ContentAsJson).First(i => i.CatalogueItemId == catalogueItemId);
             ExpectedServiceRecipient serviceRecipient = item.ServiceRecipients.First(i => i.OdsCode == odsCode);
 
             serviceRecipient.CostPerYear.Should().Be(orderItemCost);
