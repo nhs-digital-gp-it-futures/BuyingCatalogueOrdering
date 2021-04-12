@@ -66,7 +66,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
         {
             return OrderItemRecipients.Sum(r => r.CalculateTotalCostPerYear(
                 Price.GetValueOrDefault(),
-                PriceTimeUnit ?? EstimationPeriod));
+                EstimationPeriod ?? PriceTimeUnit));
         }
 
         public bool Equals(OrderItem other)

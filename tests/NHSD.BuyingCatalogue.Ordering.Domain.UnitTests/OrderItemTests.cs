@@ -116,13 +116,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public static void CalculateTotalCostPerYear_WithPriceTypePerYear_CalculatesCostCorrectly()
+        public static void CalculateCost_WithEstimationTypePerMonth_CalculatesCostCorrectly()
         {
             var orderItem = OrderItemBuilder
                 .Create()
                 .WithPrice(1m)
                 .WithRecipient(new OrderItemRecipient { Quantity = 10 })
-                .WithPriceTimeUnit(TimeUnit.PerYear)
+                .WithEstimationPeriod(TimeUnit.PerMonth)
+                .Build();
+
+            orderItem.CalculateTotalCostPerYear().Should().Be(120);
+        }
+
+        [Test]
+        public static void CalculateTotalCostPerYear_WithEstimationPeriodTypePerYear_CalculatesCostCorrectly()
+        {
+            var orderItem = OrderItemBuilder
+                .Create()
+                .WithPrice(1m)
+                .WithRecipient(new OrderItemRecipient { Quantity = 10 })
+                .WithEstimationPeriod(TimeUnit.PerYear)
                 .Build();
 
             orderItem.CalculateTotalCostPerYear().Should().Be(10);

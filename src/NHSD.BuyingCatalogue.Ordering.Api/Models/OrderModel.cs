@@ -73,7 +73,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
                         Name = recipient.Recipient.Name,
                         OdsCode = odsCode,
                         Quantity = recipient.Quantity,
-                        CostPerYear = recipient.CalculateTotalCostPerYear(orderItem.Price ?? 0, orderItem.PriceTimeUnit),
+                        CostPerYear = recipient.CalculateTotalCostPerYear(orderItem.Price ?? 0, orderItem.EstimationPeriod),
 
                         // TODO: consider refactor
                         ServiceInstanceId = order.ServiceInstanceItems.FirstOrDefault(ServiceInstancePredicate)?.ServiceInstanceId,

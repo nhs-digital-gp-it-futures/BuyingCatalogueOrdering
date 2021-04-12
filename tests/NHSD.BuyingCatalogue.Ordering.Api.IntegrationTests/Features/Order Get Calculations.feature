@@ -74,8 +74,8 @@ Scenario: verify the price calculations for an order with multiple order items
         | CatalogueItemType | ProvisioningType | TimeUnit | Price | Quantity | EstimationPeriod | RecurringPerMonthValue | RecurringPerYearValue | TotalOneOffCost | TotalOwnershipCost |
         | Solution          | OnDemand         | Null     | 0     | 1        | Month            | 2600                   | 31200                 | 200             | 93800              |
         | AssociatedService | OnDemand         | Null     | 1     | 10       | Month            | 2610                   | 31320                 | 200             | 94160              |
-        | AdditionalService | Declarative      | Month    | 9000  | 1        | Year             | 11600                  | 139200                | 200             | 417800             |
-        | Solution          | Patient          | Year     | 450   | 3        | Month            | 2712.5                 | 32550                 | 200             | 97850              |
+        | AdditionalService | Declarative      | Month    | 9000  | 1        | Year             | 3350                   | 40200                 | 200             | 120800             |
+        | Solution          | Patient          | Year     | 450   | 3        | Month            | 3950                   | 47400                 | 200             | 142400             |
         | AssociatedService | Declarative      | NULL     | 125   | 100      | NULL             | 2600                   | 31200                 | 12700           | 106300             |
 
 Scenario: verify the price calculations for Catalogue Solution order recipients
@@ -86,11 +86,11 @@ Scenario: verify the price calculations for Catalogue Solution order recipients
         | 10001-003 | Sol3 | AdditionalService   |
         | 10001-004 | Sol4 | AssociatedService   |
     And order items exist
-        | OrderId | CatalogueItemId | Price   | ProvisioningType   | PriceTimeUnit |
-        | 10001   | 10001-001       | 5       | Patient            | Year          |
-        | 10001   | 10001-002       | 10      | Patient            | Year          |
-        | 10001   | 10001-003       | 50      | Declarative        | Month         |
-        | 10001   | 10001-004       | 60      | Declarative        | Year          |
+        | OrderId | CatalogueItemId | Price   | ProvisioningType   | PriceTimeUnit | EstimationPeriod   |
+        | 10001   | 10001-001       | 5       | Patient            | Month         | Year               |
+        | 10001   | 10001-002       | 10      | Patient            | Year          | Month              |
+        | 10001   | 10001-003       | 50      | Declarative        | Month         | Month              |
+        | 10001   | 10001-004       | 60      | Declarative        | Year          | Year               |
     And order item recipients exist
         | OrderId | CatalogueItemId | OdsCode   | Quantity   |
         | 10001   | 10001-001       | eu        | 10         |
@@ -102,12 +102,12 @@ Scenario: verify the price calculations for Catalogue Solution order recipients
     When the user sends the get order request
     Then a response with status code 200 is returned
     And the get order response contains a recipient with <OdsCode> for catalogue item ID <CatalogueItemId> and a yearly value of <RecipientTotal>
-    And the get order response contains a yearly value of 7550
+    And the get order response contains a yearly value of 9750
 
     Examples:
         | OrderId | CatalogueItemId | OdsCode | RecipientTotal |
         | 10001   | 10001-001       | eu      | 50             |
         | 10001   | 10001-001       | au      | 100            |
-        | 10001   | 10001-002       | eu      | 200            |
+        | 10001   | 10001-002       | eu      | 2400           |
         | 10001   | 10001-003       | eu      | 6000           |
         | 10001   | 10001-004       | au      | 1200           |

@@ -29,7 +29,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             pricingUnit = new PricingUnit { Name = "patient", Description = "per patient" };
             priceTimeUnit = TimeUnit.PerMonth;
             currencyCode = "GBP";
-            estimationPeriod = TimeUnit.PerYear;
+            estimationPeriod = TimeUnit.PerMonth;
             defaultDeliveryDate = DateTime.UtcNow;
             orderId = 1;
             price = 2.000m;
