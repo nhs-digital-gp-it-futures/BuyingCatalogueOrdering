@@ -130,12 +130,12 @@ Scenario: get the order summary after a section has been viewed
         | funding-source      | <funding-source-status>      |       |
 
     Examples: Sections
-        | service-recipients-viewed | additional-services-viewed | catalogue-solutions-viewed | associated-services-viewed | funding-source-only-gms | service-recipients-status | additional-services-status | catalogue-solutions-status | associated-services-status | funding-source-status |
-        | True                      | False                      | False                      | False                      | NULL                    | complete                  | incomplete                 | incomplete                 | incomplete                 | incomplete            |
-        | False                     | True                       | False                      | False                      | NULL                    | incomplete                | incomplete                 | incomplete                 | incomplete                 | incomplete            |
-        | False                     | False                      | True                       | False                      | NULL                    | incomplete                | incomplete                 | complete                   | incomplete                 | incomplete            |
-        | False                     | False                      | False                      | True                       | False                   | incomplete                | incomplete                 | incomplete                 | complete                   | complete              |
-        | False                     | False                      | False                      | False                      | True                    | incomplete                | incomplete                 | incomplete                 | incomplete                 | complete              |
+        | service-recipients-viewed | additional-services-viewed | catalogue-solutions-viewed | associated-services-viewed | funding-source-only-gms | service-recipients-status | additional-services-status | catalogue-solutions-status | associated-services-status | funding-source-status   |
+        | True                      | False                      | False                      | False                      | NULL                    | complete                  | incomplete                 | incomplete                 | incomplete                 | incomplete              |
+        | False                     | True                       | False                      | False                      | NULL                    | incomplete                | incomplete                 | incomplete                 | incomplete                 | incomplete              |
+        | False                     | False                      | True                       | False                      | NULL                    | incomplete                | incomplete                 | complete                   | incomplete                 | incomplete              |
+        | False                     | False                      | False                      | True                       | False                   | incomplete                | incomplete                 | incomplete                 | complete                   | incomplete              |
+        | False                     | False                      | False                      | False                      | True                    | incomplete                | incomplete                 | incomplete                 | incomplete                 | incomplete              |
 
 @4629
 Scenario: get the order summary that includes a list of service recipients
