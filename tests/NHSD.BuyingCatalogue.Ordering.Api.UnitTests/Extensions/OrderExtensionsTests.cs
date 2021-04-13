@@ -163,7 +163,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         [Test]
         public static void IsFundingSourceComplete_OrderFundingViewed_ReturnsTrue()
         {
-            var order = OrderBuilder.Create().WithFundingSourceOnlyGms(true).Build();
+            var order = OrderBuilder.Create()
+                .WithCatalogueSolution().WithFundingSourceOnlyGms(true).Build();
             var actual = order.IsFundingSourceComplete();
             actual.Should().BeTrue();
         }
