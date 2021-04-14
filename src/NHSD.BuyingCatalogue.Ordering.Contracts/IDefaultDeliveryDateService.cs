@@ -8,8 +8,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Contracts
     {
         Task<DateTime?> GetDefaultDeliveryDate(CallOffId callOffId, CatalogueItemId catalogueItemId);
 
-        Task<DeliveryDateResult> SetDefaultDeliveryDate(CallOffId callOffId, CatalogueItemId catalogueItemId, DateTime? deliveryDate);
+        Task<DeliveryDateResult> SetDefaultDeliveryDate(CallOffId callOffId, CatalogueItemId catalogueItemId, DateTime deliveryDate);
 
-        Task<Order> GetDefaultDeliveryOrder(CallOffId callOffId, CatalogueItemId catalogueItemId);
+        Task<Order> GetOrder(CallOffId callOffId, CatalogueItemId catalogueItemId);
     }
 }

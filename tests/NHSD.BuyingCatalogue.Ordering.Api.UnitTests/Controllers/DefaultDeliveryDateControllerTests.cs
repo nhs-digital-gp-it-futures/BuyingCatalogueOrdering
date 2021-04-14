@@ -70,12 +70,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             ErrorsModel errors,
             DefaultDeliveryDateController controller)
         {
-            service.Setup(o => o.GetDefaultDeliveryOrder(callOffId, catalogueItemId)).ReturnsAsync(order);
+            service.Setup(o => o.GetOrder(callOffId, catalogueItemId)).ReturnsAsync(order);
 
             validator.Setup(v => v.Validate(model, order.CommencementDate)).Returns((false, errors));
 
             var response = await controller.AddOrUpdateAsync(callOffId, catalogueItemId, model);
-            service.Verify(o => o.GetDefaultDeliveryOrder(callOffId, catalogueItemId));
+            service.Verify(o => o.GetOrder(callOffId, catalogueItemId));
 
             response.Should().BeOfType<BadRequestObjectResult>();
             response.As<BadRequestObjectResult>().Value.Should().Be(errors);
@@ -92,9 +92,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             [Frozen] Mock<IDefaultDeliveryDateValidator> validator,
             DefaultDeliveryDateController controller)
         {
-            service.Setup(o => o.GetDefaultDeliveryOrder(callOffId, catalogueItemId)).ReturnsAsync(order);
-            service.Setup(o => o.SetDefaultDeliveryDate(callOffId, catalogueItemId, defaultDeliveryDate.DeliveryDate)).Callback(() =>
+            service.Setup(o => o.GetOrder(callOffId, catalogueItemId)).ReturnsAsync(order);
+            service.Setup(o => o.SetDefaultDeliveryDate(callOffId, catalogueItemId, defaultDeliveryDate.DeliveryDate.Value)).Callback(() =>
             {
+                // ReSharper disable once PossibleInvalidOperationException (covered by model validation)
                 order.SetDefaultDeliveryDate(catalogueItemId, defaultDeliveryDate.DeliveryDate.Value);
             });
 
@@ -103,8 +104,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             order.DefaultDeliveryDates.Should().BeEmpty();
 
             await controller.AddOrUpdateAsync(callOffId, catalogueItemId, defaultDeliveryDate);
-            service.Verify(o => o.GetDefaultDeliveryOrder(callOffId, catalogueItemId));
-            service.Verify(o => o.SetDefaultDeliveryDate(callOffId, catalogueItemId, defaultDeliveryDate.DeliveryDate));
+            service.Verify(o => o.GetOrder(callOffId, catalogueItemId));
+            service.Verify(o => o.SetDefaultDeliveryDate(callOffId, catalogueItemId, defaultDeliveryDate.DeliveryDate.Value));
 
             var expectedDeliveryDate = new DefaultDeliveryDate
             {
@@ -128,17 +129,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             [Frozen] Mock<IDefaultDeliveryDateValidator> validator,
             DefaultDeliveryDateController controller)
         {
-            service.Setup(o => o.GetDefaultDeliveryOrder(callOffId, catalogueItemId)).ReturnsAsync(order);
-            service.Setup(o => o.SetDefaultDeliveryDate(callOffId, catalogueItemId, defaultDeliveryDate.DeliveryDate)).Callback(() =>
+            service.Setup(o => o.GetOrder(callOffId, catalogueItemId)).ReturnsAsync(order);
+            service.Setup(o => o.SetDefaultDeliveryDate(callOffId, catalogueItemId, defaultDeliveryDate.DeliveryDate.Value)).Callback(() =>
             {
+                // ReSharper disable once PossibleInvalidOperationException (covered by model validation)
                 order.SetDefaultDeliveryDate(catalogueItemId, defaultDeliveryDate.DeliveryDate.Value);
             });
 
             validator.Setup(v => v.Validate(defaultDeliveryDate, order.CommencementDate)).Returns((true, null));
 
             var response = await controller.AddOrUpdateAsync(callOffId, catalogueItemId, defaultDeliveryDate);
-            service.Verify(o => o.GetDefaultDeliveryOrder(callOffId, catalogueItemId));
-            service.Verify(o => o.SetDefaultDeliveryDate(callOffId, catalogueItemId, defaultDeliveryDate.DeliveryDate));
+            service.Verify(o => o.GetOrder(callOffId, catalogueItemId));
+            service.Verify(o => o.SetDefaultDeliveryDate(callOffId, catalogueItemId, defaultDeliveryDate.DeliveryDate.Value));
 
             response.Should().BeOfType<CreatedAtActionResult>();
             response.As<CreatedAtActionResult>().Should().BeEquivalentTo(new
@@ -163,21 +165,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             [Frozen] Mock<IDefaultDeliveryDateValidator> validator,
             DefaultDeliveryDateController controller)
         {
-            service.Setup(o => o.GetDefaultDeliveryOrder(callOffId, catalogueItemId)).ReturnsAsync(order);
-            service.Setup(o => o.SetDefaultDeliveryDate(callOffId, catalogueItemId, defaultDeliveryDate.DeliveryDate)).ReturnsAsync(DeliveryDateResult.Updated);
+            service.Setup(o => o.GetOrder(callOffId, catalogueItemId)).ReturnsAsync(order);
+            service.Setup(o => o.SetDefaultDeliveryDate(callOffId, catalogueItemId, defaultDeliveryDate.DeliveryDate.Value)).ReturnsAsync(DeliveryDateResult.Updated);
 
             validator.Setup(v => v.Validate(defaultDeliveryDate, order.CommencementDate)).Returns((true, null));
 
             var response = await controller.AddOrUpdateAsync(callOffId, catalogueItemId, defaultDeliveryDate);
-            service.Verify(o => o.GetDefaultDeliveryOrder(callOffId, catalogueItemId));
-            service.Verify(o => o.SetDefaultDeliveryDate(callOffId, catalogueItemId, defaultDeliveryDate.DeliveryDate));
+            service.Verify(o => o.GetOrder(callOffId, catalogueItemId));
+            service.Verify(o => o.SetDefaultDeliveryDate(callOffId, catalogueItemId, defaultDeliveryDate.DeliveryDate.Value));
 
             response.Should().BeOfType<OkResult>();
         }
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task GetAsync_ReturnsNull(
+        public static async Task GetAsync_ReturnsNotFound(
             [Frozen] Mock<IDefaultDeliveryDateService> service,
             CallOffId callOffId,
             CatalogueItemId catalogueItemId,
@@ -188,7 +190,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var response = await controller.GetAsync(callOffId, catalogueItemId);
             service.Verify(o => o.GetDefaultDeliveryDate(callOffId, catalogueItemId));
 
-            response.Result.Should().BeNull();
+            response.Result.Should().BeOfType<NotFoundResult>();
         }
 
         [Test]

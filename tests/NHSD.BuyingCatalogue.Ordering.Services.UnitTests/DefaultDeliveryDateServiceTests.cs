@@ -97,7 +97,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
             CatalogueItemId catalogueItemId,
             DefaultDeliveryDateService service)
         {
-            var result = await service.GetDefaultDeliveryOrder(callOffId, catalogueItemId);
+            var result = await service.GetOrder(callOffId, catalogueItemId);
 
             result.Should().BeNull();
         }
@@ -116,7 +116,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
             context.Add(order);
             await context.SaveChangesAsync();
 
-            var actual = await service.GetDefaultDeliveryOrder(callOffId, catalogueItemId);
+            var actual = await service.GetOrder(callOffId, catalogueItemId);
 
             actual.CallOffId.Should().Be(order.CallOffId);
             actual.DefaultDeliveryDates.Should().BeEquivalentTo(order.DefaultDeliveryDates);

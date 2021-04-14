@@ -10,7 +10,7 @@ using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Services
 {
-    public class DefaultDeliveryDateService : IDefaultDeliveryDateService
+    public sealed class DefaultDeliveryDateService : IDefaultDeliveryDateService
     {
         private readonly ApplicationDbContext context;
 
@@ -21,30 +21,29 @@ namespace NHSD.BuyingCatalogue.Ordering.Services
 
         public async Task<DateTime?> GetDefaultDeliveryDate(CallOffId callOffId, CatalogueItemId catalogueItemId)
         {
-            Expression<Func<Order, IEnumerable<DefaultDeliveryDate>>> defaultDeliveryDate = o
+            Expression<Func<Order, IEnumerable<DefaultDeliveryDate>>> defaultDeliveryDateExpression = o
                 => o.DefaultDeliveryDates.Where(d => d.CatalogueItemId == catalogueItemId);
 
             return await context.Order
                 .Where(o => o.Id == callOffId.Id)
-                .Include(defaultDeliveryDate)
-                .SelectMany(defaultDeliveryDate)
+                .Include(defaultDeliveryDateExpression)
+                .SelectMany(defaultDeliveryDateExpression)
                 .Select(d => d.DeliveryDate)
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<DeliveryDateResult> SetDefaultDeliveryDate(CallOffId callOffId, CatalogueItemId catalogueItemId, DateTime? deliveryDate)
+        public async Task<DeliveryDateResult> SetDefaultDeliveryDate(CallOffId callOffId, CatalogueItemId catalogueItemId, DateTime deliveryDate)
         {
-          var order = await GetDefaultDeliveryOrder(callOffId, catalogueItemId);
+          var order = await GetOrder(callOffId, catalogueItemId);
 
-          // ReSharper disable once PossibleInvalidOperationException (covered by model validation)
-          DeliveryDateResult addedOrUpdated = order.SetDefaultDeliveryDate(catalogueItemId, deliveryDate.Value);
+          DeliveryDateResult addedOrUpdated = order.SetDefaultDeliveryDate(catalogueItemId, deliveryDate);
 
           await context.SaveChangesAsync();
 
           return addedOrUpdated;
         }
 
-        public async Task<Order> GetDefaultDeliveryOrder(CallOffId callOffId, CatalogueItemId catalogueItemId)
+        public async Task<Order> GetOrder(CallOffId callOffId, CatalogueItemId catalogueItemId)
         {
             return await context.Order
                 .Where(o => o.Id == callOffId.Id)

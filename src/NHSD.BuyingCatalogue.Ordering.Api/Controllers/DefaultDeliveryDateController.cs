@@ -42,7 +42,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (model is null)
                 throw new ArgumentNullException(nameof(model));
 
-            Order order = await defaultDeliveryDateService.GetDefaultDeliveryOrder(callOffId, catalogueItemId);
+            Order order = await defaultDeliveryDateService.GetOrder(callOffId, catalogueItemId);
 
             if (order is null)
                 return NotFound();
@@ -52,7 +52,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (!isValid)
                 return BadRequest(errors);
 
-            DeliveryDateResult addedOrUpdated = await defaultDeliveryDateService.SetDefaultDeliveryDate(callOffId, catalogueItemId, model.DeliveryDate);
+            // ReSharper disable once PossibleInvalidOperationException (covered by model validation)
+            DeliveryDateResult addedOrUpdated = await defaultDeliveryDateService.SetDefaultDeliveryDate(callOffId, catalogueItemId, model.DeliveryDate.Value);
 
             return addedOrUpdated == DeliveryDateResult.Added
                 ? CreatedAtAction(nameof(GetAsync).TrimAsync(), new { callOffId = callOffId.ToString(), catalogueItemId = catalogueItemId.ToString() }, null)
@@ -64,6 +65,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         public async Task<ActionResult<DefaultDeliveryDateModel>> GetAsync(CallOffId callOffId, CatalogueItemId catalogueItemId)
         {
             var deliveryDate = await defaultDeliveryDateService.GetDefaultDeliveryDate(callOffId, catalogueItemId);
+
+            if (deliveryDate is null)
+                return NotFound();
 
             return new DefaultDeliveryDateModel { DeliveryDate = deliveryDate };
         }
