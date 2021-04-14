@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
+using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NHSD.BuyingCatalogue.Ordering.Domain;
-using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -20,26 +18,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [AuthorizeOrganisation]
     public sealed class OrderDescriptionController : Controller
     {
-        private readonly ApplicationDbContext context;
+        private readonly IOrderDescriptionService orderDescriptionService;
 
-        public OrderDescriptionController(ApplicationDbContext context)
+        public OrderDescriptionController(IOrderDescriptionService orderDescriptionService)
         {
-            this.context = context ?? throw new ArgumentNullException(nameof(context));
+            this.orderDescriptionService = orderDescriptionService ?? throw new ArgumentNullException(nameof(orderDescriptionService));
         }
 
         [HttpGet]
         public async Task<ActionResult<OrderDescriptionModel>> GetAsync(CallOffId callOffId)
         {
-            var model = await context.Order
-                .Where(o => o.Id == callOffId.Id)
-                .Select(o => new OrderDescriptionModel { Description = o.Description })
-                .AsNoTracking()
-                .SingleOrDefaultAsync();
+            string description = await orderDescriptionService.GetOrderDescription(callOffId);
 
-            if (model is null)
-                return NotFound();
-
-            return model;
+            return new OrderDescriptionModel { Description = description };
         }
 
         [HttpPut]
@@ -52,9 +43,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (order is null)
                 return NotFound();
 
-            order.Description = model.Description;
-
-            await context.SaveChangesAsync();
+            await orderDescriptionService.SetOrderDescription(order, model.Description);
 
             return NoContent();
         }
