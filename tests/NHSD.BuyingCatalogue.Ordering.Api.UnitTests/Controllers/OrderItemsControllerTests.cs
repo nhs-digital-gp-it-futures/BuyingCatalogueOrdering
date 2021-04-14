@@ -367,6 +367,28 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [Test]
         [InMemoryDbAutoData]
+        public static async Task DeleteOrderItemAsync_OrderItemExistsInOrder_UpdatesProgress(
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            List<OrderItem> orderItems,
+            OrderItemsController controller)
+        {
+            var itemsToAdd = orderItems.Take(2).ToList();
+            itemsToAdd[1].CatalogueItem.ParentCatalogueItemId = itemsToAdd[0].CatalogueItem.Id;
+            itemsToAdd.ForEach(o => order.AddOrUpdateOrderItem(o));
+            order.Progress.AdditionalServicesViewed = true;
+            await context.Order.AddAsync(order);
+            await context.SaveChangesAsync();
+
+            await controller.DeleteOrderItemAsync(callOffId, itemsToAdd[0].CatalogueItem.Id);
+
+            var finalOrder = await context.Order.FindAsync(order.Id);
+            finalOrder.Progress.AdditionalServicesViewed.Should().BeFalse();
+        }
+
+        [Test]
+        [InMemoryDbAutoData]
         public static async Task DeleteOrderItemAsync_OrderItemExistsInOrder_ReturnsNoContentResult(
             [Frozen] ApplicationDbContext context,
             [Frozen] CallOffId callOffId,
