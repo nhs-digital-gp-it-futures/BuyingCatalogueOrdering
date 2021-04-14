@@ -100,7 +100,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 .AddScoped<IAsyncAuthorizationFilter, OrderLookupOrganisationAuthorizationFilter>()
                 .AddScoped<IOrderService, OrderService>()
                 .AddScoped<IFundingSourceService, FundingSourceService>()
-                .AddScoped<IDefaultDeliveryDateService, DefaultDeliveryDateService>();
+                .AddScoped<IDefaultDeliveryDateService, DefaultDeliveryDateService>()
+                .AddScoped<IOrderDescriptionService, OrderDescriptionService>();
 
             services
                 .AddSingleton(smtpSettings)
