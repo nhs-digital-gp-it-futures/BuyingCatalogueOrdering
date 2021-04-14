@@ -206,9 +206,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 || o.CatalogueItem.ParentCatalogueItemId == catalogueItemId);
         }
 
-        public bool HasAdditionalService()
+        public bool HasAssociatedService()
         {
-            return OrderItems.Any(o => o.CatalogueItem.CatalogueItemType.Equals(CatalogueItemType.AdditionalService));
+            return OrderItems.Any(o => o.CatalogueItem.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
         }
 
         public bool HasSolution()

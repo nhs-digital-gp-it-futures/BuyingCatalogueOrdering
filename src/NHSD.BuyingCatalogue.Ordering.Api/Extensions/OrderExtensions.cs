@@ -36,7 +36,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 
         public static bool IsFundingSourceComplete(this Order order)
         {
-            return order?.FundingSourceOnlyGms is not null && (order.HasSolution() || order.HasAdditionalService());
+            return order?.FundingSourceOnlyGms is not null && (order.HasSolution() || order.HasAssociatedService());
         }
 
         public static bool IsAssociatedServicesSectionComplete(this Order order)

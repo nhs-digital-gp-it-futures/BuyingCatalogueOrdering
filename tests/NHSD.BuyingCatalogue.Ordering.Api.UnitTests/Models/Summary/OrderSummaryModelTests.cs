@@ -314,14 +314,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models.Summary
 
         [Test]
         [CommonAutoData]
-        public static void Create_HasAdditionalServiceOnOrder_SetsFundingSourceSectionStatusToComplete(Order order)
+        public static void Create_HasAssociatedServiceOnOrder_SetsFundingSourceSectionStatusToComplete(Order order)
         {
             order.FundingSourceOnlyGms = true;
             order.OrderStatus = OrderStatus.Incomplete;
             order.AddOrUpdateOrderItem(
                 new OrderItem
                 {
-                    CatalogueItem = new CatalogueItem { CatalogueItemType = CatalogueItemType.AdditionalService },
+                    CatalogueItem = new CatalogueItem { CatalogueItemType = CatalogueItemType.AssociatedService },
                 });
 
             var model = OrderSummaryModel.Create(order);

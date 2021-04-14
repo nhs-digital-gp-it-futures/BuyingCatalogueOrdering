@@ -161,12 +161,41 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public static void IsFundingSourceComplete_OrderFundingViewed_ReturnsTrue()
+        public static void IsFundingSourceComplete_OrderFundingViewed_WithCatalogueSolution_ReturnsTrue()
         {
             var order = OrderBuilder.Create()
                 .WithCatalogueSolution().WithFundingSourceOnlyGms(true).Build();
             var actual = order.IsFundingSourceComplete();
             actual.Should().BeTrue();
+        }
+
+        [Test]
+        public static void IsFundingSourceComplete_OrderFundingViewed_WithAssociatedService_ReturnsTrue()
+        {
+            var order = OrderBuilder.Create()
+                .WithOrderItem(OrderItemBuilder.Create().WithCatalogueItem(new CatalogueItem
+                {
+                    CatalogueItemType = CatalogueItemType.AssociatedService,
+                }).Build()).WithFundingSourceOnlyGms(true).Build();
+            var actual = order.IsFundingSourceComplete();
+            actual.Should().BeTrue();
+        }
+
+        [Test]
+        public static void IsFundingSourceComplete_OrderFundingViewed_WithNoItem_ReturnsFalse()
+        {
+            var order = OrderBuilder.Create().WithFundingSourceOnlyGms(true).Build();
+            var actual = order.IsFundingSourceComplete();
+            actual.Should().BeFalse();
+        }
+
+        [Test]
+        public static void IsFundingSourceComplete_FundingSourceOnlyGmsIsNull_ReturnsFalse()
+        {
+            var order = OrderBuilder.Create()
+                .WithCatalogueSolution().WithFundingSourceOnlyGms(null).Build();
+            var actual = order.IsFundingSourceComplete();
+            actual.Should().BeFalse();
         }
 
         [Test]
