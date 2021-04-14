@@ -200,10 +200,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             return Result.Success();
         }
 
-        public int DeleteOrderItem(CatalogueItemId catalogueItemId)
+        public int DeleteOrderItemAndUpdateProgress(CatalogueItemId catalogueItemId)
         {
-            return orderItems.RemoveAll(o => o.CatalogueItem.Id == catalogueItemId
+            var result = orderItems.RemoveAll(o => o.CatalogueItem.Id == catalogueItemId
                 || o.CatalogueItem.ParentCatalogueItemId == catalogueItemId);
+
+            if (!HasSolution())
+            {
+                Progress.AdditionalServicesViewed = false;
+            }
+
+            return result;
         }
 
         public bool HasSolution()
