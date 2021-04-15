@@ -21,13 +21,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Services
 
         public async Task<DateTime?> GetDefaultDeliveryDate(CallOffId callOffId, CatalogueItemId catalogueItemId)
         {
-            Expression<Func<Order, IEnumerable<DefaultDeliveryDate>>> defaultDeliveryDateExpression = o
+            Expression<Func<Order, IEnumerable<DefaultDeliveryDate>>> defaultDeliveryDate = o
                 => o.DefaultDeliveryDates.Where(d => d.CatalogueItemId == catalogueItemId);
 
             return await context.Order
                 .Where(o => o.Id == callOffId.Id)
-                .Include(defaultDeliveryDateExpression)
-                .SelectMany(defaultDeliveryDateExpression)
+                .Include(defaultDeliveryDate)
+                .SelectMany(defaultDeliveryDate)
                 .Select(d => d.DeliveryDate)
                 .SingleOrDefaultAsync();
         }

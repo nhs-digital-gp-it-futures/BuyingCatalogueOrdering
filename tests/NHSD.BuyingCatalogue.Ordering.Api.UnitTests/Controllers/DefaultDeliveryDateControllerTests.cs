@@ -95,8 +95,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             service.Setup(o => o.GetOrder(callOffId, catalogueItemId)).ReturnsAsync(order);
             service.Setup(o => o.SetDefaultDeliveryDate(callOffId, catalogueItemId, defaultDeliveryDate.DeliveryDate.Value)).Callback(() =>
             {
-                // ReSharper disable once PossibleInvalidOperationException (covered by model validation)
-                order.SetDefaultDeliveryDate(catalogueItemId, defaultDeliveryDate.DeliveryDate.Value);
+                order.SetDefaultDeliveryDate(catalogueItemId, defaultDeliveryDate.DeliveryDate!.Value);
             });
 
             validator.Setup(v => v.Validate(defaultDeliveryDate, order.CommencementDate)).Returns((true, null));
@@ -132,8 +131,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             service.Setup(o => o.GetOrder(callOffId, catalogueItemId)).ReturnsAsync(order);
             service.Setup(o => o.SetDefaultDeliveryDate(callOffId, catalogueItemId, defaultDeliveryDate.DeliveryDate.Value)).Callback(() =>
             {
-                // ReSharper disable once PossibleInvalidOperationException (covered by model validation)
-                order.SetDefaultDeliveryDate(catalogueItemId, defaultDeliveryDate.DeliveryDate.Value);
+                order.SetDefaultDeliveryDate(catalogueItemId, defaultDeliveryDate.DeliveryDate!.Value);
             });
 
             validator.Setup(v => v.Validate(defaultDeliveryDate, order.CommencementDate)).Returns((true, null));
