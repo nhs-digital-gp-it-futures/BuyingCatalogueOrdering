@@ -213,6 +213,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             return result;
         }
 
+        public bool HasAssociatedService()
+        {
+            return OrderItems.Any(o => o.CatalogueItem.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
+        }
+
         public bool HasSolution()
         {
             return OrderItems.Any(o => o.CatalogueItem.CatalogueItemType.Equals(CatalogueItemType.Solution));
