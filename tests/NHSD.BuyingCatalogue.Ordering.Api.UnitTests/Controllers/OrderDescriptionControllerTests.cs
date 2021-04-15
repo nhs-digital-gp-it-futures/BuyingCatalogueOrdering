@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.AutoMoq;
@@ -8,11 +7,12 @@ using AutoFixture.Idioms;
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
+using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NHSD.BuyingCatalogue.Ordering.Domain;
-using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
@@ -34,30 +34,29 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task Get_OrderIdDoesNotExist_ReturnsNotFound(
+        public static async Task Get_OrderIdDoesNotExist_ReturnsNull(
             CallOffId callOffId,
             OrderDescriptionController controller)
         {
             var result = await controller.GetAsync(callOffId);
 
-            result.Result.Should().BeOfType<NotFoundResult>();
+            result.Result.Should().BeNull();
         }
 
         [Test]
         [InMemoryDbAutoData]
         public static async Task Get_OrderIdExists_ReturnsTheOrdersDescription(
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderDescriptionService> service,
             [Frozen] CallOffId callOffId,
             Order order,
             OrderDescriptionController controller)
         {
-            order.FundingSourceOnlyGms = true;
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
+            service.Setup(o => o.GetOrderDescription(callOffId)).ReturnsAsync(order.Description);
 
             var expected = new OrderDescriptionModel { Description = order.Description };
 
             var actual = await controller.GetAsync(callOffId);
+            service.Verify(o => o.GetOrderDescription(callOffId));
 
             actual.Value.Should().BeEquivalentTo(expected);
         }
@@ -85,13 +84,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task UpdateAsync_UpdatesDescription(
+            [Frozen] Mock<IOrderDescriptionService> service,
             Order order,
             OrderDescriptionModel model,
             OrderDescriptionController controller)
         {
             order.Description.Should().NotBe(model.Description);
+            service.Setup(o => o.SetOrderDescription(order, model.Description)).Callback(() =>
+            {
+                order.Description = model.Description;
+            });
 
             await controller.UpdateAsync(order, model);
+            service.Verify(o => o.SetOrderDescription(order, model.Description));
 
             order.Description.Should().Be(model.Description);
         }
@@ -99,31 +104,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task UpdateAsync_SuccessfulUpdate_ReturnsNoContentResult(
+            [Frozen] Mock<IOrderDescriptionService> service,
             Order order,
             OrderDescriptionModel model,
             OrderDescriptionController controller)
         {
+            service.Setup(o => o.SetOrderDescription(order, model.Description)).Callback(() =>
+            {
+                order.Description = model.Description;
+            });
+
             var result = await controller.UpdateAsync(order, model);
+            service.Verify(o => o.SetOrderDescription(order, model.Description));
 
             result.Should().BeOfType<NoContentResult>();
-        }
-
-        [Test]
-        [InMemoryDbAutoData]
-        public static async Task UpdateAsync_SavesChangesToDb(
-            [Frozen] ApplicationDbContext context,
-            Order order,
-            OrderDescriptionModel model,
-            OrderDescriptionController controller)
-        {
-            order.Description.Should().NotBe(model.Description);
-
-            context.Add(order);
-            await context.SaveChangesAsync();
-
-            await controller.UpdateAsync(order, model);
-
-            context.Set<Order>().First(o => o.Equals(order)).Description.Should().Be(model.Description);
         }
     }
 }

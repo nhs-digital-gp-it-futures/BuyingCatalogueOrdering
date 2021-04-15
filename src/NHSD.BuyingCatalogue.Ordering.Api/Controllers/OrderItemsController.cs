@@ -132,6 +132,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             var order = await context.Order
                 .Where(o => o.Id == callOffId.Id)
+                .Include(o => o.Progress)
                 .Include(orderItems)
                 .ThenInclude(i => i.CatalogueItem)
                 .SingleOrDefaultAsync();
@@ -141,7 +142,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 return NotFound();
             }
 
-            if (order.DeleteOrderItem(catalogueItemId) < 1)
+            if (order.DeleteOrderItemAndUpdateProgress(catalogueItemId) < 1)
             {
                 return NotFound();
             }

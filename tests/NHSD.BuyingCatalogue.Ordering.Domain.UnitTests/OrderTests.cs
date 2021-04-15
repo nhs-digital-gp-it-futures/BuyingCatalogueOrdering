@@ -430,7 +430,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
         [Test]
         [CommonAutoData]
-        public static void DeleteOrderItem_OrderItemPresent_DeletesOrderItem(
+        public static void DeleteOrderItemAndUpdateProgress_OrderItemPresent_DeletesOrderItem(
             OrderItem orderItem1,
             OrderItem orderItem2,
             OrderItem orderItem3,
@@ -442,14 +442,76 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             order.AddOrUpdateOrderItem(orderItem3);
             order.OrderItems.Count.Should().Be(3);
 
-            order.DeleteOrderItem(orderItem1.CatalogueItem.Id);
+            order.DeleteOrderItemAndUpdateProgress(orderItem1.CatalogueItem.Id);
 
             order.OrderItems.Count.Should().Be(1);
         }
 
         [Test]
         [CommonAutoData]
-        public static void DeleteOrderItem_OrderItemPresent_ReturnsNumberOfItemsDeleted(
+        public static void DeleteOrderItemAndUpdateProgress_AllCataloguesSolutionsDeleted_SetsAdditionalServicesViewedToFalse(
+            CatalogueItemId catalogueItemId,
+            Order order)
+        {
+            var parentOrderItem = OrderItemBuilder.Create()
+                .WithCatalogueItem(new CatalogueItem
+                {
+                    Id = catalogueItemId,
+                    CatalogueItemType = CatalogueItemType.Solution,
+                }).Build();
+            var childOrderItem = OrderItemBuilder.Create()
+                .WithCatalogueItem(
+                    new CatalogueItem
+                    {
+                        CatalogueItemType = CatalogueItemType.AdditionalService,
+                        ParentCatalogueItemId = catalogueItemId,
+                    }).Build();
+            order.Progress.AdditionalServicesViewed = true;
+            order.AddOrUpdateOrderItem(parentOrderItem);
+            order.AddOrUpdateOrderItem(childOrderItem);
+
+            order.DeleteOrderItemAndUpdateProgress(catalogueItemId);
+
+            order.Progress.AdditionalServicesViewed.Should().BeFalse();
+        }
+
+        [Test]
+        [CommonAutoData]
+        public static void DeleteOrderItemAndUpdateProgress_CataloguesSolutionsNotDeleted_AdditionalServicesViewedNotChanged(
+            CatalogueItemId catalogueItemId,
+            Order order)
+        {
+            var orderItem1 = OrderItemBuilder.Create()
+                .WithCatalogueItem(new CatalogueItem
+                {
+                    Id = catalogueItemId,
+                    CatalogueItemType = CatalogueItemType.Solution,
+                }).Build();
+            var orderItem2 = OrderItemBuilder.Create()
+                .WithCatalogueItem(new CatalogueItem
+                {
+                    CatalogueItemType = CatalogueItemType.Solution,
+                }).Build();
+            var childOrderItem = OrderItemBuilder.Create()
+                .WithCatalogueItem(
+                    new CatalogueItem
+                    {
+                        CatalogueItemType = CatalogueItemType.AdditionalService,
+                        ParentCatalogueItemId = catalogueItemId,
+                    }).Build();
+            order.AddOrUpdateOrderItem(orderItem1);
+            order.AddOrUpdateOrderItem(orderItem2);
+            order.AddOrUpdateOrderItem(childOrderItem);
+            order.Progress.AdditionalServicesViewed = true;
+
+            order.DeleteOrderItemAndUpdateProgress(orderItem1.CatalogueItem.Id);
+
+            order.Progress.AdditionalServicesViewed.Should().BeTrue();
+        }
+
+        [Test]
+        [CommonAutoData]
+        public static void DeleteOrderItemAndUpdateProgress_OrderItemPresent_ReturnsNumberOfItemsDeleted(
             OrderItem orderItem1,
             OrderItem orderItem2,
             OrderItem orderItem3,
@@ -461,18 +523,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             order.AddOrUpdateOrderItem(orderItem3);
             order.OrderItems.Count.Should().Be(3);
 
-            var actual = order.DeleteOrderItem(orderItem1.CatalogueItem.Id);
+            var actual = order.DeleteOrderItemAndUpdateProgress(orderItem1.CatalogueItem.Id);
 
             actual.Should().Be(2);
         }
 
         [Test]
         [CommonAutoData]
-        public static void DeleteOrderItem_NoOrderItem_ReturnsZero(Order order)
+        public static void DeleteOrderItemAndUpdateProgress_NoOrderItem_ReturnsZero(Order order)
         {
             order.OrderItems.Count.Should().Be(0);
 
-            var actual = order.DeleteOrderItem(default(CatalogueItemId));
+            var actual = order.DeleteOrderItemAndUpdateProgress(default(CatalogueItemId));
 
             actual.Should().Be(0);
         }

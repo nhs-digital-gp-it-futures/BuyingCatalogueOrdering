@@ -29,7 +29,7 @@ Scenario: get a default delivery date that does not exist
         | OrderId | CatalogueItemId |
         | 10001   | 10001-001       |
     Then a response with status code 404 is returned
-
+    
 @8952
 Scenario: if a user is not authorized then they cannot get a default delivery date
     Given no user is logged in
