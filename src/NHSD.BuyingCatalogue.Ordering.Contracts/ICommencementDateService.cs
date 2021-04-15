@@ -4,7 +4,7 @@ using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Contracts
 {
-    public interface IOrderService
+    public interface ICommencementDateService
     {
         Task<DateTime?> GetCommencementDate(CallOffId callOffId);
 

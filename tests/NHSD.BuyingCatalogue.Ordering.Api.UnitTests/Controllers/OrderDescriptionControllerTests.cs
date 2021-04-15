@@ -34,7 +34,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task Get_OrderIdDoesNotExist_ReturnsNull(
+        public static async Task GetAsync_OrderIdDoesNotExist_ReturnsNull(
             CallOffId callOffId,
             OrderDescriptionController controller)
         {
@@ -45,7 +45,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task Get_OrderIdExists_ReturnsTheOrdersDescription(
+        public static async Task GetAsync_OrderIdExists_ReturnsTheOrdersDescription(
             [Frozen] Mock<IOrderDescriptionService> service,
             [Frozen] CallOffId callOffId,
             Order order,

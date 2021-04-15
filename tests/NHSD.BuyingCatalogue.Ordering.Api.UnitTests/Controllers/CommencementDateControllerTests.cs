@@ -44,15 +44,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task GetAsync_ReturnsExpectedResult(
-            [Frozen] Mock<IOrderService> orderService,
+            [Frozen] Mock<ICommencementDateService> service,
             Order order,
             CommencementDateController controller)
         {
             var expectedResult = new CommencementDateModel { CommencementDate = order.CommencementDate };
-            orderService.Setup(o => o.GetCommencementDate(order.CallOffId)).ReturnsAsync(order.CommencementDate);
+            service.Setup(o => o.GetCommencementDate(order.CallOffId)).ReturnsAsync(order.CommencementDate);
 
             var result = await controller.GetAsync(order.CallOffId);
-            orderService.Verify(o => o.GetCommencementDate(order.CallOffId));
+            service.Verify(o => o.GetCommencementDate(order.CallOffId));
 
             result.Value.Should().BeEquivalentTo(expectedResult);
         }
@@ -80,20 +80,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task UpdateAsync_UpdatesCommencementDate(
-            [Frozen] Mock<IOrderService> orderService,
+            [Frozen] Mock<ICommencementDateService> service,
             Order order,
             CommencementDateModel model,
             CommencementDateController controller)
         {
             order.CommencementDate.Should().NotBeSameDateAs(model.CommencementDate.GetValueOrDefault());
 
-            orderService.Setup(o => o.SetCommencementDate(order, model.CommencementDate)).Callback(() =>
+            service.Setup(o => o.SetCommencementDate(order, model.CommencementDate)).Callback(() =>
             {
                 order.CommencementDate = model.CommencementDate;
             });
 
             await controller.UpdateAsync(order, model);
-            orderService.Verify(o => o.SetCommencementDate(order, model.CommencementDate));
+            service.Verify(o => o.SetCommencementDate(order, model.CommencementDate));
 
             order.CommencementDate.Should().Be(model.CommencementDate);
         }

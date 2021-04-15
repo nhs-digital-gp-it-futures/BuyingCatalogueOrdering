@@ -13,28 +13,38 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
     [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
-    internal static class OrderServiceTests
+    internal static class CommencementDateServiceTests
     {
         [Test]
         public static void Constructor_NullHttpContextAccessor_ThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => _ = new OrderService(null));
+            Assert.Throws<ArgumentNullException>(() => _ = new CommencementDateService(null));
+        }
+
+        [Test]
+        [InMemoryDbAutoData]
+        public static async Task GetCommencementDate_ReturnsNull(
+            CallOffId callOffId,
+            CommencementDateService service)
+        {
+            var result = await service.GetCommencementDate(callOffId);
+
+            result.Should().BeNull();
         }
 
         [Test]
         [InMemoryDbAutoData]
         public static async Task GetCommencementDate_ReturnsCommencementDate(
             [Frozen] ApplicationDbContext context,
-            Order order1,
-            Order order2,
-            OrderService service)
+            Order order,
+            CommencementDateService service)
         {
-            context.Order.AddRange(order1, order2);
+            context.Order.Add(order);
             await context.SaveChangesAsync();
 
-            var expectedResult = order2.CommencementDate;
+            var expectedResult = order.CommencementDate;
 
-            var result = await service.GetCommencementDate(order2.CallOffId);
+            var result = await service.GetCommencementDate(order.CallOffId);
 
             Assert.NotNull(result);
             result.Value.Should().Be(expectedResult!.Value);
@@ -42,30 +52,30 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
 
         [Test]
         [InMemoryDbAutoData]
-        public static void UpdateAsync_NullOrder_ThrowsException(
+        public static void SetCommencementDate_NullOrder_ThrowsException(
             DateTime? commencementDate,
-            OrderService service)
+            CommencementDateService service)
         {
             Assert.ThrowsAsync<ArgumentNullException>(async () => await service.SetCommencementDate(null, commencementDate));
         }
 
         [Test]
         [InMemoryDbAutoData]
-        public static void UpdateAsync_NullCommencementDate_ThrowsException(
+        public static void SetCommencementDate_NullCommencementDate_ThrowsException(
             Order order,
-            OrderService service)
+            CommencementDateService service)
         {
             Assert.ThrowsAsync<ArgumentNullException>(async () => await service.SetCommencementDate(order, null));
         }
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task UpdateAsync_UpdatesCommencementDate(
+        public static async Task SetCommencementDate_UpdatesCommencementDate(
             Order order,
-            DateTime? commencementDate,
-            OrderService service)
+            DateTime commencementDate,
+            CommencementDateService service)
         {
-            order.CommencementDate.Should().NotBeSameDateAs(commencementDate.GetValueOrDefault());
+            order.CommencementDate.Should().NotBeSameDateAs(commencementDate);
 
             await service.SetCommencementDate(order, commencementDate);
 
