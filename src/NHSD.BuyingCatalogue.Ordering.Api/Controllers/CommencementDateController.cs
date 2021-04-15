@@ -18,17 +18,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [AuthorizeOrganisation]
     public sealed class CommencementDateController : ControllerBase
     {
-        private readonly IOrderService orderService;
+        private readonly ICommencementDateService commencementDateService;
 
-        public CommencementDateController(IOrderService orderService)
+        public CommencementDateController(ICommencementDateService commencementDateService)
         {
-            this.orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
+            this.commencementDateService = commencementDateService ?? throw new ArgumentNullException(nameof(this.commencementDateService));
         }
 
         [HttpGet]
         public async Task<ActionResult<CommencementDateModel>> GetAsync(CallOffId callOffId)
         {
-            var commencementDate = await orderService.GetCommencementDate(callOffId);
+            var commencementDate = await commencementDateService.GetCommencementDate(callOffId);
 
             return new CommencementDateModel { CommencementDate = commencementDate };
         }
@@ -43,7 +43,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (model is null)
                 throw new ArgumentNullException(nameof(model));
 
-            await orderService.SetCommencementDate(order, model.CommencementDate);
+            await commencementDateService.SetCommencementDate(order, model.CommencementDate);
 
             return NoContent();
         }

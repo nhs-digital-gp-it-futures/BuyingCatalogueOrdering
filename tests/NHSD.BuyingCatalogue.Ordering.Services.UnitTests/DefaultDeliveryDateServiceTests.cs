@@ -23,7 +23,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task GetAsync_DefaultDeliveryDateDoesNotExist(
+        public static async Task GetDefaultDeliveryDate_ReturnsNull(
             CallOffId callOffId,
             CatalogueItemId catalogueItemId,
             DefaultDeliveryDateService service)
@@ -48,14 +48,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
             await context.SaveChangesAsync();
 
             var response = await service.GetDefaultDeliveryDate(callOffId, catalogueItemId);
-            var actualDate = response.Value;
+
+            var actualDate = response!.Value;
 
             actualDate.Should().Be(defaultDeliveryDate);
         }
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task UpdateAsync_AddDefaultDeliveryDate(
+        public static async Task SetDefaultDeliveryDate_Added(
             [Frozen] ApplicationDbContext context,
             [Frozen] CallOffId callOffId,
             [Frozen] CatalogueItemId catalogueItemId,
@@ -73,7 +74,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task UpdateAsync_UpdatesDefaultDeliveryDate(
+        public static async Task SetDefaultDeliveryDate_Updated(
             [Frozen] ApplicationDbContext context,
             [Frozen] CallOffId callOffId,
             [Frozen] CatalogueItemId catalogueItemId,
@@ -92,7 +93,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task GetAsync_OrderDoesNotExist(
+        public static async Task GetOrder_ReturnsNull(
             CallOffId callOffId,
             CatalogueItemId catalogueItemId,
             DefaultDeliveryDateService service)
