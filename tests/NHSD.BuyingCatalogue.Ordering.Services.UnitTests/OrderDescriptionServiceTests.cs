@@ -23,7 +23,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task GetAsync_OrderDescriptionDoesNotExist(
+        public static async Task GetOrderDescription_ReturnsNull(
             CallOffId callOffId,
             FundingSourceService service)
         {
@@ -52,7 +52,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
 
         [Test]
         [InMemoryDbAutoData]
-        public static void UpdateAsync_NullOrder_ThrowsException(
+        public static void SetOrderDescription_NullOrder_ThrowsException(
             string description,
             OrderDescriptionService service)
         {
@@ -61,7 +61,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
 
         [Test]
         [InMemoryDbAutoData]
-        public static void UpdateAsync_NullOrderDescription_ThrowsException(
+        public static void SetOrderDescription_NullOrderDescription_ThrowsException(
             Order order,
             OrderDescriptionService service)
         {
@@ -70,7 +70,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task UpdateAsync_UpdatesOrderDescription(
+        public static async Task SetOrderDescription_UpdatesOrderDescription(
             Order order,
             string description,
             OrderDescriptionService service)

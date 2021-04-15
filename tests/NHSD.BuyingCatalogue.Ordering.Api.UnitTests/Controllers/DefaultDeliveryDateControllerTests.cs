@@ -47,8 +47,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task AddOrUpdateAsync_BadOrderId_ReturnsNotFound(
+        public static async Task AddOrUpdateAsync_BadCallOffId_ReturnsNotFound(
             CallOffId callOffId,
+            [Frozen] CatalogueItemId catalogueItemId,
+            DefaultDeliveryDateModel model,
+            DefaultDeliveryDateController controller)
+        {
+            var response = await controller.AddOrUpdateAsync(callOffId, catalogueItemId, model);
+
+            response.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Test]
+        [InMemoryDbAutoData]
+        public static async Task AddOrUpdateAsync_BadCatalogueItemId_ReturnsNotFound(
+            [Frozen] CallOffId callOffId,
             CatalogueItemId catalogueItemId,
             DefaultDeliveryDateModel model,
             DefaultDeliveryDateController controller)

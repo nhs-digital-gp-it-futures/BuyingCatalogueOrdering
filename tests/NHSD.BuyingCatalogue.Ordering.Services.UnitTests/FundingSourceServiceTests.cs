@@ -23,7 +23,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task GetAsync_FundingSourceDoesNotExist(
+        public static async Task GetFundingSource_ReturnsNull(
             CallOffId callOffId,
             FundingSourceService service)
         {
@@ -36,16 +36,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
         [InMemoryDbAutoData]
         public static async Task GetFundingSource_ReturnsFundingSource(
             [Frozen] ApplicationDbContext context,
-            Order order1,
-            Order order2,
+            Order order,
             FundingSourceService service)
         {
-            context.Order.AddRange(order1, order2);
+            context.Order.Add(order);
             await context.SaveChangesAsync();
 
-            var expectedResult = order2.FundingSourceOnlyGms;
+            var expectedResult = order.FundingSourceOnlyGms;
 
-            var result = await service.GetFundingSource(order2.CallOffId);
+            var result = await service.GetFundingSource(order.CallOffId);
 
             Assert.NotNull(result);
             result.Value.Should().Be(expectedResult!.Value);
@@ -53,7 +52,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
 
         [Test]
         [InMemoryDbAutoData]
-        public static void UpdateAsync_NullOrder_ThrowsException(
+        public static void SetFundingSource_NullOrder_ThrowsException(
             bool? onlyGms,
             FundingSourceService service)
         {
@@ -62,7 +61,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
 
         [Test]
         [InMemoryDbAutoData]
-        public static void UpdateAsync_NullOnlyGms_ThrowsException(
+        public static void SetFundingSource_NullOnlyGms_ThrowsException(
             Order order,
             FundingSourceService service)
         {
@@ -71,7 +70,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task UpdateAsync_UpdatesFundingSource(
+        public static async Task SetFundingSource_UpdatesFundingSource(
             Order order,
             bool? onlyGms,
             FundingSourceService service)

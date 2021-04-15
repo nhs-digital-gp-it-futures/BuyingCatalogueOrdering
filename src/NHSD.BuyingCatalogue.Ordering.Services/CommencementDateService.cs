@@ -8,11 +8,11 @@ using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Services
 {
-    public sealed class OrderService : IOrderService
+    public sealed class CommencementDateService : ICommencementDateService
     {
         private readonly ApplicationDbContext context;
 
-        public OrderService(ApplicationDbContext context)
+        public CommencementDateService(ApplicationDbContext context)
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
