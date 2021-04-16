@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.AutoMoq;
@@ -13,8 +12,8 @@ using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Services;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
+using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NHSD.BuyingCatalogue.Ordering.Domain;
-using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
@@ -49,7 +48,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task GetAsync_OrderExists_ReturnsTheOrderingParty(
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderingPartyService> service,
             [Frozen] CallOffId callOffId,
             Order order,
             OrderingPartyController controller)
@@ -57,12 +56,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             order.OrderingParty.Should().NotBeNull();
             order.OrderingPartyContact.Should().NotBeNull();
 
-            context.Add(order);
-            await context.SaveChangesAsync();
+            service.Setup(o => o.GetOrder(callOffId)).ReturnsAsync(order);
 
             var expectedValue = new OrderingPartyModel(order.OrderingParty, order.OrderingPartyContact);
 
             var response = await controller.GetAsync(callOffId);
+            service.Verify(o => o.GetOrder(callOffId));
 
             response.Value.Should().BeEquivalentTo(expectedValue);
         }
@@ -79,11 +78,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task UpdateAsync_OrderDoesNotExist_ReturnsNotFound(
+            [Frozen] Mock<IOrderingPartyService> service,
             CallOffId callOffId,
             OrderingPartyModel model,
             OrderingPartyController controller)
         {
+            service.Setup(o => o.GetOrder(callOffId)).ReturnsAsync((Order)null);
+
             var response = await controller.UpdateAsync(callOffId, model);
+            service.Verify(o => o.GetOrder(callOffId));
 
             response.Should().BeOfType<NotFoundResult>();
         }
@@ -91,18 +94,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task UpdateAsync_UpdatesOrderingParty(
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderingPartyService> service,
             [Frozen] CallOffId callOffId,
             Order order,
             OrderingPartyModel model,
             OrderingPartyController controller)
         {
             order.OrderingParty.Should().NotBeEquivalentTo(model);
-
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
+            service.Setup(o => o.GetOrder(callOffId)).ReturnsAsync(order);
+            service.Setup(o => o.SetOrderingParty(order, It.IsAny<OrderingParty>(), It.IsAny<Contact>())).Callback(() =>
+            {
+                order.OrderingParty.Name = model.Name;
+                order.OrderingParty.OdsCode = model.OdsCode;
+            });
 
             await controller.UpdateAsync(callOffId, model);
+            service.Verify(o => o.GetOrder(callOffId));
+            service.Verify(o => o.SetOrderingParty(order, It.IsAny<OrderingParty>(), It.IsAny<Contact>()));
 
             order.OrderingParty.Should().BeEquivalentTo(
                 model,
@@ -113,78 +121,85 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [InMemoryDbAutoData]
         public static async Task UpdateAsync_InvokesAddOrUpdateAddress(
             [Frozen] Mock<IContactDetailsService> contactDetailsService,
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderingPartyService> service,
             [Frozen] CallOffId callOffId,
             Order order,
             OrderingPartyModel model,
             OrderingPartyController controller)
         {
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
-
             var originalAddress = order.OrderingParty.Address;
 
-            await controller.UpdateAsync(callOffId, model);
+            service.Setup(o => o.GetOrder(callOffId)).ReturnsAsync(order);
+            service.Setup(o => o.SetOrderingParty(order, It.IsAny<OrderingParty>(), It.IsAny<Contact>())).Callback(() =>
+            {
+                order.OrderingParty.Name = model.Name;
+                order.OrderingParty.OdsCode = model.OdsCode;
+            });
+            contactDetailsService.Setup(o => o.AddOrUpdateAddress(It.IsAny<Address>(), It.IsAny<AddressModel>()))
+                .Returns(order.OrderingParty.Address);
 
+            await controller.UpdateAsync(callOffId, model);
+            service.Verify(o => o.GetOrder(callOffId));
+            service.Verify(o => o.SetOrderingParty(order, It.IsAny<OrderingParty>(), It.IsAny<Contact>()));
             contactDetailsService.Verify(s => s.AddOrUpdateAddress(
                 It.Is<Address>(a => a == originalAddress),
                 It.Is<AddressModel>(a => a == model.Address)));
+
+            order.OrderingParty.Address.Should().BeEquivalentTo(originalAddress);
         }
 
         [Test]
         [InMemoryDbAutoData]
         public static async Task UpdateAsync_InvokesAddOrUpdatePrimaryContact(
             [Frozen] Mock<IContactDetailsService> contactDetailsService,
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderingPartyService> service,
             [Frozen] CallOffId callOffId,
             Order order,
             OrderingPartyModel model,
             OrderingPartyController controller)
         {
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
-
             var originalContact = order.OrderingPartyContact;
 
-            await controller.UpdateAsync(callOffId, model);
+            service.Setup(o => o.GetOrder(callOffId)).ReturnsAsync(order);
+            service.Setup(o => o.SetOrderingParty(order, It.IsAny<OrderingParty>(), It.IsAny<Contact>())).Callback(() =>
+            {
+                order.OrderingParty.Name = model.Name;
+                order.OrderingParty.OdsCode = model.OdsCode;
+            });
+            contactDetailsService.Setup(o => o.AddOrUpdatePrimaryContact(
+                    It.Is<Contact>(c => c == originalContact),
+                    It.Is<PrimaryContactModel>(c => c == model.PrimaryContact)))
+                .Returns(order.OrderingPartyContact);
 
+            await controller.UpdateAsync(callOffId, model);
+            service.Verify(o => o.GetOrder(callOffId));
+            service.Verify(o => o.SetOrderingParty(order, It.IsAny<OrderingParty>(), It.IsAny<Contact>()));
             contactDetailsService.Verify(s => s.AddOrUpdatePrimaryContact(
                 It.Is<Contact>(c => c == originalContact),
                 It.Is<PrimaryContactModel>(c => c == model.PrimaryContact)));
-        }
 
-        [Test]
-        [InMemoryDbAutoData]
-        public static async Task UpdateAsync_SavesToDb(
-            [Frozen] ApplicationDbContext context,
-            [Frozen] CallOffId callOffId,
-            Order order,
-            OrderingPartyModel model,
-            OrderingPartyController controller)
-        {
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
-
-            await controller.UpdateAsync(callOffId, model);
-
-            context.Set<Order>().First(o => o.Equals(order)).OrderingParty.Should().BeEquivalentTo(
-                model,
-                o => o.Including(p => p.Name).Including(p => p.OdsCode));
+            order.OrderingPartyContact.Should().BeEquivalentTo(originalContact);
         }
 
         [Test]
         [InMemoryDbAutoData]
         public static async Task UpdateAsync_SuccessfulUpdate_ReturnsNoContentResult(
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderingPartyService> service,
             [Frozen] CallOffId callOffId,
             Order order,
             OrderingPartyModel model,
             OrderingPartyController controller)
         {
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
+            service.Setup(o => o.GetOrder(callOffId)).ReturnsAsync(order);
+            service.Setup(o => o.SetOrderingParty(order, It.IsAny<OrderingParty>(), It.IsAny<Contact>())).Callback(() =>
+            {
+                order.OrderingParty.Name = model.Name;
+                order.OrderingParty.OdsCode = model.OdsCode;
+            });
 
             var result = await controller.UpdateAsync(callOffId, model);
+            service.Verify(o => o.GetOrder(callOffId));
+            service.Verify(o => o.SetOrderingParty(order, It.IsAny<OrderingParty>(), It.IsAny<Contact>()));
 
             result.Should().BeOfType<NoContentResult>();
         }

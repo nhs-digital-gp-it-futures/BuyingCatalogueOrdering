@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Services;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
+using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NHSD.BuyingCatalogue.Ordering.Domain;
-using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -21,29 +19,31 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [AuthorizeOrganisation]
     public sealed class OrderingPartyController : ControllerBase
     {
-        private readonly ApplicationDbContext context;
+        private readonly IOrderingPartyService orderingPartyService;
         private readonly IContactDetailsService contactDetailsService;
 
         public OrderingPartyController(
-            ApplicationDbContext context,
+            IOrderingPartyService orderingPartyService,
             IContactDetailsService contactDetailsService)
         {
-            this.context = context ?? throw new ArgumentNullException(nameof(context));
+            this.orderingPartyService = orderingPartyService ?? throw new ArgumentNullException(nameof(orderingPartyService));
             this.contactDetailsService = contactDetailsService ?? throw new ArgumentNullException(nameof(contactDetailsService));
         }
 
         [HttpGet]
         public async Task<ActionResult<OrderingPartyModel>> GetAsync(CallOffId callOffId)
         {
-            var orderingPartyModel = await context.Order
-                .Where(o => o.Id == callOffId.Id)
-                .Include(o => o.OrderingParty).ThenInclude(p => p.Address)
-                .Select(o => new OrderingPartyModel(o.OrderingParty, o.OrderingPartyContact))
-                .AsNoTracking()
-                .SingleOrDefaultAsync();
+            var order = await orderingPartyService.GetOrder(callOffId);
 
-            if (orderingPartyModel is null)
+            if (order is null)
                 return NotFound();
+
+            if (order.OrderingParty is null)
+                return NotFound();
+
+            OrderingPartyModel orderingPartyModel = new OrderingPartyModel(
+                order.OrderingParty,
+                order.OrderingPartyContact);
 
             return orderingPartyModel;
         }
@@ -55,25 +55,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (model is null)
                 throw new ArgumentNullException(nameof(model));
 
-            var order = await context.Order
-                .Where(o => o.Id == callOffId.Id)
-                .Include(o => o.OrderingParty).ThenInclude(p => p.Address)
-                .Include(o => o.OrderingPartyContact)
-                .SingleOrDefaultAsync();
+            var order = await orderingPartyService.GetOrder(callOffId);
 
             if (order is null)
                 return NotFound();
 
-            var orderingParty = order.OrderingParty;
-            orderingParty.Name = model.Name;
-            orderingParty.OdsCode = model.OdsCode;
+            OrderingParty orderingParty = new OrderingParty
+                {
+                    Name = model.Name,
+                    OdsCode = model.OdsCode,
+                    Address = contactDetailsService.AddOrUpdateAddress(order.OrderingParty.Address, model.Address),
+                };
 
-            orderingParty.Address = contactDetailsService.AddOrUpdateAddress(orderingParty.Address, model.Address);
-            order.OrderingPartyContact = contactDetailsService.AddOrUpdatePrimaryContact(
+            Contact contact = contactDetailsService.AddOrUpdatePrimaryContact(
                 order.OrderingPartyContact,
                 model.PrimaryContact);
 
-            await context.SaveChangesAsync();
+            await orderingPartyService.SetOrderingParty(order, orderingParty, contact);
 
             return NoContent();
         }
