@@ -541,6 +541,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
         [Test]
         [CommonAutoData]
+        public static void HasAssociatedService_HasAdditionalServiceItem_ReturnsTrue(Order order)
+        {
+            order.AddOrUpdateOrderItem(OrderItemBuilder.Create()
+                .WithCatalogueItem(new CatalogueItem { CatalogueItemType = CatalogueItemType.AssociatedService })
+                .Build());
+
+            var actual = order.HasAssociatedService();
+
+            actual.Should().BeTrue();
+        }
+
+        [Test]
+        [CommonAutoData]
+        public static void HasAssociatedService_HasNoHasAdditionalServiceItem_ReturnsFalse(Order order)
+        {
+            order.AddOrUpdateOrderItem(OrderItemBuilder.Create()
+                .WithCatalogueItem(new CatalogueItem { CatalogueItemType = CatalogueItemType.AdditionalService })
+                .Build());
+
+            var actual = order.HasAssociatedService();
+
+            actual.Should().BeFalse();
+        }
+
+        [Test]
+        [CommonAutoData]
         public static void HasSolution_HasSolutionItem_ReturnsTrue(Order order)
         {
             order.AddOrUpdateOrderItem(OrderItemBuilder.Create()

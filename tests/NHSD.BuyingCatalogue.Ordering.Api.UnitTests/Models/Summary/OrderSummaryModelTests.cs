@@ -285,10 +285,44 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models.Summary
 
         [Test]
         [CommonAutoData]
-        public static void Create_SetsExpectedFundingSourceSectionStatus(Order order)
+        public static void Create_NoItemOnOrder_SetsFundingSourceSectionStatusToIncomplete(Order order)
         {
             order.FundingSourceOnlyGms = true;
             order.OrderStatus = OrderStatus.Incomplete;
+
+            var model = OrderSummaryModel.Create(order);
+
+            model.Sections.Should().ContainEquivalentOf(SectionModel.FundingSource.WithStatus(Incomplete));
+        }
+
+        [Test]
+        [CommonAutoData]
+        public static void Create_HasCatalogueSolutionOnOrder_SetsFundingSourceSectionStatusToComplete(Order order)
+        {
+            order.FundingSourceOnlyGms = true;
+            order.OrderStatus = OrderStatus.Incomplete;
+            order.AddOrUpdateOrderItem(
+                new OrderItem
+                {
+                    CatalogueItem = new CatalogueItem { CatalogueItemType = CatalogueItemType.Solution },
+                });
+
+            var model = OrderSummaryModel.Create(order);
+
+            model.Sections.Should().ContainEquivalentOf(SectionModel.FundingSource.WithStatus(Complete));
+        }
+
+        [Test]
+        [CommonAutoData]
+        public static void Create_HasAssociatedServiceOnOrder_SetsFundingSourceSectionStatusToComplete(Order order)
+        {
+            order.FundingSourceOnlyGms = true;
+            order.OrderStatus = OrderStatus.Incomplete;
+            order.AddOrUpdateOrderItem(
+                new OrderItem
+                {
+                    CatalogueItem = new CatalogueItem { CatalogueItemType = CatalogueItemType.AssociatedService },
+                });
 
             var model = OrderSummaryModel.Create(order);
 
