@@ -60,12 +60,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (order is null)
                 return NotFound();
 
-            OrderingParty orderingParty = new OrderingParty
-                {
-                    Name = model.Name,
-                    OdsCode = model.OdsCode,
-                    Address = contactDetailsService.AddOrUpdateAddress(order.OrderingParty.Address, model.Address),
-                };
+            var orderingParty = new OrderingParty
+            {
+                Name = model.Name,
+                OdsCode = model.OdsCode,
+                Address = contactDetailsService.AddOrUpdateAddress(order.OrderingParty.Address, model.Address),
+            };
 
             Contact contact = contactDetailsService.AddOrUpdatePrimaryContact(
                 order.OrderingPartyContact,

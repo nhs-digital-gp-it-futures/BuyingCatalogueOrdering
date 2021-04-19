@@ -61,9 +61,22 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var expectedValue = new OrderingPartyModel(order.OrderingParty, order.OrderingPartyContact);
 
             var response = await controller.GetAsync(callOffId);
-            service.Verify(o => o.GetOrder(callOffId));
 
             response.Value.Should().BeEquivalentTo(expectedValue);
+        }
+
+        [Test]
+        [InMemoryDbAutoData]
+        public static async Task GetAsync_InvokesGetOrder(
+            [Frozen] Mock<IOrderingPartyService> service,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            OrderingPartyController controller)
+        {
+            service.Setup(o => o.GetOrder(callOffId)).ReturnsAsync(order);
+            await controller.GetAsync(callOffId);
+
+            service.Verify(o => o.GetOrder(callOffId));
         }
 
         [Test]
@@ -86,7 +99,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             service.Setup(o => o.GetOrder(callOffId)).ReturnsAsync((Order)null);
 
             var response = await controller.UpdateAsync(callOffId, model);
-            service.Verify(o => o.GetOrder(callOffId));
 
             response.Should().BeOfType<NotFoundResult>();
         }
@@ -109,9 +121,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             });
 
             await controller.UpdateAsync(callOffId, model);
-            service.Verify(o => o.GetOrder(callOffId));
-            service.Verify(o => o.SetOrderingParty(order, It.IsAny<OrderingParty>(), It.IsAny<Contact>()));
-
             order.OrderingParty.Should().BeEquivalentTo(
                 model,
                 o => o.Including(p => p.Name).Including(p => p.OdsCode));
@@ -139,8 +148,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .Returns(order.OrderingParty.Address);
 
             await controller.UpdateAsync(callOffId, model);
-            service.Verify(o => o.GetOrder(callOffId));
-            service.Verify(o => o.SetOrderingParty(order, It.IsAny<OrderingParty>(), It.IsAny<Contact>()));
             contactDetailsService.Verify(s => s.AddOrUpdateAddress(
                 It.Is<Address>(a => a == originalAddress),
                 It.Is<AddressModel>(a => a == model.Address)));
@@ -172,8 +179,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 .Returns(order.OrderingPartyContact);
 
             await controller.UpdateAsync(callOffId, model);
-            service.Verify(o => o.GetOrder(callOffId));
-            service.Verify(o => o.SetOrderingParty(order, It.IsAny<OrderingParty>(), It.IsAny<Contact>()));
             contactDetailsService.Verify(s => s.AddOrUpdatePrimaryContact(
                 It.Is<Contact>(c => c == originalContact),
                 It.Is<PrimaryContactModel>(c => c == model.PrimaryContact)));
@@ -198,10 +203,25 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             });
 
             var result = await controller.UpdateAsync(callOffId, model);
-            service.Verify(o => o.GetOrder(callOffId));
-            service.Verify(o => o.SetOrderingParty(order, It.IsAny<OrderingParty>(), It.IsAny<Contact>()));
 
             result.Should().BeOfType<NoContentResult>();
+        }
+
+        [Test]
+        [InMemoryDbAutoData]
+        public static async Task UpdateAsync_InvokesSetOrderingParty(
+            [Frozen] Mock<IOrderingPartyService> service,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            OrderingPartyModel model,
+            OrderingPartyController controller)
+        {
+            service.Setup(o => o.GetOrder(callOffId)).ReturnsAsync(order);
+            service.Setup(o => o.SetOrderingParty(order, It.IsAny<OrderingParty>(), It.IsAny<Contact>())).Verifiable();
+
+            await controller.UpdateAsync(callOffId, model);
+
+            service.Verify(o => o.SetOrderingParty(order, It.IsAny<OrderingParty>(), It.IsAny<Contact>()), () => Times.AtMost(1));
         }
     }
 }
