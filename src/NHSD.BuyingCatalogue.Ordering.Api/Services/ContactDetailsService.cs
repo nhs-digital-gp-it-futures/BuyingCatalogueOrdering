@@ -1,26 +1,29 @@
-﻿using System;
-using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
+﻿using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Domain;
-using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Services
 {
     internal sealed class ContactDetailsService : IContactDetailsService
     {
-        private readonly ApplicationDbContext context;
-
-        public ContactDetailsService(ApplicationDbContext context)
-        {
-            this.context = context ?? throw new ArgumentNullException(nameof(context));
-        }
-
         public Address AddOrUpdateAddress(Address existingAddress, AddressModel newOrUpdatedAddress)
         {
             if (existingAddress is null)
                 return newOrUpdatedAddress.ToDomain();
 
-            context.Entry(existingAddress).CurrentValues.SetValues(newOrUpdatedAddress);
+            if (newOrUpdatedAddress is null)
+                return existingAddress;
+
+            existingAddress.Line1 = newOrUpdatedAddress.Line1;
+            existingAddress.Line2 = newOrUpdatedAddress.Line2;
+            existingAddress.Line3 = newOrUpdatedAddress.Line3;
+            existingAddress.Line4 = newOrUpdatedAddress.Line4;
+            existingAddress.Line5 = newOrUpdatedAddress.Line5;
+            existingAddress.Town = newOrUpdatedAddress.Town;
+            existingAddress.County = newOrUpdatedAddress.County;
+            existingAddress.Postcode = newOrUpdatedAddress.Postcode;
+            existingAddress.Country = newOrUpdatedAddress.Country;
+
             return existingAddress;
         }
 
@@ -29,7 +32,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services
             if (existingContact is null)
                 return newOrUpdatedContact.ToDomain();
 
-            context.Entry(existingContact).CurrentValues.SetValues(newOrUpdatedContact);
+            if (newOrUpdatedContact is null)
+                return existingContact;
+
+            existingContact.FirstName = newOrUpdatedContact.FirstName;
+            existingContact.LastName = newOrUpdatedContact.LastName;
             existingContact.Email = newOrUpdatedContact.EmailAddress;
             existingContact.Phone = newOrUpdatedContact.TelephoneNumber;
 

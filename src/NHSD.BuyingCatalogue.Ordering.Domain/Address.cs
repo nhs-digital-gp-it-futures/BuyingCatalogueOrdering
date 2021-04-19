@@ -4,22 +4,22 @@
     {
         public int Id { get; set; }
 
-        public string Line1 { get; init; }
+        public string Line1 { get; set; }
 
-        public string Line2 { get; init; }
+        public string Line2 { get; set; }
 
-        public string Line3 { get; init; }
+        public string Line3 { get; set; }
 
-        public string Line4 { get; init; }
+        public string Line4 { get; set; }
 
-        public string Line5 { get; init; }
+        public string Line5 { get; set; }
 
-        public string Town { get; init; }
+        public string Town { get; set; }
 
-        public string County { get; init; }
+        public string County { get; set; }
 
-        public string Postcode { get; init; }
+        public string Postcode { get; set; }
 
-        public string Country { get; init; }
+        public string Country { get; set; }
     }
 }

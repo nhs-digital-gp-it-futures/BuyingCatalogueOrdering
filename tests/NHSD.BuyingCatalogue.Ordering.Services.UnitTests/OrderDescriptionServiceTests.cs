@@ -25,9 +25,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
         [InMemoryDbAutoData]
         public static async Task GetOrderDescription_ReturnsNull(
             CallOffId callOffId,
-            FundingSourceService service)
+            OrderDescriptionService service)
         {
-            var result = await service.GetFundingSource(callOffId);
+            var result = await service.GetOrderDescription(callOffId);
 
             result.Should().BeNull();
         }
