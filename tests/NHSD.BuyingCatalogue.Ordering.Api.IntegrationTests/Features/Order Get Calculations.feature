@@ -86,11 +86,11 @@ Scenario: verify the price calculations for Catalogue Solution order recipients
         | 10001-003 | Sol3 | AdditionalService   |
         | 10001-004 | Sol4 | AssociatedService   |
     And order items exist
-        | OrderId | CatalogueItemId | Price   | ProvisioningType   | PriceTimeUnit |
-        | 10001   | 10001-001       | 5       | Patient            | Year          |
-        | 10001   | 10001-002       | 10      | Patient            | Year          |
-        | 10001   | 10001-003       | 50      | Declarative        | Month         |
-        | 10001   | 10001-004       | 60      | Declarative        | Year          |
+        | OrderId | CatalogueItemId | Price   | ProvisioningType | PriceTimeUnit | EstimationPeriod |
+        | 10001   | 10001-001       | 5       | Patient          | Year          | Month            |
+        | 10001   | 10001-002       | 10      | Patient          | Year          | Month            |
+        | 10001   | 10001-003       | 50      | Declarative      | Month         | Month            |
+        | 10001   | 10001-004       | 60      | OnDemand         | NULL          | Month            |
     And order item recipients exist
         | OrderId | CatalogueItemId | OdsCode   | Quantity   |
         | 10001   | 10001-001       | eu        | 10         |
@@ -102,7 +102,7 @@ Scenario: verify the price calculations for Catalogue Solution order recipients
     When the user sends the get order request
     Then a response with status code 200 is returned
     And the get order response contains a recipient with <OdsCode> for catalogue item ID <CatalogueItemId> and a yearly value of <RecipientTotal>
-    And the get order response contains a yearly value of 7550
+    And the get order response contains a yearly value of 20750
 
     Examples:
         | OrderId | CatalogueItemId | OdsCode | RecipientTotal |
@@ -110,4 +110,4 @@ Scenario: verify the price calculations for Catalogue Solution order recipients
         | 10001   | 10001-001       | au      | 100            |
         | 10001   | 10001-002       | eu      | 200            |
         | 10001   | 10001-003       | eu      | 6000           |
-        | 10001   | 10001-004       | au      | 1200           |
+        | 10001   | 10001-004       | au      | 14400          |

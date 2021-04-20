@@ -66,6 +66,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
                         serviceInstanceItem.CatalogueItemId == orderItem.CatalogueItem.Id.ToString()
                         && serviceInstanceItem.OdsCode == recipient.Recipient.OdsCode;
 
+                    var priceTimeUnit = orderItem.ProvisioningType == ProvisioningType.OnDemand ?
+                        orderItem.EstimationPeriod : orderItem.PriceTimeUnit;
+
                     var recipientModel = new ExtendedOrderItemRecipientModel
                     {
                         DeliveryDate = recipient.DeliveryDate,
@@ -73,7 +76,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
                         Name = recipient.Recipient.Name,
                         OdsCode = odsCode,
                         Quantity = recipient.Quantity,
-                        CostPerYear = recipient.CalculateTotalCostPerYear(orderItem.Price ?? 0, orderItem.PriceTimeUnit),
+                        CostPerYear = recipient.CalculateTotalCostPerYear(orderItem.Price ?? 0, priceTimeUnit),
 
                         // TODO: consider refactor
                         ServiceInstanceId = order.ServiceInstanceItems.FirstOrDefault(ServiceInstancePredicate)?.ServiceInstanceId,
