@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
@@ -82,13 +83,36 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
             Order order,
             DefaultDeliveryDateService service)
         {
-            order.SetDefaultDeliveryDate(catalogueItemId, defaultDeliveryDate);
-            context.Add(order);
+            context.Order.Add(order);
             await context.SaveChangesAsync();
+            order.SetDefaultDeliveryDate(catalogueItemId, defaultDeliveryDate);
 
             DeliveryDateResult result = await service.SetDefaultDeliveryDate(callOffId, catalogueItemId, defaultDeliveryDate.AddDays(-1));
 
             result.Should().Be(DeliveryDateResult.Updated);
+        }
+
+        [Test]
+        [InMemoryDbAutoData]
+        public static async Task SetDefaultDeliveryDate_SavesToDb(
+            [Frozen] ApplicationDbContext context,
+            [Frozen] CallOffId callOffId,
+            [Frozen] CatalogueItemId catalogueItemId,
+            DateTime defaultDeliveryDate,
+            Order order,
+            DefaultDeliveryDateService service)
+        {
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
+
+            await service.SetDefaultDeliveryDate(callOffId, catalogueItemId, defaultDeliveryDate.AddDays(-1));
+
+            var defaultDeliveryDateResult = context.Set<DefaultDeliveryDate>().First(d => d.OrderId.Equals(order.Id)).DeliveryDate;
+
+            // ReSharper disable once PossibleInvalidOperationException
+            DateTime actual = (DateTime)defaultDeliveryDateResult;
+
+            actual.Date.Should().Be(defaultDeliveryDate.AddDays(-1).Date);
         }
 
         [Test]

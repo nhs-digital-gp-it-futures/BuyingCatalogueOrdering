@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
@@ -80,6 +81,26 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
             await service.SetCommencementDate(order, commencementDate);
 
             order.CommencementDate.Should().Be(commencementDate);
+        }
+
+        [Test]
+        [InMemoryDbAutoData]
+        public static async Task SetCommencementDate_SavesToDb(
+            [Frozen] ApplicationDbContext context,
+            Order order,
+            DateTime commencementDate,
+            CommencementDateService service)
+        {
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
+
+            order.CommencementDate.Should().NotBeSameDateAs(commencementDate);
+
+            await service.SetCommencementDate(order, commencementDate);
+
+            var expectedOrder = context.Set<Order>().First(o => o.Equals(order));
+
+            expectedOrder.CommencementDate.Should().Be(commencementDate);
         }
     }
 }
