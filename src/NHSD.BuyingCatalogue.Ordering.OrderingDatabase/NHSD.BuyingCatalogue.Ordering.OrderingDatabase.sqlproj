@@ -62,8 +62,6 @@
     <Folder Include="Security\Logins" />
     <Folder Include="Security\Users" />
     <Folder Include="Views" />
-    <Folder Include="Functions" />
-    <Folder Include="Indexes" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Security\Users\NHSD.sql" />
@@ -76,8 +74,6 @@
     <Build Include="Tables\SelectedServiceRecipients.sql" />
     <Build Include="Tables\ServiceRecipient.sql" />
     <Build Include="Tables\OrderProgress.sql" />
-    <Build Include="Functions\GetServiceInstanceIncrement.sql" />
-    <Build Include="Functions\HasParentSolution.sql" />
     <Build Include="Views\ServiceInstanceItem.sql" />
   </ItemGroup>
   <ItemGroup>
