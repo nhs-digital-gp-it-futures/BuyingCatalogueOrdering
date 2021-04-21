@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
@@ -80,6 +81,25 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
             await service.SetFundingSource(order, onlyGms);
 
             order.FundingSourceOnlyGms.Should().Be(onlyGms);
+        }
+
+        [Test]
+        [InMemoryDbAutoData]
+        public static async Task SetFundingSource_SavesToDb(
+            [Frozen] ApplicationDbContext context,
+            Order order,
+            bool? onlyGms,
+            FundingSourceService service)
+        {
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
+            order.FundingSourceOnlyGms.Should().NotBeNull();
+
+            await service.SetFundingSource(order, onlyGms);
+
+            var expectedOrder = context.Set<Order>().First(o => o.Equals(order));
+
+            expectedOrder.FundingSourceOnlyGms.Should().Be(onlyGms);
         }
     }
 }

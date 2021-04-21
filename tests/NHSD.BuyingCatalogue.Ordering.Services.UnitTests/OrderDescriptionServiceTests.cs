@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
@@ -80,6 +81,25 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
             await service.SetOrderDescription(order, description);
 
             order.Description.Should().Be(description);
+        }
+
+        [Test]
+        [InMemoryDbAutoData]
+        public static async Task SetOrderDescription_SavesToDb(
+            [Frozen] ApplicationDbContext context,
+            Order order,
+            string description,
+            OrderDescriptionService service)
+        {
+            context.Order.Add(order);
+            await context.SaveChangesAsync();
+            order.Description.Should().NotBe(description);
+
+            await service.SetOrderDescription(order, description);
+
+            var expectedOrder = context.Set<Order>().First(o => o.Equals(order));
+
+            expectedOrder.Description.Should().Be(description);
         }
     }
 }
