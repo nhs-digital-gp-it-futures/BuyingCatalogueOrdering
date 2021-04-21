@@ -196,7 +196,7 @@ Scenario: the correct service instance ID is generated for each order item in a 
         | 10000-001-A02   | A12345  | SI1-A12345        |
         | 10000-002       | A12345  | SI2-A12345        |
         | 10000-002       | B54321  | SI2-B54321        |
-        | 10000-002-A01   | A12345  | NULL              | # Should be SI2-A12345 – to investigate and fix
+        | 10000-002-A01   | A12345  | SI2-A12345        |
         | 10000-002-A01   | C67890  | NULL              |
         | 10000-002-A02   | A12345  | SI2-A12345        |
         | 10000-S-001     | B54321  | NULL              |
