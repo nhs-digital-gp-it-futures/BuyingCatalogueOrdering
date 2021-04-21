@@ -105,7 +105,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
             context.Order.Add(order);
             await context.SaveChangesAsync();
 
-            DeliveryDateResult result = await service.SetDefaultDeliveryDate(callOffId, catalogueItemId, defaultDeliveryDate.AddDays(-1));
+            await service.SetDefaultDeliveryDate(callOffId, catalogueItemId, defaultDeliveryDate.AddDays(-1));
 
             var defaultDeliveryDateResult = context.Set<DefaultDeliveryDate>().First(d => d.OrderId.Equals(order.Id)).DeliveryDate;
 

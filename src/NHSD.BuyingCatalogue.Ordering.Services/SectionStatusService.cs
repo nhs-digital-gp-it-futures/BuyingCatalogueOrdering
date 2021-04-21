@@ -33,13 +33,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Services
             if (sectionId is null)
                 throw new ArgumentNullException(nameof(sectionId));
 
-            var progressUpdate = sectionId switch
+            switch (sectionId)
             {
-                "catalogue-solutions" => order.Progress.CatalogueSolutionsViewed = true,
-                "additional-services" => order.Progress.AdditionalServicesViewed = true,
-                "associated-services" => order.Progress.AssociatedServicesViewed = true,
-                _ => throw new InvalidOperationException(),
-            };
+                case "catalogue-solutions":
+                    order.Progress.CatalogueSolutionsViewed = true;
+                    break;
+                case "additional-services":
+                    order.Progress.AdditionalServicesViewed = true;
+                    break;
+                case "associated-services":
+                    order.Progress.AssociatedServicesViewed = true;
+                    break;
+                default:
+                    throw new InvalidOperationException();
+            }
 
             await context.SaveChangesAsync();
         }
