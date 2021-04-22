@@ -28,7 +28,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
             ProductType = orderItem.CatalogueItem.CatalogueItemType.DisplayName();
             QuantityOrdered = orderItem.Quantity;
             UnitOfOrder = orderItem.PricingUnit.Description;
-            UnitTime = orderItem.PriceTimeUnit?.Description();
+            UnitTime = orderItem.ProvisioningType.Equals(ProvisioningType.OnDemand)
+                ? null
+                : orderItem.PriceTimeUnit?.Description();
 
             EstimationPeriod = orderItem.ProvisioningType.Equals(ProvisioningType.Declarative)
                 ? null

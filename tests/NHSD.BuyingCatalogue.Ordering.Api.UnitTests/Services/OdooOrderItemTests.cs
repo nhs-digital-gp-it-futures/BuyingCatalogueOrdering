@@ -146,6 +146,28 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
         [Test]
         [CommonAutoData]
+        public static void Constructor_OnDemandProvisioningType_InitializesEstimationPeriod(
+            Order order,
+            CatalogueItem catalogueItem,
+            PricingUnit pricingUnit,
+            ServiceRecipient recipient)
+        {
+            var orderItem = new FlattenedOrderItem
+            {
+                CatalogueItem = catalogueItem,
+                Order = order,
+                PricingUnit = pricingUnit,
+                ProvisioningType = ProvisioningType.OnDemand,
+                Recipient = recipient,
+            };
+
+            var odooOrderItem = new OdooOrderItem(orderItem);
+
+            odooOrderItem.UnitTime.Should().BeNull();
+        }
+
+        [Test]
+        [CommonAutoData]
         public static void Constructor_InitializesUnitTime(
             [Frozen] TimeUnit priceTimeUnit,
             OdooOrderItem odooOrderItem)

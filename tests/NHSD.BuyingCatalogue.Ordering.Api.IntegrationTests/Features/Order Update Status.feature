@@ -22,12 +22,14 @@ Background:
         | 10002   | Some Other Description | 4af62b99-638c-4247-875e-965239cd0c48 | 10101      | 01/10/2020       | NULL                 | NULL      | 05/05/2020 |
         | 10003   | Another Description    | 4af62b99-638c-4247-875e-965239cd0c48 | 10101      | 01/01/2020       | False                | NULL      | 05/05/2020 |
         | 10004   | A Description          | 4af62b99-638c-4247-875e-965239cd0c48 | 10101      | 07/05/2020       | True                 | NULL      | 05/05/2020 |
+        | 10005   | Yet another one        | 4af62b99-638c-4247-875e-965239cd0c48 | 10101      | 18/08/2020       | True                 | NULL      | 05/05/2020 |
     And order progress exists
         | OrderId | CatalogueSolutionsViewed | AssociatedServicesViewed |
         | 10001   | True                     | True                     |
         | 10002   | True                     | True                     |
         | 10003   | False                    | True                     |
         | 10004   | True                     | True                     |
+        | 10005   | True                     | True                     |
     And service recipients exist
         | OdsCode | Name    |
         | eu      | EU Test |
@@ -40,6 +42,7 @@ Background:
         | 10101-004 | Item 4 | Solution          | NULL                  |
         | 10101-005 | Item 5 | AdditionalService | 10101-001             |
         | 10101-006 | Item 6 | AssociatedService | NULL                  |
+        | 10101-007 | Item 7 | Solution          | NULL                  |
     And order items exist
         | OrderId | CatalogueItemId | PriceTimeUnit | EstimationPeriod | Price    | ProvisioningType |
         | 10001   | 10101-001       | Month         | Month            | 599.9999 | Patient          |
@@ -48,6 +51,7 @@ Background:
         | 10003   | 10101-004       | Month         | Month            | 793.2199 | OnDemand         |
         | 10004   | 10101-005       | Month         | Month            | 599.9999 | Patient          |
         | 10004   | 10101-006       | Year          | Year             | NULL     | Declarative      |
+        | 10005   | 10101-007       | Year          | Year             | 405.38   | OnDemand         |
     And order item recipients exist
         | OrderId | CatalogueItemId | OdsCode | Quantity | DeliveryDate |
         | 10001   | 10101-001       | eu      | 1        | 05/09/2021   |
@@ -55,6 +59,7 @@ Background:
         | 10003   | 10101-004       | eu      | 1        | 05/09/2021   |
         | 10004   | 10101-005       | au      | 1        | 05/09/2021   |
         | 10004   | 10101-006       | au      | 1        | 24/12/2021   |
+        | 10005   | 10101-007       | au      | 1        | 17/10/2021   |
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @5145
@@ -184,6 +189,24 @@ Scenario: when an order is complete, and the funding source is true, but the ord
         | Call Off Agreement ID | Call Off Ordering Party ID | Call Off Ordering Party Name | Call Off Commencement Date | Service Recipient ID | Service Recipient Name | Service Recipient Item ID | Supplier ID | Supplier Name | Product ID | Product Name | Product Type       | Quantity Ordered | Unit of Order | Unit Time | Estimation Period | Price    | Order Type | Funding Type | M1 planned (Delivery Date) | Actual M1 date | Buyer verification date (M2) | Cease Date |
         | C010004-01            | OrgOds                     | NHS NORTHUMBERLAND CCG       | 07/05/2020                 | au                   | AU Test                | C010004-01-au-1           | 10101       | Supplier 1    | 10101-005  | Item 5       | Additional Service | 1                | per patient   | per month | per month         | 599.9999 | 1          | Central      | 05/09/2021                 |                |                              |            |
         | C010004-01            | OrgOds                     | NHS NORTHUMBERLAND CCG       | 07/05/2020                 | au                   | AU Test                | C010004-01-au-2           | 10101       | Supplier 1    | 10101-006  | Item 6       | Associated Service | 1                | per patient   | per year  |                   | 0        | 2          | Central      | 24/12/2021                 |                |                              |            |
+
+@9585
+Scenario: when an order is complete, and the funding source is true, the email is sent containing a CSV file without UnitTime for OnDemand provisioning
+    Given the user creates a request to update the order status for the order with ID 10005
+    And the user enters the 'order-status-complete' update order status request payload
+    When the user sends the update order status request
+    Then a response with status code 204 is returned
+    And only one email is sent
+    And the email contains the following information
+        | FromAddress                    | FromName              | ToAddress                   | ToName                           | Subject                                      | Text                                 |
+        | noreply@buyingcatalogue.nhs.uk | Buying Catalogue Team | gpitfutures.finance@nhs.net | Buying Catalogue Finance Partner | INTEGRATION_TEST New Order C010005-01_OrgOds | Thank you for completing your order. |
+    And the email contains the following attachments
+        | Filename                   |
+        | C010005-01_OrgOds_Full.csv |
+    And all attachments use UTF8 encoding
+    And the 'full' attachment contains the following data
+        | Call Off Agreement ID | Call Off Ordering Party ID | Call Off Ordering Party Name | Call Off Commencement Date | Service Recipient ID | Service Recipient Name | Service Recipient Item ID | Supplier ID | Supplier Name | Product ID | Product Name | Product Type       | Quantity Ordered | Unit of Order | Unit Time | Estimation Period | Price    | Order Type | Funding Type | M1 planned (Delivery Date) | Actual M1 date | Buyer verification date (M2) | Cease Date |
+        | C010005-01            | OrgOds                     | NHS NORTHUMBERLAND CCG       | 18/08/2020                 | au                   | AU Test                | C010005-01-au-1           | 10101       | Supplier 1    | 10101-007  | Item 7       | Catalogue Solution | 1                | per patient   |           | per year          | 405.3800 | 3          | Central      | 17/10/2021                 |                |                              |            |
 
 @9585
 Scenario: when an order is complete, and the funding source is true, the order only has patient numbers, an email is sent containing two CSV files
