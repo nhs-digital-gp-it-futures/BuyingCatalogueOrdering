@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using NHSD.BuyingCatalogue.Ordering.Application;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 
@@ -7,12 +6,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
 {
     public sealed class OdooOrderItem
     {
-        private static readonly ProvisioningType[] ProvisioningTypesWithoutEstimationPeriod = new[]
-        {
-            ProvisioningType.Declarative,
-            ProvisioningType.OnDemand,
-        };
-
         public OdooOrderItem(FlattenedOrderItem orderItem)
         {
             if (orderItem is null)
@@ -35,9 +28,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument
             ProductType = orderItem.CatalogueItem.CatalogueItemType.DisplayName();
             QuantityOrdered = orderItem.Quantity;
             UnitOfOrder = orderItem.PricingUnit.Description;
-            UnitTime = orderItem.PriceTimeUnit?.Description();
+            UnitTime = orderItem.ProvisioningType.Equals(ProvisioningType.OnDemand)
+                ? null
+                : orderItem.PriceTimeUnit?.Description();
 
-            EstimationPeriod = ProvisioningTypesWithoutEstimationPeriod.Contains(orderItem.ProvisioningType)
+            EstimationPeriod = orderItem.ProvisioningType.Equals(ProvisioningType.Declarative)
                 ? null
                 : orderItem.EstimationPeriod?.Description();
 

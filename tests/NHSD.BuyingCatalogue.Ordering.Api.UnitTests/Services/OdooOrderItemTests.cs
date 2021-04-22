@@ -146,15 +146,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
         [Test]
         [CommonAutoData]
-        public static void Constructor_InitializesUnitTime(
-            [Frozen] TimeUnit priceTimeUnit,
-            OdooOrderItem odooOrderItem)
-        {
-            odooOrderItem.UnitTime.Should().Be(priceTimeUnit.Description());
-        }
-
-        [Test]
-        [CommonAutoData]
         public static void Constructor_OnDemandProvisioningType_InitializesEstimationPeriod(
             Order order,
             CatalogueItem catalogueItem,
@@ -172,7 +163,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             var odooOrderItem = new OdooOrderItem(orderItem);
 
-            odooOrderItem.EstimationPeriod.Should().BeNull();
+            odooOrderItem.UnitTime.Should().BeNull();
+        }
+
+        [Test]
+        [CommonAutoData]
+        public static void Constructor_InitializesUnitTime(
+            [Frozen] TimeUnit priceTimeUnit,
+            OdooOrderItem odooOrderItem)
+        {
+            odooOrderItem.UnitTime.Should().Be(priceTimeUnit.Description());
         }
 
         [Test]
