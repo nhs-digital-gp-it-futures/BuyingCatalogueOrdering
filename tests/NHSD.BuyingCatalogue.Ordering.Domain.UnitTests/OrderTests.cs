@@ -511,6 +511,52 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
 
         [Test]
         [CommonAutoData]
+        public static void DeleteOrderItemAndUpdateProgress_AllCataloguesSolutionsDeleted_FundingSourceOnlyGmsToNull(
+            CatalogueItemId catalogueItemId,
+            Order order)
+        {
+            var parentOrderItem = OrderItemBuilder.Create()
+                .WithCatalogueItem(new CatalogueItem
+                {
+                    Id = catalogueItemId,
+                    CatalogueItemType = CatalogueItemType.Solution,
+                }).Build();
+            order.FundingSourceOnlyGms = true;
+            order.AddOrUpdateOrderItem(parentOrderItem);
+
+            order.DeleteOrderItemAndUpdateProgress(catalogueItemId);
+
+            order.FundingSourceOnlyGms.Should().BeNull();
+        }
+
+        [Test]
+        [CommonAutoData]
+        public static void DeleteOrderItemAndUpdateProgress_CataloguesSolutionsNotDeleted_FundingSourceOnlyGmsNotChanged(
+           CatalogueItemId catalogueItemId,
+           Order order)
+        {
+            var orderItem1 = OrderItemBuilder.Create()
+                .WithCatalogueItem(new CatalogueItem
+                {
+                    Id = catalogueItemId,
+                    CatalogueItemType = CatalogueItemType.Solution,
+                }).Build();
+            var orderItem2 = OrderItemBuilder.Create()
+                .WithCatalogueItem(new CatalogueItem
+                {
+                    CatalogueItemType = CatalogueItemType.Solution,
+                }).Build();
+            order.AddOrUpdateOrderItem(orderItem1);
+            order.AddOrUpdateOrderItem(orderItem2);
+            order.FundingSourceOnlyGms = true;
+
+            order.DeleteOrderItemAndUpdateProgress(orderItem1.CatalogueItem.Id);
+
+            order.FundingSourceOnlyGms.Should().BeTrue();
+        }
+
+        [Test]
+        [CommonAutoData]
         public static void DeleteOrderItemAndUpdateProgress_OrderItemPresent_ReturnsNumberOfItemsDeleted(
             OrderItem orderItem1,
             OrderItem orderItem2,
