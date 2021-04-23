@@ -8,8 +8,8 @@ Background:
         | Id                                   |
         | 4af62b99-638c-4247-875e-965239cd0c48 |
     Given orders exist
-        | OrderId | Description      | OrderingPartyId                      | LastUpdatedBy                        | LastUpdatedByName | CommencementDate |
-        | 10001   | Some Description | 4af62b99-638c-4247-875e-965239cd0c48 | 335392e4-4bb1-413b-9de5-36a85c9c0422 | Tom Smith         | 01/01/2021       |
+        | OrderId | Description      | OrderingPartyId                      | LastUpdatedBy                        | LastUpdatedByName | CommencementDate | FundingSourceOnlyGMS |
+        | 10001   | Some Description | 4af62b99-638c-4247-875e-965239cd0c48 | 335392e4-4bb1-413b-9de5-36a85c9c0422 | Tom Smith         | 01/01/2021       | True                 |
     And pricing units exist
         | Name    | Description |
         | patient | per patient |
@@ -52,6 +52,14 @@ Scenario: delete a solution
         | 10001   | 100001-001      | ODS2    |
         | 10001   | 100001-001A001  | ODS1    |
         | 10001   | 100001-001A001  | ODS3    |
+
+@9038
+Scenario: deleting all order items should set funding source to null
+    Given the user creates a request to delete order item with catalogue item ID 100001-001 for the order with ID 10001
+    When the user sends the delete order item request
+    Given the user creates a request to delete order item with catalogue item ID 200002-002 for the order with ID 10001
+    When the user sends the delete order item request
+    Then the fundingSourceOnlyGms value is null
 
 @9040
 Scenario: delete a catalogue solution with an additional service

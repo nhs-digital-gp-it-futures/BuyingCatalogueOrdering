@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
+using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
@@ -36,6 +38,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await deleteOrderItemRequest.ExecuteAsync();
         }
 
+        [Then(@"the fundingSourceOnlyGms value is null")]
+        public async Task ThenTheFundingSourceOnlyGmsIs()
+        {
+            var order = await OrderEntity.FetchOrderByOrderId(settings.ConnectionString, deleteOrderItemRequest.OrderId);
+            order.FundingSourceOnlyGms.Should().BeNull();
+        }
+
         private sealed class DeleteOrderItemRequest
         {
             private readonly Request request;
@@ -48,9 +57,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                 int orderId)
             {
                 this.request = request ?? throw new ArgumentNullException(nameof(request));
-
+                OrderId = orderId;
                 deleteOrderUrl = $"{orderingApiBaseAddress}/api/v1/orders/C0{orderId}-01/order-items/{catalogueItemId}";
             }
+
+            internal int OrderId { get; }
 
             public async Task ExecuteAsync() => await request.DeleteAsync(deleteOrderUrl);
         }

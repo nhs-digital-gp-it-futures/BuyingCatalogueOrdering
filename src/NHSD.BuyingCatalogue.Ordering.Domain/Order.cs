@@ -210,6 +210,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 Progress.AdditionalServicesViewed = false;
             }
 
+            if (orderItems.Count == 0)
+            {
+                FundingSourceOnlyGms = null;
+            }
+
             return result;
         }
 
