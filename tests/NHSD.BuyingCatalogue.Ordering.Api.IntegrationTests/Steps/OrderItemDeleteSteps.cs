@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using FluentAssertions;
-using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Support;
 using NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils;
 using NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities;
 using TechTalk.SpecFlow;
@@ -13,17 +12,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
     {
         private readonly Request request;
         private readonly Settings settings;
-        private readonly OrderContext orderContext;
         private DeleteOrderItemRequest deleteOrderItemRequest;
 
         public OrderItemDeleteSteps(
             Request request,
-            Settings settings,
-            OrderContext orderContext)
+            Settings settings)
         {
             this.request = request;
             this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
-            this.orderContext = orderContext ?? throw new ArgumentNullException(nameof(orderContext));
         }
 
         [Given(@"the user creates a request to delete order item with catalogue item ID (.*) for the order with ID (\d{1,6})")]
