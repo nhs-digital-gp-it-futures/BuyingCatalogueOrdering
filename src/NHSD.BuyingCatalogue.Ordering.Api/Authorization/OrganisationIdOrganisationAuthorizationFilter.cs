@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Authorization
@@ -7,7 +8,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Authorization
     {
         internal const string DefaultParameterName = "organisationId";
 
-        protected override string ParameterName { get; } = DefaultParameterName;
+        protected override string RouteParameterName => DefaultParameterName;
+
+        protected override IEnumerable<string> ActionMethodParameterNames => new[] { DefaultParameterName };
 
         protected override Task<(string Id, IActionResult Result)> GetOrganisationId(string routeValue)
         {

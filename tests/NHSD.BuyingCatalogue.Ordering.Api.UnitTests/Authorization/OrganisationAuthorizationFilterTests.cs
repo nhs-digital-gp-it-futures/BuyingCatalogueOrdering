@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
@@ -16,7 +17,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Authorization
     [SuppressMessage("ReSharper", "NUnit.MethodWithParametersAndTestAttribute", Justification = "False positive")]
     internal static class OrganisationAuthorizationFilterTests
     {
-        private const string RouteParameterName = "aParameter";
+        private const string DefaultRouteParameterName = "aParameter";
+        private const string DefaultActionMethodParameterName = "anotherParameter";
 
         [Test]
         public static async Task OnAuthorizationAsync_NoAttribute_ReturnsExpectedValue()
@@ -56,7 +58,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Authorization
             var actionDescriptor = new ActionDescriptor
             {
                 EndpointMetadata = new object[] { new AuthorizeOrganisationAttribute() },
-                Parameters = new[] { new ParameterDescriptor { Name = RouteParameterName } },
+                Parameters = new[] { new ParameterDescriptor { Name = DefaultActionMethodParameterName } },
             };
 
             var context = AuthorizationFilterContextBuilder.Create()
@@ -78,7 +80,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Authorization
             var actionDescriptor = new ActionDescriptor
             {
                 EndpointMetadata = new object[] { new AuthorizeOrganisationAttribute() },
-                Parameters = new[] { new ParameterDescriptor { Name = RouteParameterName } },
+                Parameters = new[] { new ParameterDescriptor { Name = DefaultActionMethodParameterName } },
             };
 
             var context = AuthorizationFilterContextBuilder.Create()
@@ -100,12 +102,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Authorization
             var actionDescriptor = new ActionDescriptor
             {
                 EndpointMetadata = new object[] { new AuthorizeOrganisationAttribute() },
-                Parameters = new[] { new ParameterDescriptor { Name = RouteParameterName } },
+                Parameters = new[] { new ParameterDescriptor { Name = DefaultActionMethodParameterName } },
             };
 
             var context = AuthorizationFilterContextBuilder.Create()
                 .WithActionDescription(actionDescriptor)
-                .WithRouteValue(RouteParameterName, routeValue)
+                .WithRouteValue(DefaultRouteParameterName, routeValue)
                 .WithUser(user)
                 .Build();
 
@@ -122,12 +124,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Authorization
             var actionDescriptor = new ActionDescriptor
             {
                 EndpointMetadata = new object[] { new AuthorizeOrganisationAttribute() },
-                Parameters = new[] { new ParameterDescriptor { Name = RouteParameterName } },
+                Parameters = new[] { new ParameterDescriptor { Name = DefaultActionMethodParameterName } },
             };
 
             var context = AuthorizationFilterContextBuilder.Create()
                 .WithActionDescription(actionDescriptor)
-                .WithRouteValue(RouteParameterName, null)
+                .WithRouteValue(DefaultRouteParameterName, null)
                 .WithUser(user)
                 .Build();
 
@@ -150,12 +152,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Authorization
             var actionDescriptor = new ActionDescriptor
             {
                 EndpointMetadata = new object[] { new AuthorizeOrganisationAttribute() },
-                Parameters = new[] { new ParameterDescriptor { Name = RouteParameterName } },
+                Parameters = new[] { new ParameterDescriptor { Name = DefaultActionMethodParameterName } },
             };
 
             var context = AuthorizationFilterContextBuilder.Create()
                 .WithActionDescription(actionDescriptor)
-                .WithRouteValue(RouteParameterName, null)
+                .WithRouteValue(DefaultRouteParameterName, null)
                 .WithUser(user)
                 .Build();
 
@@ -180,12 +182,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Authorization
             var actionDescriptor = new ActionDescriptor
             {
                 EndpointMetadata = new object[] { new AuthorizeOrganisationAttribute() },
-                Parameters = new[] { new ParameterDescriptor { Name = RouteParameterName } },
+                Parameters = new[] { new ParameterDescriptor { Name = DefaultActionMethodParameterName } },
             };
 
             var context = AuthorizationFilterContextBuilder.Create()
                 .WithActionDescription(actionDescriptor)
-                .WithRouteValue(RouteParameterName, null)
+                .WithRouteValue(DefaultRouteParameterName, null)
                 .WithUser(user)
                 .Build();
 
@@ -209,12 +211,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Authorization
             var actionDescriptor = new ActionDescriptor
             {
                 EndpointMetadata = new object[] { new AuthorizeOrganisationAttribute() },
-                Parameters = new[] { new ParameterDescriptor { Name = RouteParameterName } },
+                Parameters = new[] { new ParameterDescriptor { Name = DefaultActionMethodParameterName } },
             };
 
             var context = AuthorizationFilterContextBuilder.Create()
                 .WithActionDescription(actionDescriptor)
-                .WithRouteValue(RouteParameterName, null)
+                .WithRouteValue(DefaultRouteParameterName, null)
                 .WithUser(user)
                 .Build();
 
@@ -232,7 +234,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Authorization
 
             internal string RouteValue { get; private set; }
 
-            protected override string ParameterName { get; } = RouteParameterName;
+            protected override string RouteParameterName => DefaultRouteParameterName;
+
+            protected override IEnumerable<string> ActionMethodParameterNames => new[] { DefaultActionMethodParameterName };
 
             protected override Task<(string Id, IActionResult Result)> GetOrganisationId(string routeValue)
             {

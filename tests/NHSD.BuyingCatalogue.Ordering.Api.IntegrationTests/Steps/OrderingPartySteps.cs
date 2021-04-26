@@ -89,7 +89,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             payload.OdsCode = odsCode;
         }
 
-        [When(@"the user makes a request to retrieve the ordering-party section with the ID (\d{1,6})")]
+        [When(@"the user makes a request to retrieve the ordering-party section for the order with ID (\d{1,6})")]
         public async Task GivenTheUserMakesARequestToRetrieveTheOrdering_PartySectionWithTheID(int orderId)
         {
             await request.GetAsync(string.Format(CultureInfo.InvariantCulture, orderingPartyUrl, orderId));

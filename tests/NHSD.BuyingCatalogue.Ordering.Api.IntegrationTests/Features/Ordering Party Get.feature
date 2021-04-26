@@ -20,7 +20,7 @@ Scenario: get an ordering party
     And orders exist
         | OrderId | OrderingPartyId                      | OrderingPartyContactId | Description      | Created    | LastUpdated | LastUpdatedBy                        |
         | 10001   | 4af62b99-638c-4247-875e-965239cd0c48 | 1                      | Some Description | 11/05/2020 | 11/05/2020  | 335392e4-4bb1-413b-9de5-36a85c9c0422 |
-    When the user makes a request to retrieve the ordering-party section with the ID 10001
+    When the user makes a request to retrieve the ordering-party section for the order with ID 10001
     Then a response with status code 200 is returned
     And the ordering-party is returned
         | Name         | OdsCode |
@@ -40,37 +40,53 @@ Scenario: get an empty ordering party
     And orders exist
         | OrderId | OrderingPartyId                      | Description      | Created    | LastUpdated | LastUpdatedBy                        |
         | 10002   | 4af62b99-638c-4247-875e-965239cd0c48 | Some Description | 11/05/2020 | 11/05/2020  | 335392e4-4bb1-413b-9de5-36a85c9c0422 |
-    When the user makes a request to retrieve the ordering-party section with the ID 10002
+    When the user makes a request to retrieve the ordering-party section for the order with ID 10002
     Then a response with status code 200 is returned
     And the response contains no data
 
 @4616
 Scenario: a non-existent order ID returns not found
-    When the user makes a request to retrieve the ordering-party section with the ID 10000
+    When the user makes a request to retrieve the ordering-party section for the order with ID 10000
     Then a response with status code 404 is returned
 
 @4616
 Scenario: if a user is not authorised then they cannot access the ordering-party
-    Given no user is logged in
-    When the user makes a request to retrieve the ordering-party section with the ID 10001
+    Given ordering parties exist
+        | Id                                   |
+        | 4af62b99-638c-4247-875e-965239cd0c48 |
+    And orders exist
+        | OrderId | OrderingPartyId                      | Description      | Created    | LastUpdated | LastUpdatedBy                        |
+        | 10002   | 4af62b99-638c-4247-875e-965239cd0c48 | Some Description | 11/05/2020 | 11/05/2020  | 335392e4-4bb1-413b-9de5-36a85c9c0422 |
+    And no user is logged in
+    When the user makes a request to retrieve the ordering-party section for the order with ID 10001
     Then a response with status code 401 is returned
 
 @4616
 Scenario: a non-buyer user cannot access the ordering-party
-    Given the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
-    When the user makes a request to retrieve the ordering-party section with the ID 10001
+    Given ordering parties exist
+        | Id                                   |
+        | 4af62b99-638c-4247-875e-965239cd0c48 |
+    And orders exist
+        | OrderId | OrderingPartyId                      | Description      | Created    | LastUpdated | LastUpdatedBy                        |
+        | 10002   | 4af62b99-638c-4247-875e-965239cd0c48 | Some Description | 11/05/2020 | 11/05/2020  | 335392e4-4bb1-413b-9de5-36a85c9c0422 |
+    And the user is logged in with the Authority role for organisation 4af62b99-638c-4247-875e-965239cd0c48
+    When the user makes a request to retrieve the ordering-party section for the order with ID 10001
     Then a response with status code 403 is returned
 
-# TODO: fix. Suspect param name check in auth filter is problem
-@ignore
 @4616
 Scenario: a buyer user cannot access the ordering-party for an organisation they don't belong to
-    Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
-    When the user makes a request to retrieve the ordering-party section with the ID 10001
+    Given ordering parties exist
+        | Id                                   |
+        | 4af62b99-638c-4247-875e-965239cd0c48 |
+    And orders exist
+        | OrderId | OrderingPartyId                      | Description      | Created    | LastUpdated | LastUpdatedBy                        |
+        | 10003   | 4af62b99-638c-4247-875e-965239cd0c48 | Some Description | 11/05/2020 | 11/05/2020  | 335392e4-4bb1-413b-9de5-36a85c9c0422 |
+    And the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933
+    When the user makes a request to retrieve the ordering-party section for the order with ID 10003
     Then a response with status code 403 is returned
 
 @4616
 Scenario: service failure
     Given the call to the database will fail
-    When the user makes a request to retrieve the ordering-party section with the ID 10001
+    When the user makes a request to retrieve the ordering-party section for the order with ID 10001
     Then a response with status code 500 is returned
