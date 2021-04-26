@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Services;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
+using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NHSD.BuyingCatalogue.Ordering.Domain;
-using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -21,29 +19,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [AuthorizeOrganisation]
     public sealed class SupplierSectionController : ControllerBase
     {
-        private readonly ApplicationDbContext context;
+        private readonly ISupplierSectionService supplierSectionService;
         private readonly IContactDetailsService contactDetailsService;
 
-        public SupplierSectionController(ApplicationDbContext context, IContactDetailsService contactDetailsService)
+        public SupplierSectionController(ISupplierSectionService supplierSectionService, IContactDetailsService contactDetailsService)
         {
-            this.context = context ?? throw new ArgumentNullException(nameof(context));
+            this.supplierSectionService = supplierSectionService ?? throw new ArgumentNullException(nameof(supplierSectionService));
             this.contactDetailsService = contactDetailsService ?? throw new ArgumentNullException(nameof(contactDetailsService));
         }
 
         [HttpGet]
         public async Task<ActionResult<SupplierModel>> GetAsync(CallOffId callOffId)
         {
-            var model = await context.Order
-                .Where(o => o.Id == callOffId.Id)
-                .Include(o => o.Supplier).ThenInclude(s => s.Address)
-                .Select(o => new SupplierModel(o.Supplier, o.SupplierContact))
-                .AsNoTracking()
-                .SingleOrDefaultAsync();
+            var order = await supplierSectionService.GetOrder(callOffId);
 
-            if (model is null)
+            if (order is null)
                 return NotFound();
 
-            return model;
+            return new SupplierModel(order.Supplier, order.SupplierContact);
         }
 
         [HttpPut]
@@ -53,29 +46,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (model is null)
                 throw new ArgumentNullException(nameof(model));
 
-            var order = await context.Order
-                .Where(o => o.Id == callOffId.Id)
-                .Include(o => o.Supplier).ThenInclude(s => s.Address)
-                .Include(o => o.SupplierContact)
-                .SingleOrDefaultAsync();
+            var order = await supplierSectionService.GetOrder(callOffId);
 
             if (order is null)
                 return NotFound();
 
-            var supplier = order.Supplier ?? await context.Supplier.FindAsync(model.SupplierId) ?? new Supplier
+            var supplierModel = new Supplier
             {
                 Id = model.SupplierId,
+                Name = model.Name,
+                Address = contactDetailsService.AddOrUpdateAddress(order.Supplier?.Address, model.Address),
             };
 
-            supplier.Name = model.Name;
-            supplier.Address = contactDetailsService.AddOrUpdateAddress(supplier.Address, model.Address);
-            order.SupplierContact = contactDetailsService.AddOrUpdatePrimaryContact(
+            var contact = contactDetailsService.AddOrUpdatePrimaryContact(
                 order.SupplierContact,
                 model.PrimaryContact);
 
-            order.Supplier = supplier;
-
-            await context.SaveChangesAsync();
+            await supplierSectionService.SetSupplierSection(order, supplierModel, contact);
 
             return NoContent();
         }

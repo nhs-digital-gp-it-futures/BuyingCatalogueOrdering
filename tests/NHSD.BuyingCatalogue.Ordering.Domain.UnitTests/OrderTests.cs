@@ -580,7 +580,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         {
             order.OrderItems.Count.Should().Be(0);
 
-            var actual = order.DeleteOrderItemAndUpdateProgress(default(CatalogueItemId));
+            var actual = order.DeleteOrderItemAndUpdateProgress(default);
 
             actual.Should().Be(0);
         }

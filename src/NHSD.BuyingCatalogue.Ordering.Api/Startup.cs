@@ -103,7 +103,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 .AddScoped<IDefaultDeliveryDateService, DefaultDeliveryDateService>()
                 .AddScoped<IOrderDescriptionService, OrderDescriptionService>()
                 .AddScoped<IOrderingPartyService, OrderingPartyService>()
-                .AddScoped<ISectionStatusService, SectionStatusService>();
+                .AddScoped<ISectionStatusService, SectionStatusService>()
+                .AddScoped<ISupplierSectionService, SupplierSectionService>();
 
             services
                 .AddSingleton(smtpSettings)

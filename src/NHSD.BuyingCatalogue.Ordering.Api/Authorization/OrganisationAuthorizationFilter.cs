@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -12,7 +13,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Authorization
 {
     internal abstract class OrganisationAuthorizationFilter : IAsyncAuthorizationFilter
     {
-        protected abstract string ParameterName { get; }
+        protected abstract string RouteParameterName { get; }
+
+        protected abstract IEnumerable<string> ActionMethodParameterNames { get; }
 
         public virtual async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
@@ -46,14 +49,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Authorization
         private bool ActionRequiresHandling(ActionDescriptor descriptor)
         {
             return descriptor.EndpointMetadata.OfType<AuthorizeOrganisationAttribute>().Any()
-                && descriptor.Parameters.Any(i => i.Name == ParameterName);
+                && descriptor.Parameters.Any(i => ActionMethodParameterNames.Contains(i.Name));
         }
 
         private async Task<(bool IsAuthorisedForOrganisation, IActionResult Result)> UserAuthorisedForRequestOrganisation(
             ClaimsPrincipal user,
             RouteValueDictionary routeValues)
         {
-            (var id, IActionResult result) = await GetOrganisationId(routeValues[ParameterName]?.ToString() ?? string.Empty);
+            (var id, IActionResult result) = await GetOrganisationId(routeValues[RouteParameterName]?.ToString() ?? string.Empty);
             if (result is not null)
                 return (false, result);
 

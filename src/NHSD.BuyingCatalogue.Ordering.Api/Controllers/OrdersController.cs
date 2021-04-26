@@ -131,10 +131,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                 new { orderId = order.CallOffId.ToString() });
         }
 
-        // {order} is actually a call-off ID here but model binding maps to an Order. However, the route parameter name
-        // must match the method parameter name for the model to be considered valid when the ApiController attribute is present.
-        [HttpDelete]
-        [Route("{order}")]
+        // ReSharper disable once RouteTemplates.RouteParameterIsNotPassedToMethod (bound to order parameter)
+        // ReSharper disable once RouteTemplates.MethodMissingRouteParameters
+        [HttpDelete("{callOffId}")]
         [Authorize(Policy = PolicyName.CanManageOrders)]
         public async Task<IActionResult> DeleteOrderAsync([FromRoute] Order order)
         {
