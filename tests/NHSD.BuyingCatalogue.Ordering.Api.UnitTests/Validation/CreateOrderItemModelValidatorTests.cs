@@ -405,7 +405,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         [Test]
         [CommonInlineAutoData(nameof(CatalogueItemType.Solution))]
         [CommonInlineAutoData(nameof(CatalogueItemType.AdditionalService))]
-        public static void Validate_DeliveryDateIsValid_IsSolutionOrAdditionalService_DoesNotHaveError(            
+        public static void Validate_DeliveryDateIsValid_IsSolutionOrAdditionalService_DoesNotHaveError(
             string catalogueItemType,
             DateTime deliveryDate,
             CreateOrderItemModel model,
@@ -431,7 +431,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             CreateOrderItemModel model,
             CreateOrderItemModelValidator validator)
         {
-            var recipient = new OrderItemRecipientModel() { DeliveryDate = deliveryDate };
+            var recipient = new OrderItemRecipientModel { DeliveryDate = deliveryDate };
             model.CatalogueItemType = nameof(CatalogueItemType.AssociatedService);
             model.ServiceRecipients = new List<OrderItemRecipientModel> { recipient };
 

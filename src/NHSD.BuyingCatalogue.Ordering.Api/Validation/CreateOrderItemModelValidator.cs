@@ -107,11 +107,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Validation
             return IsCatalogueItemType(model, nameof(CatalogueItemType.AssociatedService));
         }
 
-        private static bool IsSolution(CreateOrderItemModel model)
-        {
-            return IsCatalogueItemType(model, nameof(CatalogueItemType.Solution));
-        }
-
         private static bool IsCatalogueItemType(CreateOrderItemModel model, string catalogueItemType)
         {
             return model.CatalogueItemType.EqualsOrdinalIgnoreCase(catalogueItemType);
