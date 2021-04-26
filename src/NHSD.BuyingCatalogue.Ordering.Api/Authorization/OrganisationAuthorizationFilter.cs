@@ -24,7 +24,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Authorization
             if (!UserHasOrderingClaim(context.HttpContext.User))
                 return;
 
-            (var isSameOrganisation, IActionResult actionResult) = await UserBelongsToRequestOrganisation(
+            (var isAuthorisedForOrganisation, IActionResult actionResult) = await UserAuthorisedForRequestOrganisation(
                 user,
                 context.RouteData.Values);
 
@@ -34,7 +34,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Authorization
                 return;
             }
 
-            if (!isSameOrganisation)
+            if (!isAuthorisedForOrganisation)
                 context.Result = new ForbidResult();
         }
 
@@ -49,7 +49,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Authorization
                 && descriptor.Parameters.Any(i => i.Name == ParameterName);
         }
 
-        private async Task<(bool IsSameOrganisation, IActionResult Result)> UserBelongsToRequestOrganisation(
+        private async Task<(bool IsAuthorisedForOrganisation, IActionResult Result)> UserAuthorisedForRequestOrganisation(
             ClaimsPrincipal user,
             RouteValueDictionary routeValues)
         {
@@ -57,10 +57,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Authorization
             if (result is not null)
                 return (false, result);
 
-            var userOrganizationId = user.FindFirstValue(UserClaimTypes.PrimaryOrganisationId);
-            var isSameOrganisation = string.Equals(userOrganizationId, id, StringComparison.OrdinalIgnoreCase);
+            var userAuthorisedOrganisations = user.FindAll(UserClaimTypes.RelatedOrganisationId).Select(c => c.Value).Append(user.FindFirstValue(UserClaimTypes.PrimaryOrganisationId)).ToList();
 
-            return (isSameOrganisation, null);
+            var isAuthorisedForOrganisation = userAuthorisedOrganisations.Any(s => s.Equals(id, StringComparison.OrdinalIgnoreCase));
+
+            return (isAuthorisedForOrganisation, null);
         }
     }
 }
