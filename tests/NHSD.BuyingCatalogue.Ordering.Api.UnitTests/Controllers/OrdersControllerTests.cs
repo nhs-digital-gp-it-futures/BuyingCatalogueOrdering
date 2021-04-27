@@ -12,7 +12,6 @@ using AutoFixture.NUnit3;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
@@ -20,9 +19,9 @@ using NHSD.BuyingCatalogue.Ordering.Api.Models.Errors;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
+using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Domain.Results;
-using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
@@ -56,21 +55,34 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task GetAsync_OrderExists_ReturnsExpectedResult(
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderService> service,
             [Frozen] CallOffId callOffId,
             OrderItem orderItem,
             Order order,
             OrdersController controller)
         {
             order.AddOrUpdateOrderItem(orderItem);
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
+            service.Setup(o => o.GetOrder(callOffId)).ReturnsAsync(order);
 
             var expectedResult = OrderModel.Create(order);
 
             var response = await controller.GetAsync(callOffId);
 
             response.Value.Should().BeEquivalentTo(expectedResult);
+        }
+
+        [Test]
+        [InMemoryDbAutoData]
+        public static async Task GetAsync_InvokesGetOrder(
+            [Frozen] Mock<IOrderingPartyService> service,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            OrderingPartyController controller)
+        {
+            service.Setup(o => o.GetOrder(callOffId)).ReturnsAsync(order);
+            await controller.GetAsync(callOffId);
+
+            service.Verify(o => o.GetOrder(callOffId), Times.Once);
         }
 
         [Test]
@@ -87,19 +99,33 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task GetAllAsync_OrdersExist_ReturnsExpectedResult(
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderService> service,
             [Frozen] OrderingParty orderingParty,
-            IReadOnlyList<Order> orders,
+            IList<Order> orders,
             OrdersController controller)
         {
-            context.Order.AddRange(orders);
-            await context.SaveChangesAsync();
+            service.Setup(o => o.GetOrderList(orderingParty.Id)).ReturnsAsync(orders);
 
             var expectedResult = orders.Select(o => new OrderListItemModel(o));
 
             var result = await controller.GetAllAsync(orderingParty.Id);
 
             result.Value.Should().BeEquivalentTo(expectedResult);
+        }
+
+        [Test]
+        [InMemoryDbAutoData]
+        public static async Task GetAsync_InvokesGetOrderList(
+            [Frozen] Mock<IOrderService> service,
+            [Frozen] OrderingParty orderingParty,
+            IList<Order> orders,
+            OrdersController controller)
+        {
+            service.Setup(o => o.GetOrderList(orderingParty.Id)).ReturnsAsync(orders);
+
+            await controller.GetAllAsync(orderingParty.Id);
+
+            service.Verify(o => o.GetOrderList(orderingParty.Id), Times.Once);
         }
 
         [Test]
@@ -116,7 +142,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task GetOrderSummaryAsync_ReturnsExpectedResult(
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderService> service,
             [Frozen] CallOffId callOffId,
             IReadOnlyList<SelectedServiceRecipient> serviceRecipients,
             IReadOnlyList<OrderItem> orderItems,
@@ -127,14 +153,34 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             foreach (var orderItem in orderItems)
                 order.AddOrUpdateOrderItem(orderItem);
 
-            context.Order.AddRange(order);
-            await context.SaveChangesAsync();
+            service.Setup(o => o.GetOrderSummary(callOffId)).ReturnsAsync(order);
 
             var expectedResult = OrderSummaryModel.Create(order);
 
             var result = await controller.GetOrderSummaryAsync(callOffId);
 
             result.Value.Should().BeEquivalentTo(expectedResult);
+        }
+
+        [Test]
+        [InMemoryDbAutoData]
+        public static async Task GetOrderSummaryAsync_InvokesGetOrderSummary(
+            [Frozen] Mock<IOrderService> service,
+            [Frozen] CallOffId callOffId,
+            IReadOnlyList<SelectedServiceRecipient> serviceRecipients,
+            IReadOnlyList<OrderItem> orderItems,
+            Order order,
+            OrdersController controller)
+        {
+            order.SetSelectedServiceRecipients(serviceRecipients);
+            foreach (var orderItem in orderItems)
+                order.AddOrUpdateOrderItem(orderItem);
+
+            service.Setup(o => o.GetOrderSummary(callOffId)).ReturnsAsync(order);
+
+            await controller.GetOrderSummaryAsync(callOffId);
+
+            service.Verify(o => o.GetOrderSummary(callOffId), Times.Once());
         }
 
         [Test]
@@ -165,51 +211,68 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task CreateOrderAsync_CreatesOrderingParty(
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderService> service,
             [Frozen] Mock<HttpContext> httpContextMock,
+            Order order,
             CreateOrderModel model,
             OrdersController controller)
         {
             var claims = new[] { new Claim("primaryOrganisationId", model.OrganisationId.ToString()) };
             var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "mock"));
             httpContextMock.Setup(c => c.User).Returns(user);
+            service.Setup(o => o.CreateOrder(model.Description, model.OrganisationId!.Value)).Callback(() =>
+            {
+                order = new Order
+                {
+                    CallOffId = order.CallOffId,
+                    OrderingParty = new OrderingParty
+                    {
+                        Id = model.OrganisationId!.Value,
+                    },
+                };
+            }).ReturnsAsync(order);
 
             await controller.CreateOrderAsync(model);
 
-            var orderingParties = context.Set<OrderingParty>();
-            orderingParties.Should().HaveCount(1);
-            orderingParties.First().Id.Should().Be(model.OrganisationId!.Value);
+            order.OrderingParty.Id.Should().Be(model.OrganisationId!.Value);
         }
 
         [Test]
         [InMemoryDbAutoData]
         public static async Task CreateOrderAsync_CreatesOrder(
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderService> service,
             [Frozen] Mock<HttpContext> httpContextMock,
+            Order order,
             OrderingParty orderingParty,
             string description,
             OrdersController controller)
         {
-            context.Add(orderingParty);
-            await context.SaveChangesAsync();
-
             var model = new CreateOrderModel { OrganisationId = orderingParty.Id, Description = description };
             var claims = new[] { new Claim("primaryOrganisationId", model.OrganisationId.ToString()) };
             var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "mock"));
             httpContextMock.Setup(c => c.User).Returns(user);
+            service.Setup(o => o.CreateOrder(model.Description, model.OrganisationId!.Value)).Callback(() =>
+            {
+                order = new Order
+                {
+                    CallOffId = order.CallOffId,
+                    Description = model.Description,
+                    OrderingParty = orderingParty,
+                };
+            }).ReturnsAsync(order);
 
             await controller.CreateOrderAsync(model);
 
-            var orders = context.Set<Order>();
-            orders.Should().HaveCount(1);
-            orders.First().OrderingParty.Should().Be(orderingParty);
-            orders.First().Description.Should().Be(description);
+            order.OrderingParty.Should().Be(orderingParty);
+            order.Description.Should().Be(description);
         }
 
         [Test]
         [InMemoryDbAutoData]
         public static async Task CreateOrderAsync_ReturnsExpectedResult(
+            [Frozen] Mock<IOrderService> service,
             [Frozen] Mock<HttpContext> httpContextMock,
+            Order order,
             OrderingParty orderingParty,
             OrdersController controller)
         {
@@ -217,12 +280,54 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var claims = new[] { new Claim("primaryOrganisationId", model.OrganisationId.ToString()) };
             var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "mock"));
             httpContextMock.Setup(c => c.User).Returns(user);
+            service.Setup(o => o.CreateOrder(model.Description, model.OrganisationId!.Value)).Callback(() =>
+            {
+                order = new Order
+                {
+                    CallOffId = order.CallOffId,
+                    OrderingParty = new OrderingParty
+                    {
+                        Id = model.OrganisationId!.Value,
+                    },
+                };
+            }).ReturnsAsync(order);
 
             var result = await controller.CreateOrderAsync(model);
 
             result.Should().BeOfType<CreatedAtActionResult>();
             result.As<CreatedAtActionResult>().ActionName.Should().Be("Get");
             result.As<CreatedAtActionResult>().RouteValues.Should().ContainKey("callOffId");
+        }
+
+        [Test]
+        [InMemoryDbAutoData]
+        public static async Task CreateOrderAsync_InvokesCreatesOrder(
+            [Frozen] Mock<IOrderService> service,
+            [Frozen] Mock<HttpContext> httpContextMock,
+            Order order,
+            OrderingParty orderingParty,
+            string description,
+            OrdersController controller)
+        {
+            var model = new CreateOrderModel { OrganisationId = orderingParty.Id, Description = description };
+            var claims = new[] { new Claim("primaryOrganisationId", model.OrganisationId.ToString()) };
+            var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "mock"));
+            httpContextMock.Setup(c => c.User).Returns(user);
+            service.Setup(o => o.CreateOrder(model.Description, model.OrganisationId!.Value)).Callback(() =>
+            {
+                order = new Order
+                {
+                    CallOffId = order.CallOffId,
+                    OrderingParty = new OrderingParty
+                    {
+                        Id = model.OrganisationId!.Value,
+                    },
+                };
+            }).ReturnsAsync(order);
+
+            await controller.CreateOrderAsync(model);
+
+            service.Verify(o => o.CreateOrder(model.Description, model.OrganisationId!.Value), Times.Once);
         }
 
         [Test]
@@ -251,10 +356,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task DeleteOrderAsync_UpdatesOrder(
+            [Frozen] Mock<IOrderService> service,
             Order order,
             OrdersController controller)
         {
             order.IsDeleted = false;
+            service.Setup(o => o.DeleteOrder(order)).Callback(() =>
+            {
+                order.IsDeleted = true;
+            });
 
             await controller.DeleteOrderAsync(order);
 
@@ -263,31 +373,34 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task DeleteOrderAsync_UpdatesDb(
-            [Frozen] ApplicationDbContext context,
-            Order order,
-            OrdersController controller)
-        {
-            order.IsDeleted = false;
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
-
-            await controller.DeleteOrderAsync(order);
-
-            context.Set<Order>().IgnoreQueryFilters().Single(o => o.Equals(order)).IsDeleted.Should().BeTrue();
-        }
-
-        [Test]
-        [InMemoryDbAutoData]
         public static async Task DeleteOrderAsync_ReturnsExpectedResult(
+            [Frozen] Mock<IOrderService> service,
             Order order,
             OrdersController controller)
         {
             order.IsDeleted = false;
+            service.Setup(o => o.DeleteOrder(order)).Callback(() =>
+            {
+                order.IsDeleted = true;
+            });
 
             var result = await controller.DeleteOrderAsync(order);
 
             result.Should().BeOfType<NoContentResult>();
+        }
+
+        [Test]
+        [InMemoryDbAutoData]
+        public static async Task DeleteOrderAsync_InvokesDeleteOrder(
+            [Frozen] Mock<IOrderService> service,
+            Order order,
+            OrdersController controller)
+        {
+            service.Setup(o => o.DeleteOrder(order));
+
+            await controller.DeleteOrderAsync(order);
+
+            service.Verify(o => o.DeleteOrder(order), Times.Once());
         }
 
         [Test]
@@ -301,9 +414,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task UpdateStatusAsync_InvalidOrderStatus_ReturnsInvalidOrderStatusError(
+            [Frozen] Mock<IOrderService> service,
+            Order order,
             StatusModel model,
             OrdersController controller)
         {
+            service.Setup(o => o.GetOrderCompletedStatus(It.IsAny<CallOffId>())).ReturnsAsync(order);
             var response = await controller.UpdateStatusAsync(default, model);
 
             response.Result.Should().BeOfType<BadRequestObjectResult>();
@@ -318,10 +434,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task UpdateStatusAsync_IncompleteOrderStatus_ReturnsInvalidOrderStatusError(
+            [Frozen] Mock<IOrderService> service,
+            Order order,
             StatusModel model,
             OrdersController controller)
         {
             model.Status = OrderStatus.Incomplete.Name;
+            service.Setup(o => o.GetOrderCompletedStatus(It.IsAny<CallOffId>())).ReturnsAsync(order);
 
             var response = await controller.UpdateStatusAsync(default, model);
 
@@ -351,16 +470,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [InMemoryDbAutoData]
         public static async Task UpdateStatusAsync_OrderStatus_Complete_CompleteOrderServiceCalledOnce(
             [Frozen] Mock<ICompleteOrderService> completeOrderServiceMock,
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderService> service,
             [Frozen] CallOffId callOffId,
-            OrderItem orderItem,
             Order order,
             StatusModel model,
             OrdersController controller)
         {
-            order.AddOrUpdateOrderItem(orderItem);
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
+            service.Setup(o => o.GetOrderCompletedStatus(It.IsAny<CallOffId>())).ReturnsAsync(order);
 
             Expression<Func<ICompleteOrderService, Task<Result>>> completeAsync = s => s.CompleteAsync(
                 It.Is<Order>(o => o.Equals(order)));
@@ -377,17 +493,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [InMemoryDbAutoData]
         public static async Task UpdateStatusAsync_CompleteOrderFailed_ReturnsError(
             [Frozen] Mock<ICompleteOrderService> completeOrderServiceMock,
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderService> service,
             [Frozen] CallOffId callOffId,
-            OrderItem orderItem,
             Order order,
             StatusModel model,
             OrdersController controller)
         {
-            order.AddOrUpdateOrderItem(orderItem);
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
-
+            service.Setup(o => o.GetOrderCompletedStatus(It.IsAny<CallOffId>())).ReturnsAsync(order);
             Expression<Func<ICompleteOrderService, Task<Result>>> completeAsync = s => s.CompleteAsync(
                 It.Is<Order>(o => o.Equals(order)));
 
@@ -411,17 +523,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [InMemoryDbAutoData]
         public static async Task UpdateStatusAsync_OrderIsComplete_ReturnsNoContent(
             [Frozen] Mock<ICompleteOrderService> completeOrderServiceMock,
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderService> service,
             [Frozen] CallOffId callOffId,
-            OrderItem orderItem,
             Order order,
             StatusModel model,
             OrdersController controller)
         {
-            order.AddOrUpdateOrderItem(orderItem);
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
-
+            service.Setup(o => o.GetOrderCompletedStatus(It.IsAny<CallOffId>())).ReturnsAsync(order);
             Expression<Func<ICompleteOrderService, Task<Result>>> completeAsync = s => s.CompleteAsync(
                 It.Is<Order>(o => o.Equals(order)));
 
@@ -431,6 +539,22 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var response = await controller.UpdateStatusAsync(callOffId, model);
 
             response.Result.Should().BeOfType<NoContentResult>();
+        }
+
+        [Test]
+        [InMemoryDbAutoData]
+        public static async Task UpdateStatusAsync_OrderIsComplete_InvokesGetOrderCompletedStatus(
+            [Frozen] Mock<IOrderService> service,
+            [Frozen] CallOffId callOffId,
+            Order order,
+            StatusModel model,
+            OrdersController controller)
+        {
+            service.Setup(o => o.GetOrderCompletedStatus(It.IsAny<CallOffId>())).ReturnsAsync(order);
+
+            var response = await controller.UpdateStatusAsync(callOffId, model);
+
+            service.Verify(o => o.GetOrderCompletedStatus(It.IsAny<CallOffId>()), Times.Once());
         }
     }
 }
