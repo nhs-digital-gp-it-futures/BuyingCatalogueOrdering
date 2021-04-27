@@ -73,8 +73,6 @@ Scenario: a non-buyer user cannot update an orders commencement date
     When the user makes a request to update the commencement date with the ID 10001
     Then a response with status code 403 is returned
 
-# TODO: fix. Suspect param name check in auth filter is problem
-@ignore
 @4619
 Scenario: a buyer user cannot update an orders commencement date for an organisation they don't belong to
     Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933

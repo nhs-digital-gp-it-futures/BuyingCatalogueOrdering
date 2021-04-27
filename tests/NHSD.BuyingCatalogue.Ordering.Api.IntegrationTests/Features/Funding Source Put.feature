@@ -54,8 +54,6 @@ Scenario: a non-buyer user cannot update an orders funding source
     When the user sends the update funding source request
     Then a response with status code 403 is returned
 
-# TODO: fix. Suspect param name check in auth filter is problem
-@ignore
 @5437
 Scenario: a buyer user cannot update an orders funding source for an organisation they don't belong to
     Given the user is logged in with the Buyer role for organisation e6ea864e-ef1b-41aa-a4d5-04fc6fce0933

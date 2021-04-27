@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -17,7 +18,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Authorization
         public OrderLookupOrganisationAuthorizationFilter(ApplicationDbContext dbContext) =>
             this.dbContext = dbContext;
 
-        protected override string ParameterName { get; } = DefaultParameterName;
+        protected override string RouteParameterName => DefaultParameterName;
+
+        protected override IEnumerable<string> ActionMethodParameterNames => new[] { DefaultParameterName, "order" };
 
         // ReSharper disable once RedundantOverriddenMember
         // There is a bug in the Roslyn analysers library that causes an ArgumentNullException to be thrown
