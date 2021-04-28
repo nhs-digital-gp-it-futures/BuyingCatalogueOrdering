@@ -34,7 +34,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<IList<Order>> GetOrderList(Guid organisationId)
+        public async Task<IList<Order>> GetOrders(Guid organisationId)
         {
             return await context.OrderingParty
                 .Where(o => o.Id == organisationId)
@@ -58,7 +58,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<Order> GetOrderCompletedStatus(CallOffId callOffId)
+        public async Task<Order> GetOrderForStatusUpdate(CallOffId callOffId)
         {
             return await context.Order
                 .Where(o => o.Id == callOffId.Id)
@@ -69,12 +69,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Services
                 .Include(o => o.OrderItems).ThenInclude(i => i.PricingUnit)
                 .Include(o => o.Progress)
                 .SingleOrDefaultAsync();
-        }
-
-        [ItemCanBeNull]
-        public async Task<OrderingParty> GetOrderingParty(Guid organisationId)
-        {
-            return await context.OrderingParty.FindAsync(organisationId);
         }
 
         public async Task<Order> CreateOrder(string description, Guid organisationId)
@@ -101,6 +95,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Services
             order.IsDeleted = true;
 
             await context.SaveChangesAsync();
+        }
+
+        private async Task<OrderingParty> GetOrderingParty(Guid organisationId)
+        {
+            return await context.OrderingParty.FindAsync(organisationId);
         }
     }
 }

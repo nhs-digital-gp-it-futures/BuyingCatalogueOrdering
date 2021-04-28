@@ -104,7 +104,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             IList<Order> orders,
             OrdersController controller)
         {
-            service.Setup(o => o.GetOrderList(orderingParty.Id)).ReturnsAsync(orders);
+            service.Setup(o => o.GetOrders(orderingParty.Id)).ReturnsAsync(orders);
 
             var expectedResult = orders.Select(o => new OrderListItemModel(o));
 
@@ -121,11 +121,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             IList<Order> orders,
             OrdersController controller)
         {
-            service.Setup(o => o.GetOrderList(orderingParty.Id)).ReturnsAsync(orders);
+            service.Setup(o => o.GetOrders(orderingParty.Id)).ReturnsAsync(orders);
 
             await controller.GetAllAsync(orderingParty.Id);
 
-            service.Verify(o => o.GetOrderList(orderingParty.Id), Times.Once);
+            service.Verify(o => o.GetOrders(orderingParty.Id), Times.Once);
         }
 
         [Test]
@@ -419,7 +419,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             StatusModel model,
             OrdersController controller)
         {
-            service.Setup(o => o.GetOrderCompletedStatus(It.IsAny<CallOffId>())).ReturnsAsync(order);
+            service.Setup(o => o.GetOrderForStatusUpdate(It.IsAny<CallOffId>())).ReturnsAsync(order);
             var response = await controller.UpdateStatusAsync(default, model);
 
             response.Result.Should().BeOfType<BadRequestObjectResult>();
@@ -440,7 +440,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             OrdersController controller)
         {
             model.Status = OrderStatus.Incomplete.Name;
-            service.Setup(o => o.GetOrderCompletedStatus(It.IsAny<CallOffId>())).ReturnsAsync(order);
+            service.Setup(o => o.GetOrderForStatusUpdate(It.IsAny<CallOffId>())).ReturnsAsync(order);
 
             var response = await controller.UpdateStatusAsync(default, model);
 
@@ -476,7 +476,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             StatusModel model,
             OrdersController controller)
         {
-            service.Setup(o => o.GetOrderCompletedStatus(It.IsAny<CallOffId>())).ReturnsAsync(order);
+            service.Setup(o => o.GetOrderForStatusUpdate(It.IsAny<CallOffId>())).ReturnsAsync(order);
 
             Expression<Func<ICompleteOrderService, Task<Result>>> completeAsync = s => s.CompleteAsync(
                 It.Is<Order>(o => o.Equals(order)));
@@ -499,7 +499,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             StatusModel model,
             OrdersController controller)
         {
-            service.Setup(o => o.GetOrderCompletedStatus(It.IsAny<CallOffId>())).ReturnsAsync(order);
+            service.Setup(o => o.GetOrderForStatusUpdate(It.IsAny<CallOffId>())).ReturnsAsync(order);
             Expression<Func<ICompleteOrderService, Task<Result>>> completeAsync = s => s.CompleteAsync(
                 It.Is<Order>(o => o.Equals(order)));
 
@@ -529,7 +529,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             StatusModel model,
             OrdersController controller)
         {
-            service.Setup(o => o.GetOrderCompletedStatus(It.IsAny<CallOffId>())).ReturnsAsync(order);
+            service.Setup(o => o.GetOrderForStatusUpdate(It.IsAny<CallOffId>())).ReturnsAsync(order);
             Expression<Func<ICompleteOrderService, Task<Result>>> completeAsync = s => s.CompleteAsync(
                 It.Is<Order>(o => o.Equals(order)));
 
@@ -550,11 +550,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             StatusModel model,
             OrdersController controller)
         {
-            service.Setup(o => o.GetOrderCompletedStatus(It.IsAny<CallOffId>())).ReturnsAsync(order);
+            service.Setup(o => o.GetOrderForStatusUpdate(It.IsAny<CallOffId>())).ReturnsAsync(order);
 
-            var response = await controller.UpdateStatusAsync(callOffId, model);
+            await controller.UpdateStatusAsync(callOffId, model);
 
-            service.Verify(o => o.GetOrderCompletedStatus(It.IsAny<CallOffId>()), Times.Once());
+            service.Verify(o => o.GetOrderForStatusUpdate(It.IsAny<CallOffId>()), Times.Once());
         }
     }
 }

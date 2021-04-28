@@ -9,13 +9,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Contracts
     {
         Task<Order> GetOrder(CallOffId callOffId);
 
-        Task<IList<Order>> GetOrderList(Guid organisationId);
+        Task<IList<Order>> GetOrders(Guid organisationId);
 
         Task<Order> GetOrderSummary(CallOffId callOffId);
 
-        Task<Order> GetOrderCompletedStatus(CallOffId callOffId);
-
-        Task<OrderingParty> GetOrderingParty(Guid organisationId);
+        Task<Order> GetOrderForStatusUpdate(CallOffId callOffId);
 
         Task<Order> CreateOrder(string description, Guid organisationId);
 

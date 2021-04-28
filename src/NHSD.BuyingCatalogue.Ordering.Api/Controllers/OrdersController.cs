@@ -60,8 +60,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [TypeFilter(typeof(OrganisationIdOrganisationAuthorizationFilter))]
         public async Task<ActionResult<IList<OrderListItemModel>>> GetAllAsync(Guid organisationId)
         {
-            var orderingList = await orderService.GetOrderList(organisationId);
-            return orderingList.Select(o => new OrderListItemModel(o)).ToList();
+            var orders = await orderService.GetOrders(organisationId);
+            return orders.Select(o => new OrderListItemModel(o)).ToList();
         }
 
         [HttpGet]
@@ -117,7 +117,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (model is null)
                 throw new ArgumentNullException(nameof(model));
 
-            var order = await orderService.GetOrderCompletedStatus(callOffId);
+            var order = await orderService.GetOrderForStatusUpdate(callOffId);
 
             if (order is null)
                 return NotFound();

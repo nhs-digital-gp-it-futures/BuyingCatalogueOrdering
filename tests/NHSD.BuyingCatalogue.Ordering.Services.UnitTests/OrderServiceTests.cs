@@ -43,12 +43,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
             context.Order.Add(order);
             await context.SaveChangesAsync();
 
-            var expectedResult = order;
-
             var result = await service.GetOrder(order.CallOffId);
 
             Assert.NotNull(result);
-            result.Should().Be(expectedResult);
+            result.Should().Be(order);
         }
 
         [Test]
@@ -57,7 +55,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
             Guid organisationId,
             OrderService service)
         {
-            var result = await service.GetOrderList(organisationId);
+            var result = await service.GetOrders(organisationId);
 
             result.Should().BeEmpty();
         }
@@ -72,13 +70,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
             context.Order.Add(order);
             await context.SaveChangesAsync();
 
-            var expectedResult = order;
-
-            var result = await service.GetOrderList(order.OrderingParty.Id);
+            var result = await service.GetOrders(order.OrderingParty.Id);
 
             Assert.NotNull(result);
             result.Count.Should().Be(1);
-            result.First().Should().Be(expectedResult);
+            result.First().Should().Be(order);
         }
 
         [Test]
@@ -102,12 +98,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
             context.Order.Add(order);
             await context.SaveChangesAsync();
 
-            var expectedResult = order;
-
             var result = await service.GetOrderSummary(order.CallOffId);
 
             Assert.NotNull(result);
-            result.Should().Be(expectedResult);
+            result.Should().Be(order);
         }
 
         [Test]
@@ -116,7 +110,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
             CallOffId callOffId,
             OrderService service)
         {
-            var result = await service.GetOrderCompletedStatus(callOffId);
+            var result = await service.GetOrderForStatusUpdate(callOffId);
 
             result.Should().BeNull();
         }
@@ -131,41 +125,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
             context.Order.Add(order);
             await context.SaveChangesAsync();
 
-            var expectedResult = order;
-
-            var result = await service.GetOrderCompletedStatus(order.CallOffId);
+            var result = await service.GetOrderForStatusUpdate(order.CallOffId);
 
             Assert.NotNull(result);
-            result.Should().Be(expectedResult);
-        }
-
-        [Test]
-        [InMemoryDbAutoData]
-        public static async Task GetOrderingParty_ReturnsNull(
-            Guid organisationId,
-            OrderService service)
-        {
-            var result = await service.GetOrderingParty(organisationId);
-
-            result.Should().BeNull();
-        }
-
-        [Test]
-        [InMemoryDbAutoData]
-        public static async Task GetOrderingParty_ReturnsOrder(
-            [Frozen] ApplicationDbContext context,
-            Order order,
-            OrderService service)
-        {
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
-
-            var expectedResult = order.OrderingParty;
-
-            var result = await service.GetOrderingParty(order.OrderingParty.Id);
-
-            Assert.NotNull(result);
-            result.Should().Be(expectedResult);
+            result.Should().Be(order);
         }
 
         [Test]
