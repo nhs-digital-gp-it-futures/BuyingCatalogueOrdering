@@ -77,7 +77,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
 
         [Test]
         [AutoData]
-        public static void IsAuthorisedForOrganisation_OrganisationIdIsPrimary_ReturnsTrue(            string name)
+        public static void IsAuthorisedForOrganisation_OrganisationIdIsPrimary_ReturnsTrue(
+            string name)
         {
             var claims = new[]
             {
