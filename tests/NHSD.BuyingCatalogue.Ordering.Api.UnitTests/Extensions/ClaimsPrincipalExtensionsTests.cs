@@ -4,6 +4,7 @@ using System.Security.Claims;
 using AutoFixture.NUnit3;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
+using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
@@ -72,6 +73,50 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
             var user = new ClaimsPrincipal(new ClaimsIdentity(claims));
 
             user.GetUserName().Should().Be(name);
+        }
+
+        [Test]
+        [AutoData]
+        public static void IsAuthorisedForOrganisation_OrganisationIdIsPrimary_ReturnsTrue(            string name)
+        {
+            var claims = new[]
+            {
+                new Claim(UserClaimTypes.PrimaryOrganisationId, name),
+            };
+
+            var user = new ClaimsPrincipal(new ClaimsIdentity(claims));
+
+            user.IsAuthorisedForOrganisation(name).Should().BeTrue();
+        }
+
+        [Test]
+        [AutoData]
+        public static void IsAuthorisedForOrganisation_OrganisationIdIsRelated_ReturnsTrue(
+            string name)
+        {
+            var claims = new[]
+            {
+                new Claim(UserClaimTypes.RelatedOrganisationId, name),
+            };
+
+            var user = new ClaimsPrincipal(new ClaimsIdentity(claims));
+
+            user.IsAuthorisedForOrganisation(name).Should().BeTrue();
+        }
+
+        [Test]
+        [AutoData]
+        public static void IsAuthorisedForOrganisation_OrganisationIdNotRelatedOrPrimary_ReturnsFalse(
+            string name)
+        {
+            var claims = new[]
+            {
+                new Claim("some-claim", "some-value"),
+            };
+
+            var user = new ClaimsPrincipal(new ClaimsIdentity(claims));
+
+            user.IsAuthorisedForOrganisation(name).Should().BeFalse();
         }
     }
 }
