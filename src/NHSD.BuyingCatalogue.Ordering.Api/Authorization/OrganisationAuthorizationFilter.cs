@@ -60,7 +60,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Authorization
             if (result is not null)
                 return (false, result);
 
-            var userAuthorisedOrganisations = user.FindAll(UserClaimTypes.RelatedOrganisationId).Select(c => c.Value).Append(user.FindFirstValue(UserClaimTypes.PrimaryOrganisationId)).ToList();
+            var userAuthorisedOrganisations = user.FindAll(UserClaimTypes.RelatedOrganisationId)
+                                                  .Select(c => c.Value)
+                                                  .Append(user.FindFirstValue(UserClaimTypes.PrimaryOrganisationId))
+                                                  .Where(s => !string.IsNullOrEmpty(s));
 
             var isAuthorisedForOrganisation = userAuthorisedOrganisations.Any(s => s.Equals(id, StringComparison.OrdinalIgnoreCase));
 
