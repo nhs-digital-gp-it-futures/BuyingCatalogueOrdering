@@ -5,7 +5,6 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
 using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
@@ -14,9 +13,9 @@ using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
+using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Domain.Results;
-using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -27,16 +26,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [AuthorizeOrganisation]
     public sealed class OrdersController : ControllerBase
     {
-        private readonly ApplicationDbContext context;
+        private readonly IOrderService orderService;
 
         private readonly IDictionary<OrderStatus, Func<Order, Task<Result>>> updateOrderStatusActionFactory
             = new Dictionary<OrderStatus, Func<Order, Task<Result>>>();
 
         public OrdersController(
-            ApplicationDbContext context,
+            IOrderService orderService,
             ICompleteOrderService completeOrderService)
         {
-            this.context = context ?? throw new ArgumentNullException(nameof(context));
+            this.orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
 
             if (completeOrderService is null)
                 throw new ArgumentNullException(nameof(completeOrderService));
@@ -48,18 +47,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [Route("{callOffId}")]
         public async Task<ActionResult<OrderModel>> GetAsync(CallOffId callOffId)
         {
-            var order = await context.Order
-                .Where(o => o.Id == callOffId.Id)
-                .Include(o => o.OrderingParty).ThenInclude(p => p.Address)
-                .Include(o => o.OrderingPartyContact)
-                .Include(o => o.Supplier).ThenInclude(s => s.Address)
-                .Include(o => o.SupplierContact)
-                .Include(o => o.ServiceInstanceItems)
-                .Include(o => o.OrderItems).ThenInclude(i => i.CatalogueItem)
-                .Include(o => o.OrderItems).ThenInclude(i => i.OrderItemRecipients).ThenInclude(r => r.Recipient)
-                .Include(o => o.OrderItems).ThenInclude(i => i.PricingUnit)
-                .AsNoTracking()
-                .SingleOrDefaultAsync();
+            var order = await orderService.GetOrder(callOffId);
 
             if (order is null)
                 return NotFound();
@@ -72,29 +60,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [TypeFilter(typeof(OrganisationIdOrganisationAuthorizationFilter))]
         public async Task<ActionResult<IList<OrderListItemModel>>> GetAllAsync(Guid organisationId)
         {
-            return await context.OrderingParty
-                .Where(o => o.Id == organisationId)
-                .SelectMany(o => o.Orders)
-                .Select(o => new OrderListItemModel(o))
-                .AsNoTracking()
-                .ToListAsync();
+            var orders = await orderService.GetOrders(organisationId);
+            return orders.Select(o => new OrderListItemModel(o)).ToList();
         }
 
         [HttpGet]
         [Route("{callOffId}/summary")]
         public async Task<ActionResult<OrderSummaryModel>> GetOrderSummaryAsync(CallOffId callOffId)
         {
-            var order = await context.Order
-                .Where(o => o.Id == callOffId.Id)
-                .Include(o => o.OrderingParty)
-                .Include(o => o.OrderingPartyContact)
-                .Include(o => o.SupplierContact)
-                .Include(o => o.SelectedServiceRecipients)
-                .Include(o => o.OrderItems).ThenInclude(i => i.CatalogueItem)
-                .Include(o => o.OrderItems).ThenInclude(i => i.OrderItemRecipients)
-                .Include(o => o.Progress)
-                .AsNoTracking()
-                .SingleOrDefaultAsync();
+            var order = await orderService.GetOrderSummary(callOffId);
 
             if (order is null)
                 return NotFound();
@@ -113,17 +87,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (primaryOrganisationId != model.OrganisationId)
                 return Forbid();
 
-            var orderingParty = await context.OrderingParty.FindAsync(model.OrganisationId)
-                ?? new OrderingParty { Id = model.OrganisationId.Value };
-
-            var order = new Order
-            {
-                Description = model.Description,
-                OrderingParty = orderingParty,
-            };
-
-            context.Add(order);
-            await context.SaveChangesAsync();
+            var order = await orderService.CreateOrder(model.Description, model.OrganisationId.Value);
 
             return CreatedAtAction(
                 nameof(GetAsync).TrimAsync(),
@@ -140,9 +104,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (order is null || order.IsDeleted)
                 return NotFound();
 
-            order.IsDeleted = true;
-
-            await context.SaveChangesAsync();
+            await orderService.DeleteOrder(order);
 
             return NoContent();
         }
@@ -155,6 +117,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (model is null)
                 throw new ArgumentNullException(nameof(model));
 
+            var order = await orderService.GetOrderForStatusUpdate(callOffId);
+
+            if (order is null)
+                return NotFound();
+
             var orderStatus = OrderStatus.FromName(model.Status);
             if (orderStatus is null || !updateOrderStatusActionFactory.TryGetValue(orderStatus, out var updateOrderStatusAsync))
             {
@@ -163,19 +130,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
                     Errors = new[] { ErrorMessages.InvalidOrderStatus() },
                 });
             }
-
-            var order = await context.Order
-                .Where(o => o.Id == callOffId.Id)
-                .Include(o => o.OrderingParty)
-                .Include(o => o.Supplier)
-                .Include(o => o.OrderItems).ThenInclude(i => i.CatalogueItem)
-                .Include(o => o.OrderItems).ThenInclude(i => i.OrderItemRecipients).ThenInclude(r => r.Recipient)
-                .Include(o => o.OrderItems).ThenInclude(i => i.PricingUnit)
-                .Include(o => o.Progress)
-                .SingleOrDefaultAsync();
-
-            if (order is null)
-                return NotFound();
 
             var completeOrderResult = await updateOrderStatusAsync(order);
             if (!completeOrderResult.IsSuccess)

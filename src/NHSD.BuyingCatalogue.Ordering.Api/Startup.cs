@@ -104,7 +104,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api
                 .AddScoped<IOrderDescriptionService, OrderDescriptionService>()
                 .AddScoped<IOrderingPartyService, OrderingPartyService>()
                 .AddScoped<ISectionStatusService, SectionStatusService>()
-                .AddScoped<ISupplierSectionService, SupplierSectionService>();
+                .AddScoped<ISupplierSectionService, SupplierSectionService>()
+                .AddScoped<IOrderService, OrderService>();
 
             services
                 .AddSingleton(smtpSettings)
