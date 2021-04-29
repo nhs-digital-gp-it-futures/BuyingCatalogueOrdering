@@ -23,8 +23,8 @@ using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Api.Validation;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
+using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NHSD.BuyingCatalogue.Ordering.Domain;
-using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
@@ -58,17 +58,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task ListAsync_WithoutFilter_ReturnsExpectedResult(
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderItemService> service,
             [Frozen] CallOffId callOffId,
-            IReadOnlyList<OrderItem> orderItems,
+            List<OrderItem> orderItems,
             Order order,
             OrderItemsController controller)
         {
             foreach (var orderItem in orderItems)
                 order.AddOrUpdateOrderItem(orderItem);
 
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
+            service.Setup(o => o.GetOrder(callOffId)).ReturnsAsync(order);
+            service.Setup(o => o.GetOrderItems(callOffId, null)).ReturnsAsync(orderItems);
 
             var expectedResult = orderItems.Select(i => new GetOrderItemModel(i));
 
@@ -80,17 +80,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task ListAsync_CatalogueItemTypeIsInvalid_ReturnsEmptyList(
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderItemService> service,
             [Frozen] CallOffId callOffId,
-            IReadOnlyList<OrderItem> orderItems,
+            List<OrderItem> orderItems,
             Order order,
             OrderItemsController controller)
         {
             foreach (var orderItem in orderItems)
                 order.AddOrUpdateOrderItem(orderItem);
 
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
+            service.Setup(o => o.GetOrder(callOffId)).ReturnsAsync(order);
+            service.Setup(o => o.GetOrderItems(callOffId, null)).ReturnsAsync(new List<OrderItem>());
 
             var response = await controller.ListAsync(callOffId, (CatalogueItemType)100);
 
@@ -100,19 +100,20 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task ListAsync_WithFilter_ReturnsExpectedResult(
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderItemService> service,
             [Frozen] CallOffId callOffId,
-            IReadOnlyList<OrderItem> orderItems,
+            List<OrderItem> orderItems,
             Order order,
             OrderItemsController controller)
         {
             foreach (var orderItem in orderItems)
                 order.AddOrUpdateOrderItem(orderItem);
 
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
-
             const CatalogueItemType catalogueItemType = CatalogueItemType.AdditionalService;
+
+            service.Setup(o => o.GetOrder(callOffId)).ReturnsAsync(order);
+            service.Setup(o => o.GetOrderItems(callOffId, catalogueItemType)).ReturnsAsync(
+            orderItems.Where(i => i.CatalogueItem.CatalogueItemType == catalogueItemType).Select(i => i).ToList());
 
             var expectedResult = orderItems
                 .Where(i => i.CatalogueItem.CatalogueItemType == catalogueItemType)
@@ -125,7 +126,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task GetAsync_OrderDoesNotExist_ReturnsNotFound(
+        public static async Task GetAsync_OrderItemDoesNotExist_ReturnsNotFound(
             CallOffId callOffId,
             CatalogueItemId catalogueItemId,
             OrderItemsController controller)
@@ -137,25 +138,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task GetAsync_OrderItemDoesNotExist_ReturnsNotFound(
-            [Frozen] ApplicationDbContext context,
-            [Frozen] CallOffId callOffId,
-            CatalogueItemId catalogueItemId,
-            Order order,
-            OrderItemsController controller)
-        {
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
-
-            var response = await controller.GetAsync(callOffId, catalogueItemId);
-
-            response.Result.Should().BeOfType<NotFoundResult>();
-        }
-
-        [Test]
-        [InMemoryDbAutoData]
         public static async Task GetAsync_OrderItemExists_ReturnsExpected(
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderItemService> service,
             [Frozen] CallOffId callOffId,
             [Frozen] CatalogueItemId catalogueItemId,
             OrderItem orderItem,
@@ -163,8 +147,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             OrderItemsController controller)
         {
             order.AddOrUpdateOrderItem(orderItem);
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
+
+            service.Setup(o => o.GetOrderItem(callOffId, catalogueItemId)).ReturnsAsync(orderItem);
 
             var expectedValue = new GetOrderItemModel(orderItem);
 
@@ -201,21 +185,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [InMemoryDbAutoData]
         public static async Task CreateOrderItemAsync_InvokesCreateOrderItemServiceCreateAsync(
             [Frozen] Mock<ICreateOrderItemService> createOrderItemService,
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderItemService> orderItemService,
             [Frozen] CallOffId callOffId,
             CatalogueItemId catalogueItemId,
             Order order,
             CreateOrderItemModel model,
             OrderItemsController controller)
         {
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
-
             Expression<Func<ICreateOrderItemService, Task<AggregateValidationResult>>> createAsync = s => s.CreateAsync(
                 It.Is<Order>(o => o.Equals(order)),
                 It.Is<CatalogueItemId>(i => i == catalogueItemId),
                 It.Is<CreateOrderItemModel>(m => m == model));
 
+            orderItemService.Setup(o => o.GetOrder(callOffId)).ReturnsAsync(order);
             createOrderItemService.Setup(createAsync).ReturnsAsync(new AggregateValidationResult());
 
             await controller.CreateOrderItemAsync(callOffId, catalogueItemId, model);
@@ -227,21 +209,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [InMemoryDbAutoData]
         public static async Task CreateOrderItemAsync_OrderExists_ReturnsCreatedAtActionResult(
             [Frozen] Mock<ICreateOrderItemService> createOrderItemService,
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderItemService> orderItemService,
             [Frozen] CallOffId callOffId,
             CatalogueItemId catalogueItemId,
             Order order,
             CreateOrderItemModel model,
             OrderItemsController controller)
         {
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
-
             Expression<Func<ICreateOrderItemService, Task<AggregateValidationResult>>> createAsync = s => s.CreateAsync(
                 It.Is<Order>(o => o.Equals(order)),
                 It.Is<CatalogueItemId>(i => i == catalogueItemId),
                 It.Is<CreateOrderItemModel>(m => m == model));
 
+            orderItemService.Setup(o => o.GetOrder(callOffId)).ReturnsAsync(order);
             createOrderItemService.Setup(createAsync).ReturnsAsync(new AggregateValidationResult());
 
             var result = await controller.CreateOrderItemAsync(callOffId, catalogueItemId, model);
@@ -264,16 +244,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             [Frozen] IReadOnlyList<ErrorDetails> errorDetails,
             AggregateValidationResult aggregateValidationResult,
             [Frozen] Mock<ICreateOrderItemService> createOrderItemService,
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderItemService> orderItemService,
             [Frozen] CallOffId callOffId,
             CatalogueItemId catalogueItemId,
             Order order,
             CreateOrderItemModel model,
             OrderItemsController controller)
         {
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
-
             controller.ProblemDetailsFactory = new TestProblemDetailsFactory();
             aggregateValidationResult.AddValidationResult(new ValidationResult(errorDetails), 0);
 
@@ -282,6 +259,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 It.Is<CatalogueItemId>(i => i == catalogueItemId),
                 It.Is<CreateOrderItemModel>(m => m == model));
 
+            orderItemService.Setup(o => o.GetOrder(callOffId)).ReturnsAsync(order);
             createOrderItemService.Setup(createAsync).ReturnsAsync(aggregateValidationResult);
 
             await controller.CreateOrderItemAsync(callOffId, catalogueItemId, model);
@@ -300,16 +278,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             ErrorDetails errorDetails,
             AggregateValidationResult aggregateValidationResult,
             [Frozen] Mock<ICreateOrderItemService> createOrderItemService,
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderItemService> orderItemService,
             [Frozen] CallOffId callOffId,
             CatalogueItemId catalogueItemId,
             Order order,
             CreateOrderItemModel model,
             OrderItemsController controller)
         {
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
-
             controller.ProblemDetailsFactory = new TestProblemDetailsFactory();
             aggregateValidationResult.AddValidationResult(new ValidationResult(errorDetails), 0);
 
@@ -318,6 +293,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
                 It.Is<CatalogueItemId>(i => i == catalogueItemId),
                 It.Is<CreateOrderItemModel>(m => m == model));
 
+            orderItemService.Setup(o => o.GetOrder(callOffId)).ReturnsAsync(order);
             createOrderItemService.Setup(createAsync).ReturnsAsync(aggregateValidationResult);
 
             var response = await controller.CreateOrderItemAsync(callOffId, catalogueItemId, model);
@@ -347,7 +323,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task DeleteOrderItemAsync_OrderItemExistsInOrder_DeletesOrderItem(
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderItemService> service,
             [Frozen] CallOffId callOffId,
             Order order,
             List<OrderItem> orderItems,
@@ -355,20 +331,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             orderItems[2].CatalogueItem.ParentCatalogueItemId = orderItems[1].CatalogueItem.Id;
             orderItems.ForEach(o => order.AddOrUpdateOrderItem(o));
-            await context.Order.AddAsync(order);
-            await context.SaveChangesAsync();
+
+            service.Setup(o => o.GetOrderWithCatalogueItem(callOffId, orderItems[1].CatalogueItem.Id))
+                .ReturnsAsync(order);
+            service.Setup(o => o.DeleteOrderItem(order, orderItems[1].CatalogueItem.Id)).Callback(() =>
+            {
+                order.DeleteOrderItemAndUpdateProgress(orderItems[1].CatalogueItem.Id);
+            });
 
             await controller.DeleteOrderItemAsync(callOffId, orderItems[1].CatalogueItem.Id);
 
-            var finalOrder = await context.Order.FindAsync(order.Id);
-            finalOrder.OrderItems.Contains(orderItems[1]).Should().BeFalse();
-            finalOrder.OrderItems.Contains(orderItems[2]).Should().BeFalse();
+            order.OrderItems.Contains(orderItems[1]).Should().BeFalse();
+            order.OrderItems.Contains(orderItems[2]).Should().BeFalse();
         }
 
         [Test]
         [InMemoryDbAutoData]
         public static async Task DeleteOrderItemAsync_OrderItemExistsInOrder_UpdatesProgress(
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderItemService> service,
             [Frozen] CallOffId callOffId,
             Order order,
             List<OrderItem> orderItems,
@@ -378,29 +358,33 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             itemsToAdd[1].CatalogueItem.ParentCatalogueItemId = itemsToAdd[0].CatalogueItem.Id;
             itemsToAdd.ForEach(o => order.AddOrUpdateOrderItem(o));
             order.Progress.AdditionalServicesViewed = true;
-            await context.Order.AddAsync(order);
-            await context.SaveChangesAsync();
 
+            service.Setup(o => o.GetOrderWithCatalogueItem(callOffId, itemsToAdd[0].CatalogueItem.Id)).ReturnsAsync(order);
+            service.Setup(o => o.DeleteOrderItem(order, itemsToAdd[0].CatalogueItem.Id)).Callback(() =>
+            {
+                order.DeleteOrderItemAndUpdateProgress(itemsToAdd[0].CatalogueItem.Id);
+            });
             await controller.DeleteOrderItemAsync(callOffId, itemsToAdd[0].CatalogueItem.Id);
 
-            var finalOrder = await context.Order.FindAsync(order.Id);
-            finalOrder.Progress.AdditionalServicesViewed.Should().BeFalse();
+            order.Progress.AdditionalServicesViewed.Should().BeFalse();
         }
 
         [Test]
         [InMemoryDbAutoData]
         public static async Task DeleteOrderItemAsync_OrderItemExistsInOrder_ReturnsNoContentResult(
-            [Frozen] ApplicationDbContext context,
-            [Frozen] CallOffId callOffId,
+            [Frozen] Mock<IOrderItemService> service,
             Order order,
             List<OrderItem> orderItems,
             OrderItemsController controller)
         {
             orderItems.ForEach(o => order.AddOrUpdateOrderItem(o));
-            await context.Order.AddAsync(order);
-            await context.SaveChangesAsync();
+            service.Setup(o => o.GetOrderWithCatalogueItem(order.CallOffId, order.OrderItems[1].CatalogueItem.Id)).ReturnsAsync(order);
+            service.Setup(o => o.DeleteOrderItem(order, It.IsAny<CatalogueItemId>())).Callback(() =>
+            {
+                order.DeleteOrderItemAndUpdateProgress(order.OrderItems[1].CatalogueItem.Id);
+            }).ReturnsAsync(1);
 
-            var response = await controller.DeleteOrderItemAsync(callOffId, orderItems[1].CatalogueItem.Id);
+            var response = await controller.DeleteOrderItemAsync(order.CallOffId, orderItems[1].CatalogueItem.Id);
 
             response.Should().BeOfType<NoContentResult>();
         }
@@ -409,13 +393,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [InMemoryDbAutoData]
         public static async Task DeleteOrderItemAsync_OrderItemDoesNotExistInOrder_ReturnsNotFoundResult(
             [Frozen] CallOffId callOffId,
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderItemService> service,
             Order order,
+            OrderItem orderItem,
             OrderItemsController controller)
         {
             order.OrderItems.Count.Should().Be(0);
-            await context.AddAsync(order);
-            await context.SaveChangesAsync();
+
+            service.Setup(o => o.GetOrderWithCatalogueItem(callOffId, orderItem.CatalogueItem.Id))
+                .ReturnsAsync(order);
 
             var response = await controller.DeleteOrderItemAsync(callOffId, new CatalogueItemId(42, "111"));
 
@@ -425,7 +411,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task DeleteOrderItemAsync_OrderDeleted_ReturnsNotFoundResult(
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderItemService> service,
             [Frozen] CallOffId callOffId,
             Order order,
             OrderItem orderItem,
@@ -433,7 +419,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             order.AddOrUpdateOrderItem(orderItem);
             order.IsDeleted = false;
-            await context.SaveChangesAsync();
+
+            service.Setup(o => o.GetOrderWithCatalogueItem(callOffId, orderItem.CatalogueItem.Id))
+                .ReturnsAsync(order);
 
             var response = await controller.DeleteOrderItemAsync(callOffId, orderItem.CatalogueItem.Id);
 
@@ -443,11 +431,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task DeleteOrderItemAsync_OrderDoesNotExist_ReturnsNotFoundResult(
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IOrderItemService> service,
             [Frozen] CallOffId callOffId,
             OrderItemsController controller)
         {
-            (await context.Order.FindAsync(callOffId.Id)).Should().BeNull();
+            service.Setup(o => o.GetOrderWithCatalogueItem(callOffId, new CatalogueItemId(42, "111")))
+                .ReturnsAsync((Order)null);
 
             var response = await controller.DeleteOrderItemAsync(callOffId, new CatalogueItemId(42, "111"));
 
