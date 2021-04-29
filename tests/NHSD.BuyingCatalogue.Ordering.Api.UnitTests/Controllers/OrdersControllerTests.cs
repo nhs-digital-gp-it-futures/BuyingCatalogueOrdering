@@ -269,6 +269,36 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [Test]
         [InMemoryDbAutoData]
+        public static async Task CreateOrderAsync_UserFromRelatedOrganisation_CreatesOrder(
+            [Frozen] Mock<IOrderService> service,
+            [Frozen] Mock<HttpContext> httpContextMock,
+            Order order,
+            OrderingParty orderingParty,
+            string description,
+            OrdersController controller)
+        {
+            var model = new CreateOrderModel { OrganisationId = orderingParty.Id, Description = description };
+            var claims = new[] { new Claim("relatedOrganisationId", model.OrganisationId.ToString()) };
+            var user = new ClaimsPrincipal(new ClaimsIdentity(claims, "mock"));
+            httpContextMock.Setup(c => c.User).Returns(user);
+            service.Setup(o => o.CreateOrder(model.Description, model.OrganisationId!.Value)).Callback(() =>
+            {
+                order = new Order
+                {
+                    CallOffId = order.CallOffId,
+                    Description = model.Description,
+                    OrderingParty = orderingParty,
+                };
+            }).ReturnsAsync(order);
+
+            await controller.CreateOrderAsync(model);
+
+            order.OrderingParty.Should().Be(orderingParty);
+            order.Description.Should().Be(description);
+        }
+
+        [Test]
+        [InMemoryDbAutoData]
         public static async Task CreateOrderAsync_ReturnsExpectedResult(
             [Frozen] Mock<IOrderService> service,
             [Frozen] Mock<HttpContext> httpContextMock,

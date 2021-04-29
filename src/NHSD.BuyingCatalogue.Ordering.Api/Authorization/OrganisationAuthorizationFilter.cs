@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
+using NHSD.BuyingCatalogue.Ordering.Api.Extensions;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Authorization
@@ -57,17 +58,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Authorization
             RouteValueDictionary routeValues)
         {
             (var id, IActionResult result) = await GetOrganisationId(routeValues[RouteParameterName]?.ToString() ?? string.Empty);
-            if (result is not null)
-                return (false, result);
 
-            var userAuthorisedOrganisations = user.FindAll(UserClaimTypes.RelatedOrganisationId)
-                                                  .Select(c => c.Value)
-                                                  .Append(user.FindFirstValue(UserClaimTypes.PrimaryOrganisationId))
-                                                  .Where(s => !string.IsNullOrEmpty(s));
-
-            var isAuthorisedForOrganisation = userAuthorisedOrganisations.Any(s => s.Equals(id, StringComparison.OrdinalIgnoreCase));
-
-            return (isAuthorisedForOrganisation, null);
+            return result is null ? (user.IsAuthorisedForOrganisation(id), null) : (false, result);
         }
     }
 }

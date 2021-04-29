@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Claims;
+using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
 {
@@ -29,6 +31,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
                 throw new InvalidOperationException($"{nameof(ClaimsPrincipal.Identity)} is null.");
 
             return user.Identity.Name ?? "Chris";
+        }
+
+        public static bool IsAuthorisedForOrganisation(this ClaimsPrincipal user, string id)
+        {
+            var userAuthorisedOrganisations = user.FindAll(UserClaimTypes.RelatedOrganisationId)
+                .Select(c => c.Value)
+                .Append(user.FindFirstValue(UserClaimTypes.PrimaryOrganisationId))
+                .Where(s => !string.IsNullOrEmpty(s));
+
+            return userAuthorisedOrganisations.Any(s => s.Equals(id, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
