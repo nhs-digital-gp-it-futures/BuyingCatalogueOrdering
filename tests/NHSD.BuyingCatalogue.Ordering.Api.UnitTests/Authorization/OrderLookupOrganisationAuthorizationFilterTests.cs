@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
@@ -95,6 +96,42 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Authorization
             var user = ClaimsPrincipalBuilder.Create()
                 .WithClaim(ApplicationClaimTypes.Ordering)
                 .WithClaim(UserClaimTypes.PrimaryOrganisationId, order.OrderingParty.Id.ToString())
+                .Build();
+
+            var actionDescriptor = new ActionDescriptor
+            {
+                EndpointMetadata = new object[] { new AuthorizeOrganisationAttribute() },
+                Parameters = new[] { new ParameterDescriptor { Name = parameterName } },
+            };
+
+            var context = AuthorizationFilterContextBuilder.Create()
+                .WithActionDescription(actionDescriptor)
+                .WithRouteValue(parameterName, callOffId.ToString())
+                .WithUser(user)
+                .Build();
+
+            await filter.OnAuthorizationAsync(context);
+
+            context.Result.Should().BeNull();
+        }
+
+        [Test]
+        [InMemoryDbAutoData]
+        public static async Task OnAuthorizationAsync_DifferentPrimaryOrganisationId_UserHasRelatedOrganisationClaims_ReturnsExpectedValue(
+        [Frozen] ApplicationDbContext dbContext,
+        [Frozen] CallOffId callOffId,
+        Order order,
+        OrderLookupOrganisationAuthorizationFilter filter)
+        {
+            dbContext.Order.Add(order);
+            await dbContext.SaveChangesAsync();
+
+            const string parameterName = OrderLookupOrganisationAuthorizationFilter.DefaultParameterName;
+
+            var user = ClaimsPrincipalBuilder.Create()
+                .WithClaim(ApplicationClaimTypes.Ordering)
+                .WithClaim(UserClaimTypes.PrimaryOrganisationId, Guid.NewGuid().ToString())
+                .WithClaim(UserClaimTypes.RelatedOrganisationId, order.OrderingParty.Id.ToString())
                 .Build();
 
             var actionDescriptor = new ActionDescriptor
