@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using NHSD.BuyingCatalogue.Ordering.Api.Attributes;
 using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
 using NHSD.BuyingCatalogue.Ordering.Common.Extensions;
+using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NHSD.BuyingCatalogue.Ordering.Domain;
-using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -25,14 +23,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [AuthorizeOrganisation]
     public sealed class OrderItemsController : ControllerBase
     {
-        private readonly ApplicationDbContext context;
+        private readonly IOrderItemService orderItemService;
         private readonly ICreateOrderItemService createOrderItemService;
 
         public OrderItemsController(
-            ApplicationDbContext context,
+            IOrderItemService orderItemService,
             ICreateOrderItemService createOrderItemService)
         {
-            this.context = context ?? throw new ArgumentNullException(nameof(context));
+            this.orderItemService = orderItemService ?? throw new ArgumentNullException(nameof(orderItemService));
             this.createOrderItemService = createOrderItemService ?? throw new ArgumentNullException(nameof(createOrderItemService));
         }
 
@@ -41,45 +39,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             CallOffId callOffId,
             [FromQuery] CatalogueItemType? catalogueItemType)
         {
-            if (!await context.Order.AnyAsync(o => o.Id == callOffId.Id))
+            var order = await orderItemService.GetOrder(callOffId);
+            if (order is null)
                 return NotFound();
 
-            Expression<Func<Order, IEnumerable<OrderItem>>> orderItems = catalogueItemType is null
-                ? o => o.OrderItems
-                : o => o.OrderItems.Where(i => i.CatalogueItem.CatalogueItemType == catalogueItemType.Value);
-
-            return await context.Order
-                .Where(o => o.Id == callOffId.Id)
-                .Include(orderItems).ThenInclude(i => i.CatalogueItem)
-                .Include(orderItems).ThenInclude(i => i.OrderItemRecipients).ThenInclude(r => r.Recipient)
-                .Include(orderItems).ThenInclude(i => i.PricingUnit)
-                .SelectMany(orderItems)
-                .OrderBy(i => i.CatalogueItem.Name)
-                .Select(i => new GetOrderItemModel(i))
-                .AsNoTracking()
-                .ToListAsync();
+            var orderItems = await orderItemService.GetOrderItems(callOffId, catalogueItemType);
+            return orderItems.OrderBy(i => i.CatalogueItem.Name).Select(i => new GetOrderItemModel(i)).ToList();
         }
 
         [HttpGet]
         [Route("{catalogueItemId}")]
         public async Task<ActionResult<GetOrderItemModel>> GetAsync(CallOffId callOffId, CatalogueItemId catalogueItemId)
         {
-            Expression<Func<Order, IEnumerable<OrderItem>>> orderItems = o =>
-                o.OrderItems.Where(i => i.CatalogueItem.Id == catalogueItemId);
+            var orderItem = await orderItemService.GetOrderItem(callOffId, catalogueItemId);
 
-            var model = await context.Order
-                .Where(o => o.Id == callOffId.Id)
-                .Include(orderItems).ThenInclude(i => i.CatalogueItem)
-                .Include(orderItems).ThenInclude(i => i.OrderItemRecipients).ThenInclude(r => r.Recipient)
-                .Include(orderItems).ThenInclude(i => i.PricingUnit)
-                .SelectMany(orderItems)
-                .Select(i => new GetOrderItemModel(i))
-                .SingleOrDefaultAsync();
-
-            if (model is null)
+            if (orderItem is null)
                 return NotFound();
 
-            return model;
+            return new GetOrderItemModel(orderItem);
         }
 
         [HttpPut("{catalogueItemId}")]
@@ -93,13 +70,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (model is null)
                 throw new ArgumentNullException(nameof(model));
 
-            var order = await context.Order
-                .Where(o => o.Id == callOffId.Id)
-                .Include(o => o.DefaultDeliveryDates)
-                .Include(o => o.OrderItems).ThenInclude(i => i.CatalogueItem)
-                .Include(o => o.OrderItems).ThenInclude(i => i.OrderItemRecipients)
-                .Include(o => o.Progress)
-                .SingleOrDefaultAsync();
+            var order = await orderItemService.GetOrder(callOffId);
 
             if (order is null)
                 return NotFound();
@@ -126,28 +97,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             CallOffId callOffId,
             CatalogueItemId catalogueItemId)
         {
-            Expression<Func<Order, IEnumerable<OrderItem>>> orderItems = o =>
-                o.OrderItems.Where(i => i.CatalogueItem.Id == catalogueItemId
-                || i.CatalogueItem.ParentCatalogueItemId == catalogueItemId);
-
-            var order = await context.Order
-                .Where(o => o.Id == callOffId.Id)
-                .Include(o => o.Progress)
-                .Include(orderItems)
-                .ThenInclude(i => i.CatalogueItem)
-                .SingleOrDefaultAsync();
-
+            var order = await orderItemService.GetOrderWithCatalogueItem(callOffId, catalogueItemId);
             if (order is null || order.IsDeleted)
             {
                 return NotFound();
             }
 
-            if (order.DeleteOrderItemAndUpdateProgress(catalogueItemId) < 1)
+            if (await orderItemService.DeleteOrderItem(order, catalogueItemId) < 1)
             {
                 return NotFound();
             }
-
-            await context.SaveChangesAsync();
 
             return NoContent();
         }
