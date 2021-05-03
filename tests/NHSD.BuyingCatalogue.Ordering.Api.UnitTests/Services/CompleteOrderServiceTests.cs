@@ -12,6 +12,7 @@ using NHSD.BuyingCatalogue.EmailClient;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CompleteOrder;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreatePurchasingDocument;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
+using NHSD.BuyingCatalogue.Ordering.Common.UnitTests;
 using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Domain.Results;
@@ -123,6 +124,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             Order order,
             CompleteOrderService service)
         {
+            order.RemoveOrderItems();
             order.FundingSourceOnlyGms = true;
             order.OrderStatus = OrderStatus.Incomplete;
             order.AddOrUpdateOrderItem(orderItem);

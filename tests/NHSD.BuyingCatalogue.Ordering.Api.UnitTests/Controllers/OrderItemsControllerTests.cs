@@ -23,6 +23,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Api.Validation;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
+using NHSD.BuyingCatalogue.Ordering.Common.UnitTests;
 using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
@@ -354,6 +355,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             List<OrderItem> orderItems,
             OrderItemsController controller)
         {
+            order.RemoveOrderItems();
             var itemsToAdd = orderItems.Take(2).ToList();
             itemsToAdd[1].CatalogueItem.ParentCatalogueItemId = itemsToAdd[0].CatalogueItem.Id;
             itemsToAdd.ForEach(o => order.AddOrUpdateOrderItem(o));
@@ -377,6 +379,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             List<OrderItem> orderItems,
             OrderItemsController controller)
         {
+            order.RemoveOrderItems();
             orderItems.ForEach(o => order.AddOrUpdateOrderItem(o));
             service.Setup(o => o.GetOrderWithCatalogueItem(order.CallOffId, order.OrderItems[1].CatalogueItem.Id)).ReturnsAsync(order);
             service.Setup(o => o.DeleteOrderItem(order, It.IsAny<CatalogueItemId>())).Callback(() =>
@@ -398,7 +401,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             OrderItem orderItem,
             OrderItemsController controller)
         {
-            order.OrderItems.Count.Should().Be(0);
+            order.RemoveOrderItems().OrderItems.Count.Should().Be(0);
 
             service.Setup(o => o.GetOrderWithCatalogueItem(callOffId, orderItem.CatalogueItem.Id))
                 .ReturnsAsync(order);

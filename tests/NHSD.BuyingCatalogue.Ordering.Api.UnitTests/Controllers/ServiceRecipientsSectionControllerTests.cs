@@ -15,6 +15,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Services;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
+using NHSD.BuyingCatalogue.Ordering.Common.UnitTests;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 using NUnit.Framework;
@@ -55,7 +56,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             Order order,
             ServiceRecipientsSectionController controller)
         {
-            context.Order.Add(order);
+            context.Order.Add(order.RemoveOrderItems());
             await context.SaveChangesAsync();
 
             var expected = new ServiceRecipientsModel

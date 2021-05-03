@@ -17,6 +17,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
             {
                 new ControllerBaseCustomization(),
                 new EnumValueByNameCustomization(),
+                new OrderStatusCustomization(),
                 new OrderCustomization(),
                 new InMemoryDbCustomization(Guid.NewGuid().ToString()),
             };
