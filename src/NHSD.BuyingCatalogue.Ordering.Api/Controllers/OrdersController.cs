@@ -83,11 +83,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (model is null)
                 throw new ArgumentNullException(nameof(model));
 
-            var primaryOrganisationId = User.GetPrimaryOrganisationId();
-            if (primaryOrganisationId != model.OrganisationId)
+            if (!User.IsAuthorisedForOrganisation(model.OrganisationId.ToString()))
                 return Forbid();
 
-            var order = await orderService.CreateOrder(model.Description, model.OrganisationId.Value);
+            var order = await orderService.CreateOrder(model.Description, model.OrganisationId!.Value);
 
             return CreatedAtAction(
                 nameof(GetAsync).TrimAsync(),
