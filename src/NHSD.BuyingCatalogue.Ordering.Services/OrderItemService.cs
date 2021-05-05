@@ -64,6 +64,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Services
                 ? o => o.OrderItems
                 : o => o.OrderItems.Where(i => i.CatalogueItem.CatalogueItemType == catalogueItemType.Value);
 
+            if (!await context.Order.AnyAsync(o => o.Id == callOffId.Id))
+                return null;
+
             return await context.Order
                 .Where(o => o.Id == callOffId.Id)
                 .Include(orderItems).ThenInclude(i => i.CatalogueItem)

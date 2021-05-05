@@ -112,14 +112,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task GetOrderItems_ReturnsEmpty(
+        public static async Task GetOrderItems_ReturnsNull(
             CallOffId callOffId,
             CatalogueItemType catalogueItemType,
             OrderItemService service)
         {
             var result = await service.GetOrderItems(callOffId, catalogueItemType);
 
-            result.Count.Should().Be(0);
+            result.Should().BeNull();
         }
 
         [Test]

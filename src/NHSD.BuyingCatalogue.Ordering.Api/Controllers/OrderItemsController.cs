@@ -39,11 +39,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             CallOffId callOffId,
             [FromQuery] CatalogueItemType? catalogueItemType)
         {
-            var order = await orderItemService.GetOrder(callOffId);
-            if (order is null)
+            var orderItems = await orderItemService.GetOrderItems(callOffId, catalogueItemType);
+            if (orderItems is null)
                 return NotFound();
 
-            var orderItems = await orderItemService.GetOrderItems(callOffId, catalogueItemType);
             return orderItems.OrderBy(i => i.CatalogueItem.Name).Select(i => new GetOrderItemModel(i)).ToList();
         }
 

@@ -48,9 +48,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task ListAsync_OrderDoesNotExist_ReturnsNotFound(
+            [Frozen] Mock<IOrderItemService> service,
             CallOffId callOffId,
             OrderItemsController controller)
         {
+            service.Setup(o => o.GetOrderItems(callOffId, It.IsAny<CatalogueItemType?>())).ReturnsAsync((List<OrderItem>)null);
             var response = await controller.ListAsync(callOffId, null);
 
             response.Result.Should().BeOfType<NotFoundResult>();
