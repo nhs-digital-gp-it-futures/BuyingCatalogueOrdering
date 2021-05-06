@@ -33,6 +33,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 
         internal static OrderModel Create(Order order)
         {
+            if (order == null)
+                throw new ArgumentNullException(nameof(order));
+
             var calculatedCostPerYear = order.CalculateCostPerYear(CostType.Recurring);
 
             return new OrderModel(order)
@@ -64,7 +67,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
                     var odsCode = recipient.Recipient.OdsCode;
                     bool ServiceInstancePredicate(ServiceInstanceItem serviceInstanceItem) =>
                         serviceInstanceItem.CatalogueItemId == orderItem.CatalogueItem.Id.ToString()
-                        && serviceInstanceItem.OdsCode == recipient.Recipient.OdsCode;
+                        && serviceInstanceItem.OdsCode == odsCode;
 
                     var priceTimeUnit = orderItem.ProvisioningType == ProvisioningType.OnDemand ?
                         orderItem.EstimationPeriod : orderItem.PriceTimeUnit;
