@@ -23,7 +23,6 @@ using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Api.Validation;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
-using NHSD.BuyingCatalogue.Ordering.Common.UnitTests;
 using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;

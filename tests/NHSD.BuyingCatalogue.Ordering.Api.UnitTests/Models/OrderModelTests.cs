@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Linq;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
-using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
 
