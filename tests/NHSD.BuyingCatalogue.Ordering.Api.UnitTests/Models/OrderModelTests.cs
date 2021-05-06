@@ -20,7 +20,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_ValidOrder_SetsCommencementDate(Order order)
         {
             var actual = OrderModel.Create(order);
@@ -29,7 +29,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_ValidOrder_SetsDateCompleted(Order order)
         {
             var actual = OrderModel.Create(order);
@@ -38,7 +38,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_ValidOrder_SetsDescription(Order order)
         {
             var actual = OrderModel.Create(order);
@@ -47,7 +47,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_ValidOrder_SetsOrderParty(Order order)
         {
             var actual = OrderModel.Create(order);
@@ -57,7 +57,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_ValidOrder_SetsStatusName(Order order)
         {
             var actual = OrderModel.Create(order);
@@ -66,7 +66,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_ValidOrder_SetsSupplier(Order order)
         {
             var actual = OrderModel.Create(order);
@@ -75,7 +75,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_ValidOrder_SetsTotalOneOffCost(Order order)
         {
             var actual = OrderModel.Create(order);
@@ -84,7 +84,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_ValidOrder_SetsTotalRecurringCostPerMonth(Order order)
         {
             var actual = OrderModel.Create(order);
@@ -93,7 +93,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_ValidOrder_SetsTotalRecurringCostPerYear(Order order)
         {
             var actual = OrderModel.Create(order);
@@ -102,7 +102,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_OrderItems_CountSameAsForOrder(Order order)
         {
             var actual = OrderModel.Create(order);
@@ -111,7 +111,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_OrderItems_SetsCatalogueItemId(Order order)
         {
             var actual = OrderModel.Create(order);
@@ -123,7 +123,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_OrderItems_SetsCatalogueItemName(Order order)
         {
             var actual = OrderModel.Create(order);
@@ -135,7 +135,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_OrderItems_SetsCatalogueItemType(Order order)
         {
             var actual = OrderModel.Create(order);
@@ -149,7 +149,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_OrderItems_SetsCataloguePriceType(Order order)
         {
             var actual = OrderModel.Create(order).OrderItems;
@@ -161,7 +161,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_OrderItems_SetsCostPerYear(Order order)
         {
             var actual = OrderModel.Create(order).OrderItems;
@@ -173,7 +173,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_OrderItems_SetsItemUnitDescription(Order order)
         {
             var actual = OrderModel.Create(order).OrderItems;
@@ -185,7 +185,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_OrderItems_SetsPrice(Order order)
         {
             var actual = OrderModel.Create(order).OrderItems;
@@ -197,7 +197,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_OrderItems_SetsProvisioningType(Order order)
         {
             var actual = OrderModel.Create(order).OrderItems;
@@ -209,7 +209,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_OrderItems_SetsTimeUnitDescription(Order order)
         {
             var actual = OrderModel.Create(order).OrderItems;
@@ -221,7 +221,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_OrderItems_SetsQuantityPeriodDescription(Order order)
         {
             var actual = OrderModel.Create(order).OrderItems;
@@ -235,7 +235,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_OrderItems_SetsAllRecipientsFromOrder(Order order)
         {
             var actual = OrderModel.Create(order).OrderItems;
@@ -247,7 +247,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_OrderItems_Recipients_SetsCostPerYear(Order order)
         {
             var actual = OrderModel.Create(order).OrderItems;
@@ -271,7 +271,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_OrderItems_Recipients_SetsDeliveryDate(Order order)
         {
             var actual = OrderModel.Create(order).OrderItems;
@@ -289,7 +289,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_OrderItems_Recipients_SetsItemId(Order order)
         {
             var actual = OrderModel.Create(order).OrderItems;
@@ -310,7 +310,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_OrderItems_Recipients_SetsName(Order order)
         {
             var actual = OrderModel.Create(order).OrderItems;
@@ -328,7 +328,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_OrderItems_Recipients_SetsOdsCode(Order order)
         {
             var actual = OrderModel.Create(order).OrderItems;
@@ -346,7 +346,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
         }
 
         [Test]
-        [InMemoryDbAutoData]
+        [InMemoryDbFullOrderAutoData]
         public static void Create_OrderItems_Recipients_SetsQuantity(Order order)
         {
             var actual = OrderModel.Create(order).OrderItems;

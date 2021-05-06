@@ -124,7 +124,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             Order order,
             CompleteOrderService service)
         {
-            order.RemoveOrderItems();
             order.FundingSourceOnlyGms = true;
             order.OrderStatus = OrderStatus.Incomplete;
             order.AddOrUpdateOrderItem(orderItem);

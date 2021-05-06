@@ -130,7 +130,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
             OrderItem orderItem,
             OrderItemService service)
         {
-            context.Order.Add(order.RemoveOrderItems());
+            context.Order.Add(order);
             order.AddOrUpdateOrderItem(orderItem);
             await context.SaveChangesAsync();
 
@@ -175,7 +175,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
             OrderItem orderItem,
             OrderItemService service)
         {
-            order.RemoveOrderItems().OrderItems.Should().BeEmpty();
+            order.OrderItems.Should().BeEmpty();
             context.Order.Add(order);
             order.AddOrUpdateOrderItem(orderItem);
             await context.SaveChangesAsync();

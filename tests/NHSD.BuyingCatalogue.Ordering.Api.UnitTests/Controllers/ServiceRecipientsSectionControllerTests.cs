@@ -56,7 +56,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             Order order,
             ServiceRecipientsSectionController controller)
         {
-            context.Order.Add(order.RemoveOrderItems());
+            context.Order.Add(order);
             await context.SaveChangesAsync();
 
             var expected = new ServiceRecipientsModel
