@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
@@ -111,11 +112,13 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task GetOrderItems_ReturnsNull(
+        public static async Task GetOrderItems_InvalidCallOffId_ReturnsNull(
+            [Frozen] ApplicationDbContext context,
             CallOffId callOffId,
             CatalogueItemType catalogueItemType,
             OrderItemService service)
         {
+            (await context.Order.AnyAsync(o => o.CallOffId == callOffId)).Should().BeFalse();
             var result = await service.GetOrderItems(callOffId, catalogueItemType);
 
             result.Should().BeNull();
