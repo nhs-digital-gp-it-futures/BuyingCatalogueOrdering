@@ -42,31 +42,5 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 
             return new ServiceRecipientsModel { ServiceRecipients = selectedRecipientsModel };
         }
-
-        [HttpPut]
-        [Authorize(Policy = PolicyName.CanManageOrders)]
-        public async Task<ActionResult> UpdateAsync(CallOffId callOffId, ServiceRecipientsModel model)
-        {
-            if (model is null)
-                throw new ArgumentNullException(nameof(model));
-
-            var order = await serviceRecipientService.GetOrder(callOffId);
-
-            if (order is null)
-                return NotFound();
-
-            var requestRecipients = model.ServiceRecipients.Select(r => new ServiceRecipient(r.OdsCode, r.Name));
-
-            var recipients = await serviceRecipientService.AddOrUpdateServiceRecipients(requestRecipients);
-
-            var serviceRecipients = model.ServiceRecipients.Select(r => new SelectedServiceRecipient
-            {
-                Recipient = recipients[r.OdsCode],
-            }).ToList();
-
-            await serviceRecipientService.SetOrder(order, serviceRecipients);
-
-            return NoContent();
-        }
     }
 }

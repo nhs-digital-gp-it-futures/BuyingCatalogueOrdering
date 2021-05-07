@@ -16,24 +16,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Services
         public ServiceRecipientService(ApplicationDbContext context) =>
             this.context = context ?? throw new ArgumentNullException(nameof(context));
 
-        public async Task<Order> GetOrder(CallOffId callOffId)
-        {
-            return await context.Order
-                .Where(o => o.Id == callOffId.Id)
-                .Include(o => o.Progress)
-                .Include(o => o.SelectedServiceRecipients)
-                .SingleOrDefaultAsync();
-        }
-
-        public async Task SetOrder(Order order, IReadOnlyList<SelectedServiceRecipient> selectedRecipients)
-        {
-            if (order is null)
-                throw new ArgumentNullException(nameof(order));
-
-            order.SetSelectedServiceRecipients(selectedRecipients);
-            await context.SaveChangesAsync();
-        }
-
         public async Task<List<ServiceRecipient>> GetAllOrderItemRecipient(CallOffId callOffId)
         {
             if (!await context.Order.AnyAsync(o => o.Id == callOffId.Id))
