@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Validation;
+using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
@@ -109,7 +110,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 
         private async Task<IReadOnlyDictionary<string, ServiceRecipient>> AddOrUpdateServiceRecipients(CreateOrderItemModel model)
         {
-            return await serviceRecipientService.AddOrUpdateServiceRecipients(model.ServiceRecipients);
+            var serviceRecipients = model.ServiceRecipients.Select(s => new ServiceRecipient(s.OdsCode, s.Name));
+
+            return await serviceRecipientService.AddOrUpdateServiceRecipients(serviceRecipients);
         }
     }
 }

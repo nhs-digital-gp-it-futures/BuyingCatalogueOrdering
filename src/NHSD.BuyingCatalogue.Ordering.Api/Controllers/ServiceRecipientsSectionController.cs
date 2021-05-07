@@ -4,13 +4,11 @@ using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using NHSD.BuyingCatalogue.Ordering.Api.Authorization;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Api.Services;
 using NHSD.BuyingCatalogue.Ordering.Common.Constants;
+using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NHSD.BuyingCatalogue.Ordering.Domain;
-using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
 {
@@ -21,46 +19,28 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
     [AuthorizeOrganisation]
     public sealed class ServiceRecipientsSectionController : ControllerBase
     {
-        private readonly ApplicationDbContext context;
         private readonly IServiceRecipientService serviceRecipientService;
 
         public ServiceRecipientsSectionController(
-            ApplicationDbContext context,
             IServiceRecipientService serviceRecipientService)
         {
-            this.context = context ?? throw new ArgumentNullException(nameof(context));
             this.serviceRecipientService = serviceRecipientService ?? throw new ArgumentNullException(nameof(serviceRecipientService));
         }
 
         [HttpGet]
         public async Task<ActionResult<ServiceRecipientsModel>> GetAllAsync(CallOffId callOffId)
         {
-            if (!await context.Order.AnyAsync(o => o.Id == callOffId.Id))
+            var selectedRecipients = await serviceRecipientService.GetAllOrderItemRecipient(callOffId);
+
+            if (selectedRecipients is null)
                 return NotFound();
 
-            var selectedRecipients = await context.Order
-                .Where(o => o.Id == callOffId.Id)
-                .SelectMany(o => o.SelectedServiceRecipients)
-                .OrderBy(r => r.Recipient.Name)
-                .Select(r => new ServiceRecipientModel { Name = r.Recipient.Name, OdsCode = r.Recipient.OdsCode })
-                .AsNoTracking()
-                .ToListAsync();
-
-            if (selectedRecipients.Count == 0)
-            {
-                selectedRecipients = await context.Order
-                    .Where(o => o.Id == callOffId.Id)
-                    .SelectMany(o => o.OrderItems)
-                    .Where(o => o.CatalogueItem.CatalogueItemType == CatalogueItemType.Solution)
-                    .SelectMany(o => o.OrderItemRecipients)
-                    .Select(r => new ServiceRecipientModel { Name = r.Recipient.Name, OdsCode = r.Recipient.OdsCode })
+            var selectedRecipientsModel = selectedRecipients.Select(r =>
+                    new ServiceRecipientModel { Name = r.Name, OdsCode = r.OdsCode })
                     .Distinct()
-                    .OrderBy(r => r.Name)
-                    .AsNoTracking()
-                    .ToListAsync();
-            }
+                    .ToList();
 
-            return new ServiceRecipientsModel { ServiceRecipients = selectedRecipients };
+            return new ServiceRecipientsModel { ServiceRecipients = selectedRecipientsModel };
         }
 
         [HttpPut]
@@ -70,25 +50,21 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             if (model is null)
                 throw new ArgumentNullException(nameof(model));
 
-            var order = await context.Order
-                .Where(o => o.Id == callOffId.Id)
-                .Include(o => o.Progress)
-                .Include(o => o.SelectedServiceRecipients)
-                .SingleOrDefaultAsync();
+            var order = await serviceRecipientService.GetOrder(callOffId);
 
             if (order is null)
                 return NotFound();
 
-            var recipients = await serviceRecipientService.AddOrUpdateServiceRecipients(model.ServiceRecipients);
+            var requestRecipients = model.ServiceRecipients.Select(r => new ServiceRecipient(r.OdsCode, r.Name));
+
+            var recipients = await serviceRecipientService.AddOrUpdateServiceRecipients(requestRecipients);
 
             var serviceRecipients = model.ServiceRecipients.Select(r => new SelectedServiceRecipient
             {
                 Recipient = recipients[r.OdsCode],
             }).ToList();
 
-            order.SetSelectedServiceRecipients(serviceRecipients);
-
-            await context.SaveChangesAsync();
+            await serviceRecipientService.SetOrder(order, serviceRecipients);
 
             return NoContent();
         }
