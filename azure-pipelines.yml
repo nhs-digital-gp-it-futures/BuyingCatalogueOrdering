@@ -121,7 +121,7 @@ jobs:
 
   - task: DockerCompose@0
     displayName: 'Build: Dev'
-    condition: succeeded()
+    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
     inputs:
       containerregistrytype: 'Azure Container Registry'
       azureSubscription: 'NHSAPP-BuyingCatalogue (Non-Prod)'
@@ -133,7 +133,7 @@ jobs:
 
   - task: DockerCompose@0
     displayName: 'Push: Dev'
-    condition: succeeded()
+    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
     inputs:
       containerregistrytype: 'Azure Container Registry'
       azureSubscription: 'NHSAPP-BuyingCatalogue (Non-Prod)'
@@ -145,7 +145,7 @@ jobs:
 
   - task: HelmInstaller@1
     displayName: 'Install helm'
-    condition: succeeded()
+    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
     inputs:
       helmVersionToInstall: 'latest'
   - bash: |
@@ -158,7 +158,7 @@ jobs:
       done;
     failOnStderr: true
     displayName: 'Helm package'
-    condition: succeeded()
+    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
   - bash: |
       cd charts  
       for chartPackage in *.tgz; do
@@ -171,7 +171,7 @@ jobs:
     failOnStderr: false
     name: helmPush
     displayName: 'Push helm to az acr'
-    condition: succeeded()
+    condition: and(succeeded(), ne(variables['build.reason'], 'PullRequest'))
 
   - task: DockerCompose@0
     displayName: 'Build: Test'
