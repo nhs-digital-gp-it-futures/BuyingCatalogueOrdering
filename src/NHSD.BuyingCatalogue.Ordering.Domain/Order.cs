@@ -153,6 +153,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             }
 
             existingItem.EstimationPeriod = orderItem.EstimationPeriod;
+            existingItem.PriceId = orderItem.PriceId;
             existingItem.Price = orderItem.Price;
 
             return existingItem;

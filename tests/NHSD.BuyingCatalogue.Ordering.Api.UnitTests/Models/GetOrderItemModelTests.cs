@@ -80,6 +80,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models
 
         [Test]
         [CommonAutoData]
+        public static void Constructor_InitializesPriceId(OrderItem orderItem)
+        {
+            var model = new GetOrderItemModel(orderItem);
+            model.PriceId.Should().Be(orderItem.PriceId);
+        }
+
+        [Test]
+        [CommonAutoData]
         public static void Constructor_InitializesPrice(OrderItem orderItem)
         {
             var model = new GetOrderItemModel(orderItem);

@@ -90,7 +90,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             var responseBody = await response.ReadBodyAsStringAsync();
             var problemDetails = JsonConvert.DeserializeObject<ValidationProblemDetails>(responseBody);
 
-            problemDetails.Errors.Should().BeEquivalentTo(expectedErrors);
+            problemDetails?.Errors.Should().BeEquivalentTo(expectedErrors);
         }
 
         [Then(@"the catalogue solution order section is marked as complete")]
@@ -215,6 +215,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
 
             public string ItemUnitDescription { get; init; } = "per patient";
 
+            public int? PriceId { get; init; } = 1;
+
             public decimal? Price { get; init; } = 10.50m;
 
             public ProvisioningType? ProvisioningType { get; init; } = Testing.Data.Data.ProvisioningType.Patient;
@@ -243,6 +245,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                         Name = ItemUnitName,
                         Description = ItemUnitDescription,
                     },
+                    PriceId,
                     Price,
                     ProvisioningType = ProvisioningType.ToString(),
                     ServiceRecipients,
@@ -264,6 +267,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     CurrencyCode = CurrencyCode,
                     EstimationPeriod = Enum.Parse<TimeUnit>(EstimationPeriod, true),
                     OrderId = orderId,
+                    PriceId = PriceId,
                     Price = Price,
                     PricingUnitName = ItemUnitName,
                     ProvisioningType = ProvisioningType.GetValueOrDefault(),

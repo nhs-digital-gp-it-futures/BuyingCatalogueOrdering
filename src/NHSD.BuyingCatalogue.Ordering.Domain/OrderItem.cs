@@ -33,6 +33,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public IReadOnlyList<OrderItemRecipient> OrderItemRecipients => recipients;
 
+        public int? PriceId { get; set; }
+
         public decimal? Price { get; set; }
 
         public PricingUnit PricingUnit { get; init; }

@@ -52,6 +52,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
                 DefaultDeliveryDate = defaultDeliveryDate?.DeliveryDate,
                 EstimationPeriod = estimationPeriod,
                 OrderId = order.Id,
+                PriceId = model.PriceId,
                 Price = model.Price,
                 PricingUnit = pricingUnit,
                 PriceTimeUnit = model.TimeUnit?.ToTimeUnit(),

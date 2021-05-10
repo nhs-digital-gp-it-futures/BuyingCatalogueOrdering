@@ -7,6 +7,7 @@
     PricingUnitName nvarchar(20) NOT NULL,
     TimeUnitId int NULL,
     EstimationPeriodId int NULL,
+    PriceId int NULL,
     CurrencyCode nvarchar(3) NOT NULL,
     Price decimal(18, 4) NULL CONSTRAINT OrderItem_PositivePrice CHECK (Price >= 0.00),
     DefaultDeliveryDate date NULL,
