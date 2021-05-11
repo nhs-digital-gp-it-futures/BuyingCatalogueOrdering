@@ -29,7 +29,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
             CallOffId callOffId,
             ServiceRecipientService service)
         {
-            var result = await service.GetAllOrderItemRecipient(callOffId);
+            var result = await service.GetAllOrderItemRecipients(callOffId);
 
             result.Should().BeNull();
         }
@@ -39,16 +39,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
         public static async Task GetAllOrderItemRecipient_ReturnsEmptyList(
             [Frozen] ApplicationDbContext context,
             Order order,
-            List<OrderItemRecipient> orderItemRecipients,
             ServiceRecipientService service)
         {
             context.Order.Add(order);
             await context.SaveChangesAsync();
 
-            var expectedServiceRecipients =
-                orderItemRecipients.Select(o => new ServiceRecipient(o.Recipient.OdsCode, o.Recipient.Name));
-
-            var result = await service.GetAllOrderItemRecipient(order.CallOffId);
+            var result = await service.GetAllOrderItemRecipients(order.CallOffId);
 
             result.Should().BeEmpty();
         }
@@ -70,7 +66,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
             var expectedServiceRecipients =
                 orderItemRecipients.Select(o => new ServiceRecipient(o.Recipient.OdsCode, o.Recipient.Name));
 
-            var result = await service.GetAllOrderItemRecipient(order.CallOffId);
+            var result = await service.GetAllOrderItemRecipients(order.CallOffId);
 
             result.Should().BeEquivalentTo(expectedServiceRecipients);
         }
@@ -78,16 +74,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
         [Test]
         [InMemoryDbAutoData]
         public static async Task AddOrUpdateServiceRecipients_AddServiceRecipients(
-            [Frozen] ApplicationDbContext context,
             List<ServiceRecipient> serviceRecipients,
             ServiceRecipientService service)
         {
-            context.Set<ServiceRecipient>().Should().BeEmpty();
-            await service.AddOrUpdateServiceRecipients(serviceRecipients);
+            var result = await service.AddOrUpdateServiceRecipients(serviceRecipients);
 
-            var expectedServiceRecipients = context.Set<ServiceRecipient>().ToList();
-
-            expectedServiceRecipients.Should().BeEquivalentTo(serviceRecipients);
+            result.Should().Contain(serviceRecipients.ToDictionary(r => r.OdsCode));
         }
 
         [Test]

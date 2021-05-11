@@ -6,7 +6,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Contracts
 {
     public interface IServiceRecipientService
     {
-        Task<List<ServiceRecipient>> GetAllOrderItemRecipient(CallOffId callOffId);
+        Task<List<ServiceRecipient>> GetAllOrderItemRecipients(CallOffId callOffId);
 
         Task<IReadOnlyDictionary<string, ServiceRecipient>> AddOrUpdateServiceRecipients(
             IEnumerable<ServiceRecipient> recipients);

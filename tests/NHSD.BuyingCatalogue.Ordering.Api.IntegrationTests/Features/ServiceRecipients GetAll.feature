@@ -44,8 +44,8 @@ Scenario: get the service recipients from an exisiting ordering ID when there ar
     Then a response with status code 200 is returned
     And the service recipients are returned
         | OdsCode | Name        |
-        | ODS1    | Recipient Z |
         | ODS3    | Recipient Y |
+        | ODS1    | Recipient Z |
 
 @7412
 Scenario: if an order does not exist, return not found

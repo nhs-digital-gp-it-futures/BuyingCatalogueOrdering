@@ -16,18 +16,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Services
         public ServiceRecipientService(ApplicationDbContext context) =>
             this.context = context ?? throw new ArgumentNullException(nameof(context));
 
-        public async Task<List<ServiceRecipient>> GetAllOrderItemRecipient(CallOffId callOffId)
+        public async Task<List<ServiceRecipient>> GetAllOrderItemRecipients(CallOffId callOffId)
         {
             if (!await context.Order.AnyAsync(o => o.Id == callOffId.Id))
                 return null;
 
-            return await context.Order
+            var orderItemRecipients = await context.Order
                 .Where(o => o.Id == callOffId.Id)
                 .SelectMany(o => o.OrderItems)
                 .Where(o => o.CatalogueItem.CatalogueItemType == CatalogueItemType.Solution)
                 .SelectMany(o => o.OrderItemRecipients)
                 .Select(r => new ServiceRecipient(r.Recipient.OdsCode, r.Recipient.Name))
+                .Distinct()
                 .ToListAsync();
+
+            return orderItemRecipients
+                .OrderBy(r => r.Name)
+                .ToList();
         }
 
         public async Task<IReadOnlyDictionary<string, ServiceRecipient>> AddOrUpdateServiceRecipients(
@@ -47,8 +52,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Services
             // ReSharper disable once MethodHasAsyncOverload
             // Non-async method recommended over async version for most cases (see EF Core docs)
             context.ServiceRecipient.AddRange(newServiceRecipients);
-
-            await context.SaveChangesAsync();
 
             return existingServiceRecipients.Union(newServiceRecipients).ToDictionary(r => r.OdsCode);
         }

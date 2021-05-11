@@ -30,15 +30,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<ServiceRecipientsModel>> GetAllAsync(CallOffId callOffId)
         {
-            var selectedRecipients = await serviceRecipientService.GetAllOrderItemRecipient(callOffId);
+            var selectedRecipients = await serviceRecipientService.GetAllOrderItemRecipients(callOffId);
 
             if (selectedRecipients is null)
                 return NotFound();
 
             var selectedRecipientsModel = selectedRecipients.Select(r =>
-                    new ServiceRecipientModel { Name = r.Name, OdsCode = r.OdsCode })
-                    .Distinct()
-                    .ToList();
+                new ServiceRecipientModel { Name = r.Name, OdsCode = r.OdsCode })
+                .ToList();
 
             return new ServiceRecipientsModel { ServiceRecipients = selectedRecipientsModel };
         }

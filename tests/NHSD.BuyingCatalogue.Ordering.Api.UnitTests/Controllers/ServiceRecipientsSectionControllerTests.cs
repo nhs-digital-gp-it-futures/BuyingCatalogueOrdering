@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.AutoMoq;
@@ -42,7 +40,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             CallOffId callOffId,
             ServiceRecipientsSectionController controller)
         {
-            service.Setup(s => s.GetAllOrderItemRecipient(callOffId)).ReturnsAsync((List<ServiceRecipient>)null);
+            service.Setup(s => s.GetAllOrderItemRecipients(callOffId)).ReturnsAsync((List<ServiceRecipient>)null);
             var response = await controller.GetAllAsync(callOffId);
 
             response.Result.Should().BeOfType<NotFoundResult>();
@@ -55,7 +53,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             [Frozen] CallOffId callOffId,
             ServiceRecipientsSectionController controller)
         {
-            service.Setup(s => s.GetAllOrderItemRecipient(callOffId)).ReturnsAsync(new List<ServiceRecipient>());
+            service.Setup(s => s.GetAllOrderItemRecipients(callOffId)).ReturnsAsync(new List<ServiceRecipient>());
 
             var expected = new ServiceRecipientsModel
             {
@@ -78,7 +76,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             order.SetSelectedServiceRecipients(serviceRecipients);
 
-            service.Setup(s => s.GetAllOrderItemRecipient(callOffId)).ReturnsAsync(
+            service.Setup(s => s.GetAllOrderItemRecipients(callOffId)).ReturnsAsync(
                 serviceRecipients.Select(s => new ServiceRecipient(s.Recipient.OdsCode, s.Recipient.Name)).ToList());
 
             var expected = new ServiceRecipientsModel
