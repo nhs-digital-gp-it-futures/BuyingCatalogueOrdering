@@ -567,6 +567,25 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
 
         [Test]
         [AutoData]
+        public static void Validate_PriceIdIsNull_HasError(
+            CreateOrderItemModelValidator validator)
+        {
+            validator
+                .ShouldHaveValidationErrorFor(m => m.PriceId, null as int?)
+                .WithErrorMessage($"{nameof(CreateOrderItemModel.PriceId)}Required");
+        }
+
+        [Test]
+        [AutoData]
+        public static void Validate_PriceIdIsNotNull_DoesNotHaveError(
+            CreateOrderItemModel model,
+            CreateOrderItemModelValidator validator)
+        {
+            validator.ShouldNotHaveValidationErrorFor(m => m.PriceId, model);
+        }
+
+        [Test]
+        [AutoData]
         public static void Validate_PriceIsNull_HasError(
             CreateOrderItemModelValidator validator)
         {

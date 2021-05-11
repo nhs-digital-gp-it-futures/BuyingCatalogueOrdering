@@ -27,6 +27,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
                 Name = orderItem.PricingUnit.Name,
                 Description = orderItem.PricingUnit.Description,
             };
+            PriceId = orderItem.PriceId;
             Price = orderItem.Price;
             ProvisioningType = orderItem.ProvisioningType.ToString();
             ServiceRecipients = orderItem.OrderItemRecipients.ToModelList();
@@ -47,6 +48,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
         public string EstimationPeriod { get; init; }
 
         public ItemUnitModel ItemUnit { get; init; }
+
+        public int? PriceId { get; init; }
 
         public decimal? Price { get; init; }
 

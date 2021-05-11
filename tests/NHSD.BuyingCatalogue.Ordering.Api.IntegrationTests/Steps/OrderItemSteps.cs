@@ -52,6 +52,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
                     .WithTimeUnit(orderItemTableItem.PriceTimeUnit)
                     .WithEstimationPeriod(orderItemTableItem.EstimationPeriod)
                     .WithCurrencyCode(orderItemTableItem.CurrencyCode)
+                    .WithPriceId(orderItemTableItem.PriceId)
                     .WithPrice(orderItemTableItem.Price)
                     .WithCreated(orderItemTableItem.Created ?? DateTime.UtcNow)
                     .Build();
@@ -142,6 +143,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             public string CurrencyCode { get; init; } = "GBP";
 
             public TimeUnit? EstimationPeriod { get; init; } = TimeUnit.Month;
+
+            public int? PriceId { get; init; } = 1;
 
             public decimal? Price { get; init; }
 

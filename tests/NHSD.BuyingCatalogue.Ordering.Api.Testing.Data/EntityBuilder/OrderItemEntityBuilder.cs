@@ -15,6 +15,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
         private string currencyCode;
         private TimeUnit? timeUnit;
         private string pricingUnitName;
+        private int? priceId;
         private decimal? price;
         private DateTime created;
 
@@ -125,6 +126,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
             return this;
         }
 
+        public OrderItemEntityBuilder WithPriceId(int? id)
+        {
+            priceId = id;
+            return this;
+        }
+
         public OrderItemEntityBuilder WithPrice(decimal? cost)
         {
             price = cost;
@@ -149,6 +156,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.EntityBuilder
                 CurrencyCode = currencyCode,
                 TimeUnit = timeUnit,
                 PricingUnitName = pricingUnitName,
+                PriceId = priceId,
                 Price = price,
                 Created = created,
                 LastUpdated = created,

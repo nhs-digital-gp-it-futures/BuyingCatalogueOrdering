@@ -17,6 +17,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 
         public ItemUnitModel ItemUnit { get; init; }
 
+        public int? PriceId { get; init; }
+
         public decimal? Price { get; init; }
 
         public string ProvisioningType { get; set; }

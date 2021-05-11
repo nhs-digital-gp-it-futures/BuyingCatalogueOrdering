@@ -28,6 +28,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                     Name = orderItemEntity.PricingUnitName,
                     pricingUnits[orderItemEntity.PricingUnitName].Description,
                 },
+                orderItemEntity.PriceId,
                 orderItemEntity.Price,
                 orderItemEntity.ProvisioningType,
                 ServiceRecipients = orderItemRecipients.Select(r => new
@@ -54,6 +55,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Responses
                 CurrencyCode = responseBody.Value<string>("currencyCode"),
                 DeliveryDate = responseBody.Value<DateTime?>("DeliveryDate"),
                 ItemUnit = ReadItemUnit(responseBody),
+                PriceId = responseBody.Value<int?>("priceId"),
                 Price = responseBody.Value<decimal?>("price"),
                 ProvisioningType = Enum.Parse<ProvisioningType>(responseBody.Value<string>("provisioningType")),
                 Quantity = responseBody.Value<int>("quantity"),

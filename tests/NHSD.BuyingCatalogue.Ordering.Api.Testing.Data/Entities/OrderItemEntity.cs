@@ -23,6 +23,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
 
         public string CurrencyCode { get; set; }
 
+        public int? PriceId { get; set; }
+
         public decimal? Price { get; set; }
 
         public DateTime Created { get; set; } = DateTime.UtcNow.Date;
@@ -40,6 +42,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
                 TimeUnitId,
                 EstimationPeriodId,
                 CurrencyCode,
+                PriceId,
                 Price,
                 Created,
                 LastUpdated
@@ -54,6 +57,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
                 @TimeUnit,
                 @EstimationPeriod,
                 @CurrencyCode,
+                @PriceId,
                 @Price,
                 @Created,
                 @LastUpdated
@@ -73,6 +77,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
                        TimeUnitId AS TimeUnit,
                        CurrencyCode,
                        EstimationPeriodId AS EstimationPeriod,
+                       PriceId,
                        Price,
                        Created,
                        LastUpdated
@@ -96,6 +101,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
                        TimeUnitId AS TimeUnit,
                        CurrencyCode,
                        EstimationPeriodId AS EstimationPeriod,
+                       PriceId,
                        Price,
                        Created,
                        LastUpdated

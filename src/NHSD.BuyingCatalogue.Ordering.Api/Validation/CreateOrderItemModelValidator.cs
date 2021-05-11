@@ -70,6 +70,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Validation
                 .When(HasProvisioningType)
                 .When(IsOnDemand);
 
+            RuleFor(m => m.PriceId)
+                .Required();
+
             RuleFor(m => m.Price)
                 .Required()
                 .GreaterThanOrEqualTo(0.00m).WithMessage("{PropertyName}GreaterThanOrEqualToZero")
