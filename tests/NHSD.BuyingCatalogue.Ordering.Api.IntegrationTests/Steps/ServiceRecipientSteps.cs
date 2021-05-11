@@ -58,13 +58,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await request.GetAsync(string.Format(CultureInfo.InvariantCulture, serviceRecipientUrl, orderId));
         }
 
-        [When(@"the user makes a request to set the service-recipients section with order ID (\d{1,6})")]
-        public async Task WhenTheUserMakesARequestToRetrieveTheService_RecipientsSectionWithOrderID(int orderId, Table table)
-        {
-            var payload = new ServiceRecipientsTable { ServiceRecipients = table.CreateSet<ServiceRecipientTable>() };
-            await request.PutJsonAsync(string.Format(CultureInfo.InvariantCulture, serviceRecipientUrl, orderId), payload);
-        }
-
         [Then(@"the service recipients are returned")]
         public async Task ThenTheServiceRecipientsAreReturned(Table table)
         {
@@ -76,14 +69,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             expected.Should().BeEquivalentTo(
                 serviceRecipients,
                 conf => conf.Excluding(r => r.OrderId).WithStrictOrdering());
-        }
-
-        [Then(@"the persisted selected service recipients are")]
-        public async Task ThenThePersistedServiceRecipientsAreReturned(Table table)
-        {
-            var expected = table.CreateSet<ServiceRecipientTable>();
-            var actual = await SelectedServiceRecipientEntity.FetchAllServiceRecipients(settings.ConnectionString);
-            expected.Should().BeEquivalentTo(actual);
         }
 
         private static ServiceRecipientTable CreateServiceRecipients(JToken token)

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoFixture;
 using AutoFixture.AutoMoq;
@@ -13,10 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NHSD.BuyingCatalogue.Ordering.Api.Controllers;
 using NHSD.BuyingCatalogue.Ordering.Api.Models;
-using NHSD.BuyingCatalogue.Ordering.Api.Services;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
+using NHSD.BuyingCatalogue.Ordering.Contracts;
 using NHSD.BuyingCatalogue.Ordering.Domain;
-using NHSD.BuyingCatalogue.Ordering.Persistence.Data;
 using NUnit.Framework;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
@@ -39,9 +36,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task GetAllAsync_OrderDoesNotExist_ReturnsNotFound(
+            [Frozen] Mock<IServiceRecipientService> service,
             CallOffId callOffId,
             ServiceRecipientsSectionController controller)
         {
+            service.Setup(s => s.GetAllOrderItemRecipients(callOffId)).ReturnsAsync((List<ServiceRecipient>)null);
             var response = await controller.GetAllAsync(callOffId);
 
             response.Result.Should().BeOfType<NotFoundResult>();
@@ -50,13 +49,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task GetAllAsync_NoServiceRecipient_ReturnsEmptyList(
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IServiceRecipientService> service,
             [Frozen] CallOffId callOffId,
-            Order order,
             ServiceRecipientsSectionController controller)
         {
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
+            service.Setup(s => s.GetAllOrderItemRecipients(callOffId)).ReturnsAsync(new List<ServiceRecipient>());
 
             var expected = new ServiceRecipientsModel
             {
@@ -71,15 +68,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [Test]
         [InMemoryDbAutoData]
         public static async Task GetAllAsync_HasSelectedServiceRecipients_ReturnsExpectedResult(
-            [Frozen] ApplicationDbContext context,
+            [Frozen] Mock<IServiceRecipientService> service,
             [Frozen] CallOffId callOffId,
             IReadOnlyList<SelectedServiceRecipient> serviceRecipients,
             Order order,
             ServiceRecipientsSectionController controller)
         {
             order.SetSelectedServiceRecipients(serviceRecipients);
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
+
+            service.Setup(s => s.GetAllOrderItemRecipients(callOffId)).ReturnsAsync(
+                serviceRecipients.Select(s => new ServiceRecipient(s.Recipient.OdsCode, s.Recipient.Name)).ToList());
 
             var expected = new ServiceRecipientsModel
             {
@@ -89,141 +87,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             var response = await controller.GetAllAsync(callOffId);
 
             response.Value.Should().BeEquivalentTo(expected);
-        }
-
-        [Test]
-        [InMemoryDbAutoData]
-        public static void UpdateAsync_ModelIsNull_ThrowsArgumentNullException(
-            ServiceRecipientsSectionController controller)
-        {
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await controller.UpdateAsync(default, null));
-        }
-
-        [Test]
-        [InMemoryDbAutoData]
-        public static async Task UpdateAsync_OrderDoesNotExist_ReturnsNotFound(
-            ServiceRecipientsModel model,
-            ServiceRecipientsSectionController controller)
-        {
-            var response = await controller.UpdateAsync(default, model);
-
-            response.Should().BeOfType<NotFoundResult>();
-        }
-
-        [Test]
-        [InMemoryDbAutoData]
-        public static async Task UpdateAsync_InvokesAddOrUpdateServiceRecipients(
-            [Frozen] ApplicationDbContext context,
-            [Frozen] Mock<IServiceRecipientService> serviceRecipientService,
-            [Frozen] CallOffId callOffId,
-            Order order,
-            ServiceRecipientsModel model,
-            ServiceRecipientsSectionController controller)
-        {
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
-
-            var recipients = model.ServiceRecipients
-                .Select(r => new ServiceRecipient(r.OdsCode, r.Name))
-                .ToDictionary(r => r.OdsCode);
-
-            // ReSharper disable once PossibleUnintendedReferenceComparison
-            Expression<Func<IServiceRecipientService, Task<IReadOnlyDictionary<string, ServiceRecipient>>>> addOrUpdateServiceRecipients = s =>
-                s.AddOrUpdateServiceRecipients(It.Is<IEnumerable<ServiceRecipientModel>>(r => r == model.ServiceRecipients));
-
-            serviceRecipientService.Setup(addOrUpdateServiceRecipients).ReturnsAsync(recipients);
-
-            await controller.UpdateAsync(callOffId, model);
-
-            serviceRecipientService.Verify(addOrUpdateServiceRecipients);
-        }
-
-        [Test]
-        [InMemoryDbAutoData]
-        public static async Task UpdateAsync_UpdatesOrder(
-            [Frozen] ApplicationDbContext context,
-            [Frozen] Mock<IServiceRecipientService> serviceRecipientService,
-            [Frozen] CallOffId callOffId,
-            Order order,
-            ServiceRecipientsModel model,
-            ServiceRecipientsSectionController controller)
-        {
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
-
-            var recipients = model.ServiceRecipients
-                .Select(r => new ServiceRecipient(r.OdsCode, r.Name))
-                .ToDictionary(r => r.OdsCode);
-
-            // ReSharper disable once PossibleUnintendedReferenceComparison
-            Expression<Func<IServiceRecipientService, Task<IReadOnlyDictionary<string, ServiceRecipient>>>> addOrUpdateServiceRecipients = s =>
-                s.AddOrUpdateServiceRecipients(It.Is<IEnumerable<ServiceRecipientModel>>(r => r == model.ServiceRecipients));
-
-            serviceRecipientService.Setup(addOrUpdateServiceRecipients).ReturnsAsync(recipients);
-
-            await controller.UpdateAsync(callOffId, model);
-
-            order.SelectedServiceRecipients.Select(r => r.Recipient).Should().BeEquivalentTo(
-                model.ServiceRecipients,
-                o => o.ComparingByMembers<ServiceRecipientModel>());
-        }
-
-        [Test]
-        [InMemoryDbAutoData]
-        public static async Task UpdateAsync_UpdatesDb(
-            [Frozen] ApplicationDbContext context,
-            [Frozen] Mock<IServiceRecipientService> serviceRecipientService,
-            [Frozen] CallOffId callOffId,
-            Order order,
-            ServiceRecipientsModel model,
-            ServiceRecipientsSectionController controller)
-        {
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
-
-            var recipients = model.ServiceRecipients
-                .Select(r => new ServiceRecipient(r.OdsCode, r.Name))
-                .ToDictionary(r => r.OdsCode);
-
-            // ReSharper disable once PossibleUnintendedReferenceComparison
-            Expression<Func<IServiceRecipientService, Task<IReadOnlyDictionary<string, ServiceRecipient>>>> addOrUpdateServiceRecipients = s =>
-                s.AddOrUpdateServiceRecipients(It.Is<IEnumerable<ServiceRecipientModel>>(r => r == model.ServiceRecipients));
-
-            serviceRecipientService.Setup(addOrUpdateServiceRecipients).ReturnsAsync(recipients);
-
-            await controller.UpdateAsync(callOffId, model);
-
-            context.Order.Single().SelectedServiceRecipients.Select(r => r.Recipient).Should().BeEquivalentTo(
-                model.ServiceRecipients,
-                o => o.ComparingByMembers<ServiceRecipientModel>());
-        }
-
-        [Test]
-        [InMemoryDbAutoData]
-        public static async Task UpdateAsync_ReturnsNoContent(
-            [Frozen] ApplicationDbContext context,
-            [Frozen] Mock<IServiceRecipientService> serviceRecipientService,
-            [Frozen] CallOffId callOffId,
-            Order order,
-            ServiceRecipientsModel model,
-            ServiceRecipientsSectionController controller)
-        {
-            context.Order.Add(order);
-            await context.SaveChangesAsync();
-
-            var recipients = model.ServiceRecipients
-                .Select(r => new ServiceRecipient(r.OdsCode, r.Name))
-                .ToDictionary(r => r.OdsCode);
-
-            // ReSharper disable once PossibleUnintendedReferenceComparison
-            Expression<Func<IServiceRecipientService, Task<IReadOnlyDictionary<string, ServiceRecipient>>>> addOrUpdateServiceRecipients = s =>
-                s.AddOrUpdateServiceRecipients(It.Is<IEnumerable<ServiceRecipientModel>>(r => r == model.ServiceRecipients));
-
-            serviceRecipientService.Setup(addOrUpdateServiceRecipients).ReturnsAsync(recipients);
-
-            var result = await controller.UpdateAsync(callOffId, model);
-
-            result.Should().BeOfType<NoContentResult>();
         }
     }
 }

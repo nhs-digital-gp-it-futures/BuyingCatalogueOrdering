@@ -27,20 +27,6 @@ Background:
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @7412
-Scenario: get the selected service recipients from an exisiting ordering ID
-    Given selected service recipients exist
-        | OrderId | OdsCode |
-        | 10001   | ODS1    |
-        | 10002   | ODS2    |
-        | 10001   | ODS3    |
-    When the user makes a request to retrieve the service-recipients section with order ID 10001
-    Then a response with status code 200 is returned
-    And the service recipients are returned
-        | OdsCode | Name        |
-        | ODS3    | Recipient Y |
-        | ODS1    | Recipient Z |
-
-@7412
 Scenario: get the service recipients from an exisiting ordering ID when there are no selected service recipients
     Given order items exist
         | OrderId | CatalogueItemId |
