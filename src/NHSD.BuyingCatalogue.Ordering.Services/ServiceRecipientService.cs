@@ -21,18 +21,17 @@ namespace NHSD.BuyingCatalogue.Ordering.Services
             if (!await context.Order.AnyAsync(o => o.Id == callOffId.Id))
                 return null;
 
-            var orderItemRecipients = await context.Order
+            return await context.Order
                 .Where(o => o.Id == callOffId.Id)
                 .SelectMany(o => o.OrderItems)
                 .Where(o => o.CatalogueItem.CatalogueItemType == CatalogueItemType.Solution)
                 .SelectMany(o => o.OrderItemRecipients)
-                .Select(r => new ServiceRecipient(r.Recipient.OdsCode, r.Recipient.Name))
+                .Select(r => new { r.Recipient.OdsCode, r.Recipient.Name })
                 .Distinct()
-                .ToListAsync();
-
-            return orderItemRecipients
                 .OrderBy(r => r.Name)
-                .ToList();
+                .Select(r => new ServiceRecipient(r.OdsCode, r.Name))
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public async Task<IReadOnlyDictionary<string, ServiceRecipient>> AddOrUpdateServiceRecipients(
