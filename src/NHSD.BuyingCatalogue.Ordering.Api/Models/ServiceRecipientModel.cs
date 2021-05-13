@@ -10,10 +10,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models
         {
         }
 
-        internal ServiceRecipientModel(SelectedServiceRecipient recipient)
+        internal ServiceRecipientModel(ServiceRecipient recipient)
         {
-            Name = recipient.Recipient.Name;
-            OdsCode = recipient.Recipient.OdsCode;
+            Name = recipient.Name;
+            OdsCode = recipient.OdsCode;
         }
 
         public string Name { get; init; }

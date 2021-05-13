@@ -155,9 +155,12 @@ Scenario: the order section status is set for an order with a selected service r
     And order progress exists
         | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed | ServiceRecipientsViewed |
         | 10001   | false                    | false                    | false                    | true                    |
-    And selected service recipients exist
-        | OrderId | OdsCode |
-        | 10001   | ODS1    |
+    And order items exist
+        | OrderId | CatalogueItemId | PriceTimeUnit | EstimationPeriod |
+        | 10001   | 1000-001        | Month         | Month            |
+    And order item recipients exist
+        | OrderId | CatalogueItemId | OdsCode |
+        | 10001   | 1000-001        | ODS1    |
     When the user makes a request to retrieve the order summary with the ID 10001
     Then a response with status code 200 is returned
     And the order Section Status is incomplete
@@ -170,9 +173,6 @@ Scenario: the order section status is set for an imcomplete order with one solut
     And order progress exists
         | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed | ServiceRecipientsViewed |
         | 10001   | false                    | false                    | true                     | true                    |
-    And selected service recipients exist
-        | OrderId | OdsCode |
-        | 10001   | ODS1    |
     And order items exist
         | OrderId | CatalogueItemId |
         | 10001   | 1000-001        |

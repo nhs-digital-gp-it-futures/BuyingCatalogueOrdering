@@ -25,7 +25,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models.Summary
             if (order is null)
                 throw new ArgumentNullException(nameof(order));
 
-            int serviceRecipientsCount = order.SelectedServiceRecipients.Count;
+            int serviceRecipientsCount = order.OrderItems.Where(o => o.CatalogueItem.CatalogueItemType == CatalogueItemType.Solution).SelectMany(o => o.OrderItemRecipients).Count();
             int catalogueSolutionsCount = order.OrderItems.Count(i => i.CatalogueItem.CatalogueItemType.Equals(CatalogueItemType.Solution));
             int associatedServicesCount = order.OrderItems.Count(i => i.CatalogueItem.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
             int additionalServicesCount = order.OrderItems.Count(i => i.CatalogueItem.CatalogueItemType.Equals(CatalogueItemType.AdditionalService));

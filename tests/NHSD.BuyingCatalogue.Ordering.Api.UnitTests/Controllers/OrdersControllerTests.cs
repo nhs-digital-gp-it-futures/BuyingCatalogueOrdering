@@ -144,12 +144,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public static async Task GetOrderSummaryAsync_ReturnsExpectedResult(
             [Frozen] Mock<IOrderService> service,
             [Frozen] CallOffId callOffId,
-            IReadOnlyList<SelectedServiceRecipient> serviceRecipients,
             IReadOnlyList<OrderItem> orderItems,
             Order order,
             OrdersController controller)
         {
-            order.SetSelectedServiceRecipients(serviceRecipients);
             foreach (var orderItem in orderItems)
                 order.AddOrUpdateOrderItem(orderItem);
 
@@ -167,12 +165,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         public static async Task GetOrderSummaryAsync_InvokesGetOrderSummary(
             [Frozen] Mock<IOrderService> service,
             [Frozen] CallOffId callOffId,
-            IReadOnlyList<SelectedServiceRecipient> serviceRecipients,
             IReadOnlyList<OrderItem> orderItems,
             Order order,
             OrdersController controller)
         {
-            order.SetSelectedServiceRecipients(serviceRecipients);
             foreach (var orderItem in orderItems)
                 order.AddOrUpdateOrderItem(orderItem);
 

@@ -1,4 +1,4 @@
-﻿Feature: display all of the selected service recipients for an order
+﻿Feature: display all of the service recipients for an order
     As a buyer
     I want to view all of the service recipients for an order
     So that I can ensure the information is correct

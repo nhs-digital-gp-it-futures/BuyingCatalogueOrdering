@@ -112,5 +112,5 @@ Scenario: a user with read-only permissions, cannot update an ordering-party
 @4616
 Scenario: service failure
     Given the call to the database will fail
-    When the user makes a request to retrieve the ordering-party section with the ID 10001
+    When the user makes a request to retrieve the ordering-party section for the order with ID 10001
     Then a response with status code 500 is returned

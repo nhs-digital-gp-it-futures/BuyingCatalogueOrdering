@@ -67,21 +67,32 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task GetAllAsync_HasSelectedServiceRecipients_ReturnsExpectedResult(
+        public static async Task GetAllAsync_HasServiceRecipients_ReturnsExpectedResult(
             [Frozen] Mock<IServiceRecipientService> service,
             [Frozen] CallOffId callOffId,
-            IReadOnlyList<SelectedServiceRecipient> serviceRecipients,
             Order order,
+            List<OrderItem> orderItems,
             ServiceRecipientsSectionController controller)
         {
-            order.SetSelectedServiceRecipients(serviceRecipients);
+            foreach (var orderItem in orderItems)
+            {
+                order.AddOrUpdateOrderItem(orderItem);
+            }
+
+            var serviceRecipients = order.OrderItems
+                .Where(o => o.CatalogueItem.CatalogueItemType == CatalogueItemType.Solution)
+                .SelectMany(o => o.OrderItemRecipients)
+                .Select(r => new ServiceRecipient(r.Recipient.OdsCode, r.Recipient.Name))
+                .ToList();
 
             service.Setup(s => s.GetAllOrderItemRecipients(callOffId)).ReturnsAsync(
-                serviceRecipients.Select(s => new ServiceRecipient(s.Recipient.OdsCode, s.Recipient.Name)).ToList());
+                serviceRecipients);
 
             var expected = new ServiceRecipientsModel
             {
-                ServiceRecipients = serviceRecipients.Select(r => new ServiceRecipientModel(r)).ToList(),
+                ServiceRecipients = serviceRecipients.Select(r =>
+                    new ServiceRecipientModel { Name = r.Name, OdsCode = r.OdsCode })
+                    .ToList(),
             };
 
             var response = await controller.GetAllAsync(callOffId);

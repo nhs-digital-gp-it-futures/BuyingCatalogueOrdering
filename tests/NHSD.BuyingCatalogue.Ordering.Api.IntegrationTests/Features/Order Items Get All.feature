@@ -19,12 +19,6 @@ Background:
         | eu      | EU Test  |
         | auz     | AUZ Test |
         | ods     | NULL     |
-    And selected service recipients exist
-        | OrderId | OdsCode |
-        | 10001   | eu      |
-        | 10001   | auz     |
-        | 10001   | ods     |
-        | 10002   | eu      |
     And catalogue items exist
         | Id       | Name       | CatalogueItemType | ParentCatalogueItemId |
         | 1000-001 | Sol 1      | Solution          | NULL                  |

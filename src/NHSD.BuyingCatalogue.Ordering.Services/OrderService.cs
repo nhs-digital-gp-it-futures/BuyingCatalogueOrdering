@@ -49,7 +49,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Services
                 .Include(o => o.OrderingParty)
                 .Include(o => o.OrderingPartyContact)
                 .Include(o => o.SupplierContact)
-                .Include(o => o.SelectedServiceRecipients)
                 .Include(o => o.OrderItems).ThenInclude(i => i.CatalogueItem)
                 .Include(o => o.OrderItems).ThenInclude(i => i.OrderItemRecipients)
                 .Include(o => o.Progress)

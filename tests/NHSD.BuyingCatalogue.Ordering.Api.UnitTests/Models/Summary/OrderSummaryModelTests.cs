@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
 using NHSD.BuyingCatalogue.Ordering.Common.UnitTests.AutoFixture;
@@ -195,17 +196,23 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models.Summary
         [Test]
         [CommonAutoData]
         public static void Create_SetsExpectedServiceRecipientsSectionStatus(
-            IReadOnlyList<SelectedServiceRecipient> recipients,
+            IReadOnlyList<OrderItem> orderItems,
             Order order)
         {
             order.Progress.ServiceRecipientsViewed = true;
             order.OrderStatus = OrderStatus.Incomplete;
-            order.SetSelectedServiceRecipients(recipients);
+
+            foreach (var orderItem in orderItems)
+                order.AddOrUpdateOrderItem(orderItem);
+
+            var recipientCount = order.OrderItems
+                .Where(o => o.CatalogueItem.CatalogueItemType == CatalogueItemType.Solution)
+                .SelectMany(o => o.OrderItemRecipients).Count();
 
             var model = OrderSummaryModel.Create(order);
 
             model.Sections.Should().ContainEquivalentOf(
-                SectionModel.ServiceRecipients.WithStatus(Complete).WithCount(recipients.Count));
+                SectionModel.ServiceRecipients.WithStatus(Complete).WithCount(recipientCount));
         }
 
         [Test]

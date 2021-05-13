@@ -145,10 +145,18 @@ Scenario: get the order summary that includes a list of service recipients
     And order progress exists
         | OrderId | ServiceRecipientsViewed |
         | 10003   | true                    |
-    And selected service recipients exist
-        | OrderId | OdsCode |
-        | 10003   | ODS1    |
-        | 10003   | ODS2    |
+    And catalogue items exist
+        | Id        | Name         | CatalogueItemType |
+        | 10003-001 | Order Item 1 | Solution          |
+        | 10003-002 | Order Item 2 | Solution          |
+    And order items exist
+        | OrderId | CatalogueItemId |
+        | 10003   | 10003-001       |
+        | 10003   | 10003-002       |
+     And order item recipients exist
+        | OrderId | CatalogueItemId | OdsCode | Quantity | DeliveryDate |
+        | 10003   | 10003-001       | ODS1    | 5        | 21/03/2021   |
+        | 10003   | 10003-002       | ODS2    | 5        | 21/03/2021   |
     When the user makes a request to retrieve the order summary with the ID 10003
     Then a response with status code 200 is returned
     And the order Summary Sections have the following values
@@ -159,7 +167,7 @@ Scenario: get the order summary that includes a list of service recipients
         | commencement-date   | incomplete |       |
         | associated-services | incomplete | 0     |
         | service-recipients  | complete   | 2     |
-        | catalogue-solutions | incomplete | 0     |
+        | catalogue-solutions | incomplete | 2     |
         | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
 
@@ -171,10 +179,6 @@ Scenario: get the order summary that includes a list of Catalogue Solutions
     And order progress exists
         | OrderId | CatalogueSolutionsViewed |
         | 10003   | true                     |
-    And selected service recipients exist
-        | OrderId | OdsCode |
-        | 10003   | ODS1    |
-        | 10003   | ODS2    |
     And catalogue items exist
         | Id        | Name         | CatalogueItemType |
         | 10003-001 | Order Item 1 | Solution          |
@@ -183,6 +187,10 @@ Scenario: get the order summary that includes a list of Catalogue Solutions
         | OrderId | CatalogueItemId |
         | 10003   | 10003-001       |
         | 10003   | 10003-002       |
+     And order item recipients exist
+        | OrderId | CatalogueItemId | OdsCode | Quantity | DeliveryDate |
+        | 10003   | 10003-001       | ODS1    | 5        | 21/03/2021   |
+        | 10003   | 10003-002       | ODS2    | 5        | 21/03/2021   |
     When the user makes a request to retrieve the order summary with the ID 10003
     Then a response with status code 200 is returned
     And the order Summary Sections have the following values
@@ -205,9 +213,6 @@ Scenario: get the order summary that includes a list of associated services
     And order progress exists
         | OrderId | AssociatedServicesViewed |
         | 10003   | true                     |
-    And selected service recipients exist
-        | OrderId | OdsCode |
-        | 10003   | ODS1    |
     And catalogue items exist
         | Id        | Name              | CatalogueItemType |
         | 10003-001 | Associated Item 1 | AssociatedService |
@@ -225,7 +230,7 @@ Scenario: get the order summary that includes a list of associated services
         | supplier            | incomplete |       |
         | commencement-date   | incomplete |       |
         | associated-services | complete   | 2     |
-        | service-recipients  | incomplete | 1     |
+        | service-recipients  | incomplete | 0     |
         | catalogue-solutions | incomplete | 0     |
         | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
@@ -237,10 +242,7 @@ Scenario: get the order summary that includes a list of additional services
         | 10003   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | 10/03/2021 |
     And order progress exists
         | OrderId | AdditionalServicesViewed |
-        | 10003   | true                     |
-    And selected service recipients exist
-        | OrderId | OdsCode |
-        | 10003   | ODS1    |
+        | 10003   | true                     |   
     And catalogue items exist
         | Id        | Name              | CatalogueItemType |
         | 10003-001 | Additional Item 1 | AdditionalService |
@@ -251,6 +253,12 @@ Scenario: get the order summary that includes a list of additional services
         | 10003   | 10003-001       |
         | 10003   | 10003-002       |
         | 10003   | 10003-003       |
+    And service recipients exist
+        | OdsCode | Name    |
+        | eu      | EU Test |
+     And order item recipients exist
+        | OrderId | CatalogueItemId | OdsCode | Quantity | DeliveryDate |
+        | 10003   | 10003-003       | eu      | 5        | 21/03/2021   |
     When the user makes a request to retrieve the order summary with the ID 10003
     Then a response with status code 200 is returned
     And the order summary is returned with the following values

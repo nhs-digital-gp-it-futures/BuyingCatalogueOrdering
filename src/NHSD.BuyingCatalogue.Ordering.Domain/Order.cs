@@ -12,7 +12,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
     {
         private readonly List<DefaultDeliveryDate> defaultDeliveryDates = new();
         private readonly List<OrderItem> orderItems = new();
-        private readonly List<SelectedServiceRecipient> selectedServiceRecipients = new();
         private readonly List<ServiceInstanceItem> serviceInstanceItems = new();
 
         private DateTime? completed;
@@ -80,8 +79,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
         public IReadOnlyList<DefaultDeliveryDate> DefaultDeliveryDates => defaultDeliveryDates.AsReadOnly();
 
-        public IReadOnlyList<SelectedServiceRecipient> SelectedServiceRecipients => selectedServiceRecipients.AsReadOnly();
-
         public IReadOnlyList<ServiceInstanceItem> ServiceInstanceItems => serviceInstanceItems.AsReadOnly();
 
         public decimal CalculateCostPerYear(CostType costType)
@@ -115,20 +112,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
 
             existingDate.DeliveryDate = date;
             return result;
-        }
-
-        public void SetSelectedServiceRecipients(IReadOnlyList<SelectedServiceRecipient> selectedRecipients)
-        {
-            if (selectedRecipients is null)
-                throw new ArgumentNullException(nameof(selectedRecipients));
-
-            selectedServiceRecipients.Clear();
-            selectedServiceRecipients.AddRange(selectedRecipients);
-
-            if (selectedRecipients.Count == 0)
-                Progress.CatalogueSolutionsViewed = false;
-
-            Progress.ServiceRecipientsViewed = true;
         }
 
         public void SetLastUpdatedBy(Guid userId, string userName)
