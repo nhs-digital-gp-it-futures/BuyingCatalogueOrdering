@@ -71,7 +71,6 @@
     <Build Include="Tables\Supplier.sql" />
     <Build Include="Tables\CatalogueItem.sql" />
     <Build Include="Tables\PricingUnit.sql" />
-    <Build Include="Tables\SelectedServiceRecipients.sql" />
     <Build Include="Tables\ServiceRecipient.sql" />
     <Build Include="Tables\OrderProgress.sql" />
     <Build Include="Views\ServiceInstanceItem.sql" />

@@ -26,8 +26,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Models.Summary
 
         internal static SectionModel AssociatedServices => new("associated-services");
 
-        internal static SectionModel ServiceRecipients => new("service-recipients");
-
         internal static SectionModel CatalogueSolutions => new("catalogue-solutions");
 
         internal static SectionModel AdditionalServices => new("additional-services");

@@ -133,14 +133,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Test]
-        public static void SetServiceRecipient_NullRecipients_ThrowsException()
-        {
-            var order = OrderBuilder.Create().Build();
-
-            Assert.Throws<ArgumentNullException>(() => order.SetSelectedServiceRecipients(null));
-        }
-
-        [Test]
         public static void CalculateCostPerYear_Recurring_OrderItemCostTypeRecurring_ReturnsTotalOrderItemCost()
         {
             var order = new Order();
@@ -286,17 +278,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Ignore("Work in progress")]
-        [TestCase(null, false, false, false, false, false, false, false)]
-        [TestCase(true, true, true, true, true, true, false, true)]
-        [TestCase(true, true, true, true, true, true, true, true)]
-        [TestCase(true, true, true, true, false, false, true, false)]
-        [TestCase(true, true, true, true, true, false, true, true)]
-        [TestCase(true, true, false, false, true, false, false, false)]
-        [TestCase(true, true, false, true, true, true, false, false)]
-        [TestCase(true, false, true, false, false, false, true, false)]
+        [TestCase(null, false, false, false, false, false, false)]
+        [TestCase(true, true, true, true, true, false, true)]
+        [TestCase(true, true, true, true, true, true, true)]
+        [TestCase(true, true, true, false, false, true, false)]
+        [TestCase(true, true, true, true, false, true, true)]
+        [TestCase(true, false, false, true, false, false, false)]
+        [TestCase(true, false, true, true, true, false, false)]
+        [TestCase(true, true, false, false, false, true, false)]
         public static void CanComplete_ReturnsCorrectResult(
             bool? fundingComplete,
-            bool recipientViewed,
             bool associatedViewed,
             bool solutionViewed,
             bool hasRecipient,
@@ -307,7 +298,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             var orderBuilder = OrderBuilder
                 .Create()
                 .WithFundingSourceOnlyGms(fundingComplete)
-                .WithServiceRecipientsViewed(recipientViewed)
                 .WithAssociatedServicesViewed(associatedViewed)
                 .WithCatalogueSolutionsViewed(solutionViewed);
 
@@ -347,7 +337,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             var order = OrderBuilder
                 .Create()
                 .WithFundingSourceOnlyGms(true)
-                .WithServiceRecipientsViewed(true)
                 .WithAssociatedServicesViewed(true)
                 .WithOrderItem(OrderItemBuilder
                     .Create()
@@ -367,7 +356,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             var order = OrderBuilder
                 .Create()
                 .WithFundingSourceOnlyGms(true)
-                .WithServiceRecipientsViewed(true)
                 .WithAssociatedServicesViewed(true)
                 .WithOrderItem(OrderItemBuilder
                     .Create()
@@ -389,7 +377,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             var order = OrderBuilder
                 .Create()
                 .WithFundingSourceOnlyGms(true)
-                .WithServiceRecipientsViewed(true)
                 .WithAssociatedServicesViewed(true)
                 .WithOrderItem(OrderItemBuilder
                     .Create()
@@ -702,65 +689,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             var actualDefaultDeliveryDate = order.DefaultDeliveryDates[0];
 
             actualDefaultDeliveryDate.Should().BeEquivalentTo(expectedDefaultDeliveryDate);
-        }
-
-        [Test]
-        [CommonAutoData]
-        public static void SetSelectedServiceRecipient_SelectedRecipientsIsNull_ThrowsException(Order order)
-        {
-            Assert.Throws<ArgumentNullException>(() => order.SetSelectedServiceRecipients(null));
-        }
-
-        [Test]
-        [CommonAutoData]
-        public static void SetSelectedServiceRecipient_AddsSelectedRecipients(
-            Order order,
-            IReadOnlyList<SelectedServiceRecipient> recipients)
-        {
-            order.SelectedServiceRecipients.Should().BeEmpty();
-
-            order.SetSelectedServiceRecipients(recipients);
-
-            order.SelectedServiceRecipients.Should().BeEquivalentTo(recipients);
-        }
-
-        [Test]
-        [CommonAutoData]
-        public static void SetSelectedServiceRecipient_ReplacesSelectedRecipients(
-            Order order,
-            IReadOnlyList<SelectedServiceRecipient> initialRecipients,
-            IReadOnlyList<SelectedServiceRecipient> updatedRecipients)
-        {
-            BackingField.AddListItems(order, nameof(Order.SelectedServiceRecipients), initialRecipients);
-            order.SelectedServiceRecipients.Should().BeEquivalentTo(initialRecipients);
-
-            order.SetSelectedServiceRecipients(updatedRecipients);
-
-            order.SelectedServiceRecipients.Should().BeEquivalentTo(updatedRecipients);
-        }
-
-        [Test]
-        [CommonAutoData]
-        public static void SetSelectedServiceRecipient_UpdatesServiceRecipientsViewed(
-            Order order,
-            IReadOnlyList<SelectedServiceRecipient> recipients)
-        {
-            order.Progress.ServiceRecipientsViewed.Should().BeFalse();
-
-            order.SetSelectedServiceRecipients(recipients);
-
-            order.Progress.ServiceRecipientsViewed.Should().BeTrue();
-        }
-
-        [Test]
-        [CommonAutoData]
-        public static void SetSelectedServiceRecipient_NoRecipients_UpdatesCatalogueSolutionsViewed(Order order)
-        {
-            order.Progress.CatalogueSolutionsViewed = true;
-
-            order.SetSelectedServiceRecipients(Array.Empty<SelectedServiceRecipient>());
-
-            order.Progress.CatalogueSolutionsViewed.Should().BeFalse();
         }
 
         [Test]

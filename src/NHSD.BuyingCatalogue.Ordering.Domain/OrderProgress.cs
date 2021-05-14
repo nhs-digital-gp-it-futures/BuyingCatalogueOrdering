@@ -4,8 +4,6 @@
     {
         public int OrderId { get; init; }
 
-        public bool ServiceRecipientsViewed { get; set; }
-
         public bool CatalogueSolutionsViewed { get; set; }
 
         public bool AdditionalServicesViewed { get; set; }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using FluentAssertions;
 using NHSD.BuyingCatalogue.Ordering.Api.Models.Summary;
@@ -178,34 +177,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models.Summary
             var model = OrderSummaryModel.Create(order);
 
             model.Sections.Should().ContainEquivalentOf(SectionModel.AssociatedServices.WithStatus(Complete).WithCount(1));
-        }
-
-        [Test]
-        [CommonAutoData]
-        public static void Create_ServiceRecipientsNotViewed_SetsExpectedServiceRecipientsSectionStatus(Order order)
-        {
-            order.Progress.ServiceRecipientsViewed = false;
-            order.OrderStatus = OrderStatus.Incomplete;
-
-            var model = OrderSummaryModel.Create(order);
-
-            model.Sections.Should().ContainEquivalentOf(SectionModel.ServiceRecipients.WithStatus(Incomplete).WithCount(0));
-        }
-
-        [Test]
-        [CommonAutoData]
-        public static void Create_SetsExpectedServiceRecipientsSectionStatus(
-            IReadOnlyList<SelectedServiceRecipient> recipients,
-            Order order)
-        {
-            order.Progress.ServiceRecipientsViewed = true;
-            order.OrderStatus = OrderStatus.Incomplete;
-            order.SetSelectedServiceRecipients(recipients);
-
-            var model = OrderSummaryModel.Create(order);
-
-            model.Sections.Should().ContainEquivalentOf(
-                SectionModel.ServiceRecipients.WithStatus(Complete).WithCount(recipients.Count));
         }
 
         [Test]

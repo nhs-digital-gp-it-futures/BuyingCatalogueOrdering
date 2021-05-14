@@ -17,10 +17,6 @@ Background:
     And service recipients exist
         | OdsCode | Name    |
         | eu      | EU Test |
-    And selected service recipients exist
-        | OrderId | OdsCode |
-        | 10001   | eu      |
-        | 10002   | eu      |
     And catalogue items exist
         | Id       | Name   | CatalogueItemType | ParentCatalogueItemId |
         | 1000-001 | Item 1 | Solution          | NULL                  |

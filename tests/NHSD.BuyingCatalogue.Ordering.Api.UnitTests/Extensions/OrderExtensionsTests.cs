@@ -70,30 +70,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        public static void IsServiceRecipientsSectionComplete_NullOrder_ReturnsFalse()
-        {
-            var actual = OrderExtensions.IsServiceRecipientsSectionComplete(null);
-            actual.Should().BeFalse();
-        }
-
-        [Test]
-        public static void IsServiceRecipientsSectionComplete_ServiceRecipientsViewed_ReturnsTrue()
-        {
-            var order = OrderBuilder.Create().WithServiceRecipientsViewed(true).Build();
-            var actual = order.IsServiceRecipientsSectionComplete();
-            actual.Should().BeTrue();
-        }
-
-        [Test]
-        [CommonAutoData]
-        public static void IsServiceRecipientsSectionComplete_ServiceRecipientsViewedFalse_ReturnsFalse(Order order)
-        {
-            order.Progress.ServiceRecipientsViewed = false;
-            var actual = order.IsServiceRecipientsSectionComplete();
-            actual.Should().BeFalse();
-        }
-
-        [Test]
         public static void IsCatalogueSolutionsSectionComplete_NullOrder_ReturnsFalse()
         {
             var actual = OrderExtensions.IsCatalogueSolutionsSectionComplete(null);
@@ -213,16 +189,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         }
 
         [Test]
-        [CommonInlineAutoData(null, false, false, false, false, false, false)]
-        [CommonInlineAutoData(true, true, true, true, true, false, true)]
-        [CommonInlineAutoData(true, true, true, true, true, true, true)]
-        [CommonInlineAutoData(true, true, true, true, false, true, true)]
-        [CommonInlineAutoData(true, true, false, false, false, false, false)]
-        [CommonInlineAutoData(true, true, false, true, true, false, false)]
-        [CommonInlineAutoData(true, false, true, false, false, true, false)]
+        [CommonInlineAutoData(null, false, false, false, false, false)]
+        [CommonInlineAutoData(true, true, true, true, false, true)]
+        [CommonInlineAutoData(true, true, true, true, true, true)]
+        [CommonInlineAutoData(true, true, true, false, true, true)]
+        [CommonInlineAutoData(true, false, false, false, false, false)]
+        [CommonInlineAutoData(true, false, true, true, false, false)]
+        [CommonInlineAutoData(true, true, false, false, true, false)]
         public static void IsSectionStatusCompleteComplete_whenCalled_ReturnsCorrectResult(
             bool? fundingComplete,
-            bool recipientViewed,
             bool associatedViewed,
             bool solutionViewed,
             bool hasSolution,
@@ -234,7 +209,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
             order.FundingSourceOnlyGms = fundingComplete;
             order.Progress.AssociatedServicesViewed = associatedViewed;
             order.Progress.CatalogueSolutionsViewed = solutionViewed;
-            order.Progress.ServiceRecipientsViewed = recipientViewed;
 
             if (hasSolution)
             {
