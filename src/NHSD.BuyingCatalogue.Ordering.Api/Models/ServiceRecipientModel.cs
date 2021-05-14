@@ -1,15 +1,10 @@
 ﻿using System;
 using NHSD.BuyingCatalogue.Ordering.Api.Services;
-using NHSD.BuyingCatalogue.Ordering.Domain;
 
 namespace NHSD.BuyingCatalogue.Ordering.Api.Models
 {
     public sealed class ServiceRecipientModel : IEquatable<ServiceRecipientModel>, IServiceRecipient
     {
-        public ServiceRecipientModel()
-        {
-        }
-
         public string Name { get; init; }
 
         public string OdsCode { get; init; }

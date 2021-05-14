@@ -147,7 +147,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             if (!FundingSourceOnlyGms.HasValue)
                 return false;
 
-            var serviceRecipientsCount = OrderItems.SelectMany(i => i.OrderItemRecipients).Count();
             int catalogueSolutionsCount = OrderItems.Count(o => o.CatalogueItem.CatalogueItemType.Equals(CatalogueItemType.Solution));
             int associatedServicesCount = OrderItems.Count(o => o.CatalogueItem.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
 
@@ -158,17 +157,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 && associatedServicesCount == 0
                 && Progress.AssociatedServicesViewed;
 
-            var noSolutionsAndAssociatedServices = serviceRecipientsCount > 0
-                && catalogueSolutionsCount == 0
+            var noSolutionsAndAssociatedServices = catalogueSolutionsCount == 0
                 && Progress.CatalogueSolutionsViewed
-                && associatedServicesCount > 0;
-
-            var recipientsAndAssociatedServices = serviceRecipientsCount == 0
                 && associatedServicesCount > 0;
 
             return solutionAndNoAssociatedServices
                 || solutionAndAssociatedServices
-                || recipientsAndAssociatedServices
                 || noSolutionsAndAssociatedServices;
         }
 

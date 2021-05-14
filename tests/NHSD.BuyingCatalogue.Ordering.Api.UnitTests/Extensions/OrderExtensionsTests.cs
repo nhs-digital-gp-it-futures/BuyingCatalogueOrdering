@@ -195,7 +195,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
         [CommonInlineAutoData(true, true, true, false, true, true)]
         [CommonInlineAutoData(true, false, false, false, false, false)]
         [CommonInlineAutoData(true, false, true, true, false, false)]
-        [CommonInlineAutoData(true, true, false, false, true, true)]
+        [CommonInlineAutoData(true, true, false, false, true, false)]
         public static void IsSectionStatusCompleteComplete_whenCalled_ReturnsCorrectResult(
             bool? fundingComplete,
             bool associatedViewed,
