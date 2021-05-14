@@ -47,12 +47,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
             await ProgressPropertyHasExpectedValue(orderId, p => p.AssociatedServicesViewed, viewed);
         }
 
-        [Then(@"the order with ID (\d{1,6}) has service recipients viewed set to (.*)")]
-        public async Task TheOrderWithIdHasServiceRecipientsViewedSet(int orderId, bool viewed)
-        {
-            await ProgressPropertyHasExpectedValue(orderId, p => p.ServiceRecipientsViewed, viewed);
-        }
-
         private async Task ProgressPropertyHasExpectedValue(
             int orderId,
             Func<OrderProgressEntity, bool> propertySelector,

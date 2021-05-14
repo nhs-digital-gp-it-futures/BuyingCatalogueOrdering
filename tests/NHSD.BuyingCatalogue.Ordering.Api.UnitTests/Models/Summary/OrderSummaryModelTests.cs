@@ -183,40 +183,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Models.Summary
 
         [Test]
         [CommonAutoData]
-        public static void Create_ServiceRecipientsNotViewed_SetsExpectedServiceRecipientsSectionStatus(Order order)
-        {
-            order.Progress.ServiceRecipientsViewed = false;
-            order.OrderStatus = OrderStatus.Incomplete;
-
-            var model = OrderSummaryModel.Create(order);
-
-            model.Sections.Should().ContainEquivalentOf(SectionModel.ServiceRecipients.WithStatus(Incomplete).WithCount(0));
-        }
-
-        [Test]
-        [CommonAutoData]
-        public static void Create_SetsExpectedServiceRecipientsSectionStatus(
-            IReadOnlyList<OrderItem> orderItems,
-            Order order)
-        {
-            order.Progress.ServiceRecipientsViewed = true;
-            order.OrderStatus = OrderStatus.Incomplete;
-
-            foreach (var orderItem in orderItems)
-                order.AddOrUpdateOrderItem(orderItem);
-
-            var recipientCount = order.OrderItems
-                .Where(o => o.CatalogueItem.CatalogueItemType == CatalogueItemType.Solution)
-                .SelectMany(o => o.OrderItemRecipients).Count();
-
-            var model = OrderSummaryModel.Create(order);
-
-            model.Sections.Should().ContainEquivalentOf(
-                SectionModel.ServiceRecipients.WithStatus(Complete).WithCount(recipientCount));
-        }
-
-        [Test]
-        [CommonAutoData]
         public static void Create_CatalogueSolutionsNotViewed_SetsExpectedCatalogueSolutionsSectionStatus(Order order)
         {
             order.Progress.CatalogueSolutionsViewed = false;

@@ -6,8 +6,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
     {
         public int OrderId { get; set; }
 
-        public bool ServiceRecipientsViewed { get; set; }
-
         public bool CatalogueSolutionsViewed { get; set; }
 
         public bool AdditionalServicesViewed { get; set; }
@@ -18,7 +16,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
             INSERT INTO dbo.OrderProgress
             (
                 OrderId,
-                ServiceRecipientsViewed,
                 CatalogueSolutionsViewed,
                 AdditionalServicesViewed,
                 AssociatedServicesViewed
@@ -26,7 +23,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
             VALUES
             (
                 @OrderId,
-                @ServiceRecipientsViewed,
                 @CatalogueSolutionsViewed,
                 @AdditionalServicesViewed,
                 @AssociatedServicesViewed
@@ -36,7 +32,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Testing.Data.Entities
         {
             const string sql = @"
                 SELECT OrderId,
-                       ServiceRecipientsViewed,
                        CatalogueSolutionsViewed,
                        AdditionalServicesViewed,
                        AssociatedServicesViewed

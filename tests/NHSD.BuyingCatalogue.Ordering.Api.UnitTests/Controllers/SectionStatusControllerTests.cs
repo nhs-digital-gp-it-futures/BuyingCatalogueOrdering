@@ -98,7 +98,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             order.Progress.AdditionalServicesViewed = false;
             order.Progress.AssociatedServicesViewed = false;
             order.Progress.CatalogueSolutionsViewed = false;
-            order.Progress.ServiceRecipientsViewed = false;
 
             service.Setup(o => o.GetOrder(order.CallOffId)).ReturnsAsync(order);
             service.Setup(o => o.SetSectionStatus(order, It.IsAny<string>())).Callback(() =>
@@ -113,7 +112,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             order.Progress.AdditionalServicesViewed.Should().Be(additionalServicesViewed);
             order.Progress.AssociatedServicesViewed.Should().Be(associatedServicesViewed);
             order.Progress.CatalogueSolutionsViewed.Should().Be(catalogueSolutionsViewed);
-            order.Progress.ServiceRecipientsViewed.Should().BeFalse();
         }
 
         [Test]

@@ -27,7 +27,7 @@ Background:
     And the user is logged in with the Buyer role for organisation 4af62b99-638c-4247-875e-965239cd0c48
 
 @7412
-Scenario: get the service recipients from an exisiting ordering ID when there are no selected service recipients
+Scenario: get the service recipients from an existing order
     Given order items exist
         | OrderId | CatalogueItemId |
         | 10001   | 1000-001        |

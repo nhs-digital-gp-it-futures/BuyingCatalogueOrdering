@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -50,13 +51,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [InMemoryDbAutoData]
         public static async Task CompleteAsync_UpdatesDb(
             [Frozen] ApplicationDbContext context,
-            OrderItem orderItem,
+            List<OrderItem> orderItems,
             Order order,
             CompleteOrderService service)
         {
             order.FundingSourceOnlyGms = false;
             order.OrderStatus = OrderStatus.Incomplete;
-            order.AddOrUpdateOrderItem(orderItem);
+
+            foreach (var orderItem in orderItems)
+                order.AddOrUpdateOrderItem(orderItem);
+
             context.Order.Add(order);
             await context.SaveChangesAsync();
 
@@ -68,13 +72,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [Test]
         [InMemoryDbAutoData]
         public static async Task CompleteAsync_NotGms_ReturnsExpectedResult(
-            OrderItem orderItem,
+            List<OrderItem> orderItems,
             Order order,
             CompleteOrderService service)
         {
             order.FundingSourceOnlyGms = false;
             order.OrderStatus = OrderStatus.Incomplete;
-            order.AddOrUpdateOrderItem(orderItem);
+
+            foreach (var orderItem in orderItems)
+                order.AddOrUpdateOrderItem(orderItem);
 
             var result = await service.CompleteAsync(order);
 
@@ -119,13 +125,19 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [InMemoryDbAutoData]
         public static async Task CompleteAsync_Gms_PurchasingDocumentService_CreateCsvAsync_CalledOnce(
             [Frozen] Mock<ICreatePurchasingDocumentService> createPurchasingDocumentServiceMock,
-            OrderItem orderItem,
+            List<OrderItem> orderItems,
             Order order,
             CompleteOrderService service)
         {
             order.FundingSourceOnlyGms = true;
             order.OrderStatus = OrderStatus.Incomplete;
-            order.AddOrUpdateOrderItem(orderItem);
+            order.Progress.AssociatedServicesViewed = true;
+
+            var patientOrdertems = orderItems.Where(i => i.ProvisioningType.Equals(ProvisioningType.Patient)
+                && !i.CatalogueItem.CatalogueItemType.Equals(CatalogueItemType.AssociatedService));
+
+            foreach (var orderItem in patientOrdertems)
+                order.AddOrUpdateOrderItem(orderItem);
 
             await service.CompleteAsync(order);
 
@@ -138,13 +150,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [InMemoryDbAutoData]
         public static async Task CompleteAsync_EmailServiceSubjectIsSet_SubjectIsChanged(
             [Frozen] Mock<IEmailService> emailServiceMock,
-            OrderItem orderItem,
+            List<OrderItem> orderItems,
             Order order,
             CompleteOrderService service)
         {
             order.FundingSourceOnlyGms = true;
             order.OrderStatus = OrderStatus.Incomplete;
-            order.AddOrUpdateOrderItem(orderItem);
+
+            foreach (var orderItem in orderItems)
+                order.AddOrUpdateOrderItem(orderItem);
 
             EmailMessage sentMessage = null;
             emailServiceMock
@@ -160,13 +174,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [InMemoryDbAutoData]
         public static async Task CompleteAsync_EmailService_CalledOnce(
             [Frozen] Mock<IEmailService> emailServiceMock,
-            OrderItem orderItem,
+            List<OrderItem> orderItems,
             Order order,
             CompleteOrderService service)
         {
             order.FundingSourceOnlyGms = true;
             order.OrderStatus = OrderStatus.Incomplete;
-            order.AddOrUpdateOrderItem(orderItem);
+
+            foreach (var orderItem in orderItems)
+                order.AddOrUpdateOrderItem(orderItem);
 
             await service.CompleteAsync(order);
 
@@ -176,13 +192,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [Test]
         [InMemoryDbAutoData]
         public static async Task CompleteAsync_CompleteOrderRequest_ReturnsSuccessfulResult(
-            OrderItem orderItem,
+            List<OrderItem> orderItems,
             Order order,
             CompleteOrderService service)
         {
             order.FundingSourceOnlyGms = true;
             order.OrderStatus = OrderStatus.Incomplete;
-            order.AddOrUpdateOrderItem(orderItem);
+
+            foreach (var orderItem in orderItems)
+                order.AddOrUpdateOrderItem(orderItem);
 
             var result = await service.CompleteAsync(order);
 

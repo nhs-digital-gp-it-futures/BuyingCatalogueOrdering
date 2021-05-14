@@ -19,11 +19,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Extensions
             return order?.CommencementDate is not null;
         }
 
-        public static bool IsServiceRecipientsSectionComplete(this Order order)
-        {
-            return order is not null && order.Progress.ServiceRecipientsViewed;
-        }
-
         public static bool IsCatalogueSolutionsSectionComplete(this Order order)
         {
             return order is not null && order.Progress.CatalogueSolutionsViewed;

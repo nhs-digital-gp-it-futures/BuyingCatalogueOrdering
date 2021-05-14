@@ -278,17 +278,16 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
         }
 
         [Ignore("Work in progress")]
-        [TestCase(null, false, false, false, false, false, false, false)]
-        [TestCase(true, true, true, true, true, true, false, true)]
-        [TestCase(true, true, true, true, true, true, true, true)]
-        [TestCase(true, true, true, true, false, false, true, false)]
-        [TestCase(true, true, true, true, true, false, true, true)]
-        [TestCase(true, true, false, false, true, false, false, false)]
-        [TestCase(true, true, false, true, true, true, false, false)]
-        [TestCase(true, false, true, false, false, false, true, false)]
+        [TestCase(null, false, false, false, false, false, false)]
+        [TestCase(true, true, true, true, true, false, true)]
+        [TestCase(true, true, true, true, true, true, true)]
+        [TestCase(true, true, true, false, false, true, false)]
+        [TestCase(true, true, true, true, false, true, true)]
+        [TestCase(true, false, false, true, false, false, false)]
+        [TestCase(true, false, true, true, true, false, false)]
+        [TestCase(true, true, false, false, false, true, false)]
         public static void CanComplete_ReturnsCorrectResult(
             bool? fundingComplete,
-            bool recipientViewed,
             bool associatedViewed,
             bool solutionViewed,
             bool hasRecipient,
@@ -299,7 +298,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             var orderBuilder = OrderBuilder
                 .Create()
                 .WithFundingSourceOnlyGms(fundingComplete)
-                .WithServiceRecipientsViewed(recipientViewed)
                 .WithAssociatedServicesViewed(associatedViewed)
                 .WithCatalogueSolutionsViewed(solutionViewed);
 
@@ -339,7 +337,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             var order = OrderBuilder
                 .Create()
                 .WithFundingSourceOnlyGms(true)
-                .WithServiceRecipientsViewed(true)
                 .WithAssociatedServicesViewed(true)
                 .WithOrderItem(OrderItemBuilder
                     .Create()
@@ -359,7 +356,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             var order = OrderBuilder
                 .Create()
                 .WithFundingSourceOnlyGms(true)
-                .WithServiceRecipientsViewed(true)
                 .WithAssociatedServicesViewed(true)
                 .WithOrderItem(OrderItemBuilder
                     .Create()
@@ -381,7 +377,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             var order = OrderBuilder
                 .Create()
                 .WithFundingSourceOnlyGms(true)
-                .WithServiceRecipientsViewed(true)
                 .WithAssociatedServicesViewed(true)
                 .WithOrderItem(OrderItemBuilder
                     .Create()

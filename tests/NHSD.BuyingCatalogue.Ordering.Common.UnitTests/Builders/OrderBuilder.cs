@@ -23,7 +23,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
         private int orderId;
         private Contact supplierContact;
         private DateTime? commencementDate;
-        private bool serviceRecipientsViewed;
         private bool catalogueSolutionsViewed;
         private bool additionalServicesViewed;
         private bool associatedServicesViewed;
@@ -45,7 +44,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
             supplierAddress = AddressBuilder.Create().WithLine1("1 Some Supplier").Build();
             supplierContact = null;
             commencementDate = null;
-            serviceRecipientsViewed = false;
             catalogueSolutionsViewed = false;
             additionalServicesViewed = false;
             associatedServicesViewed = false;
@@ -70,12 +68,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
         public OrderBuilder WithCommencementDate(DateTime? date)
         {
             commencementDate = date;
-            return this;
-        }
-
-        public OrderBuilder WithServiceRecipientsViewed(bool viewed)
-        {
-            serviceRecipientsViewed = viewed;
             return this;
         }
 
@@ -137,7 +129,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Common.UnitTests.Builders
                     AdditionalServicesViewed = additionalServicesViewed,
                     AssociatedServicesViewed = associatedServicesViewed,
                     CatalogueSolutionsViewed = catalogueSolutionsViewed,
-                    ServiceRecipientsViewed = serviceRecipientsViewed,
                 },
                 Supplier = new Supplier
                 {

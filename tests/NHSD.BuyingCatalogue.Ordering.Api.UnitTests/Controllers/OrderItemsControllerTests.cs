@@ -339,7 +339,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         [InMemoryDbAutoData]
         public static async Task DeleteOrderItemAsync_OrderItemExistsInOrder_DeletesOrderItem(
             [Frozen] Mock<IOrderItemService> service,
-            [Frozen] CallOffId callOffId,
             Order order,
             List<OrderItem> orderItems,
             OrderItemsController controller)
@@ -347,14 +346,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             orderItems[2].CatalogueItem.ParentCatalogueItemId = orderItems[1].CatalogueItem.Id;
             orderItems.ForEach(o => order.AddOrUpdateOrderItem(o));
 
-            service.Setup(o => o.GetOrderWithCatalogueItem(callOffId, orderItems[1].CatalogueItem.Id))
+            service.Setup(o => o.GetOrderWithCatalogueItem(order.CallOffId, orderItems[1].CatalogueItem.Id))
                 .ReturnsAsync(order);
             service.Setup(o => o.DeleteOrderItem(order, orderItems[1].CatalogueItem.Id)).Callback(() =>
             {
                 order.DeleteOrderItemAndUpdateProgress(orderItems[1].CatalogueItem.Id);
             });
 
-            await controller.DeleteOrderItemAsync(callOffId, orderItems[1].CatalogueItem.Id);
+            await controller.DeleteOrderItemAsync(order.CallOffId, orderItems[1].CatalogueItem.Id);
 
             order.OrderItems.Contains(orderItems[1]).Should().BeFalse();
             order.OrderItems.Contains(orderItems[2]).Should().BeFalse();

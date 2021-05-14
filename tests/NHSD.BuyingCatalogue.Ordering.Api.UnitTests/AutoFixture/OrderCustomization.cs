@@ -12,6 +12,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture
             fixture.Customize<Order>(c => c.FromFactory(() => CreateOrder(fixture))
                 .Without(o => o.CallOffId)
                 .Without(o => o.Revision)
+                .Without(o => o.IsDeleted)
                 .Without(o => o.OrderStatus));
         }
 

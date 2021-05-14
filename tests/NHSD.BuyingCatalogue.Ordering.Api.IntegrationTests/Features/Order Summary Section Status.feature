@@ -28,8 +28,8 @@ Scenario: the order section status is set for an order with one of each catalogu
         | OrderId | Description   | OrderingPartyId                      | FundingSourceOnlyGms | OrderStatus | Created    |
         | 10001   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                 | Incomplete  | 10/03/2021 |
     And order progress exists
-        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed | ServiceRecipientsViewed |
-        | 10001   | true                     | true                     | true                     | true                    |
+        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed |
+        | 10001   | true                     | true                     | true                     |
     And order items exist
         | OrderId | CatalogueItemId |
         | 10001   | 1000-001        |
@@ -50,8 +50,8 @@ Scenario: the order section status is set for an order with one associated servi
         | OrderId | Description   | OrderingPartyId                      | FundingSourceOnlyGms | OrderStatus | Created    |
         | 10001   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                 | Incomplete  | 10/03/2021 |
     And order progress exists
-        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed | ServiceRecipientsViewed |
-        | 10001   | true                     | true                     | true                     | true                    |
+        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed |
+        | 10001   | true                     | true                     | true                     |
     And order items exist
         | OrderId | CatalogueItemId |
         | 10001   | 1000-S-01       |
@@ -68,8 +68,8 @@ Scenario: the order section status is set for an order with one associated servi
         | OrderId | Description   | OrderingPartyId                      | FundingSourceOnlyGms | OrderStatus | Created    |
         | 10001   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                 | Incomplete  | 10/03/2021 |
     And order progress exists
-        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed | ServiceRecipientsViewed |
-        | 10001   | true                     | true                     | true                     | true                    |
+        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed |
+        | 10001   | true                     | true                     | true                     |
     And order items exist
         | OrderId | CatalogueItemId |
         | 10001   | 1000-S-01       |
@@ -83,8 +83,8 @@ Scenario: the order section status is set for an order with one solution and one
         | OrderId | Description   | OrderingPartyId                      | FundingSourceOnlyGms | OrderStatus | Created    |
         | 10001   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                 | Incomplete  | 10/03/2021 |
     And order progress exists
-        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed | ServiceRecipientsViewed |
-        | 10001   | true                     | true                     | true                     | true                    |
+        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed |
+        | 10001   | true                     | true                     | true                     |
     And order items exist
         | OrderId | CatalogueItemId |
         | 10001   | 1000-001        |
@@ -103,8 +103,8 @@ Scenario: the order section status is set for an order with one solution only
         | OrderId | Description   | OrderingPartyId                      | FundingSourceOnlyGms | OrderStatus | Created    |
         | 10001   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                 | Incomplete  | 10/03/2021 |
     And order progress exists
-        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed | ServiceRecipientsViewed |
-        | 10001   | true                     | true                     | true                     | true                    |
+        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed |
+        | 10001   | true                     | true                     | true                     |
     And order items exist
         | OrderId | CatalogueItemId |
         | 10001   | 1000-001        |
@@ -121,8 +121,8 @@ Scenario: the order section status is set for an order with one solution and one
         | OrderId | Description   | OrderingPartyId                      | FundingSourceOnlyGms | OrderStatus | Created    |
         | 10001   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | NULL                 | Incomplete  | 10/03/2021 |
     And order progress exists
-        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed | ServiceRecipientsViewed |
-        | 10001   | true                     | true                     | true                     | true                    |
+        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed |
+        | 10001   | true                     | true                     | true                     |
     And order items exist
         | OrderId | CatalogueItemId |
         | 10001   | 1000-001        |
@@ -141,8 +141,8 @@ Scenario: the order section status is set for a totally incomplete order
         | OrderId | Description   | OrderingPartyId                      | FundingSourceOnlyGms | OrderStatus | Created    |
         | 10001   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | NULL                 | Incomplete  | 10/03/2021 |
     And order progress exists
-        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed | ServiceRecipientsViewed |
-        | 10001   | false                    | false                    | false                    | false                   |
+        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed |
+        | 10001   | false                    | false                    | false                    |
     When the user makes a request to retrieve the order summary with the ID 10001
     Then a response with status code 200 is returned
     And the order Section Status is incomplete
@@ -153,8 +153,8 @@ Scenario: the order section status is set for an order with a selected service r
         | OrderId | Description   | OrderingPartyId                      | FundingSourceOnlyGms | OrderStatus | Created    |
         | 10001   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                 | Incomplete  | 10/03/2021 |
     And order progress exists
-        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed | ServiceRecipientsViewed |
-        | 10001   | false                    | false                    | false                    | true                    |
+        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed |
+        | 10001   | false                    | false                    | false                    |
     And order items exist
         | OrderId | CatalogueItemId | PriceTimeUnit | EstimationPeriod |
         | 10001   | 1000-001        | Month         | Month            |
@@ -171,8 +171,8 @@ Scenario: the order section status is set for an imcomplete order with one solut
         | OrderId | Description   | OrderingPartyId                      | FundingSourceOnlyGms | OrderStatus | Created    |
         | 10001   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                 | Incomplete  | 10/03/2021 |
     And order progress exists
-        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed | ServiceRecipientsViewed |
-        | 10001   | false                    | false                    | true                     | true                    |
+        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed |
+        | 10001   | false                    | false                    | true                     |
     And order items exist
         | OrderId | CatalogueItemId |
         | 10001   | 1000-001        |
@@ -189,8 +189,8 @@ Scenario: the order section status is set for an incomplete order with one solut
         | OrderId | Description   | OrderingPartyId                      | FundingSourceOnlyGms | OrderStatus | Created    |
         | 10001   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                 | Incomplete  | 10/03/2021 |
     And order progress exists
-        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed | ServiceRecipientsViewed |
-        | 10001   | true                     | false                    | true                     | true                    |
+        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed |
+        | 10001   | true                     | false                    | true                     |
     And order items exist
         | OrderId | CatalogueItemId |
         | 10001   | 1000-001        |
@@ -209,8 +209,8 @@ Scenario: the order section status is set for an incomplete order with one assoc
         | OrderId | Description   | OrderingPartyId                      | FundingSourceOnlyGms | OrderStatus | Created    |
         | 10001   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | NULL                 | Incomplete  | 10/03/2021 |
     And order progress exists
-        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed | ServiceRecipientsViewed |
-        | 10001   | false                    | true                     | false                    | false                   |
+        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed |
+        | 10001   | false                    | true                     | false                    |
     And order items exist
         | OrderId | CatalogueItemId |
         | 10001   | 1000-S-01       |

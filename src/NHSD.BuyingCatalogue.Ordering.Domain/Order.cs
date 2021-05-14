@@ -164,7 +164,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
                 && associatedServicesCount > 0;
 
             var recipientsAndAssociatedServices = serviceRecipientsCount == 0
-                && Progress.ServiceRecipientsViewed
                 && associatedServicesCount > 0;
 
             return solutionAndNoAssociatedServices

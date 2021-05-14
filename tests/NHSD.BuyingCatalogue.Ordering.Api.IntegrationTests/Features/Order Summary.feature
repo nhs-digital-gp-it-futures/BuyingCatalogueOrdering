@@ -39,7 +39,6 @@ Scenario: get the order summary
         | supplier            | incomplete |       |
         | commencement-date   | incomplete |       |
         | associated-services | incomplete | 0     |
-        | service-recipients  | incomplete | 0     |
         | catalogue-solutions | incomplete | 0     |
         | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
@@ -61,7 +60,6 @@ Scenario: get the order summary when the order has a primary ordering party cont
         | supplier            | incomplete |       |
         | commencement-date   | incomplete |       |
         | associated-services | incomplete | 0     |
-        | service-recipients  | incomplete | 0     |
         | catalogue-solutions | incomplete | 0     |
         | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
@@ -83,7 +81,6 @@ Scenario: get the order summary when the order has a primary supplier contact
         | supplier            | complete   |       |
         | commencement-date   | incomplete |       |
         | associated-services | incomplete | 0     |
-        | service-recipients  | incomplete | 0     |
         | catalogue-solutions | incomplete | 0     |
         | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
@@ -102,7 +99,6 @@ Scenario: get the order summary when the order has a commencement date
         | supplier            | incomplete |       |
         | commencement-date   | complete   |       |
         | associated-services | incomplete | 0     |
-        | service-recipients  | incomplete | 0     |
         | catalogue-solutions | incomplete | 0     |
         | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
@@ -113,8 +109,8 @@ Scenario: get the order summary after a section has been viewed
         | OrderId | Description   | OrderingPartyId                      | FundingSourceOnlyGMS      | Created    |
         | 10002   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | <funding-source-only-gms> | 10/03/2021 |
     And order progress exists
-        | OrderId | ServiceRecipientsViewed     | AdditionalServicesViewed     | CatalogueSolutionsViewed     | AssociatedServicesViewed     |
-        | 10002   | <service-recipients-viewed> | <additional-services-viewed> | <catalogue-solutions-viewed> | <associated-services-viewed> |
+        | OrderId | AdditionalServicesViewed     | CatalogueSolutionsViewed     | AssociatedServicesViewed     |
+        | 10002   | <additional-services-viewed> | <catalogue-solutions-viewed> | <associated-services-viewed> |
     When the user makes a request to retrieve the order summary with the ID 10002
     Then a response with status code 200 is returned
     And the order Summary Sections have the following values
@@ -124,18 +120,17 @@ Scenario: get the order summary after a section has been viewed
         | supplier            | incomplete                   |       |
         | commencement-date   | incomplete                   |       |
         | associated-services | <associated-services-status> | 0     |
-        | service-recipients  | <service-recipients-status>  | 0     |
         | catalogue-solutions | <catalogue-solutions-status> | 0     |
         | additional-services | <additional-services-status> | 0     |
         | funding-source      | <funding-source-status>      |       |
 
     Examples: Sections
-        | service-recipients-viewed | additional-services-viewed | catalogue-solutions-viewed | associated-services-viewed | funding-source-only-gms | service-recipients-status | additional-services-status | catalogue-solutions-status | associated-services-status | funding-source-status   |
-        | True                      | False                      | False                      | False                      | NULL                    | complete                  | incomplete                 | incomplete                 | incomplete                 | incomplete              |
-        | False                     | True                       | False                      | False                      | NULL                    | incomplete                | incomplete                 | incomplete                 | incomplete                 | incomplete              |
-        | False                     | False                      | True                       | False                      | NULL                    | incomplete                | incomplete                 | complete                   | incomplete                 | incomplete              |
-        | False                     | False                      | False                      | True                       | False                   | incomplete                | incomplete                 | incomplete                 | complete                   | incomplete              |
-        | False                     | False                      | False                      | False                      | True                    | incomplete                | incomplete                 | incomplete                 | incomplete                 | incomplete              |
+        | additional-services-viewed | catalogue-solutions-viewed | associated-services-viewed | funding-source-only-gms | service-recipients-status | additional-services-status | catalogue-solutions-status | associated-services-status | funding-source-status   |
+        | False                      | False                      | False                      | NULL                    | complete                  | incomplete                 | incomplete                 | incomplete                 | incomplete              |
+        | True                       | False                      | False                      | NULL                    | incomplete                | incomplete                 | incomplete                 | incomplete                 | incomplete              |
+        | False                      | True                       | False                      | NULL                    | incomplete                | incomplete                 | complete                   | incomplete                 | incomplete              |
+        | False                      | False                      | True                       | False                   | incomplete                | incomplete                 | incomplete                 | complete                   | incomplete              |
+        | False                      | False                      | False                      | True                    | incomplete                | incomplete                 | incomplete                 | incomplete                 | incomplete              |
 
 @4629
 Scenario: get the order summary that includes a list of service recipients
@@ -143,8 +138,8 @@ Scenario: get the order summary that includes a list of service recipients
         | OrderId | Description   | OrderingPartyId                      | Created    |
         | 10003   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | 10/03/2021 |
     And order progress exists
-        | OrderId | ServiceRecipientsViewed |
-        | 10003   | true                    |
+        | OrderId |
+        | 10003   |
     And catalogue items exist
         | Id        | Name         | CatalogueItemType |
         | 10003-001 | Order Item 1 | Solution          |
@@ -166,7 +161,6 @@ Scenario: get the order summary that includes a list of service recipients
         | supplier            | incomplete |       |
         | commencement-date   | incomplete |       |
         | associated-services | incomplete | 0     |
-        | service-recipients  | complete   | 2     |
         | catalogue-solutions | incomplete | 2     |
         | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
@@ -200,7 +194,6 @@ Scenario: get the order summary that includes a list of Catalogue Solutions
         | supplier            | incomplete |       |
         | commencement-date   | incomplete |       |
         | associated-services | incomplete | 0     |
-        | service-recipients  | incomplete | 2     |
         | catalogue-solutions | complete   | 2     |
         | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
@@ -230,7 +223,6 @@ Scenario: get the order summary that includes a list of associated services
         | supplier            | incomplete |       |
         | commencement-date   | incomplete |       |
         | associated-services | complete   | 2     |
-        | service-recipients  | incomplete | 0     |
         | catalogue-solutions | incomplete | 0     |
         | additional-services | incomplete | 0     |
         | funding-source      | incomplete |       |
@@ -271,7 +263,6 @@ Scenario: get the order summary that includes a list of additional services
         | supplier            | incomplete |       |
         | commencement-date   | incomplete |       |
         | associated-services | incomplete | 0     |
-        | service-recipients  | incomplete | 1     |
         | catalogue-solutions | incomplete | 1     |
         | additional-services | complete   | 2     |
         | funding-source      | incomplete |       |
