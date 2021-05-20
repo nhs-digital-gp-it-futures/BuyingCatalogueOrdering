@@ -27,8 +27,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Utils
             await databaseConnection.ExecuteAsync("DELETE FROM dbo.Contact;");
             await databaseConnection.ExecuteAsync("DELETE FROM dbo.PricingUnit;");
             await databaseConnection.ExecuteAsync("DELETE FROM dbo.ServiceRecipient;");
-
-            // ReSharper disable StringLiteralTypo
             await databaseConnection.ExecuteAsync("DBCC CHECKIDENT ('dbo.[Order]', RESEED, 10000);");
 
             // ReSharper restore StringLiteralTypo

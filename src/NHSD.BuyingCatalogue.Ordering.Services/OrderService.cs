@@ -52,7 +52,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Services
                 .Include(o => o.OrderItems).ThenInclude(i => i.CatalogueItem)
                 .Include(o => o.OrderItems).ThenInclude(i => i.OrderItemRecipients)
                 .Include(o => o.Progress)
-                .AsQueryable()
                 .SingleOrDefaultAsync();
         }
 
