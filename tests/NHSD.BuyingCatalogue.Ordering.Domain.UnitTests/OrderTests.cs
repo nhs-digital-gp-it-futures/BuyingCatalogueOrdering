@@ -277,20 +277,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             order.CalculateTotalOwnershipCost().Should().Be(0);
         }
 
-        [Ignore("Work in progress")]
-        [TestCase(null, false, false, false, false, false, false)]
-        [TestCase(true, true, true, true, true, false, true)]
-        [TestCase(true, true, true, true, true, true, true)]
-        [TestCase(true, true, true, false, false, true, false)]
-        [TestCase(true, true, true, true, false, true, true)]
-        [TestCase(true, false, false, true, false, false, false)]
-        [TestCase(true, false, true, true, true, false, false)]
-        [TestCase(true, true, false, false, false, true, false)]
+        [TestCase(null, false, false, false, false, false)]
+        [TestCase(true, false, false, false, false, false)]
+        [TestCase(true, true, false, false, true, false)]
+        [TestCase(true, false, true, true, false, false)]
+        [TestCase(true, true, true, false, true, true)]
+        [TestCase(true, true, true, true, false, true)]
+        [TestCase(true, true, true, false, true, true)]
+        [TestCase(true, true, true, true, true, true)]
         public static void CanComplete_ReturnsCorrectResult(
             bool? fundingComplete,
             bool associatedViewed,
             bool solutionViewed,
-            bool hasRecipient,
             bool hasSolution,
             bool hasAssociated,
             bool expectedResult)
@@ -305,10 +303,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             {
                 var itemBuilder = OrderItemBuilder
                     .Create()
-                    .WithCatalogueItem(new CatalogueItem { CatalogueItemType = CatalogueItemType.Solution });
-
-                if (hasRecipient)
-                    itemBuilder.WithRecipient(new OrderItemRecipient());
+                    .WithCatalogueItem(new CatalogueItem { CatalogueItemType = CatalogueItemType.Solution })
+                    .WithRecipient(new OrderItemRecipient());
 
                 orderBuilder.WithOrderItem(itemBuilder.Build());
             }
@@ -317,10 +313,8 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             {
                 var itemBuilder = OrderItemBuilder
                     .Create()
-                    .WithCatalogueItem(new CatalogueItem { CatalogueItemType = CatalogueItemType.AssociatedService });
-
-                if (hasRecipient)
-                    itemBuilder.WithRecipient(new OrderItemRecipient());
+                    .WithCatalogueItem(new CatalogueItem { CatalogueItemType = CatalogueItemType.AssociatedService })
+                    .WithRecipient(new OrderItemRecipient());
 
                 orderBuilder.WithOrderItem(itemBuilder.Build());
             }
@@ -330,12 +324,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             order.CanComplete().Should().Be(expectedResult);
         }
 
-        [Ignore("Work in progress")]
         [Test]
         public static void Complete_CanCompleteOrder_ReturnsSuccessfulResult()
         {
             var order = OrderBuilder
                 .Create()
+                .WithCatalogueSolutionsViewed(true)
                 .WithFundingSourceOnlyGms(true)
                 .WithAssociatedServicesViewed(true)
                 .WithOrderItem(OrderItemBuilder
@@ -349,12 +343,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             actual.Should().BeEquivalentTo(Result.Success());
         }
 
-        [Ignore("Work in progress")]
         [Test]
         public static void Complete_CanCompleteOrder_ReturnsCompleteOrderStatus()
         {
             var order = OrderBuilder
                 .Create()
+                .WithCatalogueSolutionsViewed(true)
                 .WithFundingSourceOnlyGms(true)
                 .WithAssociatedServicesViewed(true)
                 .WithOrderItem(OrderItemBuilder
@@ -370,12 +364,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain.UnitTests
             order.OrderStatus.Should().Be(OrderStatus.Complete);
         }
 
-        [Ignore("Work in progress")]
         [Test]
         public static void Complete_CanCompleteOrder_CompletedDateIsUpdated()
         {
             var order = OrderBuilder
                 .Create()
+                .WithCatalogueSolutionsViewed(true)
                 .WithFundingSourceOnlyGms(true)
                 .WithAssociatedServicesViewed(true)
                 .WithOrderItem(OrderItemBuilder

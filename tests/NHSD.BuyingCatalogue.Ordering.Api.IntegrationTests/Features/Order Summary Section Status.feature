@@ -63,21 +63,6 @@ Scenario: the order section status is set for an order with one associated servi
     And the order Section Status is complete
 
 @5291
-Scenario: the order section status is set for an order with one associated service without recipients
-    Given orders exist
-        | OrderId | Description   | OrderingPartyId                      | FundingSourceOnlyGms | OrderStatus | Created    |
-        | 10001   | A Description | 4af62b99-638c-4247-875e-965239cd0c48 | true                 | Incomplete  | 10/03/2021 |
-    And order progress exists
-        | OrderId | AdditionalServicesViewed | AssociatedServicesViewed | CatalogueSolutionsViewed |
-        | 10001   | true                     | true                     | true                     |
-    And order items exist
-        | OrderId | CatalogueItemId |
-        | 10001   | 1000-S-01       |
-    When the user makes a request to retrieve the order summary with the ID 10001
-    Then a response with status code 200 is returned
-    And the order Section Status is complete
-
-@5291
 Scenario: the order section status is set for an order with one solution and one associated service
     Given orders exist
         | OrderId | Description   | OrderingPartyId                      | FundingSourceOnlyGms | OrderStatus | Created    |
