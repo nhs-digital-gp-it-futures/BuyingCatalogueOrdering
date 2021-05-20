@@ -8,8 +8,8 @@ Background:
         | Id                                   |
         | 4af62b99-638c-4247-875e-965239cd0c48 |
     Given orders exist
-        | OrderId | Description      | OrderingPartyId                      | LastUpdatedBy                        | LastUpdatedByName | CommencementDate | FundingSourceOnlyGMS |
-        | 10001   | Some Description | 4af62b99-638c-4247-875e-965239cd0c48 | 335392e4-4bb1-413b-9de5-36a85c9c0422 | Tom Smith         | 01/01/2021       | True                 |
+        | OrderId | Description      | OrderingPartyId                      | LastUpdatedBy                        | LastUpdatedByName | CommencementDate | FundingSourceOnlyGMS | Created    |
+        | 10001   | Some Description | 4af62b99-638c-4247-875e-965239cd0c48 | 335392e4-4bb1-413b-9de5-36a85c9c0422 | Tom Smith         | 01/01/2021       | True                 | 01/01/2021 |
     And pricing units exist
         | Name    | Description |
         | patient | per patient |

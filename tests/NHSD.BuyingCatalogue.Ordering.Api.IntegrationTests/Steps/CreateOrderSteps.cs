@@ -37,7 +37,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps
         public async Task ThenTheOrdersListIsReturnedWithTheFollowingValues(string orderId)
         {
             var responseOrderId = (await response.ReadBodyAsJsonAsync()).Value<string>("orderId");
-            orderId.Should().Be(responseOrderId);
+            responseOrderId.Should().Be(orderId);
         }
 
         [UsedImplicitly(ImplicitUseTargetFlags.Members)]
