@@ -1,6 +1,6 @@
 ﻿CREATE TABLE dbo.[Order]
 (
-    Id int IDENTITY(10000, 1) NOT NULL,
+    Id int IDENTITY(10001, 1) NOT NULL,
     Revision tinyint CONSTRAINT DF_Order_Revision DEFAULT 1 NOT NULL,
     CallOffId AS CONCAT('C', FORMAT(Id, '000000'), '-', FORMAT(Revision, '00')),
     [Description] nvarchar(100) NOT NULL,

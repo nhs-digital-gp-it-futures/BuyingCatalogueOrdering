@@ -224,14 +224,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Extensions
 
             if (hasAssociated)
             {
-                order.AddOrUpdateOrderItem(new OrderItem
+                var orderItem = new OrderItem
                 {
                     CatalogueItem = new CatalogueItem
                     {
                         Id = itemIds[1],
                         CatalogueItemType = CatalogueItemType.AssociatedService,
                     },
-                });
+                };
+
+                orderItem.SetRecipients(new[] { new OrderItemRecipient() });
+
+                order.AddOrUpdateOrderItem(orderItem);
             }
 
             var actual = order.IsSectionStatusComplete();
