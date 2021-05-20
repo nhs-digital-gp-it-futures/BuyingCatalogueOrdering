@@ -65,7 +65,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task CreateAsync_InvalidAggregateValidation_ValidateResult(
+        public static async Task CreateAsync_InvalidAggregateValidation_SuccessIsFalse(
             [Frozen] Mock<ICreateOrderItemValidator> orderItemValidator,
             Order order,
             ErrorDetails error,
@@ -86,7 +86,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task CreateAsync_ValidAggregateValidation_ValidateResult(
+        public static async Task CreateAsync_ValidAggregateValidation_SuccessIsTrue(
             [Frozen] Mock<ICreateOrderItemValidator> orderItemValidator,
             Order order,
             CatalogueItemId catalogueItemId,
@@ -143,7 +143,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task CreateAsync_RemovedDefaultDeliveryDate(
+        public static async Task CreateAsync_RemovesDefaultDeliveryDate(
             [Frozen] ApplicationDbContext context,
             [Frozen] Mock<ICreateOrderItemValidator> orderItemValidator,
             [Frozen] Mock<IServiceRecipientService> serviceRecipientService,
