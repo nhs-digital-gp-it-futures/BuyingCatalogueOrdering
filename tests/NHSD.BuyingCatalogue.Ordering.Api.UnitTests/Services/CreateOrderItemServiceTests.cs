@@ -65,7 +65,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task CreateAsync_invalidAggregateValidation_validateResult(
+        public static async Task CreateAsync_InvalidAggregateValidation_ValidateResult(
             [Frozen] Mock<ICreateOrderItemValidator> orderItemValidator,
             Order order,
             ErrorDetails error,
@@ -86,7 +86,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task CreateAsync_validAggregateValidation_validateResult(
+        public static async Task CreateAsync_ValidAggregateValidation_ValidateResult(
             [Frozen] Mock<ICreateOrderItemValidator> orderItemValidator,
             Order order,
             CatalogueItemId catalogueItemId,
@@ -106,7 +106,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task CreateAsync_setsEstimationPeriod(
+        public static async Task CreateAsync_SetsEstimationPeriod(
             [Frozen] ApplicationDbContext context,
             [Frozen] Mock<ICreateOrderItemValidator> orderItemValidator,
             [Frozen] Mock<IServiceRecipientService> serviceRecipientService,
@@ -143,7 +143,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task CreateAsync_defaultDeliveryDateRemoved(
+        public static async Task CreateAsync_RemovedDefaultDeliveryDate(
             [Frozen] ApplicationDbContext context,
             [Frozen] Mock<ICreateOrderItemValidator> orderItemValidator,
             [Frozen] Mock<IServiceRecipientService> serviceRecipientService,
@@ -177,7 +177,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task CreateAsync_orderItemsSavedToDb(
+        public static async Task CreateAsync_OrderItemsSavedToDb(
             [Frozen] ApplicationDbContext context,
             [Frozen] Mock<ICreateOrderItemValidator> orderItemValidator,
             [Frozen] Mock<IServiceRecipientService> serviceRecipientService,
@@ -211,7 +211,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task CreateAsync_pricingUnitSavedToDb(
+        public static async Task CreateAsync_PricingUnitSavedToDb(
             [Frozen] ApplicationDbContext context,
             [Frozen] Mock<ICreateOrderItemValidator> orderItemValidator,
             [Frozen] Mock<IServiceRecipientService> serviceRecipientService,
@@ -244,7 +244,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task CreateAsync_catalogueItemSavedToDb(
+        public static async Task CreateAsync_CatalogueItemSavedToDb(
             [Frozen] ApplicationDbContext context,
             [Frozen] Mock<ICreateOrderItemValidator> orderItemValidator,
             [Frozen] Mock<IServiceRecipientService> serviceRecipientService,
