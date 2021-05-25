@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31313.79
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{159641D6-6404-4A2A-AE62-294DE0FE8301}") = "NHSD.BuyingCatalogue.Ordering.BulkMigration", "NHSD.BuyingCatalogue.Ordering.BulkMigration.dtproj", "{9E268261-FF3D-4529-AF5C-4F05AC70D185}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Azure|Default = Azure|Default
+		Development|Default = Development|Default
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9E268261-FF3D-4529-AF5C-4F05AC70D185}.Azure|Default.ActiveCfg = Azure
+		{9E268261-FF3D-4529-AF5C-4F05AC70D185}.Azure|Default.Build.0 = Azure
+		{9E268261-FF3D-4529-AF5C-4F05AC70D185}.Development|Default.ActiveCfg = Development
+		{9E268261-FF3D-4529-AF5C-4F05AC70D185}.Development|Default.Build.0 = Development
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4982B108-80F6-4422-A4D9-B9F161164A78}
+	EndGlobalSection
+EndGlobal
