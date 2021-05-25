@@ -15,15 +15,18 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
         private readonly ApplicationDbContext context;
         private readonly ICreateOrderItemValidator orderItemValidator;
         private readonly IServiceRecipientService serviceRecipientService;
+        private readonly IIdentityService identityService;
 
         public CreateOrderItemService(
             ApplicationDbContext context,
             ICreateOrderItemValidator orderItemValidator,
-            IServiceRecipientService serviceRecipientService)
+            IServiceRecipientService serviceRecipientService,
+            IIdentityService identityService)
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
             this.orderItemValidator = orderItemValidator ?? throw new ArgumentNullException(nameof(orderItemValidator));
             this.serviceRecipientService = serviceRecipientService ?? throw new ArgumentNullException(nameof(serviceRecipientService));
+            this.identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
         }
 
         public async Task<AggregateValidationResult> CreateAsync(Order order, CatalogueItemId catalogueItemId, CreateOrderItemModel model)
@@ -68,6 +71,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem
 
             if (defaultDeliveryDate is not null)
                 context.DefaultDeliveryDate.Remove(defaultDeliveryDate);
+
+            (Guid userId, string userName) = identityService.GetUserInfo();
+            order.SetLastUpdatedBy(userId, userName);
 
             await context.SaveChangesAsync();
 

@@ -40,7 +40,6 @@ Scenario: create order items
         | AdditionalService | 1000-001            |
         | AssociatedService | NULL                |
 
-@ignore
 @6036
 Scenario: create an order item and the order audit information is updated
    Given the user creates a request to add the catalogue item with ID 1000-002 and the following details to the order with ID 10001
