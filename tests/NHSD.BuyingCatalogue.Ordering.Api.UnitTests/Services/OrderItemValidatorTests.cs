@@ -9,6 +9,7 @@ using NHSD.BuyingCatalogue.Ordering.Api.Models;
 using NHSD.BuyingCatalogue.Ordering.Api.Services.CreateOrderItem;
 using NHSD.BuyingCatalogue.Ordering.Api.Settings;
 using NHSD.BuyingCatalogue.Ordering.Api.UnitTests.AutoFixture;
+using NHSD.BuyingCatalogue.Ordering.Api.Validation;
 using NHSD.BuyingCatalogue.Ordering.Domain;
 using NUnit.Framework;
 
@@ -61,6 +62,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             var result = orderItemValidator.Validate(order, model, CatalogueItemType.AssociatedService);
 
+            result.FailedValidations.Should().BeEmpty();
             result.Success.Should().BeTrue();
         }
 
@@ -80,6 +82,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             var result = orderItemValidator.Validate(order, new CreateOrderItemModel { ServiceRecipients = serviceRecipients }, CatalogueItemType.AdditionalService);
 
             result.FailedValidations.Should().NotBeEmpty();
+
+            foreach ((_, ValidationResult validationResult) in result.FailedValidations)
+            {
+                var errorDetails = validationResult.Errors.SingleOrDefault();
+                errorDetails.Should().NotBeNull();
+                errorDetails.Field.Should().Be("DeliveryDate");
+                errorDetails.Id.Should().Be("DeliveryDateRequired");
+            }
+
             result.Success.Should().BeFalse();
         }
 
@@ -99,6 +110,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             var result = orderItemValidator.Validate(order, new CreateOrderItemModel { ServiceRecipients = serviceRecipients }, itemType);
 
             result.FailedValidations.Should().NotBeEmpty();
+
+            foreach ((_, ValidationResult validationResult) in result.FailedValidations)
+            {
+                var errorDetails = validationResult.Errors.SingleOrDefault();
+                errorDetails.Should().NotBeNull();
+                errorDetails.Field.Should().Be("DeliveryDate");
+                errorDetails.Id.Should().Be("DeliveryDateOutsideDeliveryWindow");
+            }
+
             result.Success.Should().BeFalse();
         }
 
@@ -120,6 +140,15 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             var result = orderItemValidator.Validate(order, new CreateOrderItemModel { ServiceRecipients = serviceRecipients }, itemType);
 
             result.FailedValidations.Should().NotBeEmpty();
+
+            foreach ((_, ValidationResult validationResult) in result.FailedValidations)
+            {
+                var errorDetails = validationResult.Errors.SingleOrDefault();
+                errorDetails.Should().NotBeNull();
+                errorDetails.Field.Should().Be("DeliveryDate");
+                errorDetails.Id.Should().Be("DeliveryDateOutsideDeliveryWindow");
+            }
+
             result.Success.Should().BeFalse();
         }
 
@@ -143,6 +172,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             var result = orderItemValidator.Validate(order, new CreateOrderItemModel { ServiceRecipients = serviceRecipients }, itemType);
 
+            result.FailedValidations.Should().BeEmpty();
             result.Success.Should().BeTrue();
         }
     }
