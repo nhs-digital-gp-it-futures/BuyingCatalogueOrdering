@@ -409,7 +409,6 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             [Frozen] CallOffId callOffId,
             [Frozen] Mock<IOrderItemService> service,
             Order order,
-            OrderItem orderItem,
             OrderItemsController controller)
         {
             order.OrderItems.Count.Should().Be(0);
