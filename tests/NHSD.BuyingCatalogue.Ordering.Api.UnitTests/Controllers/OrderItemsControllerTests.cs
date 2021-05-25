@@ -346,7 +346,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             orderItems[2].CatalogueItem.ParentCatalogueItemId = orderItems[1].CatalogueItem.Id;
             orderItems.ForEach(o => order.AddOrUpdateOrderItem(o));
 
-            service.Setup(o => o.GetOrderWithCatalogueItem(order.CallOffId, orderItems[1].CatalogueItem.Id))
+            service.Setup(o => o.GetOrderWithCatalogueItems(order.CallOffId))
                 .ReturnsAsync(order);
             service.Setup(o => o.DeleteOrderItem(order, orderItems[1].CatalogueItem.Id)).Callback(() =>
             {
@@ -373,7 +373,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             itemsToAdd.ForEach(o => order.AddOrUpdateOrderItem(o));
             order.Progress.AdditionalServicesViewed = true;
 
-            service.Setup(o => o.GetOrderWithCatalogueItem(callOffId, itemsToAdd[0].CatalogueItem.Id)).ReturnsAsync(order);
+            service.Setup(o => o.GetOrderWithCatalogueItems(callOffId)).ReturnsAsync(order);
             service.Setup(o => o.DeleteOrderItem(order, itemsToAdd[0].CatalogueItem.Id)).Callback(() =>
             {
                 order.DeleteOrderItemAndUpdateProgress(itemsToAdd[0].CatalogueItem.Id);
@@ -392,7 +392,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             OrderItemsController controller)
         {
             orderItems.ForEach(o => order.AddOrUpdateOrderItem(o));
-            service.Setup(o => o.GetOrderWithCatalogueItem(order.CallOffId, order.OrderItems[1].CatalogueItem.Id)).ReturnsAsync(order);
+            service.Setup(o => o.GetOrderWithCatalogueItems(order.CallOffId)).ReturnsAsync(order);
             service.Setup(o => o.DeleteOrderItem(order, It.IsAny<CatalogueItemId>())).Callback(() =>
             {
                 order.DeleteOrderItemAndUpdateProgress(order.OrderItems[1].CatalogueItem.Id);
@@ -414,7 +414,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
         {
             order.OrderItems.Count.Should().Be(0);
 
-            service.Setup(o => o.GetOrderWithCatalogueItem(callOffId, orderItem.CatalogueItem.Id))
+            service.Setup(o => o.GetOrderWithCatalogueItems(callOffId))
                 .ReturnsAsync(order);
 
             var response = await controller.DeleteOrderItemAsync(callOffId, new CatalogueItemId(42, "111"));
@@ -434,7 +434,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             order.AddOrUpdateOrderItem(orderItem);
             order.IsDeleted = false;
 
-            service.Setup(o => o.GetOrderWithCatalogueItem(callOffId, orderItem.CatalogueItem.Id))
+            service.Setup(o => o.GetOrderWithCatalogueItems(callOffId))
                 .ReturnsAsync(order);
 
             var response = await controller.DeleteOrderItemAsync(callOffId, orderItem.CatalogueItem.Id);
@@ -449,7 +449,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Controllers
             [Frozen] CallOffId callOffId,
             OrderItemsController controller)
         {
-            service.Setup(o => o.GetOrderWithCatalogueItem(callOffId, new CatalogueItemId(42, "111")))
+            service.Setup(o => o.GetOrderWithCatalogueItems(callOffId))
                 .ReturnsAsync((Order)null);
 
             var response = await controller.DeleteOrderItemAsync(callOffId, new CatalogueItemId(42, "111"));
