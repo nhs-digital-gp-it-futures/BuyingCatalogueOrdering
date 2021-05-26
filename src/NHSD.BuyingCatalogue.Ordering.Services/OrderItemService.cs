@@ -30,16 +30,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Services
                 .SingleOrDefaultAsync();
         }
 
-        public async Task<Order> GetOrderWithCatalogueItem(CallOffId callOffId, CatalogueItemId catalogueItemId)
+        public async Task<Order> GetOrderWithCatalogueItems(CallOffId callOffId)
         {
-            Expression<Func<Order, IEnumerable<OrderItem>>> orderItems = o =>
-                o.OrderItems.Where(i => i.CatalogueItem.Id == catalogueItemId
-                || i.CatalogueItem.ParentCatalogueItemId == catalogueItemId);
-
             return await context.Order
                 .Where(o => o.Id == callOffId.Id)
                 .Include(o => o.Progress)
-                .Include(orderItems)
+                .Include(o => o.OrderItems)
                 .ThenInclude(i => i.CatalogueItem)
                 .SingleOrDefaultAsync();
         }

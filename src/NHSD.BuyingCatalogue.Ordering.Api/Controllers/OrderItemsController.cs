@@ -96,7 +96,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.Controllers
             CallOffId callOffId,
             CatalogueItemId catalogueItemId)
         {
-            var order = await orderItemService.GetOrderWithCatalogueItem(callOffId, catalogueItemId);
+            var order = await orderItemService.GetOrderWithCatalogueItems(callOffId);
             if (order is null || order.IsDeleted)
             {
                 return NotFound();
