@@ -1,0 +1,11 @@
+DROP TABLE dbo.OrderItem;
+DROP TABLE dbo.ServiceRecipient;
+DROP TABLE dbo.DefaultDeliveryDate;
+DROP TABLE dbo.[Order];
+DROP TABLE dbo.Contact;
+DROP TABLE dbo.[Address];
+DROP TABLE dbo.CatalogueItemType;
+DROP TABLE dbo.CataloguePriceType;
+DROP TABLE dbo.OrderStatus;
+DROP TABLE dbo.ProvisioningType;
+DROP TABLE dbo.TimeUnit;
