@@ -8,7 +8,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Contracts
     {
         Task<Order> GetOrder(CallOffId callOffId);
 
-        Task<Order> GetOrderWithCatalogueItem(CallOffId callOffId, CatalogueItemId catalogueItemId);
+        Task<Order> GetOrderWithCatalogueItems(CallOffId callOffId);
 
         Task<OrderItem> GetOrderItem(CallOffId callOffId, CatalogueItemId catalogueItemId);
 
