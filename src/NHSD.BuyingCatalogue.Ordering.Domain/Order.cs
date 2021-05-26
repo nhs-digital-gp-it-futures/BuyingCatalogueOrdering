@@ -126,6 +126,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Domain
             if (orderItem is null)
                 throw new ArgumentNullException(nameof(orderItem));
 
+            // Included to force EF Core to track order as changed so audit information is updated
+            lastUpdated = DateTime.UtcNow;
+
             var existingItem = orderItems.SingleOrDefault(o => o.Equals(orderItem));
             if (existingItem is null)
             {

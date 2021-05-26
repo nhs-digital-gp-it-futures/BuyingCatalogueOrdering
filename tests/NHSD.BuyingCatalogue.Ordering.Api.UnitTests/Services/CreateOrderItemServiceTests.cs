@@ -40,40 +40,27 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [InMemoryDbAutoData]
         public static void Constructor_NullDbContext_ThrowsArgumentNullException(
             OrderItemValidator orderItemValidator,
-            ServiceRecipientService serviceRecipientService,
-            IIdentityService identityService)
+            ServiceRecipientService serviceRecipientService)
         {
-            Assert.Throws<ArgumentNullException>(() => _ = new CreateOrderItemService(null, orderItemValidator, serviceRecipientService, identityService));
+            Assert.Throws<ArgumentNullException>(() => _ = new CreateOrderItemService(null, orderItemValidator, serviceRecipientService));
         }
 
         [Test]
         [InMemoryDbAutoData]
         public static void Constructor_NullOrderItemValidator_ThrowsArgumentNullException(
             ApplicationDbContext context,
-            ServiceRecipientService serviceRecipientService,
-            IIdentityService identityService)
+            ServiceRecipientService serviceRecipientService)
         {
-            Assert.Throws<ArgumentNullException>(() => _ = new CreateOrderItemService(context, null, serviceRecipientService, identityService));
+            Assert.Throws<ArgumentNullException>(() => _ = new CreateOrderItemService(context, null, serviceRecipientService));
         }
 
         [Test]
         [InMemoryDbAutoData]
         public static void Constructor_NullServiceRecipient_ThrowsArgumentNullException(
             ApplicationDbContext context,
-            OrderItemValidator orderItemValidator,
-            IIdentityService identityService)
+            OrderItemValidator orderItemValidator)
         {
-            Assert.Throws<ArgumentNullException>(() => _ = new CreateOrderItemService(context, orderItemValidator, null, identityService));
-        }
-
-        [Test]
-        [InMemoryDbAutoData]
-        public static void Constructor_NullIdentityService_ThrowsArgumentNullException(
-            ApplicationDbContext context,
-            OrderItemValidator orderItemValidator,
-            ServiceRecipientService serviceRecipientService)
-        {
-            Assert.Throws<ArgumentNullException>(() => _ = new CreateOrderItemService(context, orderItemValidator, serviceRecipientService, null));
+            Assert.Throws<ArgumentNullException>(() => _ = new CreateOrderItemService(context, orderItemValidator, null));
         }
 
         [Test]
