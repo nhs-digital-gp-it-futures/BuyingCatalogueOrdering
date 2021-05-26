@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
@@ -52,29 +53,28 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task GetOrderWithCatalogueItem_ReturnsNull(
+        public static async Task GetOrderWithCatalogueItems_ReturnsNull(
             CallOffId callOffId,
-            CatalogueItemId catalogueItemId,
             OrderItemService service)
         {
-            var result = await service.GetOrderWithCatalogueItem(callOffId, catalogueItemId);
+            var result = await service.GetOrderWithCatalogueItems(callOffId);
 
             result.Should().BeNull();
         }
 
         [Test]
         [InMemoryDbAutoData]
-        public static async Task GetOrderWithCatalogueItem_ReturnsOrder(
+        public static async Task GetOrderWithCatalogueItems_ReturnsOrder(
             [Frozen] ApplicationDbContext context,
             Order order,
-            OrderItem orderItem,
+            List<OrderItem> orderItems,
             OrderItemService service)
         {
             context.Order.Add(order);
-            order.AddOrUpdateOrderItem(orderItem);
+            orderItems.ForEach(oi => order.AddOrUpdateOrderItem(oi));
             await context.SaveChangesAsync();
 
-            var result = await service.GetOrderWithCatalogueItem(order.CallOffId, order.OrderItems[0].CatalogueItem.Id);
+            var result = await service.GetOrderWithCatalogueItems(order.CallOffId);
 
             Assert.NotNull(result);
             result.Should().Be(order);
@@ -84,10 +84,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
         [InMemoryDbAutoData]
         public static async Task GetOrderItem_ReturnsNull(
             CallOffId callOffId,
-            CatalogueItemId catalogueItemId,
             OrderItemService service)
         {
-            var result = await service.GetOrderWithCatalogueItem(callOffId, catalogueItemId);
+            var result = await service.GetOrderWithCatalogueItems(callOffId);
 
             result.Should().BeNull();
         }
@@ -104,7 +103,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
             order.AddOrUpdateOrderItem(orderItem);
             await context.SaveChangesAsync();
 
-            var result = await service.GetOrderWithCatalogueItem(order.CallOffId, order.OrderItems[0].CatalogueItem.Id);
+            var result = await service.GetOrderWithCatalogueItems(order.CallOffId);
 
             Assert.NotNull(result);
             result.Should().Be(order);
