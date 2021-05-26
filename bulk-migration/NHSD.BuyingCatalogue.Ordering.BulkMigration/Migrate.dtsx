@@ -12,8 +12,8 @@
   DTS:ObjectName="Package"
   DTS:PackageType="5"
   DTS:ProtectionLevel="0"
-  DTS:VersionBuild="171"
-  DTS:VersionGUID="{89EA8F7D-BD01-4B82-9C47-0C892922BF7A}">
+  DTS:VersionBuild="172"
+  DTS:VersionGUID="{12E733BF-5CF8-4328-8A93-DCDB5CE5A154}">
   <DTS:Property
     DTS:Name="PackageFormatVersion">8</DTS:Property>
   <DTS:ConnectionManagers>
@@ -310,7 +310,7 @@ SELECT Line1, Line2, Line3, Line4, Line5,
       DTS:CreationName=""
       DTS:DTSID="{5CC26501-0374-4EF9-B906-F0C86BCC9DDF}"
       DTS:EvaluateAsExpression="True"
-      DTS:Expression="&quot;CREATE TABLE &quot; + @[User::orderContactsTempTableName]  + &quot;&#xA;(&#xA;    OrderId int NOT NULL PRIMARY KEY,&#xA;    OrganizationContactId int NOT NULL,&#xA;    NewOrganizationContactId int NULL,&#xA;    SupplierContactId int NOT NULL,&#xA;    NewSupplierContactId int NULL&#xA;);&quot;"
+      DTS:Expression="&quot;CREATE TABLE &quot; + @[User::orderContactsTempTableName]  + &quot;&#xA;(&#xA;    OrderId int NOT NULL PRIMARY KEY,&#xA;    OrganizationContactId int NULL,&#xA;    NewOrganizationContactId int NULL,&#xA;    SupplierContactId int NULL,&#xA;    NewSupplierContactId int NULL&#xA;);&quot;"
       DTS:IncludeInDebugDump="2345"
       DTS:Namespace="User"
       DTS:ObjectName="createOrderContactsTempTableSql">
@@ -318,9 +318,9 @@ SELECT Line1, Line2, Line3, Line4, Line5,
         DTS:DataType="8">CREATE TABLE ##OrderContacts
 (
     OrderId int NOT NULL PRIMARY KEY,
-    OrganizationContactId int NOT NULL,
+    OrganizationContactId int NULL,
     NewOrganizationContactId int NULL,
-    SupplierContactId int NOT NULL,
+    SupplierContactId int NULL,
     NewSupplierContactId int NULL
 );</DTS:VariableValue>
     </DTS:Variable>
@@ -2097,7 +2097,7 @@ WHERE NOT (OrganisationContactId IS NULL AND SupplierContactId IS NULL);</proper
               DTS:ExecutableType="Microsoft.ExecuteSQLTask"
               DTS:LocaleID="-1"
               DTS:ObjectName="Load Contact IDs Into Recordset"
-              DTS:ThreadHint="1">
+              DTS:ThreadHint="0">
               <DTS:Variables />
               <DTS:ObjectData>
                 <SQLTask:SqlTaskData
@@ -8256,28 +8256,6 @@ SELECT i.SupplierId, a.Line1, a.Line2, a.Line3, a.Line4, a.Line5, a.Town, a.Coun
           </EdgeLayout.Labels>
         </EdgeLayout>
         <EdgeLayout
-          Id="Package\Migrate Contact Data\Copy Contact Data.PrecedenceConstraints[Constraint 4]"
-          TopLeft="124.5,47.5">
-          <EdgeLayout.Curve>
-            <mssgle:Curve
-              StartConnector="{assembly:Null}"
-              EndConnector="0,60"
-              Start="0,0"
-              End="0,52.5">
-              <mssgle:Curve.Segments>
-                <mssgle:SegmentCollection
-                  Capacity="5">
-                  <mssgle:LineSegment
-                    End="0,52.5" />
-                </mssgle:SegmentCollection>
-              </mssgle:Curve.Segments>
-            </mssgle:Curve>
-          </EdgeLayout.Curve>
-          <EdgeLayout.Labels>
-            <EdgeLabelCollection />
-          </EdgeLayout.Labels>
-        </EdgeLayout>
-        <EdgeLayout
           Id="Package\Migrate Contact Data\Copy Contact Data.PrecedenceConstraints[Constraint 1]"
           TopLeft="234.5,26.5">
           <EdgeLayout.Curve>
@@ -8337,6 +8315,28 @@ SELECT i.SupplierId, a.Line1, a.Line2, a.Line3, a.Line4, a.Line5, a.Town, a.Coun
                     Point3="17,74" />
                   <mssgle:LineSegment
                     End="17,132.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Migrate Contact Data\Copy Contact Data.PrecedenceConstraints[Constraint 4]"
+          TopLeft="124.5,47.5">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,60"
+              Start="0,0"
+              End="0,52.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,52.5" />
                 </mssgle:SegmentCollection>
               </mssgle:Curve.Segments>
             </mssgle:Curve>
@@ -8636,28 +8636,6 @@ SELECT i.SupplierId, a.Line1, a.Line2, a.Line3, a.Line4, a.Line5, a.Town, a.Coun
           Id="Package\Migrate Supplier Data\Migrate Base Supplier Data\Migrate Supplier Data"
           TopLeft="357,107.5" />
         <EdgeLayout
-          Id="Package\Migrate Supplier Data\Migrate Base Supplier Data.PrecedenceConstraints[Constraint 2]"
-          TopLeft="449.5,47.5">
-          <EdgeLayout.Curve>
-            <mssgle:Curve
-              StartConnector="{assembly:Null}"
-              EndConnector="0,60"
-              Start="0,0"
-              End="0,52.5">
-              <mssgle:Curve.Segments>
-                <mssgle:SegmentCollection
-                  Capacity="5">
-                  <mssgle:LineSegment
-                    End="0,52.5" />
-                </mssgle:SegmentCollection>
-              </mssgle:Curve.Segments>
-            </mssgle:Curve>
-          </EdgeLayout.Curve>
-          <EdgeLayout.Labels>
-            <EdgeLabelCollection />
-          </EdgeLayout.Labels>
-        </EdgeLayout>
-        <EdgeLayout
           Id="Package\Migrate Supplier Data\Migrate Base Supplier Data.PrecedenceConstraints[Constraint]"
           TopLeft="277.5,26.5">
           <EdgeLayout.Curve>
@@ -8682,6 +8660,28 @@ SELECT i.SupplierId, a.Line1, a.Line2, a.Line3, a.Line4, a.Line5, a.Town, a.Coun
         <EdgeLayout
           Id="Package\Migrate Supplier Data\Migrate Base Supplier Data.PrecedenceConstraints[Constraint 1]"
           TopLeft="141.5,47.5">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,60"
+              Start="0,0"
+              End="0,52.5">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,52.5" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+        <EdgeLayout
+          Id="Package\Migrate Supplier Data\Migrate Base Supplier Data.PrecedenceConstraints[Constraint 2]"
+          TopLeft="449.5,47.5">
           <EdgeLayout.Curve>
             <mssgle:Curve
               StartConnector="{assembly:Null}"
@@ -9240,7 +9240,7 @@ SELECT i.SupplierId, a.Line1, a.Line2, a.Line3, a.Line4, a.Line5, a.Town, a.Coun
     design-time-name="Package\Migrate Contact Data\Copy Contact Data\Copy Order Contacts to Temp Table">
     <LayoutInfo>
       <GraphLayout
-        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:mssgm="clr-namespace:Microsoft.SqlServer.Graph.Model;assembly=Microsoft.SqlServer.Graph">
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
         <NodeLayout
           Size="267,42"
           Id="Package\Migrate Contact Data\Copy Contact Data\Copy Order Contacts to Temp Table\Insert Into Order Contacts Temp Table"
@@ -9268,9 +9268,7 @@ SELECT i.SupplierId, a.Line1, a.Line2, a.Line3, a.Line4, a.Line5, a.Town, a.Coun
             </mssgle:Curve>
           </EdgeLayout.Curve>
           <EdgeLayout.Labels>
-            <mssgm:EdgeLabel
-              BoundingBox="0,0,0,0"
-              RelativePosition="Any" />
+            <EdgeLabelCollection />
           </EdgeLayout.Labels>
         </EdgeLayout>
       </GraphLayout>
