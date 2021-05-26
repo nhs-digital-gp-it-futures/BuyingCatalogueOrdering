@@ -40,27 +40,40 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         [InMemoryDbAutoData]
         public static void Constructor_NullDbContext_ThrowsArgumentNullException(
             OrderItemValidator orderItemValidator,
-            ServiceRecipientService serviceRecipientService)
+            ServiceRecipientService serviceRecipientService,
+            IIdentityService identityService)
         {
-            Assert.Throws<ArgumentNullException>(() => _ = new CreateOrderItemService(null, orderItemValidator, serviceRecipientService));
+            Assert.Throws<ArgumentNullException>(() => _ = new CreateOrderItemService(null, orderItemValidator, serviceRecipientService, identityService));
         }
 
         [Test]
         [InMemoryDbAutoData]
         public static void Constructor_NullOrderItemValidator_ThrowsArgumentNullException(
             ApplicationDbContext context,
-            ServiceRecipientService serviceRecipientService)
+            ServiceRecipientService serviceRecipientService,
+            IIdentityService identityService)
         {
-            Assert.Throws<ArgumentNullException>(() => _ = new CreateOrderItemService(context, null, serviceRecipientService));
+            Assert.Throws<ArgumentNullException>(() => _ = new CreateOrderItemService(context, null, serviceRecipientService, identityService));
         }
 
         [Test]
         [InMemoryDbAutoData]
         public static void Constructor_NullServiceRecipient_ThrowsArgumentNullException(
             ApplicationDbContext context,
-            OrderItemValidator orderItemValidator)
+            OrderItemValidator orderItemValidator,
+            IIdentityService identityService)
         {
-            Assert.Throws<ArgumentNullException>(() => _ = new CreateOrderItemService(context, orderItemValidator, null));
+            Assert.Throws<ArgumentNullException>(() => _ = new CreateOrderItemService(context, orderItemValidator, null, identityService));
+        }
+
+        [Test]
+        [InMemoryDbAutoData]
+        public static void Constructor_NullIdentityService_ThrowsArgumentNullException(
+            ApplicationDbContext context,
+            OrderItemValidator orderItemValidator,
+            ServiceRecipientService serviceRecipientService)
+        {
+            Assert.Throws<ArgumentNullException>(() => _ = new CreateOrderItemService(context, orderItemValidator, serviceRecipientService, null));
         }
 
         [Test]
