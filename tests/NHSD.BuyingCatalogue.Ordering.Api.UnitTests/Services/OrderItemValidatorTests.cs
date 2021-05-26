@@ -76,7 +76,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
             model.ServiceRecipients.Should().NotBeNullOrEmpty();
             order.CommencementDate.Should().NotBeNull();
 
-            var serviceRecipients = model.ServiceRecipients.Select(r =>
+            var serviceRecipients = model.ServiceRecipients.Select(_ =>
                 new OrderItemRecipientModel { DeliveryDate = null }).ToList();
 
             var result = orderItemValidator.Validate(order, new CreateOrderItemModel { ServiceRecipients = serviceRecipients }, CatalogueItemType.AdditionalService);
@@ -104,7 +104,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         {
             model.ServiceRecipients.Should().NotBeNullOrEmpty();
 
-            var serviceRecipients = model.ServiceRecipients.Select(r =>
+            var serviceRecipients = model.ServiceRecipients.Select(_ =>
                 new OrderItemRecipientModel { DeliveryDate = order.CommencementDate.Value.AddDays(-1) }).ToList();
 
             var result = orderItemValidator.Validate(order, new CreateOrderItemModel { ServiceRecipients = serviceRecipients }, itemType);
@@ -134,7 +134,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             OrderItemValidator orderItemValidator = new OrderItemValidator(validationSettings);
 
-            var serviceRecipients = model.ServiceRecipients.Select(r =>
+            var serviceRecipients = model.ServiceRecipients.Select(_ =>
                 new OrderItemRecipientModel { DeliveryDate = order.CommencementDate.Value.AddDays(validationSettings.MaxDeliveryDateOffsetInDays + 1) }).ToList();
 
             var result = orderItemValidator.Validate(order, new CreateOrderItemModel { ServiceRecipients = serviceRecipients }, itemType);
@@ -164,7 +164,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
 
             itemType.Should().NotBeEquivalentTo(CatalogueItemType.AssociatedService);
 
-            var serviceRecipients = model.ServiceRecipients.Select(r =>
+            var serviceRecipients = model.ServiceRecipients.Select(_ =>
                 new OrderItemRecipientModel { DeliveryDate = order.CommencementDate.Value.AddDays(validationSettings.MaxDeliveryDateOffsetInDays - 1) }).ToList();
 
             OrderItemValidator orderItemValidator = new OrderItemValidator(validationSettings);
