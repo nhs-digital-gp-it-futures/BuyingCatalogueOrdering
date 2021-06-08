@@ -6,5 +6,4 @@
     AddressId int NULL,
     CONSTRAINT PK_OrderingParty PRIMARY KEY NONCLUSTERED (Id),
     CONSTRAINT FK_OrderingParty_Address FOREIGN KEY (AddressId) REFERENCES dbo.[Address] (Id),
-    CONSTRAINT AK_OrderingParty_OdsCode UNIQUE CLUSTERED (OdsCode),
 );
