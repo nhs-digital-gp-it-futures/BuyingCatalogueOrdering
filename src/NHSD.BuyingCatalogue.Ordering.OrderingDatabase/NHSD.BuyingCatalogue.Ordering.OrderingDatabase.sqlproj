@@ -107,6 +107,6 @@
     </SqlCmdVariable>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Indexes\OdsCodeIndex.sql" />
+    <None Include="Indexes\AK_OrderingParty_OdsCode.sql" />
   </ItemGroup>
 </Project>
