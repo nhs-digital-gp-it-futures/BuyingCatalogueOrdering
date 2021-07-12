@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="4.0.0" />
+    <PackageReference Include="FlexLabs.EntityFrameworkCore.Upsert" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
