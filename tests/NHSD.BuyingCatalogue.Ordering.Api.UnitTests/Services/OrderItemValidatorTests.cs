@@ -162,7 +162,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Services
         {
             model.ServiceRecipients.Should().NotBeNullOrEmpty();
 
-            itemType.Should().NotBeEquivalentTo(CatalogueItemType.AssociatedService);
+            itemType.Should().NotBe(CatalogueItemType.AssociatedService);
 
             var serviceRecipients = model.ServiceRecipients.Select(_ =>
                 new OrderItemRecipientModel { DeliveryDate = order.CommencementDate.Value.AddDays(validationSettings.MaxDeliveryDateOffsetInDays - 1) }).ToList();

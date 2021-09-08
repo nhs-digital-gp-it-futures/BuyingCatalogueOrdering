@@ -27,8 +27,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             string description,
             CreateOrderModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.Description, description)
+            var model = new CreateOrderModel { Description = description };
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.Description)
                 .WithErrorMessage($"{nameof(CreateOrderModel.Description)}Required");
         }
 
@@ -37,8 +41,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         public static void Validate_DescriptionIsTooLong_HasError(
             CreateOrderModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.Description, new string('A', 101))
+            var model = new CreateOrderModel { Description = new string('A', 101) };
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.Description)
                 .WithErrorMessage($"{nameof(CreateOrderModel.Description)}TooLong");
         }
 
@@ -47,7 +55,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         public static void Validate_DescriptionIsValid_DoesNotHaveError(
             CreateOrderModelValidator validator)
         {
-            validator.ShouldNotHaveValidationErrorFor(m => m.Description, new string('A', 100));
+            var model = new CreateOrderModel { Description = new string('A', 10) };
+
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.Description);
         }
 
         [Test]
@@ -55,18 +67,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         public static void Validate_OrganisationIdIsEmptyGuid_HasError(
             CreateOrderModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.OrganisationId, Guid.Empty)
+            var model = new CreateOrderModel { OrganisationId = Guid.Empty };
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.OrganisationId)
                 .WithErrorMessage($"{nameof(CreateOrderModel.OrganisationId)}Required");
         }
 
         [Test]
         [AutoData]
         public static void Validate_OrganisationIdIsValid_DoesNotHaveError(
-            Guid id,
+            CreateOrderModel model,
             CreateOrderModelValidator validator)
         {
-            validator.ShouldNotHaveValidationErrorFor(m => m.OrganisationId, id);
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.OrganisationId);
         }
     }
 }

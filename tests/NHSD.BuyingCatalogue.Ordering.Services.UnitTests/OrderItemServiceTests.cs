@@ -138,7 +138,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Services.UnitTests
             var result = await service.GetOrderItems(order.CallOffId, order.OrderItems[0].CatalogueItem.CatalogueItemType);
 
             Assert.NotNull(result);
-            result.Should().BeEquivalentTo(orderItem);
+            result.Should().BeEquivalentTo(new[] { orderItem });
         }
 
         [Test]
