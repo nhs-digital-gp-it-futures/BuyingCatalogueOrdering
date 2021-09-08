@@ -32,20 +32,29 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         [CommonInlineAutoData("\t")]
         public static void Validate_CatalogueItemTypeIsEmpty_HasError(
             string catalogueItemType,
+            CreateOrderItemModel model,
             CreateOrderItemModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.CatalogueItemType, catalogueItemType)
+            model.CatalogueItemType = catalogueItemType;
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.CatalogueItemType)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.CatalogueItemType)}Required");
         }
 
         [Test]
         [AutoData]
         public static void Validate_CatalogueItemTypeIsNotValid_HasError(
+            CreateOrderItemModel model,
             CreateOrderItemModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.CatalogueItemType, "InvalidCatalogueItemType")
+            model.CatalogueItemType = "InvalidCatalogueItemType";
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.CatalogueItemType)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.CatalogueItemType)}ValidValue");
         }
 
@@ -55,9 +64,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         [CommonInlineAutoData(nameof(CatalogueItemType.Solution))]
         public static void Validate_CatalogueItemTypeIsValid_DoesNotHaveError(
             string catalogueItemType,
+            CreateOrderItemModel model,
             CreateOrderItemModelValidator validator)
         {
-            validator.ShouldNotHaveValidationErrorFor(m => m.CatalogueItemType, catalogueItemType);
+            model.CatalogueItemType = catalogueItemType;
+
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.CatalogueItemType);
         }
 
         [Test]
@@ -71,9 +85,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         {
             var model = new CreateOrderItemModel { CatalogueItemType = catalogueItemType };
 
-            validator.ShouldNotHaveValidationErrorFor(m => m.CatalogueSolutionId, model);
-            validator.ShouldNotHaveValidationErrorFor(m => m.ServiceRecipients, model);
-            validator.ShouldNotHaveValidationErrorFor(m => m.TimeUnit, model);
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.CatalogueSolutionId);
+            result.ShouldNotHaveValidationErrorFor(m => m.ServiceRecipients);
+            result.ShouldNotHaveValidationErrorFor(m => m.TimeUnit);
         }
 
         [Test]
@@ -84,8 +100,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             string catalogueItemName,
             CreateOrderItemModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.CatalogueItemName, catalogueItemName)
+            var model = new CreateOrderItemModel { CatalogueItemName = catalogueItemName };
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.CatalogueItemName)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.CatalogueItemName)}Required");
         }
 
@@ -94,8 +114,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         public static void Validate_CatalogueItemNameIsTooLong_HasError(
             CreateOrderItemModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.CatalogueItemName, new string('A', 256))
+            var model = new CreateOrderItemModel { CatalogueItemName = new string('A', 256) };
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.CatalogueItemName)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.CatalogueItemName)}TooLong");
         }
 
@@ -104,7 +128,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         public static void Validate_CatalogueItemNameIsValid_DoesNotHaveError(
             CreateOrderItemModelValidator validator)
         {
-            validator.ShouldNotHaveValidationErrorFor(m => m.CatalogueItemName, new string('A', 255));
+            var model = new CreateOrderItemModel { CatalogueItemName = new string('A', 255) };
+
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.CatalogueItemName);
         }
 
         [Test]
@@ -113,20 +141,30 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         [CommonInlineAutoData("\t")]
         public static void Validate_ProvisioningTypeIsEmpty_HasError(
             string provisioningType,
+            CreateOrderItemModel model,
             CreateOrderItemModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.ProvisioningType, provisioningType)
+            model.ProvisioningType = provisioningType;
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.ProvisioningType)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.ProvisioningType)}Required");
         }
 
         [Test]
         [AutoData]
         public static void Validate_ProvisioningTypeIsNotValid_HasError(
+            CreateOrderItemModel model,
             CreateOrderItemModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.ProvisioningType, "InvalidProvisioningType")
+            model.ProvisioningType = "InvalidProvisioningType";
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.ProvisioningType)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.ProvisioningType)}ValidValue");
         }
 
@@ -136,9 +174,14 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         [CommonInlineAutoData(nameof(ProvisioningType.Patient))]
         public static void Validate_ProvisioningTypeIsValid_DoesNotHaveError(
             string provisioningType,
+            CreateOrderItemModel model,
             CreateOrderItemModelValidator validator)
         {
-            validator.ShouldNotHaveValidationErrorFor(m => m.ProvisioningType, provisioningType);
+            model.ProvisioningType = provisioningType;
+
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.ProvisioningType);
         }
 
         [Test]
@@ -149,8 +192,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             string type,
             CreateOrderItemModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.Type, type)
+            var model = new CreateOrderItemModel { Type = type };
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.Type)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.Type)}Required");
         }
 
@@ -159,8 +206,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         public static void Validate_TypeIsNotValid_HasError(
             CreateOrderItemModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.Type, "InvalidType")
+            var model = new CreateOrderItemModel { Type = "InvalidType" };
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.Type)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.Type)}ValidValue");
         }
 
@@ -171,7 +222,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             string type,
             CreateOrderItemModelValidator validator)
         {
-            validator.ShouldNotHaveValidationErrorFor(m => m.Type, type);
+            var model = new CreateOrderItemModel { Type = type };
+
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.Type);
         }
 
         [Test]
@@ -182,8 +237,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             string currencyCode,
             CreateOrderItemModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.CurrencyCode, currencyCode)
+            var model = new CreateOrderItemModel { CurrencyCode = currencyCode };
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.CurrencyCode)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.CurrencyCode)}Required");
         }
 
@@ -192,8 +251,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         public static void Validate_CurrencyCodeIsNotValid_HasError(
             CreateOrderItemModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.CurrencyCode, "InvalidCurrencyCode")
+            var model = new CreateOrderItemModel { CurrencyCode = "InvalidCurrencyCode" };
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.CurrencyCode)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.CurrencyCode)}ValidValue");
         }
 
@@ -202,7 +265,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         public static void Validate_CurrencyCodeIsValid_DoesNotHaveError(
             CreateOrderItemModelValidator validator)
         {
-            validator.ShouldNotHaveValidationErrorFor(m => m.CurrencyCode, "GBP");
+            var model = new CreateOrderItemModel { CurrencyCode = "GBP" };
+
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.CurrencyCode);
         }
 
         [Test]
@@ -210,8 +277,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         public static void Validate_ItemUnitIsNull_HasError(
             CreateOrderItemModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.ItemUnit, null as ItemUnitModel)
+            var model = new CreateOrderItemModel();
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.ItemUnit)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.ItemUnit)}Required");
         }
 
@@ -221,7 +292,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             ItemUnitModel itemUnit,
             CreateOrderItemModelValidator validator)
         {
-            validator.ShouldNotHaveValidationErrorFor(m => m.ItemUnit, itemUnit);
+            var model = new CreateOrderItemModel { ItemUnit = itemUnit };
+
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.ItemUnit);
         }
 
         [Test]
@@ -236,8 +311,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             model.CatalogueItemType = nameof(CatalogueItemType.AdditionalService);
             model.CatalogueSolutionId = catalogueSolutionId;
 
-            validator
-                .ShouldHaveValidationErrorFor(m => m.CatalogueSolutionId, model)
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.CatalogueSolutionId)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.CatalogueSolutionId)}Required");
         }
 
@@ -250,8 +327,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             model.CatalogueItemType = nameof(CatalogueItemType.AdditionalService);
             model.CatalogueSolutionId = new string('1', 15);
 
-            validator
-                .ShouldHaveValidationErrorFor(m => m.CatalogueSolutionId, model)
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.CatalogueSolutionId)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.CatalogueSolutionId)}TooLong");
         }
 
@@ -264,8 +343,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             model.CatalogueItemType = nameof(CatalogueItemType.AdditionalService);
             model.CatalogueSolutionId = new string('1', 14);
 
-            validator
-                .ShouldHaveValidationErrorFor(m => m.CatalogueSolutionId, model)
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.CatalogueSolutionId)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.CatalogueSolutionId)}ValidValue");
         }
 
@@ -278,7 +359,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             model.CatalogueItemType = nameof(CatalogueItemType.AdditionalService);
             model.CatalogueSolutionId = new CatalogueItemId(1, "001").ToString();
 
-            validator.ShouldNotHaveValidationErrorFor(m => m.CatalogueSolutionId, model);
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.CatalogueSolutionId);
         }
 
         [Test]
@@ -292,7 +375,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             model.CatalogueItemType = catalogueItemType;
             model.CatalogueSolutionId = null;
 
-            validator.ShouldNotHaveValidationErrorFor(m => m.CatalogueSolutionId, model);
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.CatalogueSolutionId);
         }
 
         [Test]
@@ -306,8 +391,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             model.CatalogueItemType = catalogueItemType;
             model.ServiceRecipients = null;
 
-            validator
-                .ShouldHaveValidationErrorFor(m => m.ServiceRecipients, model)
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.ServiceRecipients)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.ServiceRecipients)}Required");
         }
 
@@ -323,7 +410,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             model.CatalogueItemType = catalogueItemType;
             model.ServiceRecipients = recipients;
 
-            validator.ShouldNotHaveValidationErrorFor(m => m.ServiceRecipients, model);
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.ServiceRecipients);
         }
 
         [Test]
@@ -336,8 +425,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             model.CatalogueItemType = nameof(CatalogueItemType.Solution);
             model.ServiceRecipients = new List<OrderItemRecipientModel> { recipientModel, recipientModel };
 
-            validator
-                .ShouldHaveValidationErrorFor(m => m.ServiceRecipients, model)
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.ServiceRecipients)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.ServiceRecipients)}ContainsDuplicates");
         }
 
@@ -356,8 +447,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             model.ProvisioningType = provisioningType;
             model.TimeUnit = null;
 
-            validator
-                .ShouldHaveValidationErrorFor(m => m.TimeUnit, model)
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.TimeUnit)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.TimeUnit)}Required");
         }
 
@@ -377,7 +470,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             model.ProvisioningType = provisioningType;
             model.TimeUnit = timeUnit;
 
-            validator.ShouldNotHaveValidationErrorFor(m => m.TimeUnit, model);
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.TimeUnit);
         }
 
         [Test]
@@ -456,8 +551,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             model.ProvisioningType = nameof(ProvisioningType.OnDemand);
             model.EstimationPeriod = estimationPeriod;
 
-            validator
-                .ShouldHaveValidationErrorFor(m => m.EstimationPeriod, model)
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.EstimationPeriod)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.EstimationPeriod)}RequiredIfVariableOnDemand");
         }
 
@@ -470,8 +567,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             model.ProvisioningType = nameof(ProvisioningType.OnDemand);
             model.EstimationPeriod = "InvalidTimeUnit";
 
-            validator
-                .ShouldHaveValidationErrorFor(m => m.EstimationPeriod, model)
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.EstimationPeriod)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.EstimationPeriod)}ValidValue");
         }
 
@@ -486,7 +585,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             model.ProvisioningType = nameof(ProvisioningType.OnDemand);
             model.EstimationPeriod = estimationPeriod;
 
-            validator.ShouldNotHaveValidationErrorFor(m => m.EstimationPeriod, model);
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.EstimationPeriod);
         }
 
         [Test]
@@ -505,7 +606,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             model.ProvisioningType = provisioningType;
             model.EstimationPeriod = estimationPeriod;
 
-            validator.ShouldNotHaveValidationErrorFor(m => m.EstimationPeriod, model);
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.EstimationPeriod);
         }
 
         [Test]
@@ -519,7 +622,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             model.ProvisioningType = provisioningType;
             model.EstimationPeriod = "InvalidTimeUnit";
 
-            validator.ShouldNotHaveValidationErrorFor(m => m.EstimationPeriod, model);
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.EstimationPeriod);
         }
 
         [Test]
@@ -533,8 +638,10 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             model.ProvisioningType = provisioningType;
             model.TimeUnit = null;
 
-            validator
-                .ShouldHaveValidationErrorFor(m => m.TimeUnit, model)
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.TimeUnit)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.TimeUnit)}Required");
         }
 
@@ -550,7 +657,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             model.ProvisioningType = provisioningType;
             model.TimeUnit = timeUnit;
 
-            validator.ShouldNotHaveValidationErrorFor(m => m.TimeUnit, model);
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.TimeUnit);
         }
 
         [Test]
@@ -562,7 +671,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             model.ProvisioningType = nameof(ProvisioningType.OnDemand);
             model.TimeUnit = null;
 
-            validator.ShouldNotHaveValidationErrorFor(m => m.TimeUnit, model);
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.TimeUnit);
         }
 
         [Test]
@@ -570,8 +681,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         public static void Validate_PriceIdIsNull_HasError(
             CreateOrderItemModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.PriceId, null as int?)
+            var model = new CreateOrderItemModel();
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.PriceId)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.PriceId)}Required");
         }
 
@@ -581,7 +696,9 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             CreateOrderItemModel model,
             CreateOrderItemModelValidator validator)
         {
-            validator.ShouldNotHaveValidationErrorFor(m => m.PriceId, model);
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.PriceId);
         }
 
         [Test]
@@ -589,8 +706,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         public static void Validate_PriceIsNull_HasError(
             CreateOrderItemModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.Price, null as decimal?)
+            var model = new CreateOrderItemModel();
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.Price)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.Price)}Required");
         }
 
@@ -599,8 +720,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         public static void Validate_PriceIsLessThanZero_HasError(
             CreateOrderItemModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.Price, -0.01m)
+            var model = new CreateOrderItemModel { Price = -0.01m };
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.Price)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.Price)}GreaterThanOrEqualToZero");
         }
 
@@ -609,17 +734,24 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         public static void Validate_PriceIsMaxPrice_HasError(
             CreateOrderItemModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.Price, CreateOrderItemModelValidator.MaxPrice + 0.001m)
+            var model = new CreateOrderItemModel { Price = CreateOrderItemModelValidator.MaxPrice + 0.001m };
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.Price)
                 .WithErrorMessage($"{nameof(CreateOrderItemModel.Price)}LessThanMax");
         }
 
         [TestCaseSource(nameof(PriceIsValidTestCases))]
         public static void Validate_PriceIsValid_DoesNotHaveError(decimal price)
         {
+            var model = new CreateOrderItemModel { Price = price };
             var validator = new CreateOrderItemModelValidator();
 
-            validator.ShouldNotHaveValidationErrorFor(m => m.Price, price);
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.Price);
         }
 
         private static IEnumerable<ITestCaseData> PriceIsValidTestCases()

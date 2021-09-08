@@ -23,8 +23,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         public static void Validate_NameIsTooLong_HasError(
             OrderItemRecipientModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.Name, new string('A', 257))
+            var model = new OrderItemRecipientModel { Name = new string('A', 257) };
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.Name)
                 .WithErrorMessage($"{nameof(OrderItemRecipientModel.Name)}TooLong");
         }
 
@@ -33,7 +37,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         public static void Validate_NameIsValid_DoesNotHaveError(
             OrderItemRecipientModelValidator validator)
         {
-            validator.ShouldNotHaveValidationErrorFor(m => m.Name, new string('A', 256));
+            var model = new OrderItemRecipientModel { Name = new string('A', 256) };
+
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.Name);
         }
 
         [Test]
@@ -44,8 +52,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             string odsCode,
             OrderItemRecipientModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.OdsCode, odsCode)
+            var model = new OrderItemRecipientModel { OdsCode = odsCode };
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.OdsCode)
                 .WithErrorMessage($"{nameof(OrderItemRecipientModel.OdsCode)}Required");
         }
 
@@ -54,8 +66,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         public static void Validate_OdsCodeIsTooLong_HasError(
             OrderItemRecipientModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.OdsCode, new string('A', 9))
+            var model = new OrderItemRecipientModel { OdsCode = new string('A', 9) };
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.OdsCode)
                 .WithErrorMessage($"{nameof(OrderItemRecipientModel.OdsCode)}TooLong");
         }
 
@@ -64,7 +80,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         public static void Validate_OdsCodeIsValid_DoesNotHaveError(
             OrderItemRecipientModelValidator validator)
         {
-            validator.ShouldNotHaveValidationErrorFor(m => m.OdsCode, new string('A', 8));
+            var model = new OrderItemRecipientModel { OdsCode = new string('A', 8) };
+
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.OdsCode);
         }
 
         [Test]
@@ -72,8 +92,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         public static void Validate_QuantityIsNull_HasError(
             OrderItemRecipientModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.Quantity, (int?)null)
+            var model = new OrderItemRecipientModel();
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.Quantity)
                 .WithErrorMessage($"{nameof(OrderItemRecipientModel.Quantity)}Required");
         }
 
@@ -84,8 +108,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             int quantity,
             OrderItemRecipientModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.Quantity, quantity)
+            var model = new OrderItemRecipientModel { Quantity = quantity };
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.Quantity)
                 .WithErrorMessage($"{nameof(OrderItemRecipientModel.Quantity)}GreaterThanZero");
         }
 
@@ -94,8 +122,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         public static void Validate_QuantityIsMaxInt_HasError(
             OrderItemRecipientModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.Quantity, int.MaxValue)
+            var model = new OrderItemRecipientModel { Quantity = int.MaxValue };
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.Quantity)
                 .WithErrorMessage($"{nameof(OrderItemRecipientModel.Quantity)}LessThanMax");
         }
 
@@ -106,7 +138,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             int quantity,
             OrderItemRecipientModelValidator validator)
         {
-            validator.ShouldNotHaveValidationErrorFor(m => m.Quantity, quantity);
+            var model = new OrderItemRecipientModel { Quantity = quantity };
+
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.Quantity);
         }
     }
 }

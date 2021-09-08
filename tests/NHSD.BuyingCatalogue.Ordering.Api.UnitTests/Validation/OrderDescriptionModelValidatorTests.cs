@@ -26,8 +26,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
             string description,
             OrderDescriptionModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.Description, description)
+            var model = new OrderDescriptionModel { Description = description };
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.Description)
                 .WithErrorMessage($"{nameof(OrderDescriptionModel.Description)}Required");
         }
 
@@ -36,8 +40,12 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         public static void Validate_DescriptionIsTooLong_HasError(
             OrderDescriptionModelValidator validator)
         {
-            validator
-                .ShouldHaveValidationErrorFor(m => m.Description, new string('A', 101))
+            var model = new OrderDescriptionModel { Description = new string('A', 101) };
+
+            var result = validator.TestValidate(model);
+
+            result
+                .ShouldHaveValidationErrorFor(m => m.Description)
                 .WithErrorMessage($"{nameof(OrderDescriptionModel.Description)}TooLong");
         }
 
@@ -46,7 +54,11 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.UnitTests.Validation
         public static void Validate_DescriptionIsValid_DoesNotHaveError(
             OrderDescriptionModelValidator validator)
         {
-            validator.ShouldNotHaveValidationErrorFor(m => m.Description, new string('A', 100));
+            var model = new OrderDescriptionModel { Description = new string('A', 100) };
+
+            var result = validator.TestValidate(model);
+
+            result.ShouldNotHaveValidationErrorFor(m => m.Description);
         }
     }
 }

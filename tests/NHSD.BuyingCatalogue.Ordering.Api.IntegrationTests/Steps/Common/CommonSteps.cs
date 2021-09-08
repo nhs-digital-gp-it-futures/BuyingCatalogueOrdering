@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using FluentAssertions;
 using JetBrains.Annotations;
@@ -21,7 +22,7 @@ namespace NHSD.BuyingCatalogue.Ordering.Api.IntegrationTests.Steps.Common
         public void AResponseIsReturned(int code)
         {
             response.Should().NotBeNull();
-            response.Result.StatusCode.Should().Be(code);
+            response.Result.StatusCode.Should().Be((HttpStatusCode)code);
         }
 
         [Then(@"the response contains the following errors")]
